@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "LIMS.DDD.Service", "LIMS.DDD.Service", "{5160D0A8-BCC4-42F3-8102-6680FB4C4533}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Files", "Solution Files", "{25C25A69-5166-4FE8-B612-26BF5BA8D344}"
+	ProjectSection(SolutionItems) = preProject
+		.dockerignore = .dockerignore
+		.editorconfig = .editorconfig
+		.gitignore = .gitignore
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LIMS.DDD.Service.Domain", "src\LIMS.DDD.Service.Domain\LIMS.DDD.Service.Domain.csproj", "{84FBFE31-7AC3-462A-9B67-CB6887BC21C0}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{84FBFE31-7AC3-462A-9B67-CB6887BC21C0} = {5160D0A8-BCC4-42F3-8102-6680FB4C4533}
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{84FBFE31-7AC3-462A-9B67-CB6887BC21C0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{84FBFE31-7AC3-462A-9B67-CB6887BC21C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{84FBFE31-7AC3-462A-9B67-CB6887BC21C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{84FBFE31-7AC3-462A-9B67-CB6887BC21C0}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
