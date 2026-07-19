@@ -13,7 +13,7 @@ public sealed class StudyTemplate
 
     public Name Name { get; private set; }
 
-    public Description? Description { get; private set; }
+    public Description Description { get; private set; }
 
     public Revision Revision { get; private set; }
 

@@ -12,18 +12,18 @@ public sealed class StudyTemplateParameter
 
     public Name Name { get; private set; }
 
-    public Description? Description { get; private set; }
+    public Description Description { get; private set; }
 
-    public AliasName? AliasName { get; private set; }
+    public AliasName AliasName { get; private set; }
 
-    public ValueRange? ValueRange { get; private set; }
+    public ValueRange ValueRange { get; private set; } = null!;
 
     public static StudyTemplateParameter Create(
         StudyTemplateId studyTemplateId,
         Name name,
-        Description? description,
-        AliasName? aliasName,
-        ValueRange? valueRange)
+        Description description,
+        AliasName aliasName,
+        ValueRange valueRange)
     {
         var studyTemplateParameter = new StudyTemplateParameter
         {
