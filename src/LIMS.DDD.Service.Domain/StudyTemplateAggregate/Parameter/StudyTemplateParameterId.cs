@@ -1,4 +1,4 @@
-﻿namespace LIMS.DDD.Service.Domain.StudyTemplate.Parameter;
+﻿namespace LIMS.DDD.Service.Domain.StudyTemplateAggregate.Parameter;
 
 [StronglyTypedId]
 public readonly partial struct StudyTemplateParameterId;
