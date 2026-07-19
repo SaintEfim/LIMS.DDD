@@ -12,12 +12,12 @@ public sealed class StudyTemplateResult
 
     public string Unit { get; private set; } = string.Empty;
 
-    public ValueRange? ValueRange { get; private set; }
+    public ValueRange ValueRange { get; private set; } = null!;
 
     public static StudyTemplateResult Create(
         StudyTemplateId studyTemplateId,
         string unit,
-        ValueRange? valueRange)
+        ValueRange valueRange)
     {
         var result = new StudyTemplateResult
         {
