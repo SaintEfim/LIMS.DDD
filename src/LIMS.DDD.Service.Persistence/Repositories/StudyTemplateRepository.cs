@@ -18,6 +18,7 @@ public class StudyTemplateRepository : IStudyTemplateRepository
         CancellationToken cancellationToken = default)
     {
         return await _context.StudyTemplates
+            .AsNoTracking()
             .Include(t => t.Parameters)
             .Include(t => t.Results)
             .FirstOrDefaultAsync(t => t.Id == id, cancellationToken);
@@ -27,6 +28,7 @@ public class StudyTemplateRepository : IStudyTemplateRepository
         CancellationToken cancellationToken = default)
     {
         return await _context.StudyTemplates
+            .AsNoTracking()
             .Include(t => t.Parameters)
             .Include(t => t.Results)
             .ToListAsync(cancellationToken);
