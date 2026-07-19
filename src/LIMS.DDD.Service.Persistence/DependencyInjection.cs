@@ -1,7 +1,5 @@
-﻿using LIMS.DDD.Service.Domain.StudyTemplate;
-using LIMS.DDD.Service.Domain.StudyTemplate.Parameter;
-using LIMS.DDD.Service.Domain.StudyTemplate.Result;
-using LIMS.DDD.Service.Persistence.Repositories;
+﻿using System.Reflection;
+using LIMS.DDD.Service.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,9 +12,12 @@ public static class DependencyInjection
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        services.AddScoped<IStudyTemplateRepository, StudyTemplateRepository>();
-        services.AddScoped<IStudyTemplateParameterRepository, StudyTemplateParameterRepository>();
-        services.AddScoped<IStudyTemplateResultRepository, StudyTemplateResultRepository>();
+        var currentAssembly = Assembly.GetExecutingAssembly();
+
+        services.Scan(scan => scan.FromAssemblies(currentAssembly)
+            .AddClasses(classes => classes.AssignableTo(typeof(IRepository<>)))
+            .AsImplementedInterfaces()
+            .WithScopedLifetime());
 
         services.AddDbContext<ApplicationDbContext>(options =>
             options.UseNpgsql(configuration.GetConnectionString("Database")));
