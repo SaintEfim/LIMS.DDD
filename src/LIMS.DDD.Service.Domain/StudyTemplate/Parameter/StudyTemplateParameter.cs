@@ -19,16 +19,15 @@ public sealed class StudyTemplateParameter
     public ValueRange? ValueRange { get; private set; }
 
     public static StudyTemplateParameter Create(
-        StudyTemplateParameterId id,
         StudyTemplateId studyTemplateId,
         Name name,
         Description? description,
-        AliasName aliasName,
-        ValueRange valueRange)
+        AliasName? aliasName,
+        ValueRange? valueRange)
     {
         var studyTemplateParameter = new StudyTemplateParameter
         {
-            Id = id,
+            Id = new StudyTemplateParameterId(Guid.NewGuid()),
             StudyTemplateId = studyTemplateId,
             Name = name,
             Description = description,

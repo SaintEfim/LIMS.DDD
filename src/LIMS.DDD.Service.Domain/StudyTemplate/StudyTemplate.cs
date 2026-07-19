@@ -34,6 +34,7 @@ public sealed class StudyTemplate
     {
         var studyTemplate = new StudyTemplate
         {
+            Id = new StudyTemplateId(Guid.NewGuid()),
             Name = name,
             Description = description,
             Revision = revision
