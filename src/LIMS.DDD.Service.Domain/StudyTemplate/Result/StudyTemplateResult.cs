@@ -1,6 +1,6 @@
 ﻿namespace LIMS.DDD.Service.Domain.StudyTemplate.Result;
 
-public class StudyTemplateResult
+public sealed class StudyTemplateResult
 {
-    
+
 }
