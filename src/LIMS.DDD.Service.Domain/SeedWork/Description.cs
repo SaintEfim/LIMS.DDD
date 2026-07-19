@@ -1,12 +1,12 @@
-﻿namespace LIMS.DDD.Service.Domain.StudyTemplate.Parameter;
+﻿namespace LIMS.DDD.Service.Domain.SeedWork;
 
-public readonly record struct AliasName
+public readonly record struct Description
 {
-    private const int MaxAliasNameLength = 100;
+    private const int MaxDescriptionLength = 1000;
 
     public string Value { get; }
 
-    public AliasName(
+    public Description(
         string value)
     {
         if (string.IsNullOrWhiteSpace(value))
@@ -14,10 +14,10 @@ public readonly record struct AliasName
             throw new ArgumentException("Invalid name.", nameof(value));
         }
 
-        if (value.Length > MaxAliasNameLength)
+        if (value.Length > MaxDescriptionLength)
         {
             throw new ArgumentException(
-                $"AliasName length cannot exceed {MaxAliasNameLength} characters. " +
+                $"Description length cannot exceed {MaxDescriptionLength} characters. " +
                 $"Current length: {value.Length}.", nameof(value));
         }
 

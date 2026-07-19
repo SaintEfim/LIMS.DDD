@@ -11,4 +11,13 @@
     <PackageReference Include="StronglyTypedId" Version="0.2.1"/>
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Update="SeedWork\Description.cs">
+      <Generator>MSBuild:GenerateCodeFromAttributes</Generator>
+    </Compile>
+    <Compile Update="SeedWork\Name.cs">
+      <Generator>MSBuild:GenerateCodeFromAttributes</Generator>
+    </Compile>
+  </ItemGroup>
+
 </Project>
