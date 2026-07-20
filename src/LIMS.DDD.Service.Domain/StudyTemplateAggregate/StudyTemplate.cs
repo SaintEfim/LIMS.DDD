@@ -38,7 +38,6 @@ public sealed class StudyTemplate : IAggregateRoot
     {
         var studyTemplate = new StudyTemplate
         {
-            Id = new StudyTemplateId(Guid.NewGuid()),
             Name = name,
             Description = description,
             Revision = revision
@@ -82,7 +81,7 @@ public sealed class StudyTemplate : IAggregateRoot
             throw new InvalidOperationException("Parameter name must be unique within the template.");
         }
 
-        var parameter = new StudyTemplateParameter(Id, name, description, aliasName, valueRange);
+        var parameter = StudyTemplateParameter.Create(Id, name, description, aliasName, valueRange);
 
         _parameters.Add(parameter);
         return parameter;
@@ -104,7 +103,7 @@ public sealed class StudyTemplate : IAggregateRoot
         string unit,
         ValueRange valueRange)
     {
-        var result = new StudyTemplateResult(Id, unit, valueRange);
+        var result = StudyTemplateResult.Create(Id, unit, valueRange);
         _results.Add(result);
         return result;
     }
