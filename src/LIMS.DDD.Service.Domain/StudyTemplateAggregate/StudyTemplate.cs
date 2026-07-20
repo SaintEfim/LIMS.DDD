@@ -47,6 +47,16 @@ public sealed class StudyTemplate : IAggregateRoot
         return studyTemplate;
     }
 
+    public void UpdatePartial(
+        Name? name,
+        Description? description,
+        Revision? revision)
+    {
+        if (name is not null) Name = name.Value;
+        if (description is not null) Description = description.Value;
+        if (revision is not null) Revision = revision.Value;
+    }
+
     public static StudyTemplate ChangeStatus(
         StudyTemplate studyTemplate,
         Status status)

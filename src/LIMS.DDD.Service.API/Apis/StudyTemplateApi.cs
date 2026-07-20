@@ -37,5 +37,26 @@ public class StudyTemplateModule : ICarterModule
             var studyTemplate = await services.Commands.CreateAsync(createCommand, ct);
             return studyTemplate;
         });
+
+        group.MapPatch("/{id:guid}", async (
+            Guid id,
+            UpdateStudyTemplateCommand updateCommand,
+            [FromServices] StudyTemplateServices services,
+            CancellationToken ct = default) =>
+        {
+            var isUpdated = await services.Commands.UpdateAsync(id, updateCommand, ct);
+
+            return isUpdated ? Results.NoContent() : Results.NotFound();
+        });
+
+        group.MapDelete("/{id:guid}", async (
+            Guid id,
+            [FromServices] StudyTemplateServices services,
+            CancellationToken ct = default) =>
+        {
+            var isDeleted = await services.Commands.DeleteAsync(id, ct);
+
+            return isDeleted ? Results.NoContent() : Results.NotFound();
+        });
     }
 }
