@@ -1,6 +1,7 @@
 ﻿using Carter;
 using LIMS.DDD.Service.API.Apis;
 using LIMS.DDD.Service.API.Dtos;
+using Microsoft.AspNetCore.Mvc;
 
 namespace LIMS.DDD.Service.API.Modules;
 
@@ -13,7 +14,7 @@ public class StudyTemplateModule : ICarterModule
             .WithTags("StudyTemplates");
 
         group.MapGet("/", async (
-            StudyTemplateServices services,
+            [FromServices] StudyTemplateServices services,
             CancellationToken ct = default) =>
         {
             var studyTemplates = await services.Queries.GetAllAsync(ct);
@@ -23,7 +24,7 @@ public class StudyTemplateModule : ICarterModule
 
         group.MapGet("/{id:guid}", async (
             Guid id,
-            StudyTemplateServices services,
+            [FromServices] StudyTemplateServices services,
             CancellationToken ct = default) =>
         {
             var studyTemplate = await services.Queries.GetByIdAsync(id, ct);
