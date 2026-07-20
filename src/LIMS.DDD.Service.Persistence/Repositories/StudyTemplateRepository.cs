@@ -49,8 +49,7 @@ public class StudyTemplateRepository : IStudyTemplateRepository
     }
 
     public void Update(
-        StudyTemplate entity,
-        CancellationToken cancellationToken = default)
+        StudyTemplate entity)
     {
         _context.StudyTemplates.Update(entity);
     }

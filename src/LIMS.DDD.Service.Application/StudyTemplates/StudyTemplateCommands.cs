@@ -18,7 +18,7 @@ public sealed class StudyTemplateCommands(IStudyTemplateRepository repository)
         StudyTemplate studyTemplate,
         CancellationToken cancellationToken = default)
     {
-        repository.Update(studyTemplate, cancellationToken);
+        repository.Update(studyTemplate);
         await repository.SaveChangesAsync(cancellationToken);
     }
 

@@ -19,8 +19,7 @@ public interface IRepository<TEntity>
         TEntity studyTemplate);
 
     void Update(
-        TEntity entity,
-        CancellationToken cancellationToken = default);
+        TEntity entity);
 
     Task<int> SaveChangesAsync(
         CancellationToken cancellationToken = default);
