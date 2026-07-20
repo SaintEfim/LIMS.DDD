@@ -15,6 +15,7 @@ public sealed class StudyTemplateParameter
         AliasName aliasName,
         ValueRange valueRange)
     {
+        Id = new StudyTemplateParameterId(Guid.NewGuid());
         StudyTemplateId = studyTemplateId;
         Name = name;
         Description = description;

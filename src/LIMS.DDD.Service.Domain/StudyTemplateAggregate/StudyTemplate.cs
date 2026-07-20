@@ -38,6 +38,7 @@ public sealed class StudyTemplate : IAggregateRoot
     {
         var studyTemplate = new StudyTemplate
         {
+            Id = new StudyTemplateId(Guid.NewGuid()),
             Name = name,
             Description = description,
             Revision = revision

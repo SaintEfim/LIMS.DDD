@@ -11,6 +11,7 @@ public sealed class StudyTemplateResult
         string unit,
         ValueRange valueRange)
     {
+        Id = new StudyTemplateResultId(Guid.NewGuid());
         StudyTemplateId = studyTemplateId;
         Unit = unit;
         ValueRange = valueRange;
