@@ -13,15 +13,17 @@ public class StudyTemplateRepository : IStudyTemplateRepository
         _context = context;
     }
 
-    public async Task<StudyTemplate?> GetByIdAsync(
+    public async Task<StudyTemplate> GetByIdAsync(
         StudyTemplateId id,
         CancellationToken cancellationToken = default)
     {
-        return await _context.StudyTemplates
+        var studyTemplate = await _context.StudyTemplates
             .AsNoTracking()
             .Include(t => t.Parameters)
             .Include(t => t.Results)
-            .FirstOrDefaultAsync(t => t.Id == id, cancellationToken);
+            .SingleOrDefaultAsync(t => t.Id == id, cancellationToken);
+
+        return studyTemplate ?? throw new KeyNotFoundException("No study template found with id: " + id);
     }
 
     public async Task<ICollection<StudyTemplate>> GetAllAsync(

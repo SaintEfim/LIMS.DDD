@@ -20,5 +20,14 @@ public class StudyTemplateModule : ICarterModule
             return studyTemplates.Select(StudyTemplateDto.FromDomain)
                 .ToList();
         });
+
+        group.MapGet("/{id:guid}", async (
+            Guid id,
+            StudyTemplateServices services,
+            CancellationToken ct = default) =>
+        {
+            var studyTemplate = await services.Queries.GetByIdAsync(id, ct);
+            return StudyTemplateDto.FromDomain(studyTemplate);
+        });
     }
 }

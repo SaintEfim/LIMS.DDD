@@ -4,11 +4,11 @@ namespace LIMS.DDD.Service.Application.StudyTemplates;
 
 public sealed class StudyTemplateQueries(IStudyTemplateRepository repository)
 {
-    public async Task<StudyTemplate?> GetByIdAsync(
-        StudyTemplateId id,
+    public async Task<StudyTemplate> GetByIdAsync(
+        Guid id,
         CancellationToken cancellationToken = default)
     {
-        return await repository.GetByIdAsync(id, cancellationToken);
+        return await repository.GetByIdAsync(new StudyTemplateId(id), cancellationToken);
     }
 
     public async Task<ICollection<StudyTemplate>> GetAllAsync(
