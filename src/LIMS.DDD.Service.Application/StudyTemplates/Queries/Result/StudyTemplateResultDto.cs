@@ -1,6 +1,6 @@
 ﻿using LIMS.DDD.Service.Domain.StudyTemplateAggregate.Result;
 
-namespace LIMS.DDD.Service.API.Dtos;
+namespace LIMS.DDD.Service.Application.StudyTemplates.Queries.Result;
 
 public sealed record StudyTemplateResultDto(Guid Id, string Unit, double? MinValue, double? MaxValue)
 {

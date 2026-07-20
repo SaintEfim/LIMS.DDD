@@ -13,7 +13,7 @@ public class StudyTemplateRepository : IStudyTemplateRepository
         _context = context;
     }
 
-    public async Task<StudyTemplate> GetByIdAsync(
+    public async Task<StudyTemplate?> GetByIdAsync(
         StudyTemplateId id,
         CancellationToken cancellationToken = default)
     {
@@ -23,7 +23,7 @@ public class StudyTemplateRepository : IStudyTemplateRepository
             .Include(t => t.Results)
             .SingleOrDefaultAsync(t => t.Id == id, cancellationToken);
 
-        return studyTemplate ?? throw new KeyNotFoundException("No study template found with id: " + id);
+        return studyTemplate;
     }
 
     public async Task<ICollection<StudyTemplate>> GetAllAsync(

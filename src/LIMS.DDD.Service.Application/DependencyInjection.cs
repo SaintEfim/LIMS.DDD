@@ -1,4 +1,6 @@
 ﻿using LIMS.DDD.Service.Application.StudyTemplates;
+using LIMS.DDD.Service.Application.StudyTemplates.Commands;
+using LIMS.DDD.Service.Application.StudyTemplates.Queries;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace LIMS.DDD.Service.Application;

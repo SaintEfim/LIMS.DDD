@@ -1,9 +1,8 @@
 ﻿using Carter;
-using LIMS.DDD.Service.API.Apis;
-using LIMS.DDD.Service.API.Dtos;
+using LIMS.DDD.Service.Application.StudyTemplates.Commands;
 using Microsoft.AspNetCore.Mvc;
 
-namespace LIMS.DDD.Service.API.Modules;
+namespace LIMS.DDD.Service.API.Apis;
 
 public class StudyTemplateModule : ICarterModule
 {
@@ -18,8 +17,7 @@ public class StudyTemplateModule : ICarterModule
             CancellationToken ct = default) =>
         {
             var studyTemplates = await services.Queries.GetAllAsync(ct);
-            return studyTemplates.Select(StudyTemplateDto.FromDomain)
-                .ToList();
+            return studyTemplates;
         });
 
         group.MapGet("/{id:guid}", async (
@@ -27,8 +25,17 @@ public class StudyTemplateModule : ICarterModule
             [FromServices] StudyTemplateServices services,
             CancellationToken ct = default) =>
         {
-            var studyTemplate = await services.Queries.GetByIdAsync(id, ct);
-            return StudyTemplateDto.FromDomain(studyTemplate);
+            var dto = await services.Queries.GetByIdAsync(id, ct);
+            return dto is not null ? Results.Ok(dto) : Results.NotFound();
+        });
+
+        group.MapPost("/", async (
+            CreateStudyTemplateCommand createCommand,
+            [FromServices] StudyTemplateServices services,
+            CancellationToken ct = default) =>
+        {
+            var studyTemplate = await services.Commands.CreateAsync(createCommand, ct);
+            return studyTemplate;
         });
     }
 }

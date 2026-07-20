@@ -1,4 +1,5 @@
-﻿using LIMS.DDD.Service.Application.StudyTemplates;
+﻿using LIMS.DDD.Service.Application.StudyTemplates.Commands;
+using LIMS.DDD.Service.Application.StudyTemplates.Queries;
 
 namespace LIMS.DDD.Service.API.Apis;
 

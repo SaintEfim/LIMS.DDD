@@ -1,11 +1,13 @@
-﻿using LIMS.DDD.Service.Domain.StudyTemplateAggregate;
+﻿using LIMS.DDD.Service.Application.StudyTemplates.Queries.Parameter;
+using LIMS.DDD.Service.Application.StudyTemplates.Queries.Result;
+using LIMS.DDD.Service.Domain.StudyTemplateAggregate;
 
-namespace LIMS.DDD.Service.API.Dtos;
+namespace LIMS.DDD.Service.Application.StudyTemplates.Queries;
 
 public sealed record StudyTemplateDto(
     Guid Id,
     string Name,
-    string? Description,
+    string Description,
     string Revision,
     string Status,
     List<StudyTemplateResultDto> Results,

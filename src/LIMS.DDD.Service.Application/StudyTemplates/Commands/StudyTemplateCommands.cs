@@ -1,13 +1,17 @@
-﻿using LIMS.DDD.Service.Domain.StudyTemplateAggregate;
+﻿using LIMS.DDD.Service.Domain.SeedWork;
+using LIMS.DDD.Service.Domain.StudyTemplateAggregate;
 
-namespace LIMS.DDD.Service.Application.StudyTemplates;
+namespace LIMS.DDD.Service.Application.StudyTemplates.Commands;
 
 public sealed class StudyTemplateCommands(IStudyTemplateRepository repository)
 {
     public async Task<Guid?> CreateAsync(
-        StudyTemplate studyTemplate,
+        CreateStudyTemplateCommand createCommand,
         CancellationToken cancellationToken = default)
     {
+        var studyTemplate = StudyTemplate.Create(new Name(createCommand.Name),
+            new Description(createCommand.Description), new Revision(createCommand.Revision));
+
         repository.Add(studyTemplate);
         await repository.SaveChangesAsync(cancellationToken);
 
@@ -22,14 +26,17 @@ public sealed class StudyTemplateCommands(IStudyTemplateRepository repository)
         await repository.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task DeleteAsync(
+    public async Task<bool> DeleteAsync(
         StudyTemplateId id,
         CancellationToken cancellationToken = default)
     {
-        var studyTemplate = await repository.GetByIdAsync(id, cancellationToken) ??
-                            throw new KeyNotFoundException($"StudyTemplate with id {id} not found.");
+        var studyTemplate = await repository.GetByIdAsync(id, cancellationToken);
+
+        if (studyTemplate is null) return false;
 
         repository.Remove(studyTemplate);
         await repository.SaveChangesAsync(cancellationToken);
+
+        return true;
     }
 }
