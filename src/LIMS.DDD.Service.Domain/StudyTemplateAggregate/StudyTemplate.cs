@@ -47,18 +47,25 @@ public sealed class StudyTemplate : IAggregateRoot
         return studyTemplate;
     }
 
-    public static StudyTemplate ChangeStatus(
-        StudyTemplate studyTemplate,
-        Status status)
+    public void UpdatePartial(
+        Name? name,
+        Description? description,
+        Revision? revision)
     {
-        if (studyTemplate.Status == status)
-        {
-            throw new InvalidOperationException("Cannot change status of study template.");
-        }
+        if (Status == Status.Completed)
+            throw new InvalidOperationException("Cannot modify a completed study template.");
 
-        studyTemplate.Status = status;
+        if (name is not null) Name = name.Value;
+        if (description is not null) Description = description.Value;
+        if (revision is not null) Revision = revision.Value;
+    }
 
-        return studyTemplate;
+    public void ChangeStatus(
+        Status newStatus)
+    {
+        if (Status == newStatus) return;
+
+        Status = newStatus;
     }
 
     public StudyTemplateParameter AddParameter(
@@ -72,7 +79,7 @@ public sealed class StudyTemplate : IAggregateRoot
             throw new InvalidOperationException("Parameter name must be unique within the template.");
         }
 
-        var parameter = new StudyTemplateParameter(Id, name, description, aliasName, valueRange);
+        var parameter = StudyTemplateParameter.Create(Id, name, description, aliasName, valueRange);
 
         _parameters.Add(parameter);
         return parameter;
@@ -94,7 +101,7 @@ public sealed class StudyTemplate : IAggregateRoot
         string unit,
         ValueRange valueRange)
     {
-        var result = new StudyTemplateResult(Id, unit, valueRange);
+        var result = StudyTemplateResult.Create(Id, unit, valueRange);
         _results.Add(result);
         return result;
     }

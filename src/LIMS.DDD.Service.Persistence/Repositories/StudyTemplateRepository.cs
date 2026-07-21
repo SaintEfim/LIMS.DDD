@@ -13,21 +13,38 @@ public class StudyTemplateRepository : IStudyTemplateRepository
         _context = context;
     }
 
-    public async Task<StudyTemplate?> GetByIdAsync(
+    public async Task<StudyTemplate> GetByIdAsync(
         StudyTemplateId id,
         CancellationToken cancellationToken = default)
     {
-        return await _context.StudyTemplates
+        var studyTemplate = await _context.StudyTemplates
+            .AsSplitQuery()
             .AsNoTracking()
             .Include(t => t.Parameters)
             .Include(t => t.Results)
-            .FirstOrDefaultAsync(t => t.Id == id, cancellationToken);
+            .SingleOrDefaultAsync(t => t.Id == id, cancellationToken);
+
+        return studyTemplate ?? throw new KeyNotFoundException($"StudyTemplate with id {id.Value} not found.");
+    }
+
+    public async Task<StudyTemplate> GetByIdForChangeAsync(
+        StudyTemplateId id,
+        CancellationToken cancellationToken = default)
+    {
+        var studyTemplate = await _context.StudyTemplates
+            .AsSplitQuery()
+            .Include(t => t.Parameters)
+            .Include(t => t.Results)
+            .SingleOrDefaultAsync(t => t.Id == id, cancellationToken);
+
+        return studyTemplate ?? throw new KeyNotFoundException($"StudyTemplate with id {id.Value} not found.");
     }
 
     public async Task<ICollection<StudyTemplate>> GetAllAsync(
         CancellationToken cancellationToken = default)
     {
         return await _context.StudyTemplates
+            .AsSplitQuery()
             .AsNoTracking()
             .Include(t => t.Parameters)
             .Include(t => t.Results)
@@ -47,8 +64,7 @@ public class StudyTemplateRepository : IStudyTemplateRepository
     }
 
     public void Update(
-        StudyTemplate entity,
-        CancellationToken cancellationToken = default)
+        StudyTemplate entity)
     {
         _context.StudyTemplates.Update(entity);
     }

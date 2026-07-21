@@ -6,15 +6,20 @@ public sealed class StudyTemplateResult
     {
     }
 
-    internal StudyTemplateResult(
+    internal static StudyTemplateResult Create(
         StudyTemplateId studyTemplateId,
         string unit,
         ValueRange valueRange)
     {
-        Id = new StudyTemplateResultId(Guid.NewGuid());
-        StudyTemplateId = studyTemplateId;
-        Unit = unit;
-        ValueRange = valueRange;
+        var result = new StudyTemplateResult
+        {
+            Id = new StudyTemplateResultId(Guid.NewGuid()),
+            StudyTemplateId = studyTemplateId,
+            Unit = unit,
+            ValueRange = valueRange
+        };
+
+        return result;
     }
 
     public StudyTemplateResultId Id { get; private set; }

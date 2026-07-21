@@ -1,4 +1,3 @@
-using LIMS.DDD.Service.Domain;
 using LIMS.DDD.Service.Domain.SeedWork;
 using LIMS.DDD.Service.Domain.StudyTemplateAggregate;
 using Microsoft.EntityFrameworkCore;
@@ -32,12 +31,12 @@ public class StudyTemplateConfiguration : IEntityTypeConfiguration<StudyTemplate
         builder.HasMany(x => x.Results)
             .WithOne()
             .HasForeignKey(x => x.StudyTemplateId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasMany(x => x.Parameters)
             .WithOne()
             .HasForeignKey(x => x.StudyTemplateId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasIndex(x => new
             {

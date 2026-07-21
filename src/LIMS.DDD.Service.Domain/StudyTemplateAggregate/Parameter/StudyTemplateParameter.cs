@@ -8,19 +8,24 @@ public sealed class StudyTemplateParameter
     {
     }
 
-    internal StudyTemplateParameter(
+    internal static StudyTemplateParameter Create(
         StudyTemplateId studyTemplateId,
         Name name,
         Description description,
         AliasName aliasName,
         ValueRange valueRange)
     {
-        Id = new StudyTemplateParameterId(Guid.NewGuid());
-        StudyTemplateId = studyTemplateId;
-        Name = name;
-        Description = description;
-        AliasName = aliasName;
-        ValueRange = valueRange;
+        var parameter = new StudyTemplateParameter
+        {
+            Id = new StudyTemplateParameterId(Guid.NewGuid()),
+            StudyTemplateId = studyTemplateId,
+            Name = name,
+            Description = description,
+            AliasName = aliasName,
+            ValueRange = valueRange
+        };
+
+        return parameter;
     }
 
     public StudyTemplateParameterId Id { get; private set; }

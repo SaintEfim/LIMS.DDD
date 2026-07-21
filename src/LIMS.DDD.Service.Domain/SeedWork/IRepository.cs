@@ -8,7 +8,11 @@ public interface IRepository<TEntity>
     Task<ICollection<TEntity>> GetAllAsync(
         CancellationToken cancellationToken = default);
 
-    Task<TEntity?> GetByIdAsync(
+    Task<TEntity> GetByIdAsync(
+        StudyTemplateId id,
+        CancellationToken cancellationToken = default);
+
+    Task<StudyTemplate> GetByIdForChangeAsync(
         StudyTemplateId id,
         CancellationToken cancellationToken = default);
 
@@ -19,8 +23,7 @@ public interface IRepository<TEntity>
         TEntity studyTemplate);
 
     void Update(
-        TEntity entity,
-        CancellationToken cancellationToken = default);
+        TEntity entity);
 
     Task<int> SaveChangesAsync(
         CancellationToken cancellationToken = default);
