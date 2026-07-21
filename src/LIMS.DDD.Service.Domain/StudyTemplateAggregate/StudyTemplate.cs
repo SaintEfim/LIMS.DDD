@@ -52,6 +52,9 @@ public sealed class StudyTemplate : IAggregateRoot
         Description? description,
         Revision? revision)
     {
+        if (Status == Status.Completed)
+            throw new InvalidOperationException("Cannot modify a completed study template.");
+
         if (name is not null) Name = name.Value;
         if (description is not null) Description = description.Value;
         if (revision is not null) Revision = revision.Value;
