@@ -1,4 +1,4 @@
-﻿namespace LIMS.DDD.Service.Application.StudyTemplates.StudyTemplateResult.Queries;
+﻿namespace LIMS.DDD.Service.Application.StudyTemplates.StudyTemplateResults.Queries;
 
 public sealed record StudyTemplateResultDto(Guid Id, string Unit, double? MinValue, double? MaxValue)
 {
