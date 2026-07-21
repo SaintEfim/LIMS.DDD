@@ -15,7 +15,7 @@ public static class DependencyInjection
         services.AddScoped<IStudyTemplateRepository, StudyTemplateRepository>();
 
         services.AddDbContext<ApplicationDbContext>(options =>
-            options.UseNpgsql(configuration.GetConnectionString("Database")));
+            options.UseNpgsql(configuration.GetConnectionString("ServiceDB")));
 
         return services;
     }
