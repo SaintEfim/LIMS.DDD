@@ -27,7 +27,7 @@ public class StudyTemplateRepository : IStudyTemplateRepository
         return studyTemplate;
     }
 
-    public async Task<StudyTemplate?> GetByIdForUpdateAsync(
+    public async Task<StudyTemplate?> GetByIdForChangeAsync(
         StudyTemplateId id,
         CancellationToken cancellationToken = default)
     {

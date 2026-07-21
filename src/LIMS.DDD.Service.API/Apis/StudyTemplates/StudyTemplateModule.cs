@@ -34,8 +34,9 @@ public class StudyTemplateModule : ICarterModule
             [FromServices] StudyTemplateServices services,
             CancellationToken ct = default) =>
         {
-            var studyTemplate = await services.Commands.CreateAsync(createCommand, ct);
-            return studyTemplate;
+            var studyTemplateId = await services.Commands.CreateAsync(createCommand, ct);
+
+            return Results.Created($"/api/studyTemplates", new { id = studyTemplateId });
         });
 
         group.MapPatch("/{id:guid}", async (

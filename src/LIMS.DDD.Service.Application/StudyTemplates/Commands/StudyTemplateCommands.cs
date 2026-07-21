@@ -5,7 +5,7 @@ namespace LIMS.DDD.Service.Application.StudyTemplates.Commands;
 
 public sealed class StudyTemplateCommands(IStudyTemplateRepository repository)
 {
-    public async Task<Guid?> CreateAsync(
+    public async Task<Guid> CreateAsync(
         CreateStudyTemplateCommand createCommand,
         CancellationToken cancellationToken = default)
     {
@@ -63,9 +63,7 @@ public sealed class StudyTemplateCommands(IStudyTemplateRepository repository)
         if (studyTemplate is null) return false;
 
         if (!Enum.TryParse<Status>(command.Status, ignoreCase: true, out var newStatus))
-        {
             throw new ArgumentException($"Invalid status value: {command.Status}");
-        }
 
         studyTemplate.ChangeStatus(newStatus);
 

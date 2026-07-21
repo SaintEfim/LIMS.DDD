@@ -12,12 +12,10 @@ public sealed class StudyTemplateParameterCommands(IStudyTemplateRepository repo
         CancellationToken cancellationToken = default)
     {
         var studyTemplate =
-            await repository.GetByIdForUpdateAsync(new StudyTemplateId(studyTemplateId), cancellationToken);
+            await repository.GetByIdForChangeAsync(new StudyTemplateId(studyTemplateId), cancellationToken);
 
         if (studyTemplate is null)
-        {
             throw new KeyNotFoundException($"StudyTemplate with id {studyTemplateId} not found.");
-        }
 
         var newParameter = studyTemplate.AddParameter(new Name(command.Name), new Description(command.Description),
             new AliasName(command.AliasName), new ValueRange(command.MinValue, command.MaxValue));
@@ -33,12 +31,10 @@ public sealed class StudyTemplateParameterCommands(IStudyTemplateRepository repo
         CancellationToken cancellationToken = default)
     {
         var studyTemplate =
-            await repository.GetByIdForUpdateAsync(new StudyTemplateId(studyTemplateId), cancellationToken);
+            await repository.GetByIdForChangeAsync(new StudyTemplateId(studyTemplateId), cancellationToken);
 
         if (studyTemplate is null)
-        {
             throw new KeyNotFoundException($"StudyTemplate with id {studyTemplateId} not found.");
-        }
 
         try
         {

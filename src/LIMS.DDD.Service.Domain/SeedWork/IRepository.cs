@@ -12,7 +12,7 @@ public interface IRepository<TEntity>
         StudyTemplateId id,
         CancellationToken cancellationToken = default);
 
-    Task<StudyTemplate?> GetByIdForUpdateAsync(
+    Task<StudyTemplate?> GetByIdForChangeAsync(
         StudyTemplateId id,
         CancellationToken cancellationToken = default);
 
