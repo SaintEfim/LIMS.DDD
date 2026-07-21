@@ -18,6 +18,7 @@ public class StudyTemplateRepository : IStudyTemplateRepository
         CancellationToken cancellationToken = default)
     {
         var studyTemplate = await _context.StudyTemplates
+            .AsSplitQuery()
             .AsNoTracking()
             .Include(t => t.Parameters)
             .Include(t => t.Results)
@@ -30,6 +31,7 @@ public class StudyTemplateRepository : IStudyTemplateRepository
         CancellationToken cancellationToken = default)
     {
         return await _context.StudyTemplates
+            .AsSplitQuery()
             .AsNoTracking()
             .Include(t => t.Parameters)
             .Include(t => t.Results)

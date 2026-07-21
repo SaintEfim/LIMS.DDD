@@ -53,4 +53,24 @@ public sealed class StudyTemplateCommands(IStudyTemplateRepository repository)
 
         return true;
     }
+
+    public async Task<bool> ChangeStatusAsync(
+        Guid id,
+        ChangeStatusCommand command,
+        CancellationToken cancellationToken = default)
+    {
+        var studyTemplate = await repository.GetByIdAsync(new StudyTemplateId(id), cancellationToken);
+        if (studyTemplate is null) return false;
+
+        if (!Enum.TryParse<Status>(command.Status, ignoreCase: true, out var newStatus))
+        {
+            throw new ArgumentException($"Invalid status value: {command.Status}");
+        }
+
+        studyTemplate.ChangeStatus(newStatus);
+
+        repository.Update(studyTemplate);
+        await repository.SaveChangesAsync(cancellationToken);
+        return true;
+    }
 }

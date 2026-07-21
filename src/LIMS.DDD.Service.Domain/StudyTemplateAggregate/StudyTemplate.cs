@@ -60,18 +60,12 @@ public sealed class StudyTemplate : IAggregateRoot
         if (revision is not null) Revision = revision.Value;
     }
 
-    public static StudyTemplate ChangeStatus(
-        StudyTemplate studyTemplate,
-        Status status)
+    public void ChangeStatus(
+        Status newStatus)
     {
-        if (studyTemplate.Status == status)
-        {
-            throw new InvalidOperationException("Cannot change status of study template.");
-        }
+        if (Status == newStatus) return;
 
-        studyTemplate.Status = status;
-
-        return studyTemplate;
+        Status = newStatus;
     }
 
     public StudyTemplateParameter AddParameter(

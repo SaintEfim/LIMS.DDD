@@ -58,5 +58,16 @@ public class StudyTemplateModule : ICarterModule
 
             return isDeleted ? Results.NoContent() : Results.NotFound();
         });
+
+        group.MapPost("/{id:guid}/status", async (
+            Guid id,
+            ChangeStatusCommand command,
+            [FromServices] StudyTemplateCommands commands,
+            CancellationToken ct) =>
+        {
+            var isChanged = await commands.ChangeStatusAsync(id, command, ct);
+
+            return isChanged ? Results.NoContent() : Results.NotFound();
+        });
     }
 }
