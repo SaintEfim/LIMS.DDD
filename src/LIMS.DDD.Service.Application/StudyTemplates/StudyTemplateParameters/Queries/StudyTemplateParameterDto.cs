@@ -1,6 +1,6 @@
 ﻿using LIMS.DDD.Service.Domain.StudyTemplateAggregate.Parameter;
 
-namespace LIMS.DDD.Service.Application.StudyTemplates.Queries.Parameter;
+namespace LIMS.DDD.Service.Application.StudyTemplates.StudyTemplateParameters.Queries;
 
 public sealed record StudyTemplateParameterDto(
     Guid Id,
