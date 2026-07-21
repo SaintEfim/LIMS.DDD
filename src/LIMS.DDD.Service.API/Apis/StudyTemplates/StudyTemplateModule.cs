@@ -2,7 +2,7 @@
 using LIMS.DDD.Service.Application.StudyTemplates.Commands;
 using Microsoft.AspNetCore.Mvc;
 
-namespace LIMS.DDD.Service.API.Apis;
+namespace LIMS.DDD.Service.API.Apis.StudyTemplates;
 
 public class StudyTemplateModule : ICarterModule
 {

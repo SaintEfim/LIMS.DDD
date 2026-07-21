@@ -27,6 +27,19 @@ public class StudyTemplateRepository : IStudyTemplateRepository
         return studyTemplate;
     }
 
+    public async Task<StudyTemplate?> GetByIdForUpdateAsync(
+        StudyTemplateId id,
+        CancellationToken cancellationToken = default)
+    {
+        var studyTemplate = await _context.StudyTemplates
+            .AsSplitQuery()
+            .Include(t => t.Parameters)
+            .Include(t => t.Results)
+            .SingleOrDefaultAsync(t => t.Id == id, cancellationToken);
+
+        return studyTemplate;
+    }
+
     public async Task<ICollection<StudyTemplate>> GetAllAsync(
         CancellationToken cancellationToken = default)
     {

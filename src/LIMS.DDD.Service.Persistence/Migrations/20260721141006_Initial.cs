@@ -46,7 +46,7 @@ namespace LIMS.DDD.Service.Persistence.Migrations
                         column: x => x.StudyTemplateId,
                         principalTable: "StudyTemplates",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -67,7 +67,7 @@ namespace LIMS.DDD.Service.Persistence.Migrations
                         column: x => x.StudyTemplateId,
                         principalTable: "StudyTemplates",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(

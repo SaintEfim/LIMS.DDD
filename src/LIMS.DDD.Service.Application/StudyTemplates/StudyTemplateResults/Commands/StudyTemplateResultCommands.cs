@@ -6,22 +6,19 @@ namespace LIMS.DDD.Service.Application.StudyTemplates.StudyTemplateResults.Comma
 public sealed class StudyTemplateResultCommands(IStudyTemplateRepository repository)
 {
     public async Task<Guid> AddStudyTemplateResultAsync(
+        Guid studyTemplateId,
         CreateStudyTemplateResultCommand command,
         CancellationToken cancellationToken = default)
     {
-        var studyTemplateId = new StudyTemplateId(command.StudyTemplateId);
-        var studyTemplate = await repository.GetByIdAsync(studyTemplateId, cancellationToken);
+        var studyTemplate = await repository.GetByIdForUpdateAsync(new StudyTemplateId(studyTemplateId), cancellationToken);
 
         if (studyTemplate is null)
         {
-            throw new KeyNotFoundException($"StudyTemplate with id {studyTemplateId.Value} not found.");
+            throw new KeyNotFoundException($"StudyTemplate with id {studyTemplateId} not found.");
         }
 
-        var newResult = studyTemplate.AddResult(
-            command.Unit,
-            new ValueRange(command.MinValue, command.MaxValue));
+        var newResult = studyTemplate.AddResult(command.Unit, new ValueRange(command.MinValue, command.MaxValue));
 
-        repository.Update(studyTemplate);
         await repository.SaveChangesAsync(cancellationToken);
 
         return newResult.Id.Value;

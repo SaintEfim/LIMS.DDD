@@ -7,21 +7,19 @@ namespace LIMS.DDD.Service.Application.StudyTemplates.StudyTemplateParameters.Co
 public sealed class StudyTemplateParameterCommands(IStudyTemplateRepository repository)
 {
     public async Task<Guid> AddStudyTemplateParameterAsync(
+        Guid studyTemplateId,
         CreateStudyTemplateParameterCommand command,
         CancellationToken cancellationToken = default)
     {
-        var studyTemplateId = new StudyTemplateId(command.StudyTemplateId);
-        var studyTemplate = await repository.GetByIdAsync(studyTemplateId, cancellationToken);
+        var studyTemplate = await repository.GetByIdForUpdateAsync(new StudyTemplateId(studyTemplateId), cancellationToken);
 
         if (studyTemplate is null)
         {
-            throw new KeyNotFoundException($"StudyTemplate with id {studyTemplateId.Value} not found.");
+            throw new KeyNotFoundException($"StudyTemplate with id {studyTemplateId} not found.");
         }
 
         var newParameter = studyTemplate.AddParameter(new Name(command.Name), new Description(command.Description),
             new AliasName(command.AliasName), new ValueRange(command.MinValue, command.MaxValue));
-
-        repository.Update(studyTemplate);
 
         await repository.SaveChangesAsync(cancellationToken);
 
