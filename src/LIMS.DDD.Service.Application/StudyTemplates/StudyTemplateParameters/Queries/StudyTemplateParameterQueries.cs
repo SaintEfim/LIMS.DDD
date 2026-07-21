@@ -14,8 +14,8 @@ public sealed class StudyTemplateParameterQueries(IStudyTemplateRepository repos
             new StudyTemplateId(studyTemplateId),
             cancellationToken);
 
-        var parameter = studyTemplate?.Parameters
-            .FirstOrDefault(p => p.Id == new StudyTemplateParameterId(parameterId));
+        var parameter = studyTemplate.Parameters
+            .SingleOrDefault(p => p.Id == new StudyTemplateParameterId(parameterId));
 
         return parameter != null
             ? StudyTemplateParameterDto.FromDomain(parameter)
@@ -29,11 +29,6 @@ public sealed class StudyTemplateParameterQueries(IStudyTemplateRepository repos
         var studyTemplate = await repository.GetByIdAsync(
             new StudyTemplateId(studyTemplateId),
             cancellationToken);
-
-        if (studyTemplate is null)
-        {
-            return [];
-        }
 
         return studyTemplate.Parameters
             .Select(StudyTemplateParameterDto.FromDomain)

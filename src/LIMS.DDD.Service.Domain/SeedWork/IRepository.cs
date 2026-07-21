@@ -8,11 +8,11 @@ public interface IRepository<TEntity>
     Task<ICollection<TEntity>> GetAllAsync(
         CancellationToken cancellationToken = default);
 
-    Task<TEntity?> GetByIdAsync(
+    Task<TEntity> GetByIdAsync(
         StudyTemplateId id,
         CancellationToken cancellationToken = default);
 
-    Task<StudyTemplate?> GetByIdForChangeAsync(
+    Task<StudyTemplate> GetByIdForChangeAsync(
         StudyTemplateId id,
         CancellationToken cancellationToken = default);
 

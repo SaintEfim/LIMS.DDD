@@ -45,9 +45,9 @@ public class StudyTemplateModule : ICarterModule
             [FromServices] StudyTemplateServices services,
             CancellationToken ct = default) =>
         {
-            var isUpdated = await services.Commands.UpdateAsync(id, updateCommand, ct);
+            await services.Commands.UpdateAsync(id, updateCommand, ct);
 
-            return isUpdated ? Results.NoContent() : Results.NotFound();
+            return Results.NoContent();
         });
 
         group.MapDelete("/{id:guid}", async (
@@ -55,9 +55,9 @@ public class StudyTemplateModule : ICarterModule
             [FromServices] StudyTemplateServices services,
             CancellationToken ct = default) =>
         {
-            var isDeleted = await services.Commands.DeleteAsync(id, ct);
+            await services.Commands.DeleteAsync(id, ct);
 
-            return isDeleted ? Results.NoContent() : Results.NotFound();
+            return Results.NoContent();
         });
 
         group.MapPost("/{id:guid}/status", async (
@@ -66,9 +66,9 @@ public class StudyTemplateModule : ICarterModule
             [FromServices] StudyTemplateCommands commands,
             CancellationToken ct) =>
         {
-            var isChanged = await commands.ChangeStatusAsync(id, command, ct);
+            await commands.ChangeStatusAsync(id, command, ct);
 
-            return isChanged ? Results.NoContent() : Results.NotFound();
+            return Results.NoContent();
         });
     }
 }

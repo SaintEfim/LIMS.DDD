@@ -49,8 +49,8 @@ public class StudyTemplateParameterModule : ICarterModule
             [FromServices] StudyTemplateParameterServices services,
             CancellationToken ct = default) =>
         {
-            var isRemoved = await services.Commands.RemoveStudyTemplateParameterAsync(studyTemplateId, parameterId, ct);
-            return isRemoved ? Results.NoContent() : Results.NotFound();
+            await services.Commands.RemoveStudyTemplateParameterAsync(studyTemplateId, parameterId, ct);
+            return Results.NoContent();
         });
     }
 }

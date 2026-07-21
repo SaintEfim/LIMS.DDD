@@ -18,7 +18,7 @@ public sealed class StudyTemplateCommands(IStudyTemplateRepository repository)
         return studyTemplate.Id.Value;
     }
 
-    public async Task<bool> UpdateAsync(
+    public async Task UpdateAsync(
         Guid id,
         UpdateStudyTemplateCommand updateCommand,
         CancellationToken cancellationToken = default)
@@ -26,7 +26,8 @@ public sealed class StudyTemplateCommands(IStudyTemplateRepository repository)
         var studyTemplateId = new StudyTemplateId(id);
         var studyTemplate = await repository.GetByIdAsync(studyTemplateId, cancellationToken);
 
-        if (studyTemplate is null) return false;
+        if (studyTemplate is null)
+            throw new KeyNotFoundException($"StudyTemplate with id {studyTemplateId} not found.");
 
         Name? name = updateCommand.Name is not null ? new Name(updateCommand.Name) : null;
         Description? desc = updateCommand.Description is not null ? new Description(updateCommand.Description) : null;
@@ -36,31 +37,24 @@ public sealed class StudyTemplateCommands(IStudyTemplateRepository repository)
 
         repository.Update(studyTemplate);
         await repository.SaveChangesAsync(cancellationToken);
-
-        return true;
     }
 
-    public async Task<bool> DeleteAsync(
+    public async Task DeleteAsync(
         Guid id,
         CancellationToken cancellationToken = default)
     {
         var studyTemplate = await repository.GetByIdAsync(new StudyTemplateId(id), cancellationToken);
 
-        if (studyTemplate is null) return false;
-
         repository.Remove(studyTemplate);
         await repository.SaveChangesAsync(cancellationToken);
-
-        return true;
     }
 
-    public async Task<bool> ChangeStatusAsync(
+    public async Task ChangeStatusAsync(
         Guid id,
         ChangeStatusCommand command,
         CancellationToken cancellationToken = default)
     {
         var studyTemplate = await repository.GetByIdAsync(new StudyTemplateId(id), cancellationToken);
-        if (studyTemplate is null) return false;
 
         if (!Enum.TryParse<Status>(command.Status, ignoreCase: true, out var newStatus))
             throw new ArgumentException($"Invalid status value: {command.Status}");
@@ -69,6 +63,5 @@ public sealed class StudyTemplateCommands(IStudyTemplateRepository repository)
 
         repository.Update(studyTemplate);
         await repository.SaveChangesAsync(cancellationToken);
-        return true;
     }
 }

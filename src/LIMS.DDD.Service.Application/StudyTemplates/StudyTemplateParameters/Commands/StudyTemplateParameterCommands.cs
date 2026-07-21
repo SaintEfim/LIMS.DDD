@@ -14,9 +14,6 @@ public sealed class StudyTemplateParameterCommands(IStudyTemplateRepository repo
         var studyTemplate =
             await repository.GetByIdForChangeAsync(new StudyTemplateId(studyTemplateId), cancellationToken);
 
-        if (studyTemplate is null)
-            throw new KeyNotFoundException($"StudyTemplate with id {studyTemplateId} not found.");
-
         var newParameter = studyTemplate.AddParameter(new Name(command.Name), new Description(command.Description),
             new AliasName(command.AliasName), new ValueRange(command.MinValue, command.MaxValue));
 
@@ -25,7 +22,7 @@ public sealed class StudyTemplateParameterCommands(IStudyTemplateRepository repo
         return newParameter.Id.Value;
     }
 
-    public async Task<bool> RemoveStudyTemplateParameterAsync(
+    public async Task RemoveStudyTemplateParameterAsync(
         Guid studyTemplateId,
         Guid parameterId,
         CancellationToken cancellationToken = default)
@@ -33,20 +30,8 @@ public sealed class StudyTemplateParameterCommands(IStudyTemplateRepository repo
         var studyTemplate =
             await repository.GetByIdForChangeAsync(new StudyTemplateId(studyTemplateId), cancellationToken);
 
-        if (studyTemplate is null)
-            throw new KeyNotFoundException($"StudyTemplate with id {studyTemplateId} not found.");
-
-        try
-        {
-            studyTemplate.RemoveParameter(new StudyTemplateParameterId(parameterId));
-        }
-        catch (InvalidOperationException)
-        {
-            return false;
-        }
+        studyTemplate.RemoveParameter(new StudyTemplateParameterId(parameterId));
 
         await repository.SaveChangesAsync(cancellationToken);
-
-        return true;
     }
 }

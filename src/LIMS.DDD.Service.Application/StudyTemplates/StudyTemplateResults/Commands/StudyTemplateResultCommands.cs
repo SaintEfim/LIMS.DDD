@@ -13,11 +13,6 @@ public sealed class StudyTemplateResultCommands(IStudyTemplateRepository reposit
         var studyTemplate =
             await repository.GetByIdForChangeAsync(new StudyTemplateId(studyTemplateId), cancellationToken);
 
-        if (studyTemplate is null)
-        {
-            throw new KeyNotFoundException($"StudyTemplate with id {studyTemplateId} not found.");
-        }
-
         var newResult = studyTemplate.AddResult(command.Unit, new ValueRange(command.MinValue, command.MaxValue));
 
         await repository.SaveChangesAsync(cancellationToken);
