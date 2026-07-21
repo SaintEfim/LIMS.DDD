@@ -10,7 +10,8 @@ public sealed class StudyTemplateResultCommands(IStudyTemplateRepository reposit
         CreateStudyTemplateResultCommand command,
         CancellationToken cancellationToken = default)
     {
-        var studyTemplate = await repository.GetByIdForUpdateAsync(new StudyTemplateId(studyTemplateId), cancellationToken);
+        var studyTemplate =
+            await repository.GetByIdForUpdateAsync(new StudyTemplateId(studyTemplateId), cancellationToken);
 
         if (studyTemplate is null)
         {
@@ -29,7 +30,8 @@ public sealed class StudyTemplateResultCommands(IStudyTemplateRepository reposit
         Guid resultId,
         CancellationToken cancellationToken = default)
     {
-        var studyTemplate = await repository.GetByIdAsync(new StudyTemplateId(studyTemplateId), cancellationToken);
+        var studyTemplate =
+            await repository.GetByIdForUpdateAsync(new StudyTemplateId(studyTemplateId), cancellationToken);
 
         if (studyTemplate is null)
         {
@@ -45,7 +47,6 @@ public sealed class StudyTemplateResultCommands(IStudyTemplateRepository reposit
             return false;
         }
 
-        repository.Update(studyTemplate);
         await repository.SaveChangesAsync(cancellationToken);
 
         return true;
