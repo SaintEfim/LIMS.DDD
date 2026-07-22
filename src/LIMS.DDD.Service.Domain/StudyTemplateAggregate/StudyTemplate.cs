@@ -98,10 +98,17 @@ public sealed class StudyTemplate : IAggregateRoot
     }
 
     public StudyTemplateResult AddResult(
+        string resultInstance,
         string unit,
         ValueRange valueRange)
     {
-        var result = StudyTemplateResult.Create(Id, unit, valueRange);
+        var existsResult = _results.Any(x => x.ResultInstance == resultInstance && x.Unit == unit);
+        if (existsResult)
+        {
+            throw new InvalidOperationException("Result instance already exists.");
+        }
+
+        var result = StudyTemplateResult.Create(Id, resultInstance, unit, valueRange);
         _results.Add(result);
         return result;
     }
