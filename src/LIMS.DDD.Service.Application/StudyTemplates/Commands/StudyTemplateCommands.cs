@@ -33,7 +33,7 @@ public sealed class StudyTemplateCommands(IStudyTemplateRepository repository)
         Description? desc = updateCommand.Description is not null ? new Description(updateCommand.Description) : null;
         Revision? rev = updateCommand.Revision is not null ? new Revision(updateCommand.Revision) : null;
 
-        studyTemplate.UpdatePartial(name, desc, rev);
+        studyTemplate.Update(name, desc, rev);
 
         repository.Update(studyTemplate);
         await repository.SaveChangesAsync(cancellationToken);

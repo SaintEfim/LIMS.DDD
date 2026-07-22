@@ -47,7 +47,7 @@ public sealed class StudyTemplate : IAggregateRoot
         return studyTemplate;
     }
 
-    public void UpdatePartial(
+    public void Update(
         Name? name,
         Description? description,
         Revision? revision)
