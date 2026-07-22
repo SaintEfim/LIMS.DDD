@@ -13,7 +13,8 @@ public sealed class StudyTemplateResultCommands(IStudyTemplateRepository reposit
         var studyTemplate =
             await repository.GetByIdForChangeAsync(new StudyTemplateId(studyTemplateId), cancellationToken);
 
-        var newResult = studyTemplate.AddResult(command.Unit, new ValueRange(command.MinValue, command.MaxValue));
+        var newResult = studyTemplate.AddResult(command.ResultInstance, command.Unit,
+            new ValueRange(command.MinValue, command.MaxValue));
 
         await repository.SaveChangesAsync(cancellationToken);
 

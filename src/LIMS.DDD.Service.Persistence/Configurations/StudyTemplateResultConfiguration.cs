@@ -27,5 +27,12 @@ public class StudyTemplateResultConfiguration : IEntityTypeConfiguration<StudyTe
             vr.Property(p => p.MaxValue);
             vr.Property(p => p.MinValue);
         });
+
+        builder.HasIndex(x => new
+            {
+                x.Unit,
+                x.ResultInstance
+            })
+            .IsUnique();
     }
 }

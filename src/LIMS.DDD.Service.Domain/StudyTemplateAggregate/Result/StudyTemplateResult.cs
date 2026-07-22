@@ -8,6 +8,7 @@ public sealed class StudyTemplateResult
 
     internal static StudyTemplateResult Create(
         StudyTemplateId studyTemplateId,
+        string resultInstance,
         string unit,
         ValueRange valueRange)
     {
@@ -15,12 +16,15 @@ public sealed class StudyTemplateResult
         {
             Id = new StudyTemplateResultId(Guid.NewGuid()),
             StudyTemplateId = studyTemplateId,
+            ResultInstance = resultInstance,
             Unit = unit,
             ValueRange = valueRange
         };
 
         return result;
     }
+
+    public string ResultInstance { get; private set; } = string.Empty;
 
     public StudyTemplateResultId Id { get; private set; }
 
