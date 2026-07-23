@@ -1,4 +1,4 @@
-﻿namespace LIMS.DDD.Service.Domain.StudyTemplateAggregate.Result;
+﻿namespace LIMS.DDD.Service.Domain.StudyTemplateAggregate.StudyTemplateResults;
 
 public sealed class StudyTemplateResult
 {

@@ -1,3 +1,3 @@
-﻿namespace LIMS.DDD.Service.Domain.Seedwork;
+﻿namespace LIMS.DDD.Service.Domain.SeedWork;
 
 public interface IAggregateRoot;
