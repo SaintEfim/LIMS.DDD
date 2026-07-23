@@ -11,21 +11,23 @@ public sealed class StudyTemplateCommands(IStudyTemplateRepository repository)
         CancellationToken cancellationToken = default)
     {
         var studyTemplate = StudyTemplate.Create(new Name(createCommand.Name),
-                new Description(createCommand.Description), new Revision(createCommand.Revision))
-            .Bind(template =>
-            {
-                repository.Add(template);
-                //await repository.SaveChangesAsync(cancellationToken);
-            });
+            new Description(createCommand.Description), new Revision(createCommand.Revision));
 
         return await studyTemplate.OnSuccess(async x =>
         {
-            repository.Add(x);
-            await repository.SaveChangesAsync(cancellationToken);
+            try
+            {
+                repository.Add(x);
+                await repository.SaveChangesAsync(cancellationToken);
+            }
+            catch (Exception e)
+            {
+                Result<StudyTemplate, Exception>.Failure(e);
+            }
         });
     }
 
-    public async Task UpdateAsync(
+    public async Task<Result<Exception>> UpdateAsync(
         Guid id,
         UpdateStudyTemplateCommand updateCommand,
         CancellationToken cancellationToken = default)
@@ -34,26 +36,41 @@ public sealed class StudyTemplateCommands(IStudyTemplateRepository repository)
         var studyTemplate = await repository.GetByIdAsync(studyTemplateId, cancellationToken);
 
         if (studyTemplate is null)
-            throw new KeyNotFoundException($"StudyTemplate with id {studyTemplateId} not found.");
+            return Result<Exception>.Failure(new KeyNotFoundException($"StudyTemplate with id {id} not found."));
 
         Name? name = updateCommand.Name is not null ? new Name(updateCommand.Name) : null;
         Description? desc = updateCommand.Description is not null ? new Description(updateCommand.Description) : null;
         Revision? rev = updateCommand.Revision is not null ? new Revision(updateCommand.Revision) : null;
 
-        studyTemplate.UpdatePartial(name, desc, rev);
+        studyTemplate.UpdatePartial(name, desc, rev)
+            .OnFailure(x => Result<Exception>.Failure(x));
 
-        repository.Update(studyTemplate);
-        await repository.SaveChangesAsync(cancellationToken);
+        try
+        {
+            repository.Update(studyTemplate);
+            await repository.SaveChangesAsync(cancellationToken);
+        }
+        catch (Exception e)
+        {
+            Result<StudyTemplate, Exception>.Failure(e);
+        }
+
+        return Result<Exception>.Success();
     }
 
-    public async Task DeleteAsync(
+    public async Task<Result<Exception>> DeleteAsync(
         Guid id,
         CancellationToken cancellationToken = default)
     {
         var studyTemplate = await repository.GetByIdAsync(new StudyTemplateId(id), cancellationToken);
 
+        if (studyTemplate is null)
+            return Result<Exception>.Failure(new KeyNotFoundException($"StudyTemplate with id {id} not found."));
+
         repository.Remove(studyTemplate);
         await repository.SaveChangesAsync(cancellationToken);
+
+        return Result<Exception>.Success();
     }
 
     public async Task ChangeStatusAsync(

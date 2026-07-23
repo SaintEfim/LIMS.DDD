@@ -45,20 +45,22 @@ public sealed class StudyTemplate : IAggregateRoot
             Revision = revision
         };
 
-        return new Result<StudyTemplate, Exception>.Success(studyTemplate);
+        return Result<StudyTemplate, Exception>.Success(studyTemplate);
     }
 
-    public void UpdatePartial(
+    public Result<Exception> UpdatePartial(
         Name? name,
         Description? description,
         Revision? revision)
     {
         if (Status == Status.Completed)
-            throw new InvalidOperationException("Cannot modify a completed study template.");
+            return Result< Exception>.Failure(new InvalidOperationException("Cannot modify a completed study template."));
 
         if (name is not null) Name = name.Value;
         if (description is not null) Description = description.Value;
         if (revision is not null) Revision = revision.Value;
+
+        return Result<Exception>.Success();
     }
 
     public void ChangeStatus(
