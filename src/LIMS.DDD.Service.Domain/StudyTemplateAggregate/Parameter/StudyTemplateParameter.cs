@@ -1,4 +1,6 @@
-﻿namespace LIMS.DDD.Service.Domain.StudyTemplateAggregate.StudyTemplateParameters;
+﻿using LIMS.DDD.Service.Domain.SeedWork;
+
+namespace LIMS.DDD.Service.Domain.StudyTemplateAggregate.Parameter;
 
 public sealed class StudyTemplateParameter
 {

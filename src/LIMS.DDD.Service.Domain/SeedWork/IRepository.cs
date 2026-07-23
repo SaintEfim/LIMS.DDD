@@ -1,9 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-using LIMS.DDD.Service.Domain.StudyTemplateAggregate;
+﻿using LIMS.DDD.Service.Domain.StudyTemplateAggregate;
 
-namespace LIMS.DDD.Service.Domain.SeedWork;
+namespace LIMS.DDD.Service.Domain.Seedwork;
 
 public interface IRepository<TEntity>
     where TEntity : IAggregateRoot

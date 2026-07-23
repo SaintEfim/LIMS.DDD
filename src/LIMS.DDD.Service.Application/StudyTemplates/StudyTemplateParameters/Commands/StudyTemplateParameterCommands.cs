@@ -1,6 +1,6 @@
-﻿using LIMS.DDD.Service.Domain;
+﻿using LIMS.DDD.Service.Domain.SeedWork;
 using LIMS.DDD.Service.Domain.StudyTemplateAggregate;
-using LIMS.DDD.Service.Domain.StudyTemplateAggregate.StudyTemplateParameters;
+using LIMS.DDD.Service.Domain.StudyTemplateAggregate.Parameter;
 
 namespace LIMS.DDD.Service.Application.StudyTemplates.StudyTemplateParameters.Commands;
 

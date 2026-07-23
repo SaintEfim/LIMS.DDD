@@ -1,4 +1,4 @@
-﻿using LIMS.DDD.Service.Domain.SeedWork;
+﻿using LIMS.DDD.Service.Domain.Seedwork;
 
 namespace LIMS.DDD.Service.Domain.StudyTemplateAggregate;
 
