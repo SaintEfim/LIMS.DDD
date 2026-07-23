@@ -1,9 +1,10 @@
-﻿using LIMS.DDD.Service.Domain.Seedwork;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using LIMS.DDD.Service.Domain.SeedWork;
-using LIMS.DDD.Service.Domain.StudyTemplateAggregate.Parameter;
-using LIMS.DDD.Service.Domain.StudyTemplateAggregate.Result;
-using StudyTemplateParameterId = LIMS.DDD.Service.Domain.StudyTemplateAggregate.Parameter.StudyTemplateParameterId;
-using StudyTemplateResultId = LIMS.DDD.Service.Domain.StudyTemplateAggregate.Result.StudyTemplateResultId;
+using LIMS.DDD.Service.Domain.SeedWork.Result;
+using LIMS.DDD.Service.Domain.StudyTemplateAggregate.StudyTemplateParameters;
+using LIMS.DDD.Service.Domain.StudyTemplateAggregate.StudyTemplateResults;
 
 namespace LIMS.DDD.Service.Domain.StudyTemplateAggregate;
 
@@ -31,7 +32,7 @@ public sealed class StudyTemplate : IAggregateRoot
 
     private readonly List<StudyTemplateParameter> _parameters = [];
 
-    public static StudyTemplate Create(
+    public static Result<StudyTemplate, Exception> Create(
         Name name,
         Description description,
         Revision revision)
@@ -44,10 +45,10 @@ public sealed class StudyTemplate : IAggregateRoot
             Revision = revision
         };
 
-        return studyTemplate;
+        return new Result<StudyTemplate, Exception>.Success(studyTemplate);
     }
 
-    public void Update(
+    public void UpdatePartial(
         Name? name,
         Description? description,
         Revision? revision)
@@ -97,7 +98,7 @@ public sealed class StudyTemplate : IAggregateRoot
         _parameters.Remove(parameter);
     }
 
-    public StudyTemplateResult AddResult(
+    public StudyTemplateResults.StudyTemplateResult AddResult(
         string resultInstance,
         string unit,
         ValueRange valueRange)
@@ -108,7 +109,7 @@ public sealed class StudyTemplate : IAggregateRoot
             throw new InvalidOperationException("Result instance already exists.");
         }
 
-        var result = StudyTemplateResult.Create(Id, resultInstance, unit, valueRange);
+        var result = StudyTemplateResults.StudyTemplateResult.Create(Id, resultInstance, unit, valueRange);
         _results.Add(result);
         return result;
     }
