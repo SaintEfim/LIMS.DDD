@@ -1,4 +1,6 @@
-﻿namespace LIMS.DDD.Service.Domain.SeedWork;
+﻿using System;
+
+namespace LIMS.DDD.Service.Domain;
 
 public readonly record struct Name
 {

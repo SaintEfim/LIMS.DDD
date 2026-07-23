@@ -1,5 +1,5 @@
 ﻿using LIMS.DDD.Service.Domain.StudyTemplateAggregate;
-using LIMS.DDD.Service.Domain.StudyTemplateAggregate.Parameter;
+using LIMS.DDD.Service.Domain.StudyTemplateAggregate.StudyTemplateParameters;
 
 namespace LIMS.DDD.Service.Application.StudyTemplates.StudyTemplateParameters.Queries;
 
