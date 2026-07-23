@@ -1,5 +1,5 @@
 using LIMS.DDD.Service.Domain.StudyTemplateAggregate;
-using LIMS.DDD.Service.Domain.StudyTemplateAggregate.StudyTemplateResults;
+using LIMS.DDD.Service.Domain.StudyTemplateAggregate.Result;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

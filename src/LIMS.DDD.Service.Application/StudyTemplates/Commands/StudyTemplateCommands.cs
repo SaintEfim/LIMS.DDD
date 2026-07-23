@@ -1,28 +1,21 @@
-﻿using LIMS.DDD.Service.Domain;
-using LIMS.DDD.Service.Domain.SeedWork.Result;
+﻿using LIMS.DDD.Service.Domain.SeedWork;
 using LIMS.DDD.Service.Domain.StudyTemplateAggregate;
 
 namespace LIMS.DDD.Service.Application.StudyTemplates.Commands;
 
 public sealed class StudyTemplateCommands(IStudyTemplateRepository repository)
 {
-    public async Task<Result<StudyTemplate, Exception>> CreateAsync(
+    public async Task<Guid> CreateAsync(
         CreateStudyTemplateCommand createCommand,
         CancellationToken cancellationToken = default)
     {
         var studyTemplate = StudyTemplate.Create(new Name(createCommand.Name),
-                new Description(createCommand.Description), new Revision(createCommand.Revision))
-            .Bind(template =>
-            {
-                repository.Add(template);
-                //await repository.SaveChangesAsync(cancellationToken);
-            });
+            new Description(createCommand.Description), new Revision(createCommand.Revision));
 
-        return await studyTemplate.OnSuccess(async x =>
-        {
-            repository.Add(x);
-            await repository.SaveChangesAsync(cancellationToken);
-        });
+        repository.Add(studyTemplate);
+        await repository.SaveChangesAsync(cancellationToken);
+
+        return studyTemplate.Id.Value;
     }
 
     public async Task UpdateAsync(
@@ -40,7 +33,7 @@ public sealed class StudyTemplateCommands(IStudyTemplateRepository repository)
         Description? desc = updateCommand.Description is not null ? new Description(updateCommand.Description) : null;
         Revision? rev = updateCommand.Revision is not null ? new Revision(updateCommand.Revision) : null;
 
-        studyTemplate.UpdatePartial(name, desc, rev);
+        studyTemplate.Update(name, desc, rev);
 
         repository.Update(studyTemplate);
         await repository.SaveChangesAsync(cancellationToken);
