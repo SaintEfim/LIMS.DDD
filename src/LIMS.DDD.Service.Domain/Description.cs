@@ -1,21 +1,30 @@
-﻿namespace LIMS.DDD.Service.Domain;
+﻿using LIMS.DDD.Service.Domain.SeedWork.Result;
+
+namespace LIMS.DDD.Service.Domain;
 
 public readonly record struct Description
 {
     private const int MaxDescriptionLength = 1000;
 
-    public string Value { get; }
+    public string? Value { get; }
 
-    public Description(
+    private Description(
+        string? value) =>
+        Value = value;
+
+    public static Result<Description, Exception> Create(
         string? value)
     {
-        Value = string.IsNullOrWhiteSpace(value) ? string.Empty : value.Trim();
+        var descriptionValue = string.IsNullOrWhiteSpace(value) ? string.Empty : value.Trim();
 
-        if (Value.Length > MaxDescriptionLength)
+        if (descriptionValue.Length > MaxDescriptionLength)
         {
             throw new ArgumentException(
                 $"Description length cannot exceed {MaxDescriptionLength} characters. " +
-                $"Current length: {Value.Length}.", nameof(value));
+                $"Current length: {descriptionValue.Length}.", nameof(value));
         }
+
+        var description = new Description(descriptionValue);
+        return Result<Description, Exception>.Success(description);
     }
 }

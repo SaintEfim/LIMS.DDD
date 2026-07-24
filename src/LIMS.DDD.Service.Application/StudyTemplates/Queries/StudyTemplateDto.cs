@@ -7,7 +7,7 @@ namespace LIMS.DDD.Service.Application.StudyTemplates.Queries;
 public sealed record StudyTemplateDto(
     Guid Id,
     string Name,
-    string Description,
+    string? Description,
     string Revision,
     string Status,
     List<StudyTemplateResultDto> Results,

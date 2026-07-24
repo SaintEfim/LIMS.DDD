@@ -10,8 +10,25 @@ public sealed class StudyTemplateCommands(IStudyTemplateRepository repository)
         CreateStudyTemplateCommand createCommand,
         CancellationToken cancellationToken = default)
     {
-        var createResult = StudyTemplate.Create(new Name(createCommand.Name),
-            new Description(createCommand.Description), new Revision(createCommand.Revision));
+        var nameResult = Name.Create(createCommand.Name);
+        if (nameResult is { IsFailure: true, Error: not null })
+        {
+            return Result<StudyTemplate, Exception>.Failure(nameResult.Error);
+        }
+
+        var descriptionResult = Description.Create(createCommand.Description);
+        if (descriptionResult is { IsFailure: true, Error: not null })
+        {
+            return Result<StudyTemplate, Exception>.Failure(descriptionResult.Error);
+        }
+
+        var revisionResult = Revision.Create(createCommand.Description);
+        if (revisionResult is { IsFailure: true, Error: not null })
+        {
+            return Result<StudyTemplate, Exception>.Failure(revisionResult.Error);
+        }
+
+        var createResult = StudyTemplate.Create(nameResult.Value, descriptionResult.Value, revisionResult.Value);
 
         return await createResult.Bind(async template =>
         {
@@ -40,11 +57,46 @@ public sealed class StudyTemplateCommands(IStudyTemplateRepository repository)
         if (studyTemplate is null)
             return Result<Exception>.Failure(new KeyNotFoundException($"StudyTemplate with id {id} not found."));
 
-        Name? name = updateCommand.Name is not null ? new Name(updateCommand.Name) : null;
-        Description? desc = updateCommand.Description is not null ? new Description(updateCommand.Description) : null;
-        Revision? rev = updateCommand.Revision is not null ? new Revision(updateCommand.Revision) : null;
+        Name? name = null;
+        if (updateCommand.Name is not null)
+        {
+            var nameResult = Name.Create(updateCommand.Name);
 
-        var updateResult = studyTemplate.UpdatePartial(name, desc, rev);
+            if (nameResult is { IsFailure: true, Error: not null })
+            {
+                return Result<Exception>.Failure(nameResult.Error);
+            }
+
+            name = nameResult.Value;
+        }
+
+        Description? description = null;
+        if (updateCommand.Description is not null)
+        {
+            var descriptionResult = Description.Create(updateCommand.Name);
+
+            if (descriptionResult is { IsFailure: true, Error: not null })
+            {
+                return Result<Exception>.Failure(descriptionResult.Error);
+            }
+
+            description = descriptionResult.Value;
+        }
+
+        Revision? rev = null;
+        if (updateCommand.Revision is not null)
+        {
+            var revisionResult = Revision.Create(updateCommand.Revision);
+
+            if (revisionResult is { IsFailure: true, Error: not null })
+            {
+                return Result<Exception>.Failure(revisionResult.Error);
+            }
+
+            rev = revisionResult.Value;
+        }
+
+        var updateResult = studyTemplate.UpdatePartial(name, description, rev);
         if (updateResult.IsFailure) return updateResult;
 
         try

@@ -1,4 +1,6 @@
-﻿namespace LIMS.DDD.Service.Domain;
+﻿using LIMS.DDD.Service.Domain.SeedWork.Result;
+
+namespace LIMS.DDD.Service.Domain;
 
 public readonly record struct Name
 {
@@ -6,21 +8,26 @@ public readonly record struct Name
 
     public string Value { get; }
 
-    public Name(
+    private Name(
+        string value) =>
+        Value = value;
+
+    public static Result<Name, Exception> Create(
         string value)
     {
         if (string.IsNullOrWhiteSpace(value))
         {
-            throw new ArgumentException("Invalid name.", nameof(value));
+            return Result<Name, Exception>.Failure(new ArgumentException("Invalid name.", nameof(value)));
         }
 
         if (value.Length > MaxNameLength)
         {
-            throw new ArgumentException(
+            return Result<Name, Exception>.Failure(new ArgumentException(
                 $"Name length cannot exceed {MaxNameLength} characters. " + $"Current length: {value.Length}.",
-                nameof(value));
+                nameof(value)));
         }
 
-        Value = value;
+        var name = new Name(value);
+        return Result<Name, Exception>.Success(name);
     }
 }

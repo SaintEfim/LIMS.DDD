@@ -1,12 +1,18 @@
-﻿namespace LIMS.DDD.Service.Domain.StudyTemplateAggregate;
+﻿using LIMS.DDD.Service.Domain.SeedWork.Result;
+
+namespace LIMS.DDD.Service.Domain.StudyTemplateAggregate;
 
 public readonly record struct Revision
 {
     private const int MaxRevisionLength = 100;
 
+    private Revision(
+        string value) =>
+        Value = value;
+
     public string Value { get; }
 
-    public Revision(
+    public static Result<Revision, Exception> Create(
         string value)
     {
         if (string.IsNullOrWhiteSpace(value))
@@ -21,6 +27,7 @@ public readonly record struct Revision
                 nameof(value));
         }
 
-        Value = value;
+        var revision = new Revision(value);
+        return Result<Revision, Exception>.Success(revision);
     }
 }

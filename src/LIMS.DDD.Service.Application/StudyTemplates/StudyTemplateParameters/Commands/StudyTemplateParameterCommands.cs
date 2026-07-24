@@ -21,7 +21,19 @@ public sealed class StudyTemplateParameterCommands(IStudyTemplateRepository repo
                 new KeyNotFoundException($"StudyTemplate with id {studyTemplateId} not found."));
         }
 
-        var addResult = studyTemplate.AddParameter(new Name(command.Name), new Description(command.Description),
+        var nameResult = Name.Create(command.Name);
+        if (nameResult is { IsFailure: true, Error: not null })
+        {
+            return Result<Guid, Exception>.Failure(nameResult.Error);
+        }
+
+        var descriptionResult = Description.Create(command.Description);
+        if (descriptionResult is { IsFailure: true, Error: not null })
+        {
+            return Result<Guid, Exception>.Failure(descriptionResult.Error);
+        }
+
+        var addResult = studyTemplate.AddParameter(nameResult.Value, descriptionResult.Value,
             new AliasName(command.AliasName), new ValueRange(command.MinValue, command.MaxValue));
 
         return await addResult.Bind(async result =>

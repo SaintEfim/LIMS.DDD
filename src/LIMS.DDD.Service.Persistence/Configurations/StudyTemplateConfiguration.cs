@@ -16,16 +16,19 @@ public class StudyTemplateConfiguration : IEntityTypeConfiguration<StudyTemplate
             .HasConversion(id => id.Value, id => new StudyTemplateId(id));
 
         builder.Property(x => x.Name)
-            .HasConversion(n => n.Value, n => new Name(n))
+            .HasConversion(n => n.Value, n => Name.Create(n)
+                .Value)
             .HasMaxLength(100)
             .IsRequired();
 
         builder.Property(x => x.Description)
-            .HasConversion(d => d.Value, d => new Description(d))
+            .HasConversion(d => d.Value, d => Description.Create(d)
+                .Value)
             .HasMaxLength(1000);
 
         builder.Property(x => x.Revision)
-            .HasConversion(r => r.Value, r => new Revision(r))
+            .HasConversion(r => r.Value, r => Revision.Create(r)
+                .Value)
             .IsRequired();
 
         builder.HasMany(x => x.Results)
