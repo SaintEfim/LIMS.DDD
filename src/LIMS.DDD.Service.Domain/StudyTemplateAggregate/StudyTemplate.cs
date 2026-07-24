@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using LIMS.DDD.Service.Domain.SeedWork;
+﻿using LIMS.DDD.Service.Domain.SeedWork;
 using LIMS.DDD.Service.Domain.SeedWork.Result;
 using LIMS.DDD.Service.Domain.StudyTemplateAggregate.StudyTemplateParameters;
 using LIMS.DDD.Service.Domain.StudyTemplateAggregate.StudyTemplateResults;
@@ -54,7 +51,8 @@ public sealed class StudyTemplate : IAggregateRoot
         Revision? revision)
     {
         if (Status == Status.Completed)
-            return Result< Exception>.Failure(new InvalidOperationException("Cannot modify a completed study template."));
+            return Result<Exception>.Failure(
+                new InvalidOperationException("Cannot modify a completed study template."));
 
         if (name is not null) Name = name.Value;
         if (description is not null) Description = description.Value;
@@ -71,7 +69,7 @@ public sealed class StudyTemplate : IAggregateRoot
         Status = newStatus;
     }
 
-    public StudyTemplateParameter AddParameter(
+    public Result<StudyTemplateParameter, Exception> AddParameter(
         Name name,
         Description description,
         AliasName aliasName,
@@ -79,28 +77,31 @@ public sealed class StudyTemplate : IAggregateRoot
     {
         if (_parameters.Any(p => p.Name == name))
         {
-            throw new InvalidOperationException("Parameter name must be unique within the template.");
+            return Result<StudyTemplateParameter, Exception>.Failure(
+                new InvalidOperationException("Parameter name must be unique within the template."));
         }
 
         var parameter = StudyTemplateParameter.Create(Id, name, description, aliasName, valueRange);
-
         _parameters.Add(parameter);
-        return parameter;
+
+        return Result<StudyTemplateParameter, Exception>.Success(parameter);
     }
 
-    public void RemoveParameter(
+    public Result<Exception> RemoveParameter(
         StudyTemplateParameterId parameterId)
     {
         var parameter = _parameters.FirstOrDefault(p => p.Id == parameterId);
         if (parameter == null)
         {
-            throw new InvalidOperationException("Parameter not found.");
+            return Result<Exception>.Failure(
+                new InvalidOperationException("Parameter not found."));
         }
 
         _parameters.Remove(parameter);
+        return Result<Exception>.Success();
     }
 
-    public StudyTemplateResults.StudyTemplateResult AddResult(
+    public Result<StudyTemplateResult, Exception> AddResult(
         string resultInstance,
         string unit,
         ValueRange valueRange)
@@ -108,23 +109,27 @@ public sealed class StudyTemplate : IAggregateRoot
         var existsResult = _results.Any(x => x.ResultInstance == resultInstance && x.Unit == unit);
         if (existsResult)
         {
-            throw new InvalidOperationException("Result instance already exists.");
+            return Result<StudyTemplateResult, Exception>.Failure(
+                new InvalidOperationException("Result instance already exists."));
         }
 
-        var result = StudyTemplateResults.StudyTemplateResult.Create(Id, resultInstance, unit, valueRange);
+        var result = StudyTemplateResult.Create(Id, resultInstance, unit, valueRange);
         _results.Add(result);
-        return result;
+
+        return Result<StudyTemplateResult, Exception>.Success(result);
     }
 
-    public void RemoveResult(
+    public Result<Exception> RemoveResult(
         StudyTemplateResultId resultId)
     {
         var result = _results.FirstOrDefault(r => r.Id == resultId);
         if (result == null)
         {
-            throw new InvalidOperationException("Result not found.");
+            return Result<Exception>.Failure(
+                new InvalidOperationException("Result not found."));
         }
 
         _results.Remove(result);
+        return Result<Exception>.Success();
     }
 }

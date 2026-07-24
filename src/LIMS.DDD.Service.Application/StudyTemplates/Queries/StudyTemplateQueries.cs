@@ -10,13 +10,16 @@ public sealed class StudyTemplateQueries(IStudyTemplateRepository repository)
     {
         var studyTemplate = await repository.GetByIdAsync(new StudyTemplateId(id), cancellationToken);
 
-        return StudyTemplateDto.FromDomain(studyTemplate);
+        return studyTemplate is null
+            ? null
+            : StudyTemplateDto.FromDomain(studyTemplate);
     }
 
     public async Task<ICollection<StudyTemplateDto>> GetAllAsync(
         CancellationToken cancellationToken = default)
     {
-        return (await repository.GetAllAsync(cancellationToken)).Select(StudyTemplateDto.FromDomain)
-            .ToList();
+        var studyTemplates = await repository.GetAllAsync(cancellationToken);
+
+        return studyTemplates.Select(StudyTemplateDto.FromDomain).ToList();
     }
 }

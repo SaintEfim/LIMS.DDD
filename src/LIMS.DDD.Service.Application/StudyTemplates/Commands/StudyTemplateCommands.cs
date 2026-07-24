@@ -10,19 +10,21 @@ public sealed class StudyTemplateCommands(IStudyTemplateRepository repository)
         CreateStudyTemplateCommand createCommand,
         CancellationToken cancellationToken = default)
     {
-        var studyTemplate = StudyTemplate.Create(new Name(createCommand.Name),
+        var createResult = StudyTemplate.Create(new Name(createCommand.Name),
             new Description(createCommand.Description), new Revision(createCommand.Revision));
 
-        return await studyTemplate.OnSuccess(async x =>
+        return await createResult.Bind(async template =>
         {
             try
             {
-                repository.Add(x);
+                repository.Add(template);
                 await repository.SaveChangesAsync(cancellationToken);
+                return createResult;
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                Result<StudyTemplate, Exception>.Failure(e);
+                return Result<StudyTemplate, Exception>.Failure(
+                    new Exception($"Failed to save study template: {ex.Message}"));
             }
         });
     }
@@ -42,20 +44,19 @@ public sealed class StudyTemplateCommands(IStudyTemplateRepository repository)
         Description? desc = updateCommand.Description is not null ? new Description(updateCommand.Description) : null;
         Revision? rev = updateCommand.Revision is not null ? new Revision(updateCommand.Revision) : null;
 
-        studyTemplate.UpdatePartial(name, desc, rev)
-            .OnFailure(x => Result<Exception>.Failure(x));
+        var updateResult = studyTemplate.UpdatePartial(name, desc, rev);
+        if (updateResult.IsFailure) return updateResult;
 
         try
         {
             repository.Update(studyTemplate);
             await repository.SaveChangesAsync(cancellationToken);
+            return Result<Exception>.Success();
         }
         catch (Exception e)
         {
-            Result<StudyTemplate, Exception>.Failure(e);
+            return Result<Exception>.Failure(e);
         }
-
-        return Result<Exception>.Success();
     }
 
     public async Task<Result<Exception>> DeleteAsync(
@@ -67,25 +68,42 @@ public sealed class StudyTemplateCommands(IStudyTemplateRepository repository)
         if (studyTemplate is null)
             return Result<Exception>.Failure(new KeyNotFoundException($"StudyTemplate with id {id} not found."));
 
-        repository.Remove(studyTemplate);
-        await repository.SaveChangesAsync(cancellationToken);
-
-        return Result<Exception>.Success();
+        try
+        {
+            repository.Remove(studyTemplate);
+            await repository.SaveChangesAsync(cancellationToken);
+            return Result<Exception>.Success();
+        }
+        catch (Exception e)
+        {
+            return Result<Exception>.Failure(e);
+        }
     }
 
-    public async Task ChangeStatusAsync(
+    public async Task<Result<Exception>> ChangeStatusAsync(
         Guid id,
         ChangeStatusCommand command,
         CancellationToken cancellationToken = default)
     {
         var studyTemplate = await repository.GetByIdAsync(new StudyTemplateId(id), cancellationToken);
 
+        if (studyTemplate is null)
+            return Result<Exception>.Failure(new KeyNotFoundException($"StudyTemplate with id {id} not found."));
+
         if (!Enum.TryParse<Status>(command.Status, ignoreCase: true, out var newStatus))
-            throw new ArgumentException($"Invalid status value: {command.Status}");
+            return Result<Exception>.Failure(new ArgumentException($"Invalid status value: {command.Status}"));
 
         studyTemplate.ChangeStatus(newStatus);
 
-        repository.Update(studyTemplate);
-        await repository.SaveChangesAsync(cancellationToken);
+        try
+        {
+            repository.Update(studyTemplate);
+            await repository.SaveChangesAsync(cancellationToken);
+            return Result<Exception>.Success();
+        }
+        catch (Exception e)
+        {
+            return Result<Exception>.Failure(e);
+        }
     }
 }

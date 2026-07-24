@@ -1,4 +1,5 @@
 ﻿using LIMS.DDD.Service.Domain;
+using LIMS.DDD.Service.Domain.SeedWork.Result;
 using LIMS.DDD.Service.Domain.StudyTemplateAggregate;
 using LIMS.DDD.Service.Domain.StudyTemplateAggregate.StudyTemplateParameters;
 
@@ -6,32 +7,66 @@ namespace LIMS.DDD.Service.Application.StudyTemplates.StudyTemplateParameters.Co
 
 public sealed class StudyTemplateParameterCommands(IStudyTemplateRepository repository)
 {
-    public async Task<Guid> AddStudyTemplateParameterAsync(
+    public async Task<Result<Guid, Exception>> AddStudyTemplateParameterAsync(
         Guid studyTemplateId,
         CreateStudyTemplateParameterCommand command,
         CancellationToken cancellationToken = default)
     {
-        var studyTemplate =
-            await repository.GetByIdForChangeAsync(new StudyTemplateId(studyTemplateId), cancellationToken);
+        var studyTemplate = await repository.GetByIdForChangeAsync(
+            new StudyTemplateId(studyTemplateId), cancellationToken);
 
-        var newParameter = studyTemplate.AddParameter(new Name(command.Name), new Description(command.Description),
+        if (studyTemplate is null)
+        {
+            return Result<Guid, Exception>.Failure(
+                new KeyNotFoundException($"StudyTemplate with id {studyTemplateId} not found."));
+        }
+
+        var addResult = studyTemplate.AddParameter(new Name(command.Name), new Description(command.Description),
             new AliasName(command.AliasName), new ValueRange(command.MinValue, command.MaxValue));
 
-        await repository.SaveChangesAsync(cancellationToken);
-
-        return newParameter.Id.Value;
+        return await addResult.Bind(async result =>
+        {
+            try
+            {
+                await repository.SaveChangesAsync(cancellationToken);
+                return Result<Guid, Exception>.Success(result.Id.Value);
+            }
+            catch (Exception ex)
+            {
+                return Result<Guid, Exception>.Failure(new Exception($"Failed to save parameter: {ex.Message}", ex));
+            }
+        });
     }
 
-    public async Task RemoveStudyTemplateParameterAsync(
+    public async Task<Result<Exception>> RemoveStudyTemplateParameterAsync(
         Guid studyTemplateId,
         Guid parameterId,
         CancellationToken cancellationToken = default)
     {
-        var studyTemplate =
-            await repository.GetByIdForChangeAsync(new StudyTemplateId(studyTemplateId), cancellationToken);
+        var studyTemplate = await repository.GetByIdForChangeAsync(
+            new StudyTemplateId(studyTemplateId), cancellationToken);
 
-        studyTemplate.RemoveParameter(new StudyTemplateParameterId(parameterId));
+        if (studyTemplate is null)
+        {
+            return Result<Exception>.Failure(
+                new KeyNotFoundException($"StudyTemplate with id {studyTemplateId} not found."));
+        }
 
-        await repository.SaveChangesAsync(cancellationToken);
+        var removeResult = studyTemplate.RemoveParameter(new StudyTemplateParameterId(parameterId));
+
+        if (removeResult.IsFailure)
+        {
+            return Result<Exception>.Failure(removeResult.Error!);
+        }
+
+        try
+        {
+            await repository.SaveChangesAsync(cancellationToken);
+            return Result<Exception>.Success();
+        }
+        catch (Exception ex)
+        {
+            return Result<Exception>.Failure(new Exception($"Failed to remove parameter: {ex.Message}", ex));
+        }
     }
 }

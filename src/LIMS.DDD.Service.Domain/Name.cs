@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace LIMS.DDD.Service.Domain;
+﻿namespace LIMS.DDD.Service.Domain;
 
 public readonly record struct Name
 {
