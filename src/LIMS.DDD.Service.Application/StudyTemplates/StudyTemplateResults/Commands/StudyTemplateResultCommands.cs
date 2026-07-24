@@ -20,21 +20,20 @@ public sealed class StudyTemplateResultCommands(IStudyTemplateRepository reposit
                 new KeyNotFoundException($"StudyTemplate with id {studyTemplateId} not found."));
         }
 
-        var addResult = studyTemplate.AddResult(command.ResultInstance, command.Unit,
-            new ValueRange(command.MinValue, command.MaxValue));
-
-        return await addResult.Bind(async result =>
-        {
-            try
+        return await studyTemplate.AddResult(command.ResultInstance, command.Unit,
+                new ValueRange(command.MinValue, command.MaxValue))
+            .Bind(async result =>
             {
-                await repository.SaveChangesAsync(cancellationToken);
-                return Result<Guid, Exception>.Success(result.Id.Value);
-            }
-            catch (Exception ex)
-            {
-                return Result<Guid, Exception>.Failure(new Exception($"Failed to save result: {ex.Message}", ex));
-            }
-        });
+                try
+                {
+                    await repository.SaveChangesAsync(cancellationToken);
+                    return Result<Guid, Exception>.Success(result.Id.Value);
+                }
+                catch (Exception ex)
+                {
+                    return Result<Guid, Exception>.Failure(new Exception($"Failed to save result: {ex.Message}", ex));
+                }
+            });
     }
 
     public async Task<Result<Exception>> RemoveStudyTemplateResultAsync(

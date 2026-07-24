@@ -21,33 +21,26 @@ public sealed class StudyTemplateParameterCommands(IStudyTemplateRepository repo
                 new KeyNotFoundException($"StudyTemplate with id {studyTemplateId} not found."));
         }
 
-        var nameResult = Name.Create(command.Name);
-        if (nameResult is { IsFailure: true, Error: not null })
-        {
-            return Result<Guid, Exception>.Failure(nameResult.Error);
-        }
-
-        var descriptionResult = Description.Create(command.Description);
-        if (descriptionResult is { IsFailure: true, Error: not null })
-        {
-            return Result<Guid, Exception>.Failure(descriptionResult.Error);
-        }
-
-        var addResult = studyTemplate.AddParameter(nameResult.Value, descriptionResult.Value,
-            new AliasName(command.AliasName), new ValueRange(command.MinValue, command.MaxValue));
-
-        return await addResult.Bind(async result =>
-        {
-            try
+        return await Name.Create(command.Name)
+            .Bind(name => Description.Create(command.Description)
+                .Map(description => (name, description)))
+            .Bind(tuple => AliasName.Create(command.AliasName)
+                .Map(aliasName => (tuple.name, tuple.description, aliasName)))
+            .Bind(tuple => studyTemplate.AddParameter(tuple.name, tuple.description, tuple.aliasName,
+                new ValueRange(command.MinValue, command.MaxValue)))
+            .Bind(async result =>
             {
-                await repository.SaveChangesAsync(cancellationToken);
-                return Result<Guid, Exception>.Success(result.Id.Value);
-            }
-            catch (Exception ex)
-            {
-                return Result<Guid, Exception>.Failure(new Exception($"Failed to save parameter: {ex.Message}", ex));
-            }
-        });
+                try
+                {
+                    await repository.SaveChangesAsync(cancellationToken);
+                    return Result<Guid, Exception>.Success(result.Id.Value);
+                }
+                catch (Exception ex)
+                {
+                    return Result<Guid, Exception>.Failure(new Exception($"Failed to save parameter: {ex.Message}",
+                        ex));
+                }
+            });
     }
 
     public async Task<Result<Exception>> RemoveStudyTemplateParameterAsync(

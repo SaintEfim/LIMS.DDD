@@ -2,33 +2,56 @@
 
 public static class ResultExtensions
 {
+    // 1. Sync Result + Sync Map (T -> TNext) -> Sync Result
+    public static Result<TNext, TError> Map<TValue, TNext, TError>(
+        this Result<TValue, TError> result,
+        Func<TValue, TNext> func)
+        where TError : Exception
+    {
+        return result.IsFailure
+            ? Result<TNext, TError>.Failure(result.Error!)
+            : Result<TNext, TError>.Success(func(result.Value!));
+    }
+
+    // 2. Sync Result + Sync Bind (T -> Result) -> Sync Result
+    public static Result<TNext, TError> Bind<TValue, TNext, TError>(
+        this Result<TValue, TError> result,
+        Func<TValue, Result<TNext, TError>> func)
+        where TError : Exception
+    {
+        return result.IsFailure ? Result<TNext, TError>.Failure(result.Error!) : func(result.Value!);
+    }
+
+    // 3. Sync Result + Async Bind (T -> Task<Result>) -> Task<Result>
     public static async Task<Result<TNext, TError>> Bind<TValue, TNext, TError>(
         this Result<TValue, TError> result,
         Func<TValue, Task<Result<TNext, TError>>> func)
         where TError : Exception
     {
         if (result.IsFailure) return Result<TNext, TError>.Failure(result.Error!);
-
         return await func(result.Value!);
     }
 
-    public static async Task<Result<TValue, TError>> OnSuccess<TValue, TError>(
-        this Result<TValue, TError> result,
-        Func<TValue, Task> action)
+    // 4. Task<Result> + Sync Map (T -> TNext) -> Task<Result>
+    public static async Task<Result<TNext, TError>> Map<TValue, TNext, TError>(
+        this Task<Result<TValue, TError>> resultTask,
+        Func<TValue, TNext> func)
         where TError : Exception
     {
-        if (result is { IsSuccess: true, Value: not null }) await action(result.Value);
-
-        return result;
+        var result = await resultTask;
+        return result.IsFailure
+            ? Result<TNext, TError>.Failure(result.Error!)
+            : Result<TNext, TError>.Success(func(result.Value!));
     }
 
-    public static async Task<Result<TValue, TError>> OnFailure<TValue, TError>(
-        this Result<TValue, TError> result,
-        Func<TError, Task> action)
+    // 5. Task<Result> + Async Bind (T -> Task<Result>) -> Task<Result>
+    public static async Task<Result<TNext, TError>> Bind<TValue, TNext, TError>(
+        this Task<Result<TValue, TError>> resultTask,
+        Func<TValue, Task<Result<TNext, TError>>> func)
         where TError : Exception
     {
-        if (result is { IsFailure: true, Error: not null }) await action(result.Error);
-
-        return result;
+        var result = await resultTask;
+        if (result.IsFailure) return Result<TNext, TError>.Failure(result.Error!);
+        return await func(result.Value!);
     }
 }

@@ -45,20 +45,22 @@ public sealed class StudyTemplate : IAggregateRoot
         return Result<StudyTemplate, Exception>.Success(studyTemplate);
     }
 
-    public Result<Exception> UpdatePartial(
+    public Result<StudyTemplate, Exception> UpdatePartial(
         Name? name,
         Description? description,
         Revision? revision)
     {
         if (Status == Status.Completed)
-            return Result<Exception>.Failure(
+        {
+            return Result<StudyTemplate, Exception>.Failure(
                 new InvalidOperationException("Cannot modify a completed study template."));
+        }
 
         if (name is not null) Name = name.Value;
         if (description is not null) Description = description.Value;
         if (revision is not null) Revision = revision.Value;
 
-        return Result<Exception>.Success();
+        return Result<StudyTemplate, Exception>.Success(this);
     }
 
     public void ChangeStatus(
@@ -93,8 +95,7 @@ public sealed class StudyTemplate : IAggregateRoot
         var parameter = _parameters.FirstOrDefault(p => p.Id == parameterId);
         if (parameter == null)
         {
-            return Result<Exception>.Failure(
-                new InvalidOperationException("Parameter not found."));
+            return Result<Exception>.Failure(new InvalidOperationException("Parameter not found."));
         }
 
         _parameters.Remove(parameter);
@@ -125,8 +126,7 @@ public sealed class StudyTemplate : IAggregateRoot
         var result = _results.FirstOrDefault(r => r.Id == resultId);
         if (result == null)
         {
-            return Result<Exception>.Failure(
-                new InvalidOperationException("Result not found."));
+            return Result<Exception>.Failure(new InvalidOperationException("Result not found."));
         }
 
         _results.Remove(result);

@@ -31,7 +31,8 @@ public class StudyTemplateParameterConfiguration : IEntityTypeConfiguration<Stud
             .HasMaxLength(1000);
 
         builder.Property(x => x.AliasName)
-            .HasConversion(a => a.Value, a => new AliasName(a))
+            .HasConversion(a => a.Value, a => AliasName.Create(a)
+                .Value)
             .HasMaxLength(100);
 
         builder.OwnsOne(x => x.ValueRange, vr =>

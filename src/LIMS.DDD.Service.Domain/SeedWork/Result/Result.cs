@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace LIMS.DDD.Service.Domain.SeedWork.Result;
+﻿namespace LIMS.DDD.Service.Domain.SeedWork.Result;
 
 public class Result<TError>
     where TError : Exception
@@ -24,6 +22,7 @@ public class Result<TError>
         new(false, error);
 }
 
+// TODO make not nullable field
 public class Result<TValue, TError>
     where TError : Exception
 {

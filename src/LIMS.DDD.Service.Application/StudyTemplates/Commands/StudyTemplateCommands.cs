@@ -10,43 +10,29 @@ public sealed class StudyTemplateCommands(IStudyTemplateRepository repository)
         CreateStudyTemplateCommand createCommand,
         CancellationToken cancellationToken = default)
     {
-        var nameResult = Name.Create(createCommand.Name);
-        if (nameResult is { IsFailure: true, Error: not null })
-        {
-            return Result<StudyTemplate, Exception>.Failure(nameResult.Error);
-        }
-
-        var descriptionResult = Description.Create(createCommand.Description);
-        if (descriptionResult is { IsFailure: true, Error: not null })
-        {
-            return Result<StudyTemplate, Exception>.Failure(descriptionResult.Error);
-        }
-
-        var revisionResult = Revision.Create(createCommand.Description);
-        if (revisionResult is { IsFailure: true, Error: not null })
-        {
-            return Result<StudyTemplate, Exception>.Failure(revisionResult.Error);
-        }
-
-        var createResult = StudyTemplate.Create(nameResult.Value, descriptionResult.Value, revisionResult.Value);
-
-        return await createResult.Bind(async template =>
-        {
-            try
+        return await Name.Create(createCommand.Name)
+            .Bind(name => Description.Create(createCommand.Description)
+                .Map(desc => (name, desc)))
+            .Bind(tuple => Revision.Create(createCommand.Revision)
+                .Map(rev => (tuple.name, tuple.desc, rev)))
+            .Bind(tuple => StudyTemplate.Create(tuple.name, tuple.desc, tuple.rev))
+            .Bind(async template =>
             {
-                repository.Add(template);
-                await repository.SaveChangesAsync(cancellationToken);
-                return createResult;
-            }
-            catch (Exception ex)
-            {
-                return Result<StudyTemplate, Exception>.Failure(
-                    new Exception($"Failed to save study template: {ex.Message}"));
-            }
-        });
+                try
+                {
+                    repository.Add(template);
+                    await repository.SaveChangesAsync(cancellationToken);
+                    return Result<StudyTemplate, Exception>.Success(template);
+                }
+                catch (Exception ex)
+                {
+                    return Result<StudyTemplate, Exception>.Failure(
+                        new Exception($"Failed to save study template: {ex.Message}"));
+                }
+            });
     }
 
-    public async Task<Result<Exception>> UpdateAsync(
+    public async Task<Result<StudyTemplate, Exception>> UpdateAsync(
         Guid id,
         UpdateStudyTemplateCommand updateCommand,
         CancellationToken cancellationToken = default)
@@ -55,60 +41,40 @@ public sealed class StudyTemplateCommands(IStudyTemplateRepository repository)
         var studyTemplate = await repository.GetByIdAsync(studyTemplateId, cancellationToken);
 
         if (studyTemplate is null)
-            return Result<Exception>.Failure(new KeyNotFoundException($"StudyTemplate with id {id} not found."));
+            return Result<StudyTemplate, Exception>.Failure(
+                new KeyNotFoundException($"StudyTemplate with id {id} not found."));
 
-        Name? name = null;
-        if (updateCommand.Name is not null)
-        {
-            var nameResult = Name.Create(updateCommand.Name);
+        var nameResult = updateCommand.Name is null
+            ? Result<Name?, Exception>.Success(null)
+            : Name.Create(updateCommand.Name)
+                .Map(n => (Name?) n);
 
-            if (nameResult is { IsFailure: true, Error: not null })
+        var descResult = updateCommand.Description is null
+            ? Result<Description?, Exception>.Success(null)
+            : Description.Create(updateCommand.Description)
+                .Map(d => (Description?) d);
+
+        var revResult = updateCommand.Revision is null
+            ? Result<Revision?, Exception>.Success(null)
+            : Revision.Create(updateCommand.Revision)
+                .Map(r => (Revision?) r);
+
+        return await studyTemplate.UpdatePartial(nameResult.Value, descResult.Value, revResult.Value)
+            .Bind(async template =>
             {
-                return Result<Exception>.Failure(nameResult.Error);
-            }
+                try
+                {
+                    repository.Update(studyTemplate);
+                    await repository.SaveChangesAsync(cancellationToken);
 
-            name = nameResult.Value;
-        }
-
-        Description? description = null;
-        if (updateCommand.Description is not null)
-        {
-            var descriptionResult = Description.Create(updateCommand.Name);
-
-            if (descriptionResult is { IsFailure: true, Error: not null })
-            {
-                return Result<Exception>.Failure(descriptionResult.Error);
-            }
-
-            description = descriptionResult.Value;
-        }
-
-        Revision? rev = null;
-        if (updateCommand.Revision is not null)
-        {
-            var revisionResult = Revision.Create(updateCommand.Revision);
-
-            if (revisionResult is { IsFailure: true, Error: not null })
-            {
-                return Result<Exception>.Failure(revisionResult.Error);
-            }
-
-            rev = revisionResult.Value;
-        }
-
-        var updateResult = studyTemplate.UpdatePartial(name, description, rev);
-        if (updateResult.IsFailure) return updateResult;
-
-        try
-        {
-            repository.Update(studyTemplate);
-            await repository.SaveChangesAsync(cancellationToken);
-            return Result<Exception>.Success();
-        }
-        catch (Exception e)
-        {
-            return Result<Exception>.Failure(e);
-        }
+                    return Result<StudyTemplate, Exception>.Success(template);
+                }
+                catch (Exception ex)
+                {
+                    return Result<StudyTemplate, Exception>.Failure(
+                        new Exception($"Failed to save study template: {ex.Message}"));
+                }
+            });
     }
 
     public async Task<Result<Exception>> DeleteAsync(

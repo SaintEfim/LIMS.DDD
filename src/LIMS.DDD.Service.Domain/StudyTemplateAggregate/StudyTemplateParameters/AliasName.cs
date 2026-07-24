@@ -1,4 +1,6 @@
-﻿namespace LIMS.DDD.Service.Domain.StudyTemplateAggregate.StudyTemplateParameters;
+﻿using LIMS.DDD.Service.Domain.SeedWork.Result;
+
+namespace LIMS.DDD.Service.Domain.StudyTemplateAggregate.StudyTemplateParameters;
 
 public readonly record struct AliasName
 {
@@ -6,21 +8,26 @@ public readonly record struct AliasName
 
     public string Value { get; }
 
-    public AliasName(
+    private AliasName(
+        string value) =>
+        Value = value;
+
+    public static Result<AliasName, Exception> Create(
         string value)
     {
         if (string.IsNullOrWhiteSpace(value))
         {
-            throw new ArgumentException("Invalid name.", nameof(value));
+            return Result<AliasName, Exception>.Failure(new ArgumentException("Invalid name.", nameof(value)));
         }
 
         if (value.Length > MaxAliasNameLength)
         {
-            throw new ArgumentException(
+            return Result<AliasName, Exception>.Failure(new ArgumentException(
                 $"AliasName length cannot exceed {MaxAliasNameLength} characters. " +
-                $"Current length: {value.Length}.", nameof(value));
+                $"Current length: {value.Length}.", nameof(value)));
         }
 
-        Value = value;
+        var aliasName = new AliasName(value);
+        return Result<AliasName, Exception>.Success(aliasName);
     }
 }
