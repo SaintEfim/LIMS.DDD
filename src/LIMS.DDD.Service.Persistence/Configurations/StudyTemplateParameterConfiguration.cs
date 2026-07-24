@@ -1,7 +1,6 @@
 using LIMS.DDD.Service.Domain;
-using LIMS.DDD.Service.Domain.SeedWork;
 using LIMS.DDD.Service.Domain.StudyTemplateAggregate;
-using LIMS.DDD.Service.Domain.StudyTemplateAggregate.Parameter;
+using LIMS.DDD.Service.Domain.StudyTemplateAggregate.StudyTemplateParameters;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -21,16 +20,19 @@ public class StudyTemplateParameterConfiguration : IEntityTypeConfiguration<Stud
             .HasConversion(id => id.Value, id => new StudyTemplateId(id));
 
         builder.Property(x => x.Name)
-            .HasConversion(n => n.Value, n => new Name(n))
+            .HasConversion(n => n.Value, n => Name.Create(n)
+                .Value)
             .HasMaxLength(100)
             .IsRequired();
 
         builder.Property(x => x.Description)
-            .HasConversion(d => d.Value, d => new Description(d))
+            .HasConversion(d => d.Value, d => Description.Create(d)
+                .Value)
             .HasMaxLength(1000);
 
         builder.Property(x => x.AliasName)
-            .HasConversion(a => a.Value, a => new AliasName(a))
+            .HasConversion(a => a.Value, a => AliasName.Create(a)
+                .Value)
             .HasMaxLength(100);
 
         builder.OwnsOne(x => x.ValueRange, vr =>

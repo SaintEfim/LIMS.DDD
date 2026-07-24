@@ -1,6 +1,6 @@
 ﻿using Carter;
 using LIMS.DDD.Service.Application.StudyTemplates.Commands;
-using Microsoft.AspNetCore.Mvc;
+using LIMS.DDD.Service.Application.StudyTemplates.Queries;
 
 namespace LIMS.DDD.Service.API.Apis.StudyTemplates;
 
@@ -12,63 +12,99 @@ public class StudyTemplateModule : ICarterModule
         var group = app.MapGroup("/api/studyTemplates")
             .WithTags("StudyTemplates");
 
-        group.MapGet("/", async (
-            [FromServices] StudyTemplateServices services,
-            CancellationToken ct = default) =>
-        {
-            var studyTemplates = await services.Queries.GetAllAsync(ct);
-            return studyTemplates;
-        });
+        group.MapGet("/", GetAllStudyTemplates)
+            .Produces<ICollection<StudyTemplateDto>>();
 
-        group.MapGet("/{id:guid}", async (
-            Guid id,
-            [FromServices] StudyTemplateServices services,
-            CancellationToken ct = default) =>
-        {
-            var dto = await services.Queries.GetByIdAsync(id, ct);
-            return dto is not null ? Results.Ok(dto) : Results.NotFound();
-        });
+        group.MapGet("/{id:guid}", GetStudyTemplateById)
+            .Produces<StudyTemplateDto>()
+            .Produces(StatusCodes.Status404NotFound);
 
-        group.MapPost("/", async (
-            CreateStudyTemplateCommand createCommand,
-            [FromServices] StudyTemplateServices services,
-            CancellationToken ct = default) =>
-        {
-            var studyTemplateId = await services.Commands.CreateAsync(createCommand, ct);
+        group.MapPost("/", CreateStudyTemplate)
+            .Produces(StatusCodes.Status201Created)
+            .Produces(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status500InternalServerError);
 
-            return Results.Created($"/api/studyTemplates", new { id = studyTemplateId });
-        });
+        group.MapPatch("/{id:guid}", UpdateStudyTemplate)
+            .Produces(StatusCodes.Status204NoContent)
+            .Produces(StatusCodes.Status404NotFound)
+            .Produces(StatusCodes.Status400BadRequest);
 
-        group.MapPatch("/{id:guid}", async (
-            Guid id,
-            UpdateStudyTemplateCommand updateCommand,
-            [FromServices] StudyTemplateServices services,
-            CancellationToken ct = default) =>
-        {
-            await services.Commands.UpdateAsync(id, updateCommand, ct);
+        group.MapDelete("/{id:guid}", DeleteStudyTemplate)
+            .Produces(StatusCodes.Status204NoContent)
+            .Produces(StatusCodes.Status404NotFound);
 
-            return Results.NoContent();
-        });
-
-        group.MapDelete("/{id:guid}", async (
-            Guid id,
-            [FromServices] StudyTemplateServices services,
-            CancellationToken ct = default) =>
-        {
-            await services.Commands.DeleteAsync(id, ct);
-
-            return Results.NoContent();
-        });
-
-        group.MapPost("/{id:guid}/status", async (
-            Guid id,
-            ChangeStatusCommand command,
-            [FromServices] StudyTemplateCommands commands,
-            CancellationToken ct) =>
-        {
-            await commands.ChangeStatusAsync(id, command, ct);
-
-            return Results.NoContent();
-        });
+        group.MapPost("/{id:guid}/status", ChangeStudyTemplateStatus)
+            .Produces(StatusCodes.Status204NoContent)
+            .Produces(StatusCodes.Status404NotFound)
+            .Produces(StatusCodes.Status400BadRequest);
     }
+
+    private static async Task<IResult> GetAllStudyTemplates(
+        [AsParameters] StudyTemplateServices services,
+        CancellationToken ct)
+    {
+        var studyTemplates = await services.Queries.GetAllAsync(ct);
+        return Results.Ok(studyTemplates);
+    }
+
+    private static async Task<IResult> GetStudyTemplateById(
+        Guid id,
+        [AsParameters] StudyTemplateServices services,
+        CancellationToken ct)
+    {
+        var dto = await services.Queries.GetByIdAsync(id, ct);
+        return dto is null ? Results.NotFound() : Results.Ok(dto);
+    }
+
+    private static async Task<IResult> CreateStudyTemplate(
+        CreateStudyTemplateCommand createCommand,
+        [AsParameters] StudyTemplateServices services,
+        CancellationToken ct)
+    {
+        var result = await services.Commands.CreateAsync(createCommand, ct);
+
+        if (result.IsFailure) return HandleFailure(result.Error!);
+
+        var createdId = result.Value!.Id.Value;
+        return Results.Created($"/api/studyTemplates/{createdId}", new { id = createdId });
+    }
+
+    private static async Task<IResult> UpdateStudyTemplate(
+        Guid id,
+        UpdateStudyTemplateCommand updateCommand,
+        [AsParameters] StudyTemplateServices services,
+        CancellationToken ct)
+    {
+        var result = await services.Commands.UpdateAsync(id, updateCommand, ct);
+        return result.IsFailure ? HandleFailure(result.Error!) : Results.NoContent();
+    }
+
+    private static async Task<IResult> DeleteStudyTemplate(
+        Guid id,
+        [AsParameters] StudyTemplateServices services,
+        CancellationToken ct)
+    {
+        var result = await services.Commands.DeleteAsync(id, ct);
+        return result.IsFailure ? HandleFailure(result.Error!) : Results.NoContent();
+    }
+
+    private static async Task<IResult> ChangeStudyTemplateStatus(
+        Guid id,
+        ChangeStatusCommand command,
+        [AsParameters] StudyTemplateServices services,
+        CancellationToken ct)
+    {
+        var result = await services.Commands.ChangeStatusAsync(id, command, ct);
+        return result.IsFailure ? HandleFailure(result.Error!) : Results.NoContent();
+    }
+
+    private static IResult HandleFailure(
+        Exception error) =>
+        error switch
+        {
+            KeyNotFoundException => Results.NotFound(new { error.Message }),
+            ArgumentException or InvalidOperationException => Results.BadRequest(new { error.Message }),
+            _ => Results.Problem(detail: error.Message, statusCode: StatusCodes.Status500InternalServerError,
+                title: "An unexpected error occurred")
+        };
 }

@@ -12,10 +12,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="SeedWork\Description.cs">
+    <Compile Update="Description.cs">
       <Generator>MSBuild:GenerateCodeFromAttributes</Generator>
     </Compile>
-    <Compile Update="SeedWork\Name.cs">
+    <Compile Update="Name.cs">
       <Generator>MSBuild:GenerateCodeFromAttributes</Generator>
     </Compile>
   </ItemGroup>

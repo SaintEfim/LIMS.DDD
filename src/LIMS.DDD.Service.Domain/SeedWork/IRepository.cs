@@ -1,6 +1,9 @@
-﻿using LIMS.DDD.Service.Domain.StudyTemplateAggregate;
+﻿using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using LIMS.DDD.Service.Domain.StudyTemplateAggregate;
 
-namespace LIMS.DDD.Service.Domain.Seedwork;
+namespace LIMS.DDD.Service.Domain.SeedWork;
 
 public interface IRepository<TEntity>
     where TEntity : IAggregateRoot
@@ -8,11 +11,11 @@ public interface IRepository<TEntity>
     Task<ICollection<TEntity>> GetAllAsync(
         CancellationToken cancellationToken = default);
 
-    Task<TEntity> GetByIdAsync(
+    Task<TEntity?> GetByIdAsync(
         StudyTemplateId id,
         CancellationToken cancellationToken = default);
 
-    Task<StudyTemplate> GetByIdForChangeAsync(
+    Task<StudyTemplate?> GetByIdForChangeAsync(
         StudyTemplateId id,
         CancellationToken cancellationToken = default);
 

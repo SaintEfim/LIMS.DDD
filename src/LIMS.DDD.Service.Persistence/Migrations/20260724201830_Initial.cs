@@ -54,6 +54,7 @@ namespace LIMS.DDD.Service.Persistence.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    ResultInstance = table.Column<string>(type: "text", nullable: false),
                     StudyTemplateId = table.Column<Guid>(type: "uuid", nullable: false),
                     Unit = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
                     ValueRange_MinValue = table.Column<double>(type: "double precision", nullable: true),
@@ -79,6 +80,12 @@ namespace LIMS.DDD.Service.Persistence.Migrations
                 name: "IX_StudyTemplateResults_StudyTemplateId",
                 table: "StudyTemplateResults",
                 column: "StudyTemplateId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_StudyTemplateResults_Unit_ResultInstance",
+                table: "StudyTemplateResults",
+                columns: new[] { "Unit", "ResultInstance" },
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_StudyTemplates_Name_Revision",

@@ -1,5 +1,5 @@
 ﻿using LIMS.DDD.Service.Domain.StudyTemplateAggregate;
-using LIMS.DDD.Service.Domain.StudyTemplateAggregate.Result;
+using LIMS.DDD.Service.Domain.StudyTemplateAggregate.StudyTemplateResults;
 
 namespace LIMS.DDD.Service.Application.StudyTemplates.StudyTemplateResults.Queries;
 
@@ -12,7 +12,7 @@ public sealed class StudyTemplateResultQueries(IStudyTemplateRepository reposito
     {
         var studyTemplate = await repository.GetByIdAsync(new StudyTemplateId(studyTemplateId), cancellationToken);
 
-        var result = studyTemplate.Results.SingleOrDefault(r => r.Id == new StudyTemplateResultId(resultId));
+        var result = studyTemplate?.Results.SingleOrDefault(r => r.Id == new StudyTemplateResultId(resultId));
 
         return result != null ? StudyTemplateResultDto.FromDomain(result) : null;
     }
@@ -22,6 +22,8 @@ public sealed class StudyTemplateResultQueries(IStudyTemplateRepository reposito
         CancellationToken cancellationToken = default)
     {
         var studyTemplate = await repository.GetByIdAsync(new StudyTemplateId(studyTemplateId), cancellationToken);
+
+        if (studyTemplate is null) return [];
 
         return studyTemplate.Results
             .Select(StudyTemplateResultDto.FromDomain)
