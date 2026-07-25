@@ -1,20 +1,20 @@
 using LIMS.DDD.Service.Domain;
 using LIMS.DDD.Service.Domain.StudyTemplateAggregate;
-using LIMS.DDD.Service.Domain.StudyTemplateAggregate.StudyTemplateParameters;
+using LIMS.DDD.Service.Domain.StudyTemplateAggregate.StudyTemplateObservations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace LIMS.DDD.Service.Persistence.Configurations;
 
-public class StudyTemplateParameterConfiguration : IEntityTypeConfiguration<StudyTemplateParameter>
+public class StudyTemplateObservationConfiguration : IEntityTypeConfiguration<StudyTemplateObservation>
 {
     public void Configure(
-        EntityTypeBuilder<StudyTemplateParameter> builder)
+        EntityTypeBuilder<StudyTemplateObservation> builder)
     {
         builder.HasKey(x => x.Id);
 
         builder.Property(x => x.Id)
-            .HasConversion(id => id.Value, id => new StudyTemplateParameterId(id));
+            .HasConversion(id => id.Value, id => new StudyTemplateObservationId(id));
 
         builder.Property(x => x.StudyTemplateId)
             .HasConversion(id => id.Value, id => new StudyTemplateId(id));

@@ -1,4 +1,5 @@
-﻿using LIMS.DDD.Service.API.Apis.StudyTemplateParameters;
+﻿using LIMS.DDD.Service.API.Apis.StudyTemplateDeterminations;
+using LIMS.DDD.Service.API.Apis.StudyTemplateObservations;
 using LIMS.DDD.Service.API.Apis.StudyTemplates;
 using LIMS.DDD.Service.Application;
 using LIMS.DDD.Service.Persistence;
@@ -14,7 +15,8 @@ public static class DependencyInjection
         services.AddPersistence(configuration);
         services.AddApplication();
 
-        services.AddScoped<StudyTemplateParameterServices>();
+        services.AddScoped<StudyTemplateObservationServices>();
+        services.AddScoped<StudyTemplateDeterminationServices>();
         services.AddScoped<StudyTemplateServices>();
     }
 }

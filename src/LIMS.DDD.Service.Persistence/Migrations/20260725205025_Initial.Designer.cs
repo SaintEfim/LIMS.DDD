@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace LIMS.DDD.Service.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260724201830_Initial")]
+    [Migration("20260725205025_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -55,7 +55,34 @@ namespace LIMS.DDD.Service.Persistence.Migrations
                     b.ToTable("StudyTemplates");
                 });
 
-            modelBuilder.Entity("LIMS.DDD.Service.Domain.StudyTemplateAggregate.StudyTemplateParameters.StudyTemplateParameter", b =>
+            modelBuilder.Entity("LIMS.DDD.Service.Domain.StudyTemplateAggregate.StudyTemplateDeterminations.StudyTemplateDetermination", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("ResultInstance")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("StudyTemplateId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Unit")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("StudyTemplateId");
+
+                    b.HasIndex("Unit", "ResultInstance")
+                        .IsUnique();
+
+                    b.ToTable("StudyTemplateDetermination");
+                });
+
+            modelBuilder.Entity("LIMS.DDD.Service.Domain.StudyTemplateAggregate.StudyTemplateObservations.StudyTemplateObservation", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
@@ -82,47 +109,20 @@ namespace LIMS.DDD.Service.Persistence.Migrations
 
                     b.HasIndex("StudyTemplateId");
 
-                    b.ToTable("StudyTemplateParameters");
+                    b.ToTable("StudyTemplateObservations");
                 });
 
-            modelBuilder.Entity("LIMS.DDD.Service.Domain.StudyTemplateAggregate.StudyTemplateResults.StudyTemplateResult", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("ResultInstance")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<Guid>("StudyTemplateId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Unit")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("StudyTemplateId");
-
-                    b.HasIndex("Unit", "ResultInstance")
-                        .IsUnique();
-
-                    b.ToTable("StudyTemplateResults");
-                });
-
-            modelBuilder.Entity("LIMS.DDD.Service.Domain.StudyTemplateAggregate.StudyTemplateParameters.StudyTemplateParameter", b =>
+            modelBuilder.Entity("LIMS.DDD.Service.Domain.StudyTemplateAggregate.StudyTemplateDeterminations.StudyTemplateDetermination", b =>
                 {
                     b.HasOne("LIMS.DDD.Service.Domain.StudyTemplateAggregate.StudyTemplate", null)
-                        .WithMany("Parameters")
+                        .WithMany("Determinations")
                         .HasForeignKey("StudyTemplateId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.OwnsOne("LIMS.DDD.Service.Domain.StudyTemplateAggregate.ValueRange", "ValueRange", b1 =>
+                    b.OwnsOne("LIMS.DDD.Service.Domain.StudyTemplateAggregate.Specification", "Specification", b1 =>
                         {
-                            b1.Property<Guid>("StudyTemplateParameterId")
+                            b1.Property<Guid>("StudyTemplateDeterminationId")
                                 .HasColumnType("uuid");
 
                             b1.Property<double?>("MaxValue")
@@ -131,29 +131,29 @@ namespace LIMS.DDD.Service.Persistence.Migrations
                             b1.Property<double?>("MinValue")
                                 .HasColumnType("double precision");
 
-                            b1.HasKey("StudyTemplateParameterId");
+                            b1.HasKey("StudyTemplateDeterminationId");
 
-                            b1.ToTable("StudyTemplateParameters");
+                            b1.ToTable("StudyTemplateDetermination");
 
                             b1.WithOwner()
-                                .HasForeignKey("StudyTemplateParameterId");
+                                .HasForeignKey("StudyTemplateDeterminationId");
                         });
 
-                    b.Navigation("ValueRange")
+                    b.Navigation("Specification")
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("LIMS.DDD.Service.Domain.StudyTemplateAggregate.StudyTemplateResults.StudyTemplateResult", b =>
+            modelBuilder.Entity("LIMS.DDD.Service.Domain.StudyTemplateAggregate.StudyTemplateObservations.StudyTemplateObservation", b =>
                 {
                     b.HasOne("LIMS.DDD.Service.Domain.StudyTemplateAggregate.StudyTemplate", null)
-                        .WithMany("Results")
+                        .WithMany("Observations")
                         .HasForeignKey("StudyTemplateId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.OwnsOne("LIMS.DDD.Service.Domain.StudyTemplateAggregate.ValueRange", "ValueRange", b1 =>
+                    b.OwnsOne("LIMS.DDD.Service.Domain.StudyTemplateAggregate.Specification", "Specification", b1 =>
                         {
-                            b1.Property<Guid>("StudyTemplateResultId")
+                            b1.Property<Guid>("StudyTemplateObservationId")
                                 .HasColumnType("uuid");
 
                             b1.Property<double?>("MaxValue")
@@ -162,23 +162,23 @@ namespace LIMS.DDD.Service.Persistence.Migrations
                             b1.Property<double?>("MinValue")
                                 .HasColumnType("double precision");
 
-                            b1.HasKey("StudyTemplateResultId");
+                            b1.HasKey("StudyTemplateObservationId");
 
-                            b1.ToTable("StudyTemplateResults");
+                            b1.ToTable("StudyTemplateObservations");
 
                             b1.WithOwner()
-                                .HasForeignKey("StudyTemplateResultId");
+                                .HasForeignKey("StudyTemplateObservationId");
                         });
 
-                    b.Navigation("ValueRange")
+                    b.Navigation("Specification")
                         .IsRequired();
                 });
 
             modelBuilder.Entity("LIMS.DDD.Service.Domain.StudyTemplateAggregate.StudyTemplate", b =>
                 {
-                    b.Navigation("Parameters");
+                    b.Navigation("Determinations");
 
-                    b.Navigation("Results");
+                    b.Navigation("Observations");
                 });
 #pragma warning restore 612, 618
         }

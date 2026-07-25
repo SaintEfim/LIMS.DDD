@@ -1,21 +1,21 @@
-﻿namespace LIMS.DDD.Service.Domain.StudyTemplateAggregate.StudyTemplateParameters;
+﻿namespace LIMS.DDD.Service.Domain.StudyTemplateAggregate.StudyTemplateObservations;
 
-public sealed class StudyTemplateParameter
+public sealed class StudyTemplateObservation
 {
-    private StudyTemplateParameter()
+    private StudyTemplateObservation()
     {
     }
 
-    internal static StudyTemplateParameter Create(
+    internal static StudyTemplateObservation Create(
         StudyTemplateId studyTemplateId,
         Name name,
         Description description,
         AliasName aliasName,
         Specification specification)
     {
-        var parameter = new StudyTemplateParameter
+        var parameter = new StudyTemplateObservation
         {
-            Id = new StudyTemplateParameterId(Guid.NewGuid()),
+            Id = new StudyTemplateObservationId(Guid.NewGuid()),
             StudyTemplateId = studyTemplateId,
             Name = name,
             Description = description,
@@ -26,7 +26,7 @@ public sealed class StudyTemplateParameter
         return parameter;
     }
 
-    public StudyTemplateParameterId Id { get; private set; }
+    public StudyTemplateObservationId Id { get; private set; }
 
     public StudyTemplateId StudyTemplateId { get; private set; }
 

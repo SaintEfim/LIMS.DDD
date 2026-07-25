@@ -7,11 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.4"/>
-    <PackageReference Include="StronglyTypedId" Version="0.2.1"/>
-  </ItemGroup>
-
-  <ItemGroup>
     <Compile Update="Description.cs">
       <Generator>MSBuild:GenerateCodeFromAttributes</Generator>
     </Compile>
