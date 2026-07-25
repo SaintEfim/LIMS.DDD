@@ -2,8 +2,6 @@
 using LIMS.DDD.Service.Application.StudyTemplates.Queries;
 using LIMS.DDD.Service.Application.StudyTemplates.StudyTemplateParameters.Commands;
 using LIMS.DDD.Service.Application.StudyTemplates.StudyTemplateParameters.Queries;
-using LIMS.DDD.Service.Application.StudyTemplates.StudyTemplateResults.Commands;
-using LIMS.DDD.Service.Application.StudyTemplates.StudyTemplateResults.Queries;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace LIMS.DDD.Service.Application;
@@ -15,10 +13,6 @@ public static class DependencyInjection
     {
         services.AddScoped<StudyTemplateCommands>();
         services.AddScoped<StudyTemplateQueries>();
-
-        services.AddScoped<StudyTemplateResultCommands>();
-        services.AddScoped<StudyTemplateResultQueries>();
-
         services.AddScoped<StudyTemplateParameterCommands>();
         services.AddScoped<StudyTemplateParameterQueries>();
     }

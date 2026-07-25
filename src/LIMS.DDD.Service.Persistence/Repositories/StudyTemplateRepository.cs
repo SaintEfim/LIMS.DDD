@@ -1,4 +1,5 @@
-﻿using LIMS.DDD.Service.Domain.StudyTemplateAggregate;
+﻿using LIMS.DDD.Service.Domain;
+using LIMS.DDD.Service.Domain.StudyTemplateAggregate;
 using Microsoft.EntityFrameworkCore;
 
 namespace LIMS.DDD.Service.Persistence.Repositories;
@@ -21,7 +22,6 @@ public class StudyTemplateRepository : IStudyTemplateRepository
             .AsSplitQuery()
             .AsNoTracking()
             .Include(t => t.Parameters)
-            .Include(t => t.Results)
             .SingleOrDefaultAsync(t => t.Id == id, cancellationToken);
 
         return studyTemplate;
@@ -34,7 +34,6 @@ public class StudyTemplateRepository : IStudyTemplateRepository
         var studyTemplate = await _context.StudyTemplates
             .AsSplitQuery()
             .Include(t => t.Parameters)
-            .Include(t => t.Results)
             .SingleOrDefaultAsync(t => t.Id == id, cancellationToken);
 
         return studyTemplate;
@@ -47,7 +46,6 @@ public class StudyTemplateRepository : IStudyTemplateRepository
             .AsSplitQuery()
             .AsNoTracking()
             .Include(t => t.Parameters)
-            .Include(t => t.Results)
             .ToListAsync(cancellationToken);
     }
 
@@ -73,5 +71,14 @@ public class StudyTemplateRepository : IStudyTemplateRepository
         CancellationToken cancellationToken = default)
     {
         return await _context.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task<bool> ExistsByNameAndRevisionAsync(
+        Name name,
+        Revision revision,
+        CancellationToken cancellationToken = default)
+    {
+        return await _context.StudyTemplates.AnyAsync(x => x.Name == name && x.Revision == revision,
+            cancellationToken: cancellationToken);
     }
 }

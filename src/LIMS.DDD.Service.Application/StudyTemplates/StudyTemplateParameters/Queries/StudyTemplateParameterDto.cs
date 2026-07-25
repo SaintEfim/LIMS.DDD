@@ -15,6 +15,6 @@ public sealed record StudyTemplateParameterDto(
     {
         return new StudyTemplateParameterDto(Id: parameter.Id.Value, Name: parameter.Name.Value,
             Description: parameter.Description.Value, AliasName: parameter.AliasName.Value,
-            MinValue: parameter.ValueRange?.MinValue, MaxValue: parameter.ValueRange?.MaxValue);
+            MinValue: parameter.Specification?.MinValue, MaxValue: parameter.Specification?.MaxValue);
     }
 }

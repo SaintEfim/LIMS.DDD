@@ -35,7 +35,7 @@ public class StudyTemplateParameterConfiguration : IEntityTypeConfiguration<Stud
                 .Value)
             .HasMaxLength(100);
 
-        builder.OwnsOne(x => x.ValueRange, vr =>
+        builder.OwnsOne(x => x.Specification, vr =>
         {
             vr.Property(p => p.MaxValue);
             vr.Property(p => p.MinValue);

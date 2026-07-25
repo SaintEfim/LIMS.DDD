@@ -31,11 +31,6 @@ public class StudyTemplateConfiguration : IEntityTypeConfiguration<StudyTemplate
                 .Value)
             .IsRequired();
 
-        builder.HasMany(x => x.Results)
-            .WithOne()
-            .HasForeignKey(x => x.StudyTemplateId)
-            .OnDelete(DeleteBehavior.Cascade);
-
         builder.HasMany(x => x.Parameters)
             .WithOne()
             .HasForeignKey(x => x.StudyTemplateId)

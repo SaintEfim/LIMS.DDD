@@ -11,7 +11,7 @@ public sealed class StudyTemplateParameter
         Name name,
         Description description,
         AliasName aliasName,
-        ValueRange valueRange)
+        Specification specification)
     {
         var parameter = new StudyTemplateParameter
         {
@@ -20,7 +20,7 @@ public sealed class StudyTemplateParameter
             Name = name,
             Description = description,
             AliasName = aliasName,
-            ValueRange = valueRange
+            Specification = specification
         };
 
         return parameter;
@@ -36,5 +36,5 @@ public sealed class StudyTemplateParameter
 
     public AliasName AliasName { get; private set; }
 
-    public ValueRange ValueRange { get; private set; } = null!;
+    public Specification Specification { get; private set; } = null!;
 }

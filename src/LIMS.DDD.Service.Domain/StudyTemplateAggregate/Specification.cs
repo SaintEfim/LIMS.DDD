@@ -1,8 +1,8 @@
 namespace LIMS.DDD.Service.Domain.StudyTemplateAggregate;
 
-public record ValueRange(double? MinValue, double? MaxValue)
+public record Specification(double? MinValue, double? MaxValue)
 {
-    public static ValueRange Create(
+    public static Specification Create(
         double? minValue,
         double? maxValue)
     {
@@ -11,7 +11,7 @@ public record ValueRange(double? MinValue, double? MaxValue)
             throw new ArgumentException($"Min value ({minValue}) cannot be greater than max value ({maxValue}).");
         }
 
-        return new ValueRange(minValue, maxValue);
+        return new Specification(minValue, maxValue);
     }
 
     public bool Contains(

@@ -1,5 +1,4 @@
 ﻿using LIMS.DDD.Service.Application.StudyTemplates.StudyTemplateParameters.Queries;
-using LIMS.DDD.Service.Application.StudyTemplates.StudyTemplateResults.Queries;
 using LIMS.DDD.Service.Domain.StudyTemplateAggregate;
 
 namespace LIMS.DDD.Service.Application.StudyTemplates.Queries;
@@ -10,7 +9,6 @@ public sealed record StudyTemplateDto(
     string? Description,
     string Revision,
     string Status,
-    List<StudyTemplateResultDto> Results,
     List<StudyTemplateParameterDto> Parameters)
 {
     public static StudyTemplateDto FromDomain(
@@ -18,9 +16,7 @@ public sealed record StudyTemplateDto(
     {
         return new StudyTemplateDto(Id: template.Id.Value, Name: template.Name.Value,
             Description: template.Description.Value, Revision: template.Revision.Value,
-            Status: template.Status.ToString(), Results: template.Results
-                .Select(StudyTemplateResultDto.FromDomain)
-                .ToList(), Parameters: template.Parameters
+            Status: template.Status.ToString(), Parameters: template.Parameters
                 .Select(StudyTemplateParameterDto.FromDomain)
                 .ToList());
     }

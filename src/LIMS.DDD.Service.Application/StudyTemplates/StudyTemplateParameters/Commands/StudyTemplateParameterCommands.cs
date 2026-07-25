@@ -27,7 +27,7 @@ public sealed class StudyTemplateParameterCommands(IStudyTemplateRepository repo
             .Bind(tuple => AliasName.Create(command.AliasName)
                 .Map(aliasName => (tuple.name, tuple.description, aliasName)))
             .Bind(tuple => studyTemplate.AddParameter(tuple.name, tuple.description, tuple.aliasName,
-                new ValueRange(command.MinValue, command.MaxValue)))
+                new Specification(command.MinValue, command.MaxValue)))
             .Bind(async result =>
             {
                 try
