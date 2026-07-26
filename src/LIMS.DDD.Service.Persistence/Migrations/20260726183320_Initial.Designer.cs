@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace LIMS.DDD.Service.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260725205025_Initial")]
+    [Migration("20260726183320_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -79,7 +79,7 @@ namespace LIMS.DDD.Service.Persistence.Migrations
                     b.HasIndex("Unit", "ResultInstance")
                         .IsUnique();
 
-                    b.ToTable("StudyTemplateDetermination");
+                    b.ToTable("StudyTemplateDeterminations", (string)null);
                 });
 
             modelBuilder.Entity("LIMS.DDD.Service.Domain.StudyTemplateAggregate.StudyTemplateObservations.StudyTemplateObservation", b =>
@@ -109,7 +109,7 @@ namespace LIMS.DDD.Service.Persistence.Migrations
 
                     b.HasIndex("StudyTemplateId");
 
-                    b.ToTable("StudyTemplateObservations");
+                    b.ToTable("StudyTemplateObservations", (string)null);
                 });
 
             modelBuilder.Entity("LIMS.DDD.Service.Domain.StudyTemplateAggregate.StudyTemplateDeterminations.StudyTemplateDetermination", b =>
@@ -133,7 +133,7 @@ namespace LIMS.DDD.Service.Persistence.Migrations
 
                             b1.HasKey("StudyTemplateDeterminationId");
 
-                            b1.ToTable("StudyTemplateDetermination");
+                            b1.ToTable("StudyTemplateDeterminations");
 
                             b1.WithOwner()
                                 .HasForeignKey("StudyTemplateDeterminationId");

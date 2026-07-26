@@ -11,6 +11,8 @@ public class StudyTemplateObservationConfiguration : IEntityTypeConfiguration<St
     public void Configure(
         EntityTypeBuilder<StudyTemplateObservation> builder)
     {
+        builder.ToTable("StudyTemplateObservations");
+
         builder.HasKey(x => x.Id);
 
         builder.Property(x => x.Id)

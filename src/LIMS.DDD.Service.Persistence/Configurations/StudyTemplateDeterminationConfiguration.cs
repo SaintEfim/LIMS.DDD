@@ -10,6 +10,8 @@ public class StudyTemplateDeterminationConfiguration : IEntityTypeConfiguration<
     public void Configure(
         EntityTypeBuilder<StudyTemplateDetermination> builder)
     {
+        builder.ToTable("StudyTemplateDeterminations");
+
         builder.HasKey(x => x.Id);
 
          builder.Property(x => x.Id)

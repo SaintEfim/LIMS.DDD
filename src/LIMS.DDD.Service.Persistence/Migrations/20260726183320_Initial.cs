@@ -27,7 +27,7 @@ namespace LIMS.DDD.Service.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "StudyTemplateDetermination",
+                name: "StudyTemplateDeterminations",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -39,9 +39,9 @@ namespace LIMS.DDD.Service.Persistence.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_StudyTemplateDetermination", x => x.Id);
+                    table.PrimaryKey("PK_StudyTemplateDeterminations", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_StudyTemplateDetermination_StudyTemplates_StudyTemplateId",
+                        name: "FK_StudyTemplateDeterminations_StudyTemplates_StudyTemplateId",
                         column: x => x.StudyTemplateId,
                         principalTable: "StudyTemplates",
                         principalColumn: "Id",
@@ -72,13 +72,13 @@ namespace LIMS.DDD.Service.Persistence.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_StudyTemplateDetermination_StudyTemplateId",
-                table: "StudyTemplateDetermination",
+                name: "IX_StudyTemplateDeterminations_StudyTemplateId",
+                table: "StudyTemplateDeterminations",
                 column: "StudyTemplateId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_StudyTemplateDetermination_Unit_ResultInstance",
-                table: "StudyTemplateDetermination",
+                name: "IX_StudyTemplateDeterminations_Unit_ResultInstance",
+                table: "StudyTemplateDeterminations",
                 columns: new[] { "Unit", "ResultInstance" },
                 unique: true);
 
@@ -98,7 +98,7 @@ namespace LIMS.DDD.Service.Persistence.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "StudyTemplateDetermination");
+                name: "StudyTemplateDeterminations");
 
             migrationBuilder.DropTable(
                 name: "StudyTemplateObservations");
