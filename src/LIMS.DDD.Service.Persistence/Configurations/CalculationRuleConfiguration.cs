@@ -6,12 +6,12 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace LIMS.DDD.Service.Persistence.Configurations;
 
-public class StudyTemplateCalculationConfiguration : IEntityTypeConfiguration<StudyTemplateCalculations>
+public class CalculationRuleConfiguration : IEntityTypeConfiguration<StudyTemplateCalculations>
 {
     public void Configure(
         EntityTypeBuilder<StudyTemplateCalculations> builder)
     {
-        builder.ToTable("StudyTemplateCalculations");
+        builder.ToTable("CalculationRules");
 
         builder.HasKey(x => x.Id);
 
