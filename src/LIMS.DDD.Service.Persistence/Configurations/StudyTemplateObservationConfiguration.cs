@@ -1,18 +1,24 @@
 using LIMS.DDD.Service.Domain;
 using LIMS.DDD.Service.Domain.StudyTemplateAggregate;
+using LIMS.DDD.Service.Domain.StudyTemplateAggregate.StudyTemplateObservations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace LIMS.DDD.Service.Persistence.Configurations;
 
-public class StudyTemplateConfiguration : IEntityTypeConfiguration<StudyTemplate>
+public class StudyTemplateObservationConfiguration : IEntityTypeConfiguration<StudyTemplateObservation>
 {
     public void Configure(
-        EntityTypeBuilder<StudyTemplate> builder)
+        EntityTypeBuilder<StudyTemplateObservation> builder)
     {
+        builder.ToTable("StudyTemplateObservations");
+
         builder.HasKey(x => x.Id);
 
         builder.Property(x => x.Id)
+            .HasConversion(id => id.Value, id => new StudyTemplateObservationId(id));
+
+        builder.Property(x => x.StudyTemplateId)
             .HasConversion(id => id.Value, id => new StudyTemplateId(id));
 
         builder.Property(x => x.Name)
@@ -26,21 +32,15 @@ public class StudyTemplateConfiguration : IEntityTypeConfiguration<StudyTemplate
                 .Value)
             .HasMaxLength(1000);
 
-        builder.Property(x => x.Revision)
-            .HasConversion(r => r.Value, r => Revision.Create(r)
+        builder.Property(x => x.AliasName)
+            .HasConversion(a => a.Value, a => AliasName.Create(a)
                 .Value)
-            .IsRequired();
+            .HasMaxLength(100);
 
-        builder.HasMany(x => x.Observations)
-            .WithOne()
-            .HasForeignKey(x => x.StudyTemplateId)
-            .OnDelete(DeleteBehavior.Cascade);
-
-        builder.HasIndex(x => new
-            {
-                x.Name,
-                x.Revision
-            })
-            .IsUnique();
+        builder.OwnsOne(x => x.Specification, vr =>
+        {
+            vr.Property(p => p.MaxValue);
+            vr.Property(p => p.MinValue);
+        });
     }
 }

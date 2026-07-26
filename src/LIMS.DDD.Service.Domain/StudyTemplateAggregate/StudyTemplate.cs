@@ -1,7 +1,7 @@
 ﻿using LIMS.DDD.Service.Domain.SeedWork;
 using LIMS.DDD.Service.Domain.SeedWork.Result;
-using LIMS.DDD.Service.Domain.StudyTemplateAggregate.StudyTemplateParameters;
-using LIMS.DDD.Service.Domain.StudyTemplateAggregate.StudyTemplateResults;
+using LIMS.DDD.Service.Domain.StudyTemplateAggregate.StudyTemplateDeterminations;
+using LIMS.DDD.Service.Domain.StudyTemplateAggregate.StudyTemplateObservations;
 
 namespace LIMS.DDD.Service.Domain.StudyTemplateAggregate;
 
@@ -21,13 +21,13 @@ public sealed class StudyTemplate : IAggregateRoot
 
     public Status Status { get; private set; }
 
-    public IReadOnlyList<StudyTemplateResult> Results => _results.AsReadOnly();
+    public IReadOnlyList<StudyTemplateObservation> Observations => _observation.AsReadOnly();
 
-    private readonly List<StudyTemplateResult> _results = [];
+    private readonly List<StudyTemplateObservation> _observation = [];
 
-    public IReadOnlyList<StudyTemplateParameter> Parameters => _parameters.AsReadOnly();
+    public IReadOnlyList<StudyTemplateDetermination> Determinations => _determinations.AsReadOnly();
 
-    private readonly List<StudyTemplateParameter> _parameters = [];
+    private readonly List<StudyTemplateDetermination> _determinations = [];
 
     public static Result<StudyTemplate, Exception> Create(
         Name name,
@@ -47,89 +47,123 @@ public sealed class StudyTemplate : IAggregateRoot
 
     public Result<StudyTemplate, Exception> UpdatePartial(
         Name? name,
-        Description? description,
-        Revision? revision)
+        Description? description)
     {
-        if (Status == Status.Completed)
-        {
+        if (Status != Status.Draft)
             return Result<StudyTemplate, Exception>.Failure(
-                new InvalidOperationException("Cannot modify a completed study template."));
-        }
+                new InvalidOperationException(
+                    "Cannot modify details of an Active or Archived template. Create a new revision."));
 
         if (name is not null) Name = name.Value;
         if (description is not null) Description = description.Value;
-        if (revision is not null) Revision = revision.Value;
 
         return Result<StudyTemplate, Exception>.Success(this);
     }
 
-    public void ChangeStatus(
-        Status newStatus)
-    {
-        if (Status == newStatus) return;
-
-        Status = newStatus;
-    }
-
-    public Result<StudyTemplateParameter, Exception> AddParameter(
+    public Result<StudyTemplateObservation, Exception> AddStudyTemplateObservation(
         Name name,
         Description description,
         AliasName aliasName,
-        ValueRange valueRange)
+        Specification specification)
     {
-        if (_parameters.Any(p => p.Name == name))
-        {
-            return Result<StudyTemplateParameter, Exception>.Failure(
+        if (Status != Status.Draft)
+            return Result<StudyTemplateObservation, Exception>.Failure(
+                new InvalidOperationException("Cannot add observation to an Active template."));
+
+        if (_observation.Any(p => p.Name == name))
+            return Result<StudyTemplateObservation, Exception>.Failure(
                 new InvalidOperationException("Parameter name must be unique within the template."));
-        }
 
-        var parameter = StudyTemplateParameter.Create(Id, name, description, aliasName, valueRange);
-        _parameters.Add(parameter);
+        var parameter = StudyTemplateObservation.Create(Id, name, description, aliasName, specification);
 
-        return Result<StudyTemplateParameter, Exception>.Success(parameter);
+        _observation.Add(parameter);
+        return Result<StudyTemplateObservation, Exception>.Success(parameter);
     }
 
-    public Result<Exception> RemoveParameter(
-        StudyTemplateParameterId parameterId)
+    public Result<Exception> RemoveStudyTemplateObservation(
+        StudyTemplateObservationId observationId)
     {
-        var parameter = _parameters.FirstOrDefault(p => p.Id == parameterId);
-        if (parameter == null)
-        {
-            return Result<Exception>.Failure(new InvalidOperationException("Parameter not found."));
-        }
+        if (Status != Status.Draft)
+            return Result<Exception>.Failure(
+                new InvalidOperationException("Cannot remove observation from an Active template."));
 
-        _parameters.Remove(parameter);
+        var parameter = _observation.SingleOrDefault(p => p.Id == observationId);
+        if (parameter == null) return Result<Exception>.Failure(new InvalidOperationException("Parameter not found."));
+
+        _observation.Remove(parameter);
         return Result<Exception>.Success();
     }
 
-    public Result<StudyTemplateResult, Exception> AddResult(
-        string resultInstance,
-        string unit,
-        ValueRange valueRange)
+    public Result<Exception> Approve()
     {
-        var existsResult = _results.Any(x => x.ResultInstance == resultInstance && x.Unit == unit);
-        if (existsResult)
-        {
-            return Result<StudyTemplateResult, Exception>.Failure(
-                new InvalidOperationException("Result instance already exists."));
-        }
+        if (Status != Status.Draft)
+            return Result<Exception>.Failure(new InvalidOperationException("Only Draft templates can be approved."));
 
-        var result = StudyTemplateResult.Create(Id, resultInstance, unit, valueRange);
-        _results.Add(result);
+        if (!_observation.Any())
+            return Result<Exception>.Failure(
+                new InvalidOperationException("Cannot approve a template without parameters."));
 
-        return Result<StudyTemplateResult, Exception>.Success(result);
+        Status = Status.Active;
+
+        return Result<Exception>.Success();
     }
 
-    public Result<Exception> RemoveResult(
-        StudyTemplateResultId resultId)
+    public Result<Exception> Archive()
     {
-        var result = _results.FirstOrDefault(r => r.Id == resultId);
-        if (result == null)
+        if (Status == Status.Archived)
+            return Result<Exception>.Failure(new InvalidOperationException("Template is already archived."));
+
+        Status = Status.Archived;
+        return Result<Exception>.Success();
+    }
+
+    public Result<Exception> EnsureCanBeDeleted()
+    {
+        if (Status != Status.Draft)
         {
-            return Result<Exception>.Failure(new InvalidOperationException("Result not found."));
+            return Result<Exception>.Failure(new InvalidOperationException(
+                $"Cannot delete a template with status '{Status}'. Only 'Draft' templates can be deleted. Use Archive instead."));
         }
 
-        _results.Remove(result);
+        return Result<Exception>.Success();
+    }
+
+    public Result<StudyTemplateDetermination, Exception> AddStudyTemplateDetermination(
+        string resultInstance,
+        string unit,
+        Specification valueRange)
+    {
+        if (Status != Status.Draft)
+            return Result<StudyTemplateDetermination, Exception>.Failure(
+                new InvalidOperationException("Cannot add determination to an Active template."));
+
+        var existsResult = _determinations.Any(x => x.ResultInstance == resultInstance && x.Unit == unit);
+        if (existsResult)
+        {
+            return Result<StudyTemplateDetermination, Exception>.Failure(
+                new InvalidOperationException("Determination result instance already exists."));
+        }
+
+        var result = StudyTemplateDetermination.Create(Id, resultInstance, unit, valueRange);
+        _determinations.Add(result);
+
+        return Result<StudyTemplateDetermination, Exception>.Success(result);
+    }
+
+    public Result<Exception> RemoveStudyTemplateDetermination(
+        StudyTemplateDeterminationId determinationId)
+    {
+        if (Status != Status.Draft)
+            return Result<Exception>.Failure(
+                new InvalidOperationException("Cannot add determination to an Active template."));
+
+        var result = _determinations.SingleOrDefault(r => r.Id == determinationId);
+        if (result == null)
+        {
+            return Result<Exception>.Failure(new InvalidOperationException("Determination result not found."));
+        }
+
+        _determinations.Remove(result);
         return Result<Exception>.Success();
     }
 }

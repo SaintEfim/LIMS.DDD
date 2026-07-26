@@ -33,8 +33,15 @@ public class StudyTemplateModule : ICarterModule
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status404NotFound);
 
-        group.MapPost("/{id:guid}/status", ChangeStudyTemplateStatus)
-            .Produces(StatusCodes.Status204NoContent)
+        group.MapPost("/{id:guid}/approve", ApproveStudyTemplate)
+            .WithName("ApproveStudyTemplate")
+            .Produces(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status404NotFound)
+            .Produces(StatusCodes.Status400BadRequest);
+
+        group.MapPost("/{id:guid}/archive", ArchiveStudyTemplate)
+            .WithName("ArchiveStudyTemplate")
+            .Produces(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status404NotFound)
             .Produces(StatusCodes.Status400BadRequest);
     }
@@ -88,14 +95,24 @@ public class StudyTemplateModule : ICarterModule
         return result.IsFailure ? HandleFailure(result.Error!) : Results.NoContent();
     }
 
-    private static async Task<IResult> ChangeStudyTemplateStatus(
+    private static async Task<IResult> ApproveStudyTemplate(
         Guid id,
-        ChangeStatusCommand command,
         [AsParameters] StudyTemplateServices services,
         CancellationToken ct)
     {
-        var result = await services.Commands.ChangeStatusAsync(id, command, ct);
-        return result.IsFailure ? HandleFailure(result.Error!) : Results.NoContent();
+        var result = await services.Commands.ApproveAsync(id, ct);
+
+        return result.IsFailure ? HandleFailure(result.Error!) : Results.Ok(result.Value);
+    }
+
+    private static async Task<IResult> ArchiveStudyTemplate(
+        Guid id,
+        [AsParameters] StudyTemplateServices services,
+        CancellationToken ct)
+    {
+        var result = await services.Commands.ArchiveAsync(id, ct);
+
+        return result.IsFailure ? HandleFailure(result.Error!) : Results.Ok(result.Value);
     }
 
     private static IResult HandleFailure(

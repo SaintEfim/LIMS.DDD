@@ -1,4 +1,8 @@
-﻿namespace LIMS.DDD.Service.Domain.StudyTemplateAggregate;
+﻿using LIMS.DDD.Service.Domain.SeedWork;
 
-[StronglyTypedId]
-public readonly partial struct StudyTemplateId;
+namespace LIMS.DDD.Service.Domain.StudyTemplateAggregate;
+
+public readonly record struct StudyTemplateId(Guid Value) : IValueObjectId
+{
+    public Guid Value { get; } = Value;
+}
