@@ -27,6 +27,27 @@ namespace LIMS.DDD.Service.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "StudyTemplateCalculations",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    StudyTemplateId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    FormulaExpression = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: false),
+                    Description = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_StudyTemplateCalculations", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_StudyTemplateCalculations_StudyTemplates_StudyTemplateId",
+                        column: x => x.StudyTemplateId,
+                        principalTable: "StudyTemplates",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "StudyTemplateDeterminations",
                 columns: table => new
                 {
@@ -72,6 +93,11 @@ namespace LIMS.DDD.Service.Persistence.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_StudyTemplateCalculations_StudyTemplateId",
+                table: "StudyTemplateCalculations",
+                column: "StudyTemplateId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_StudyTemplateDeterminations_StudyTemplateId",
                 table: "StudyTemplateDeterminations",
                 column: "StudyTemplateId");
@@ -97,6 +123,9 @@ namespace LIMS.DDD.Service.Persistence.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "StudyTemplateCalculations");
+
             migrationBuilder.DropTable(
                 name: "StudyTemplateDeterminations");
 

@@ -1,4 +1,5 @@
-﻿using LIMS.DDD.Service.API.Apis.StudyTemplateDeterminations;
+﻿using LIMS.DDD.Service.API.Apis.CalculationRules;
+using LIMS.DDD.Service.API.Apis.StudyTemplateDeterminations;
 using LIMS.DDD.Service.API.Apis.StudyTemplateObservations;
 using LIMS.DDD.Service.API.Apis.StudyTemplates;
 using LIMS.DDD.Service.Application;
@@ -18,5 +19,6 @@ public static class DependencyInjection
         services.AddScoped<StudyTemplateObservationServices>();
         services.AddScoped<StudyTemplateDeterminationServices>();
         services.AddScoped<StudyTemplateServices>();
+        services.AddScoped<CalculationRuleServices>();
     }
 }

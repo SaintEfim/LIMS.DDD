@@ -30,4 +30,8 @@ public readonly record struct Revision
         var revision = new Revision(value);
         return Result<Revision, Exception>.Success(revision);
     }
+
+    public static implicit operator string(
+        Revision revision) =>
+        revision.Value;
 }

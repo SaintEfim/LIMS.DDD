@@ -13,8 +13,8 @@ public sealed record StudyTemplateObservationDto(
     public static StudyTemplateObservationDto FromDomain(
         StudyTemplateObservation observation)
     {
-        return new StudyTemplateObservationDto(Id: observation.Id.Value, Name: observation.Name.Value,
-            Description: observation.Description.Value, AliasName: observation.AliasName.Value,
+        return new StudyTemplateObservationDto(Id: observation.Id.Value, Name: observation.Name,
+            Description: observation.Description, AliasName: observation.AliasName,
             MinValue: observation.Specification?.MinValue, MaxValue: observation.Specification?.MaxValue);
     }
 }

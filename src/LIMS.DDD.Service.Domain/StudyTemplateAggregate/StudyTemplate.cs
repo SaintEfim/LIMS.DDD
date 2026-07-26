@@ -1,9 +1,15 @@
 ﻿using LIMS.DDD.Service.Domain.SeedWork;
 using LIMS.DDD.Service.Domain.SeedWork.Result;
+using LIMS.DDD.Service.Domain.StudyTemplateAggregate.CalculationRules;
 using LIMS.DDD.Service.Domain.StudyTemplateAggregate.StudyTemplateDeterminations;
 using LIMS.DDD.Service.Domain.StudyTemplateAggregate.StudyTemplateObservations;
 
 namespace LIMS.DDD.Service.Domain.StudyTemplateAggregate;
+
+public readonly record struct StudyTemplateId(Guid Value) : IValueObjectId
+{
+    public Guid Value { get; } = Value;
+}
 
 public sealed class StudyTemplate : IAggregateRoot
 {
@@ -28,6 +34,10 @@ public sealed class StudyTemplate : IAggregateRoot
     public IReadOnlyList<StudyTemplateDetermination> Determinations => _determinations.AsReadOnly();
 
     private readonly List<StudyTemplateDetermination> _determinations = [];
+
+    public IReadOnlyList<StudyTemplateCalculations> CalculationRules => _calculationRules.AsReadOnly();
+
+    private readonly List<StudyTemplateCalculations> _calculationRules = [];
 
     public static Result<StudyTemplate, Exception> Create(
         Name name,
@@ -78,6 +88,24 @@ public sealed class StudyTemplate : IAggregateRoot
 
         _observation.Add(parameter);
         return Result<StudyTemplateObservation, Exception>.Success(parameter);
+    }
+
+    public Result<StudyTemplateCalculations, Exception> AddCalculationRule(
+        Name name,
+        FormulaExpression formula,
+        Description description)
+    {
+        if (Status != Status.Draft)
+            return Result<StudyTemplateCalculations, Exception>.Failure(
+                new InvalidOperationException("Cannot add calculation rules to an Active template."));
+
+        if (string.IsNullOrWhiteSpace(formula))
+            return Result<StudyTemplateCalculations, Exception>.Failure(new ArgumentException("Formula cannot be empty."));
+
+        var rule = StudyTemplateCalculations.Create(Id, name, formula, description);
+        _calculationRules.Add(rule);
+
+        return Result<StudyTemplateCalculations, Exception>.Success(rule);
     }
 
     public Result<Exception> RemoveStudyTemplateObservation(
@@ -164,6 +192,23 @@ public sealed class StudyTemplate : IAggregateRoot
         }
 
         _determinations.Remove(result);
+        return Result<Exception>.Success();
+    }
+
+    public Result<Exception> RemoveCalculationRule(
+        CalculationRuleId ruleId)
+    {
+        if (Status != Status.Draft)
+            return Result<Exception>.Failure(
+                new InvalidOperationException("Cannot add calculation rule to an Active template."));
+
+        var result = _calculationRules.SingleOrDefault(r => r.Id == ruleId);
+        if (result == null)
+        {
+            return Result<Exception>.Failure(new InvalidOperationException("Calculation rule not found."));
+        }
+
+        _calculationRules.Remove(result);
         return Result<Exception>.Success();
     }
 }

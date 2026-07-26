@@ -1,4 +1,6 @@
-﻿using LIMS.DDD.Service.Application.StudyTemplates.Commands;
+﻿using LIMS.DDD.Service.Application.StudyTemplates.CalculationRules.Commands;
+using LIMS.DDD.Service.Application.StudyTemplates.CalculationRules.Queries;
+using LIMS.DDD.Service.Application.StudyTemplates.Commands;
 using LIMS.DDD.Service.Application.StudyTemplates.Queries;
 using LIMS.DDD.Service.Application.StudyTemplates.StudyTemplateDeterminations.Commands;
 using LIMS.DDD.Service.Application.StudyTemplates.StudyTemplateDeterminations.Queries;
@@ -21,5 +23,8 @@ public static class DependencyInjection
 
         services.AddScoped<StudyTemplateDeterminationCommands>();
         services.AddScoped<StudyTemplateDeterminationQueries>();
+
+        services.AddScoped<CalculationRuleCommands>();
+        services.AddScoped<CalculationRuleQueries>();
     }
 }

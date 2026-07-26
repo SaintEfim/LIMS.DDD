@@ -27,4 +27,8 @@ public readonly record struct Description
         var description = new Description(descriptionValue);
         return Result<Description, Exception>.Success(description);
     }
+
+    public static implicit operator string?(
+        Description description) =>
+        description.Value;
 }

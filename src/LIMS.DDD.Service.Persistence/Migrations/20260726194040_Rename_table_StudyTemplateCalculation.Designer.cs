@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace LIMS.DDD.Service.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260726183320_Initial")]
-    partial class Initial
+    [Migration("20260726194040_Rename_table_StudyTemplateCalculation")]
+    partial class Rename_table_StudyTemplateCalculation
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,36 @@ namespace LIMS.DDD.Service.Persistence.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+
+            modelBuilder.Entity("LIMS.DDD.Service.Domain.StudyTemplateAggregate.CalculationRules.StudyTemplateCalculations", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<string>("FormulaExpression")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<Guid>("StudyTemplateId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("StudyTemplateId");
+
+                    b.ToTable("CalculationRules", (string)null);
+                });
 
             modelBuilder.Entity("LIMS.DDD.Service.Domain.StudyTemplateAggregate.StudyTemplate", b =>
                 {
@@ -112,6 +142,15 @@ namespace LIMS.DDD.Service.Persistence.Migrations
                     b.ToTable("StudyTemplateObservations", (string)null);
                 });
 
+            modelBuilder.Entity("LIMS.DDD.Service.Domain.StudyTemplateAggregate.CalculationRules.StudyTemplateCalculations", b =>
+                {
+                    b.HasOne("LIMS.DDD.Service.Domain.StudyTemplateAggregate.StudyTemplate", null)
+                        .WithMany("CalculationRules")
+                        .HasForeignKey("StudyTemplateId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("LIMS.DDD.Service.Domain.StudyTemplateAggregate.StudyTemplateDeterminations.StudyTemplateDetermination", b =>
                 {
                     b.HasOne("LIMS.DDD.Service.Domain.StudyTemplateAggregate.StudyTemplate", null)
@@ -176,6 +215,8 @@ namespace LIMS.DDD.Service.Persistence.Migrations
 
             modelBuilder.Entity("LIMS.DDD.Service.Domain.StudyTemplateAggregate.StudyTemplate", b =>
                 {
+                    b.Navigation("CalculationRules");
+
                     b.Navigation("Determinations");
 
                     b.Navigation("Observations");

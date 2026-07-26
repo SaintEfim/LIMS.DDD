@@ -36,6 +36,16 @@ public class StudyTemplateConfiguration : IEntityTypeConfiguration<StudyTemplate
             .HasForeignKey(x => x.StudyTemplateId)
             .OnDelete(DeleteBehavior.Cascade);
 
+        builder.HasMany(x => x.Determinations)
+            .WithOne()
+            .HasForeignKey(x => x.StudyTemplateId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasMany(x => x.CalculationRules)
+            .WithOne()
+            .HasForeignKey(x => x.StudyTemplateId)
+            .OnDelete(DeleteBehavior.Cascade);
+
         builder.HasIndex(x => new
             {
                 x.Name,
