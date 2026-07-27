@@ -1,6 +1,7 @@
 ﻿using LIMS.DDD.Service.Domain;
 using LIMS.DDD.Service.Domain.StudyTemplateAggregate;
 using LIMS.DDD.Service.Domain.StudyTemplateAggregate.CalculationRules;
+using LIMS.DDD.Service.Domain.StudyTemplateAggregate.InputParameters;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -41,5 +42,23 @@ public class CalculationRuleConfiguration : IEntityTypeConfiguration<Calculation
 
         builder.HasIndex(x => x.Name)
             .IsUnique();
+
+        builder.OwnsMany(x => x.CalculationInputs, inputBuilder =>
+        {
+            inputBuilder.Property(x => x.VariableAlias)
+                .HasConversion(
+                    vo => vo.Value,
+                    db => AliasName.Create(db).Value
+                )
+                .HasMaxLength(100)
+                .IsRequired();
+
+            inputBuilder.Property(x => x.ParameterId)
+                .HasConversion(
+                    id => id.Value,
+                    id => new InputParameterId(id)
+                )
+                .IsRequired();
+        });
     }
 }
