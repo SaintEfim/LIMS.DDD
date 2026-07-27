@@ -14,14 +14,23 @@ public class StudyTemplateRepository : IStudyTemplateRepository
         _context = context;
     }
 
+    private static IQueryable<StudyTemplate> StudyTemplateBaseQuery(
+        IQueryable<StudyTemplate> query)
+    {
+        return query.Include(t => t.InputParameters)
+            .Include(t => t.ResultDefinitions)
+            .Include(t => t.CalculationRules);
+    }
+
     public async Task<StudyTemplate?> GetByIdAsync(
         StudyTemplateId id,
         CancellationToken cancellationToken = default)
     {
-        var studyTemplate = await _context.StudyTemplates
+        var studyTemplateQuery = _context.StudyTemplates
             .AsSplitQuery()
-            .AsNoTracking()
-            .Include(t => t.InputParameters)
+            .AsNoTracking();
+
+        var studyTemplate = await StudyTemplateBaseQuery(studyTemplateQuery)
             .SingleOrDefaultAsync(t => t.Id == id, cancellationToken);
 
         return studyTemplate;
@@ -31,9 +40,9 @@ public class StudyTemplateRepository : IStudyTemplateRepository
         StudyTemplateId id,
         CancellationToken cancellationToken = default)
     {
-        var studyTemplate = await _context.StudyTemplates
-            .AsSplitQuery()
-            .Include(t => t.InputParameters)
+        var studyTemplateQuery = _context.StudyTemplates.AsSplitQuery();
+
+        var studyTemplate = await StudyTemplateBaseQuery(studyTemplateQuery)
             .SingleOrDefaultAsync(t => t.Id == id, cancellationToken);
 
         return studyTemplate;
@@ -42,11 +51,14 @@ public class StudyTemplateRepository : IStudyTemplateRepository
     public async Task<ICollection<StudyTemplate>> GetAllAsync(
         CancellationToken cancellationToken = default)
     {
-        return await _context.StudyTemplates
+        var studyTemplateQuery = _context.StudyTemplates
             .AsSplitQuery()
-            .AsNoTracking()
-            .Include(t => t.InputParameters)
+            .AsNoTracking();
+
+        var studyTemplates = await StudyTemplateBaseQuery(studyTemplateQuery)
             .ToListAsync(cancellationToken);
+
+        return studyTemplates;
     }
 
     public void Add(

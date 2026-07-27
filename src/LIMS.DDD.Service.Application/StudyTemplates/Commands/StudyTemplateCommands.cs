@@ -78,30 +78,6 @@ public sealed class StudyTemplateCommands(IStudyTemplateRepository repository)
             });
     }
 
-    public async Task<Result<Exception>> DeleteAsync(
-        Guid id,
-        CancellationToken cancellationToken = default)
-    {
-        var studyTemplate = await repository.GetByIdAsync(new StudyTemplateId(id), cancellationToken);
-
-        if (studyTemplate is null)
-            return Result<Exception>.Failure(new KeyNotFoundException($"StudyTemplate with id {id} not found."));
-
-        var canDeleteResult = studyTemplate.EnsureCanBeDeleted();
-        if (canDeleteResult.IsFailure) return canDeleteResult;
-
-        try
-        {
-            repository.Remove(studyTemplate);
-            await repository.SaveChangesAsync(cancellationToken);
-            return Result<Exception>.Success();
-        }
-        catch (Exception e)
-        {
-            return Result<Exception>.Failure(e);
-        }
-    }
-
     public async Task<Result<StudyTemplate, Exception>> ApproveAsync(
         Guid id,
         CancellationToken cancellationToken = default)

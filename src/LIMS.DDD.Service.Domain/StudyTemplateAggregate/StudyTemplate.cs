@@ -35,9 +35,9 @@ public sealed class StudyTemplate : IAggregateRoot
 
     private readonly List<ResultDefinition> _resultDefinitions = [];
 
-    public IReadOnlyList<StudyTemplateCalculations> CalculationRules => _calculationRules.AsReadOnly();
+    public IReadOnlyList<CalculationRule> CalculationRules => _calculationRules.AsReadOnly();
 
-    private readonly List<StudyTemplateCalculations> _calculationRules = [];
+    private readonly List<CalculationRule> _calculationRules = [];
 
     public static Result<StudyTemplate, Exception> Create(
         Name name,
@@ -90,23 +90,23 @@ public sealed class StudyTemplate : IAggregateRoot
         return Result<InputParameter, Exception>.Success(parameter);
     }
 
-    public Result<StudyTemplateCalculations, Exception> AddCalculationRule(
+    public Result<CalculationRule, Exception> AddCalculationRule(
         Name name,
         FormulaExpression formula,
         Description description)
     {
         if (Status != Status.Draft)
-            return Result<StudyTemplateCalculations, Exception>.Failure(
+            return Result<CalculationRule, Exception>.Failure(
                 new InvalidOperationException("Cannot add calculation rules to an Active template."));
 
         if (string.IsNullOrWhiteSpace(formula))
-            return Result<StudyTemplateCalculations, Exception>.Failure(
+            return Result<CalculationRule, Exception>.Failure(
                 new ArgumentException("Formula cannot be empty."));
 
-        var rule = StudyTemplateCalculations.Create(Id, name, formula, description);
+        var rule = CalculationRule.Create(Id, name, formula, description);
         _calculationRules.Add(rule);
 
-        return Result<StudyTemplateCalculations, Exception>.Success(rule);
+        return Result<CalculationRule, Exception>.Success(rule);
     }
 
     public Result<Exception> RemoveInputParameter(
@@ -128,9 +128,17 @@ public sealed class StudyTemplate : IAggregateRoot
         if (Status != Status.Draft)
             return Result<Exception>.Failure(new InvalidOperationException("Only Draft templates can be approved."));
 
+        if (_calculationRules.Count == 0)
+            return Result<Exception>.Failure(
+                new InvalidOperationException("Cannot approve a template without calculation rules."));
+
         if (_inputParameters.Count == 0)
             return Result<Exception>.Failure(
                 new InvalidOperationException("Cannot approve a template without parameters."));
+
+        if (_resultDefinitions.Count == 0)
+            return Result<Exception>.Failure(
+                new InvalidOperationException("Cannot approve a template without result."));
 
         Status = Status.Active;
 
@@ -143,17 +151,6 @@ public sealed class StudyTemplate : IAggregateRoot
             return Result<Exception>.Failure(new InvalidOperationException("Template is already archived."));
 
         Status = Status.Archived;
-        return Result<Exception>.Success();
-    }
-
-    public Result<Exception> EnsureCanBeDeleted()
-    {
-        if (Status != Status.Draft)
-        {
-            return Result<Exception>.Failure(new InvalidOperationException(
-                $"Cannot delete a template with status '{Status}'. Only 'Draft' templates can be deleted. Use Archive instead."));
-        }
-
         return Result<Exception>.Success();
     }
 
