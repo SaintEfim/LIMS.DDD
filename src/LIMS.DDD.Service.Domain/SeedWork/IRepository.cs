@@ -1,30 +1,4 @@
-﻿using LIMS.DDD.Service.Domain.StudyTemplateAggregate;
-
-namespace LIMS.DDD.Service.Domain.SeedWork;
+﻿namespace LIMS.DDD.Service.Domain.SeedWork;
 
 public interface IRepository<TEntity>
-    where TEntity : IAggregateRoot
-{
-    Task<ICollection<TEntity>> GetAllAsync(
-        CancellationToken cancellationToken = default);
-
-    Task<TEntity?> GetByIdAsync(
-        StudyTemplateId id,
-        CancellationToken cancellationToken = default);
-
-    Task<StudyTemplate?> GetByIdForChangeAsync(
-        StudyTemplateId id,
-        CancellationToken cancellationToken = default);
-
-    void Add(
-        TEntity studyTemplate);
-
-    void Remove(
-        TEntity studyTemplate);
-
-    void Update(
-        TEntity entity);
-
-    Task<int> SaveChangesAsync(
-        CancellationToken cancellationToken = default);
-}
+    where TEntity : IAggregateRoot;

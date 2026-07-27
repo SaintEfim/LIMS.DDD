@@ -7,19 +7,19 @@ public readonly record struct CalculationRuleId(Guid Value) : IValueObjectId
     public Guid Value { get; } = Value;
 }
 
-public sealed class StudyTemplateCalculations
+public sealed class CalculationRule
 {
-    private StudyTemplateCalculations()
+    private CalculationRule()
     {
     }
 
-    internal static StudyTemplateCalculations Create(
+    internal static CalculationRule Create(
         StudyTemplateId studyTemplateId,
         Name name,
         FormulaExpression formulaExpression,
         Description description)
     {
-        return new StudyTemplateCalculations
+        return new CalculationRule
         {
             Id = new CalculationRuleId(Guid.NewGuid()),
             StudyTemplateId = studyTemplateId,

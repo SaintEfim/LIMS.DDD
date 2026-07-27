@@ -29,10 +29,6 @@ public class StudyTemplateModule : ICarterModule
             .Produces(StatusCodes.Status404NotFound)
             .Produces(StatusCodes.Status400BadRequest);
 
-        group.MapDelete("/{id:guid}", DeleteStudyTemplate)
-            .Produces(StatusCodes.Status204NoContent)
-            .Produces(StatusCodes.Status404NotFound);
-
         group.MapPost("/{id:guid}/approve", ApproveStudyTemplate)
             .WithName("ApproveStudyTemplate")
             .Produces(StatusCodes.Status200OK)
@@ -86,15 +82,6 @@ public class StudyTemplateModule : ICarterModule
         return result.IsFailure ? HandleFailure(result.Error!) : Results.NoContent();
     }
 
-    private static async Task<IResult> DeleteStudyTemplate(
-        Guid id,
-        [AsParameters] StudyTemplateServices services,
-        CancellationToken ct)
-    {
-        var result = await services.Commands.DeleteAsync(id, ct);
-        return result.IsFailure ? HandleFailure(result.Error!) : Results.NoContent();
-    }
-
     private static async Task<IResult> ApproveStudyTemplate(
         Guid id,
         [AsParameters] StudyTemplateServices services,
@@ -102,7 +89,7 @@ public class StudyTemplateModule : ICarterModule
     {
         var result = await services.Commands.ApproveAsync(id, ct);
 
-        return result.IsFailure ? HandleFailure(result.Error!) : Results.Ok(result.Value);
+        return result.IsFailure ? HandleFailure(result.Error!) : Results.Ok();
     }
 
     private static async Task<IResult> ArchiveStudyTemplate(
@@ -112,7 +99,7 @@ public class StudyTemplateModule : ICarterModule
     {
         var result = await services.Commands.ArchiveAsync(id, ct);
 
-        return result.IsFailure ? HandleFailure(result.Error!) : Results.Ok(result.Value);
+        return result.IsFailure ? HandleFailure(result.Error!) : Results.Ok();
     }
 
     private static IResult HandleFailure(

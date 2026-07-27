@@ -6,10 +6,10 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace LIMS.DDD.Service.Persistence.Configurations;
 
-public class CalculationRuleConfiguration : IEntityTypeConfiguration<StudyTemplateCalculations>
+public class CalculationRuleConfiguration : IEntityTypeConfiguration<CalculationRule>
 {
     public void Configure(
-        EntityTypeBuilder<StudyTemplateCalculations> builder)
+        EntityTypeBuilder<CalculationRule> builder)
     {
         builder.ToTable("CalculationRules");
 

@@ -9,7 +9,7 @@ public class InputParameterModule : ICarterModule
     public void AddRoutes(
         IEndpointRouteBuilder app)
     {
-        var group = app.MapGroup("/api/studyTemplates/{studyTemplateId:guid}/observations")
+        var group = app.MapGroup("/api/studyTemplates/{studyTemplateId:guid}/inputParameters")
             .WithTags("InputParameters");
 
         group.MapGet("/", GetAllInputParameterS)
