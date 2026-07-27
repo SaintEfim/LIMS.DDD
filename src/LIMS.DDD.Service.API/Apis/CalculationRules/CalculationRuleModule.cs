@@ -8,7 +8,7 @@ public class CalculationRuleModule : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        var group = app.MapGroup("/api/studyTemplates/{studyTemplateId:guid}/calculations")
+        var group = app.MapGroup("/api/studyTemplates/{studyTemplateId:guid}/calculation-rules")
             .WithTags("CalculationRules");
 
         group.MapGet("/", GetAllCalculations)

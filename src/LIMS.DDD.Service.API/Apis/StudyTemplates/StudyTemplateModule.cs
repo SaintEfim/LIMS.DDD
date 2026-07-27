@@ -9,7 +9,7 @@ public class StudyTemplateModule : ICarterModule
     public void AddRoutes(
         IEndpointRouteBuilder app)
     {
-        var group = app.MapGroup("/api/studyTemplates")
+        var group = app.MapGroup("/api/study-templates")
             .WithTags("StudyTemplates");
 
         group.MapGet("/", GetAllStudyTemplates)
@@ -29,14 +29,8 @@ public class StudyTemplateModule : ICarterModule
             .Produces(StatusCodes.Status404NotFound)
             .Produces(StatusCodes.Status400BadRequest);
 
-        group.MapPost("/{id:guid}/approve", ApproveStudyTemplate)
+        group.MapPost("/{id:guid}/change-status", ChangeStatusStudyTemplate)
             .WithName("ApproveStudyTemplate")
-            .Produces(StatusCodes.Status200OK)
-            .Produces(StatusCodes.Status404NotFound)
-            .Produces(StatusCodes.Status400BadRequest);
-
-        group.MapPost("/{id:guid}/archive", ArchiveStudyTemplate)
-            .WithName("ArchiveStudyTemplate")
             .Produces(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status404NotFound)
             .Produces(StatusCodes.Status400BadRequest);
@@ -82,23 +76,13 @@ public class StudyTemplateModule : ICarterModule
         return result.IsFailure ? HandleFailure(result.Error!) : Results.NoContent();
     }
 
-    private static async Task<IResult> ApproveStudyTemplate(
+    private static async Task<IResult> ChangeStatusStudyTemplate(
         Guid id,
+        string newStatus,
         [AsParameters] StudyTemplateServices services,
         CancellationToken ct)
     {
-        var result = await services.Commands.ApproveAsync(id, ct);
-
-        return result.IsFailure ? HandleFailure(result.Error!) : Results.Ok();
-    }
-
-    private static async Task<IResult> ArchiveStudyTemplate(
-        Guid id,
-        [AsParameters] StudyTemplateServices services,
-        CancellationToken ct)
-    {
-        var result = await services.Commands.ArchiveAsync(id, ct);
-
+        var result = await services.Commands.ChangeStatusAsync(id, newStatus, ct);
         return result.IsFailure ? HandleFailure(result.Error!) : Results.Ok();
     }
 

@@ -5,7 +5,7 @@ namespace LIMS.DDD.Service.Application.StudyTemplates.CalculationRules.Queries;
 public sealed record CalculationRuleDto(Guid Id, string Name, string FormulaExpression, string? Description)
 {
     public static CalculationRuleDto FromDomain(
-        Domain.StudyTemplateAggregate.CalculationRules.CalculationRule rule)
+        CalculationRule rule)
     {
         return new CalculationRuleDto(Id: rule.Id.Value, Name: rule.Name.Value,
             FormulaExpression: rule.FormulaExpression.Value, Description: rule.Description.Value);
