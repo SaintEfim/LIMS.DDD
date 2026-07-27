@@ -18,8 +18,9 @@ public sealed record StudyTemplateDto(
     public static StudyTemplateDto FromDomain(
         StudyTemplate template)
     {
-        return new StudyTemplateDto(Id: template.Id.Value, Name: template.Name, Description: template.Description,
-            Revision: template.Revision, Status: template.Status.ToString(),
+        return new StudyTemplateDto(Id: template.Id.Value, Name: template.Name.Value,
+            Description: template.Description.Value, Revision: template.Revision.Value,
+            Status: template.Status.ToString(),
             ResultDefinitions: template.ResultDefinitions.Select(ResultDefinitionDto.FromDomain),
             InputParameters: template.InputParameters.Select(InputParameterDto.FromDomain),
             CalculationRules: template.CalculationRules.Select(CalculationRuleDto.FromDomain));

@@ -39,9 +39,7 @@ public class CalculationRuleConfiguration : IEntityTypeConfiguration<Calculation
                 .Value)
             .HasMaxLength(1000);
 
-        builder.HasOne<StudyTemplate>()
-            .WithMany()
-            .HasForeignKey(x => x.StudyTemplateId)
-            .OnDelete(DeleteBehavior.Cascade);
+        builder.HasIndex(x => x.Name)
+            .IsUnique();
     }
 }

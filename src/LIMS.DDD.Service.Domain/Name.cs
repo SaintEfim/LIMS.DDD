@@ -30,8 +30,4 @@ public readonly record struct Name
         var name = new Name(value);
         return Result<Name, Exception>.Success(name);
     }
-
-    public static implicit operator string(
-        Name name) =>
-        name.Value;
 }

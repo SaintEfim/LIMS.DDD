@@ -6,7 +6,8 @@ namespace LIMS.DDD.Service.API.Apis.CalculationRules;
 
 public class CalculationRuleModule : ICarterModule
 {
-    public void AddRoutes(IEndpointRouteBuilder app)
+    public void AddRoutes(
+        IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("/api/studyTemplates/{studyTemplateId:guid}/calculation-rules")
             .WithTags("CalculationRules");
@@ -25,6 +26,21 @@ public class CalculationRuleModule : ICarterModule
             .Produces(StatusCodes.Status500InternalServerError);
 
         group.MapDelete("/{ruleId:guid}", DeleteCalculation)
+            .Produces(StatusCodes.Status204NoContent)
+            .Produces(StatusCodes.Status404NotFound)
+            .Produces(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status500InternalServerError);
+
+        var inputsGroup = group.MapGroup("/{ruleId:guid}/inputs")
+            .WithTags("CalculationRuleInputs");
+
+        inputsGroup.MapPost("/", AddCalculationInput)
+            .Produces(StatusCodes.Status201Created)
+            .Produces(StatusCodes.Status404NotFound)
+            .Produces(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status500InternalServerError);
+
+        inputsGroup.MapDelete("/{variableAlias}", RemoveCalculationInput)
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status404NotFound)
             .Produces(StatusCodes.Status400BadRequest)
@@ -61,7 +77,8 @@ public class CalculationRuleModule : ICarterModule
         if (result.IsFailure) return HandleFailure(result.Error!);
 
         var ruleId = result.Value;
-        return Results.Created($"/api/studyTemplates/{studyTemplateId}/calculations/{ruleId}", new { id = ruleId });
+        return Results.Created($"/api/studyTemplates/{studyTemplateId}/calculation-rules/{ruleId}",
+            new { id = ruleId });
     }
 
     private static async Task<IResult> DeleteCalculation(
@@ -74,14 +91,36 @@ public class CalculationRuleModule : ICarterModule
         return result.IsFailure ? HandleFailure(result.Error!) : Results.NoContent();
     }
 
-    private static IResult HandleFailure(Exception error) =>
+    private static async Task<IResult> AddCalculationInput(
+        Guid studyTemplateId,
+        Guid ruleId,
+        AddCalculationInputCommand command,
+        [AsParameters] CalculationRuleServices services,
+        CancellationToken ct)
+    {
+        var result = await services.Commands.AddCalculationInputAsync(studyTemplateId, ruleId, command, ct);
+        return result.IsFailure ? HandleFailure(result.Error!) : Results.Created();
+    }
+
+    private static async Task<IResult> RemoveCalculationInput(
+        Guid studyTemplateId,
+        Guid ruleId,
+        string variableAlias,
+        [AsParameters] CalculationRuleServices services,
+        CancellationToken ct)
+    {
+        var command = new RemoveCalculationInputCommand(variableAlias);
+        var result = await services.Commands.RemoveCalculationInputAsync(studyTemplateId, ruleId, command, ct);
+        return result.IsFailure ? HandleFailure(result.Error!) : Results.NoContent();
+    }
+
+    private static IResult HandleFailure(
+        Exception error) =>
         error switch
         {
             KeyNotFoundException => Results.NotFound(new { error.Message }),
             InvalidOperationException => Results.BadRequest(new { error.Message }),
-            _ => Results.Problem(
-                detail: error.Message,
-                statusCode: StatusCodes.Status500InternalServerError,
+            _ => Results.Problem(detail: error.Message, statusCode: StatusCodes.Status500InternalServerError,
                 title: "An unexpected error occurred")
         };
 }

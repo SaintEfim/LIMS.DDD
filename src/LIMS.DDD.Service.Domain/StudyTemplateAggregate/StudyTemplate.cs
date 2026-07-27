@@ -93,19 +93,73 @@ public sealed class StudyTemplate : IAggregateRoot
     public Result<CalculationRule, Exception> AddCalculationRule(
         Name name,
         FormulaExpression formula,
-        Description description)
+        Description description,
+        ResultDefinitionId resultDefinitionId)
     {
         if (Status != Status.Draft)
             return Result<CalculationRule, Exception>.Failure(
                 new InvalidOperationException("Cannot add calculation rules to an Active template."));
 
-        if (string.IsNullOrWhiteSpace(formula))
-            return Result<CalculationRule, Exception>.Failure(new ArgumentException("Formula cannot be empty."));
+        if (_calculationRules.Any(p => p.Name == name))
+            return Result<CalculationRule, Exception>.Failure(
+                new InvalidOperationException("Calculation rule name must be unique within the template."));
 
-        var rule = CalculationRule.Create(Id, name, formula, description);
+        if (_resultDefinitions.All(p => p.Id != resultDefinitionId))
+            throw new InvalidOperationException("Result definition not found in template.");
+
+        var rule = CalculationRule.Create(Id, name, formula, description, resultDefinitionId);
         _calculationRules.Add(rule);
 
         return Result<CalculationRule, Exception>.Success(rule);
+    }
+
+    public Result<Exception> RemoveCalculationRule(
+        CalculationRuleId ruleId)
+    {
+        if (Status != Status.Draft)
+            return Result<Exception>.Failure(
+                new InvalidOperationException("Cannot add calculation rule to an Active template."));
+
+        var result = _calculationRules.SingleOrDefault(r => r.Id == ruleId);
+        if (result == null)
+        {
+            return Result<Exception>.Failure(new InvalidOperationException("Calculation rule not found."));
+        }
+
+        _calculationRules.Remove(result);
+        return Result<Exception>.Success();
+    }
+
+    public Result<Exception> AddCalculationInput(
+        CalculationRuleId ruleId,
+        AliasName variableAlias,
+        InputParameterId inputParameterId)
+    {
+        if (Status != Status.Draft)
+            return Result<Exception>.Failure(
+                new InvalidOperationException("Cannot modify calculation rules in an Active template."));
+
+        var rule = _calculationRules.SingleOrDefault(r => r.Id == ruleId);
+        if (rule == null)
+            return Result<Exception>.Failure(new InvalidOperationException("Calculation rule not found."));
+
+        return _inputParameters.All(p => p.Id != inputParameterId)
+            ? Result<Exception>.Failure(new InvalidOperationException("InputParameter not found in template."))
+            : rule.AddInput(variableAlias, inputParameterId);
+    }
+
+    public Result<Exception> RemoveCalculationInput(
+        CalculationRuleId ruleId,
+        AliasName variableAlias)
+    {
+        if (Status != Status.Draft)
+            return Result<Exception>.Failure(
+                new InvalidOperationException("Cannot modify calculation rules in an Active template."));
+
+        var rule = _calculationRules.SingleOrDefault(r => r.Id == ruleId);
+        return rule == null
+            ? Result<Exception>.Failure(new InvalidOperationException("Calculation rule not found."))
+            : rule.RemoveInput(variableAlias);
     }
 
     public Result<Exception> RemoveInputParameter(
@@ -123,7 +177,7 @@ public sealed class StudyTemplate : IAggregateRoot
     }
 
     public Result<Exception> ChangeStatus(
-         Status newStatus)
+        Status newStatus)
     {
         if (Status == newStatus) return Result<Exception>.Success();
 
@@ -197,23 +251,6 @@ public sealed class StudyTemplate : IAggregateRoot
         }
 
         _resultDefinitions.Remove(result);
-        return Result<Exception>.Success();
-    }
-
-    public Result<Exception> RemoveCalculationRule(
-        CalculationRuleId ruleId)
-    {
-        if (Status != Status.Draft)
-            return Result<Exception>.Failure(
-                new InvalidOperationException("Cannot add calculation rule to an Active template."));
-
-        var result = _calculationRules.SingleOrDefault(r => r.Id == ruleId);
-        if (result == null)
-        {
-            return Result<Exception>.Failure(new InvalidOperationException("Calculation rule not found."));
-        }
-
-        _calculationRules.Remove(result);
         return Result<Exception>.Success();
     }
 }

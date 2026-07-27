@@ -3,4 +3,5 @@
 public sealed record CreateCalculationRuleCommand(
     string Name,
     string FormulaExpression,
-    string Description);
+    string Description,
+    Guid ResultDefinitionId);
