@@ -2,10 +2,10 @@
 using LIMS.DDD.Service.Application.StudyTemplates.CalculationRules.Queries;
 using LIMS.DDD.Service.Application.StudyTemplates.Commands;
 using LIMS.DDD.Service.Application.StudyTemplates.Queries;
-using LIMS.DDD.Service.Application.StudyTemplates.StudyTemplateDeterminations.Commands;
-using LIMS.DDD.Service.Application.StudyTemplates.StudyTemplateDeterminations.Queries;
-using LIMS.DDD.Service.Application.StudyTemplates.StudyTemplateObservations.Commands;
-using LIMS.DDD.Service.Application.StudyTemplates.StudyTemplateObservations.Queries;
+using LIMS.DDD.Service.Application.StudyTemplates.ResultDefinitions.Commands;
+using LIMS.DDD.Service.Application.StudyTemplates.ResultDefinitions.Queries;
+using LIMS.DDD.Service.Application.StudyTemplates.InputParameters.Commands;
+using LIMS.DDD.Service.Application.StudyTemplates.InputParameters.Queries;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace LIMS.DDD.Service.Application;
@@ -18,11 +18,11 @@ public static class DependencyInjection
         services.AddScoped<StudyTemplateCommands>();
         services.AddScoped<StudyTemplateQueries>();
 
-        services.AddScoped<StudyTemplateObservationCommands>();
-        services.AddScoped<StudyTemplateObservationQueries>();
+        services.AddScoped<InputParameterCommands>();
+        services.AddScoped<InputParameterQueries>();
 
-        services.AddScoped<StudyTemplateDeterminationCommands>();
-        services.AddScoped<StudyTemplateDeterminationQueries>();
+        services.AddScoped<ResultDefinitionCommands>();
+        services.AddScoped<ResultDefinitionQueries>();
 
         services.AddScoped<CalculationRuleCommands>();
         services.AddScoped<CalculationRuleQueries>();

@@ -21,7 +21,7 @@ public class StudyTemplateRepository : IStudyTemplateRepository
         var studyTemplate = await _context.StudyTemplates
             .AsSplitQuery()
             .AsNoTracking()
-            .Include(t => t.Observations)
+            .Include(t => t.InputParameters)
             .SingleOrDefaultAsync(t => t.Id == id, cancellationToken);
 
         return studyTemplate;
@@ -33,7 +33,7 @@ public class StudyTemplateRepository : IStudyTemplateRepository
     {
         var studyTemplate = await _context.StudyTemplates
             .AsSplitQuery()
-            .Include(t => t.Observations)
+            .Include(t => t.InputParameters)
             .SingleOrDefaultAsync(t => t.Id == id, cancellationToken);
 
         return studyTemplate;
@@ -45,7 +45,7 @@ public class StudyTemplateRepository : IStudyTemplateRepository
         return await _context.StudyTemplates
             .AsSplitQuery()
             .AsNoTracking()
-            .Include(t => t.Observations)
+            .Include(t => t.InputParameters)
             .ToListAsync(cancellationToken);
     }
 

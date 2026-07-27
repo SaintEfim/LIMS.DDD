@@ -31,12 +31,12 @@ public class StudyTemplateConfiguration : IEntityTypeConfiguration<StudyTemplate
                 .Value)
             .IsRequired();
 
-        builder.HasMany(x => x.Observations)
+        builder.HasMany(x => x.InputParameters)
             .WithOne()
             .HasForeignKey(x => x.StudyTemplateId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasMany(x => x.Determinations)
+        builder.HasMany(x => x.ResultDefinitions)
             .WithOne()
             .HasForeignKey(x => x.StudyTemplateId)
             .OnDelete(DeleteBehavior.Cascade);
