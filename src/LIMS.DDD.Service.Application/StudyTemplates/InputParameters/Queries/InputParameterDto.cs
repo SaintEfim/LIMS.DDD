@@ -15,6 +15,6 @@ public sealed record InputParameterDto(
     {
         return new InputParameterDto(Id: inputParameter.Id.Value, Name: inputParameter.Name,
             Description: inputParameter.Description, AliasName: inputParameter.AliasName,
-            MinValue: inputParameter.Specification?.MinValue, MaxValue: inputParameter.Specification?.MaxValue);
+            MinValue: inputParameter.Specification.MinValue, MaxValue: inputParameter.Specification?.MaxValue);
     }
 }

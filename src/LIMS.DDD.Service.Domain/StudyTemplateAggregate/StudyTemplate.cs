@@ -100,8 +100,7 @@ public sealed class StudyTemplate : IAggregateRoot
                 new InvalidOperationException("Cannot add calculation rules to an Active template."));
 
         if (string.IsNullOrWhiteSpace(formula))
-            return Result<CalculationRule, Exception>.Failure(
-                new ArgumentException("Formula cannot be empty."));
+            return Result<CalculationRule, Exception>.Failure(new ArgumentException("Formula cannot be empty."));
 
         var rule = CalculationRule.Create(Id, name, formula, description);
         _calculationRules.Add(rule);
@@ -123,34 +122,42 @@ public sealed class StudyTemplate : IAggregateRoot
         return Result<Exception>.Success();
     }
 
-    public Result<Exception> Approve()
+    public Result<Exception> ChangeStatus(
+         Status newStatus)
     {
-        if (Status != Status.Draft)
-            return Result<Exception>.Failure(new InvalidOperationException("Only Draft templates can be approved."));
+        if (Status == newStatus) return Result<Exception>.Success();
 
-        if (_calculationRules.Count == 0)
-            return Result<Exception>.Failure(
-                new InvalidOperationException("Cannot approve a template without calculation rules."));
+        switch (newStatus)
+        {
+            case Status.Active:
+                if (Status != Status.Draft)
+                    return Result<Exception>.Failure(
+                        new InvalidOperationException("Only Draft templates can be activated."));
 
-        if (_inputParameters.Count == 0)
-            return Result<Exception>.Failure(
-                new InvalidOperationException("Cannot approve a template without parameters."));
+                if (_inputParameters.Count == 0 && _resultDefinitions.Count == 0 && _calculationRules.Count != 0)
+                    return Result<Exception>.Failure(
+                        new InvalidOperationException("Cannot activate an empty template."));
 
-        if (_resultDefinitions.Count == 0)
-            return Result<Exception>.Failure(
-                new InvalidOperationException("Cannot approve a template without result."));
+                break;
 
-        Status = Status.Active;
+            case Status.Archived:
+                if (Status != Status.Active && Status != Status.Draft)
+                    return Result<Exception>.Failure(
+                        new InvalidOperationException("Only Active or Draft templates can be archived."));
+                break;
 
-        return Result<Exception>.Success();
-    }
+            case Status.Draft:
+                if (Status == Status.Active)
+                    return Result<Exception>.Failure(new InvalidOperationException(
+                        "Active templates cannot be reverted to Draft. Create a new revision instead."));
+                break;
 
-    public Result<Exception> Archive()
-    {
-        if (Status == Status.Archived)
-            return Result<Exception>.Failure(new InvalidOperationException("Template is already archived."));
+            default:
+                return Result<Exception>.Failure(new ArgumentException($"Unknown status: {newStatus}"));
+        }
 
-        Status = Status.Archived;
+        Status = newStatus;
+
         return Result<Exception>.Success();
     }
 

@@ -78,8 +78,9 @@ public sealed class StudyTemplateCommands(IStudyTemplateRepository repository)
             });
     }
 
-    public async Task<Result<StudyTemplate, Exception>> ApproveAsync(
+    public async Task<Result<StudyTemplate, Exception>> ChangeStatusAsync(
         Guid id,
+        string statusCommand,
         CancellationToken cancellationToken = default)
     {
         var studyTemplateId = new StudyTemplateId(id);
@@ -89,7 +90,11 @@ public sealed class StudyTemplateCommands(IStudyTemplateRepository repository)
             return Result<StudyTemplate, Exception>.Failure(
                 new KeyNotFoundException($"StudyTemplate with id {id} not found."));
 
-        var studyTemplateApproveResult = studyTemplate.Approve();
+        if(!Enum.TryParse<Status>(statusCommand, out var newStatus))
+            return Result<StudyTemplate, Exception>.Failure(
+                new KeyNotFoundException("Not found status"));
+
+        var studyTemplateApproveResult = studyTemplate.ChangeStatus(newStatus);
 
         if (studyTemplateApproveResult.IsFailure)
             return Result<StudyTemplate, Exception>.Failure(studyTemplateApproveResult.Error!);
@@ -104,35 +109,6 @@ public sealed class StudyTemplateCommands(IStudyTemplateRepository repository)
         {
             return Result<StudyTemplate, Exception>.Failure(
                 new Exception($"Failed to approve study template: {ex.Message}"));
-        }
-    }
-
-    public async Task<Result<StudyTemplate, Exception>> ArchiveAsync(
-        Guid id,
-        CancellationToken cancellationToken = default)
-    {
-        var studyTemplateId = new StudyTemplateId(id);
-        var studyTemplate = await repository.GetByIdAsync(studyTemplateId, cancellationToken);
-
-        if (studyTemplate is null)
-            return Result<StudyTemplate, Exception>.Failure(
-                new KeyNotFoundException($"StudyTemplate with id {id} not found."));
-
-        var studyTemplateArchiveResult = studyTemplate.Archive();
-
-        if (studyTemplateArchiveResult.IsFailure)
-            return Result<StudyTemplate, Exception>.Failure(studyTemplateArchiveResult.Error!);
-
-        try
-        {
-            repository.Update(studyTemplate);
-            await repository.SaveChangesAsync(cancellationToken);
-            return Result<StudyTemplate, Exception>.Success(studyTemplate);
-        }
-        catch (Exception ex)
-        {
-            return Result<StudyTemplate, Exception>.Failure(
-                new Exception($"Failed to archive study template: {ex.Message}"));
         }
     }
 }
