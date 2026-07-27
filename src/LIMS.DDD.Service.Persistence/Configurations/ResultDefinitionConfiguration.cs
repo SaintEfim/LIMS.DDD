@@ -1,21 +1,21 @@
 ﻿using LIMS.DDD.Service.Domain.StudyTemplateAggregate;
-using LIMS.DDD.Service.Domain.StudyTemplateAggregate.StudyTemplateDeterminations;
+using LIMS.DDD.Service.Domain.StudyTemplateAggregate.ResultDefinitions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace LIMS.DDD.Service.Persistence.Configurations;
 
-public class StudyTemplateDeterminationConfiguration : IEntityTypeConfiguration<StudyTemplateDetermination>
+public class ResultDefinitionConfiguration : IEntityTypeConfiguration<ResultDefinition>
 {
     public void Configure(
-        EntityTypeBuilder<StudyTemplateDetermination> builder)
+        EntityTypeBuilder<ResultDefinition> builder)
     {
-        builder.ToTable("StudyTemplateDeterminations");
+        builder.ToTable("ResultDefinitions");
 
         builder.HasKey(x => x.Id);
 
          builder.Property(x => x.Id)
-            .HasConversion(id => id.Value, id => new StudyTemplateDeterminationId(id));
+            .HasConversion(id => id.Value, id => new ResultDefinitionId(id));
 
         builder.Property(x => x.StudyTemplateId)
             .HasConversion(id => id.Value, id => new StudyTemplateId(id));

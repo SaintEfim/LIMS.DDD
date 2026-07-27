@@ -1,14 +1,15 @@
-﻿using LIMS.DDD.Service.Domain.SeedWork.Result;
+﻿using LIMS.DDD.Service.Domain;
+using LIMS.DDD.Service.Domain.SeedWork.Result;
 using LIMS.DDD.Service.Domain.StudyTemplateAggregate;
-using LIMS.DDD.Service.Domain.StudyTemplateAggregate.StudyTemplateDeterminations;
+using LIMS.DDD.Service.Domain.StudyTemplateAggregate.InputParameters;
 
-namespace LIMS.DDD.Service.Application.StudyTemplates.StudyTemplateDeterminations.Commands;
+namespace LIMS.DDD.Service.Application.StudyTemplates.InputParameters.Commands;
 
-public sealed class StudyTemplateDeterminationCommands(IStudyTemplateRepository repository)
+public sealed class InputParameterCommands(IStudyTemplateRepository repository)
 {
-    public async Task<Result<Guid, Exception>> AddStudyTemplateDeterminationAsync(
+    public async Task<Result<Guid, Exception>> AddInputParameterAsync(
         Guid studyTemplateId,
-        CreateStudyTemplateDeterminationCommand command,
+        CreateInputParameterCommand command,
         CancellationToken cancellationToken = default)
     {
         var studyTemplate = await repository.GetByIdForChangeAsync(
@@ -20,8 +21,13 @@ public sealed class StudyTemplateDeterminationCommands(IStudyTemplateRepository 
                 new KeyNotFoundException($"StudyTemplate with id {studyTemplateId} not found."));
         }
 
-        return await studyTemplate.AddStudyTemplateDetermination(command.ResultInstance, command.Unit,
-                new Specification(command.MinValue, command.MaxValue))
+        return await Name.Create(command.Name)
+            .Bind(name => Description.Create(command.Description)
+                .Map(description => (name, description)))
+            .Bind(tuple => AliasName.Create(command.AliasName)
+                .Map(aliasName => (tuple.name, tuple.description, aliasName)))
+            .Bind(tuple => studyTemplate.AddInputParameter(tuple.name, tuple.description, tuple.aliasName,
+                new Specification(command.MinValue, command.MaxValue)))
             .Bind(async result =>
             {
                 try
@@ -31,14 +37,15 @@ public sealed class StudyTemplateDeterminationCommands(IStudyTemplateRepository 
                 }
                 catch (Exception ex)
                 {
-                    return Result<Guid, Exception>.Failure(new Exception($"Failed to save StudyTemplateDetermination: {ex.Message}", ex));
+                    return Result<Guid, Exception>.Failure(new Exception($"Failed to save parameter: {ex.Message}",
+                        ex));
                 }
             });
     }
 
-    public async Task<Result<Exception>> RemoveStudyTemplateDeterminationAsync(
+    public async Task<Result<Exception>> RemoveInputParameterAsync(
         Guid studyTemplateId,
-        Guid resultId,
+        Guid parameterId,
         CancellationToken cancellationToken = default)
     {
         var studyTemplate = await repository.GetByIdForChangeAsync(
@@ -50,7 +57,7 @@ public sealed class StudyTemplateDeterminationCommands(IStudyTemplateRepository 
                 new KeyNotFoundException($"StudyTemplate with id {studyTemplateId} not found."));
         }
 
-        var removeResult = studyTemplate.RemoveStudyTemplateDetermination(new StudyTemplateDeterminationId(resultId));
+        var removeResult = studyTemplate.RemoveInputParameter(new InputParameterId(parameterId));
 
         if (removeResult.IsFailure)
         {
@@ -64,7 +71,7 @@ public sealed class StudyTemplateDeterminationCommands(IStudyTemplateRepository 
         }
         catch (Exception ex)
         {
-            return Result<Exception>.Failure(new Exception($"Failed to remove StudyTemplateDetermination: {ex.Message}", ex));
+            return Result<Exception>.Failure(new Exception($"Failed to remove parameter: {ex.Message}", ex));
         }
     }
 }

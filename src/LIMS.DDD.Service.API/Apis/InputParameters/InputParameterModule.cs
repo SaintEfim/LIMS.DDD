@@ -1,63 +1,63 @@
 ﻿using Carter;
-using LIMS.DDD.Service.Application.StudyTemplates.StudyTemplateObservations.Commands;
-using LIMS.DDD.Service.Application.StudyTemplates.StudyTemplateObservations.Queries;
+using LIMS.DDD.Service.Application.StudyTemplates.InputParameters.Commands;
+using LIMS.DDD.Service.Application.StudyTemplates.InputParameters.Queries;
 
-namespace LIMS.DDD.Service.API.Apis.StudyTemplateObservations;
+namespace LIMS.DDD.Service.API.Apis.InputParameters;
 
-public class StudyTemplateObservationModule : ICarterModule
+public class InputParameterModule : ICarterModule
 {
     public void AddRoutes(
         IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("/api/studyTemplates/{studyTemplateId:guid}/observations")
-            .WithTags("StudyTemplateObservations");
+            .WithTags("InputParameters");
 
-        group.MapGet("/", GetAllObservations)
-            .Produces<ICollection<StudyTemplateObservationDto>>();
+        group.MapGet("/", GetAllInputParameterS)
+            .Produces<ICollection<InputParameterDto>>();
 
-        group.MapGet("/{parameterId:guid}", GetObservationById)
-            .Produces<StudyTemplateObservationDto>()
+        group.MapGet("/{parameterId:guid}", GetInputParameterById)
+            .Produces<InputParameterDto>()
             .Produces(StatusCodes.Status404NotFound);
 
-        group.MapPost("/", CreateObservation)
+        group.MapPost("/", CreateInputParameter)
             .Produces(StatusCodes.Status201Created)
             .Produces(StatusCodes.Status404NotFound)
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status500InternalServerError);
 
-        group.MapDelete("/{parameterId:guid}", DeleteObservation)
+        group.MapDelete("/{parameterId:guid}", DeleteInputParameter)
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status404NotFound)
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status500InternalServerError);
     }
 
-    private static async Task<IResult> GetAllObservations(
+    private static async Task<IResult> GetAllInputParameterS(
         Guid studyTemplateId,
-        [AsParameters] StudyTemplateObservationServices services,
+        [AsParameters] InputParameterServices services,
         CancellationToken ct)
     {
         var parameters = await services.Queries.GetAllByTemplateIdAsync(studyTemplateId, ct);
         return Results.Ok(parameters);
     }
 
-    private static async Task<IResult> GetObservationById(
+    private static async Task<IResult> GetInputParameterById(
         Guid studyTemplateId,
         Guid parameterId,
-        [AsParameters] StudyTemplateObservationServices services,
+        [AsParameters] InputParameterServices services,
         CancellationToken ct)
     {
         var parameter = await services.Queries.GetByIdAsync(studyTemplateId, parameterId, ct);
         return parameter is not null ? Results.Ok(parameter) : Results.NotFound();
     }
 
-    private static async Task<IResult> CreateObservation(
+    private static async Task<IResult> CreateInputParameter(
         Guid studyTemplateId,
-        CreateStudyTemplateObservationCommand command,
-        [AsParameters] StudyTemplateObservationServices services,
+        CreateInputParameterCommand command,
+        [AsParameters] InputParameterServices services,
         CancellationToken ct)
     {
-        var result = await services.Commands.AddAddStudyTemplateObservationAsync(studyTemplateId, command, ct);
+        var result = await services.Commands.AddInputParameterAsync(studyTemplateId, command, ct);
 
         if (result.IsFailure) return HandleFailure(result.Error!);
 
@@ -66,13 +66,13 @@ public class StudyTemplateObservationModule : ICarterModule
             new { id = parameterId });
     }
 
-    private static async Task<IResult> DeleteObservation(
+    private static async Task<IResult> DeleteInputParameter(
         Guid studyTemplateId,
         Guid parameterId,
-        [AsParameters] StudyTemplateObservationServices services,
+        [AsParameters] InputParameterServices services,
         CancellationToken ct)
     {
-        var result = await services.Commands.RemoveRemoveStudyTemplateObservationAsync(studyTemplateId, parameterId, ct);
+        var result = await services.Commands.RemoveInputParameterAsync(studyTemplateId, parameterId, ct);
 
         return result.IsFailure ? HandleFailure(result.Error!) : Results.NoContent();
     }

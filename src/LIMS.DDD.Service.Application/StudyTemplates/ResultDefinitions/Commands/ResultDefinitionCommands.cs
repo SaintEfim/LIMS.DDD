@@ -1,15 +1,14 @@
-﻿using LIMS.DDD.Service.Domain;
-using LIMS.DDD.Service.Domain.SeedWork.Result;
+﻿using LIMS.DDD.Service.Domain.SeedWork.Result;
 using LIMS.DDD.Service.Domain.StudyTemplateAggregate;
-using LIMS.DDD.Service.Domain.StudyTemplateAggregate.StudyTemplateObservations;
+using LIMS.DDD.Service.Domain.StudyTemplateAggregate.ResultDefinitions;
 
-namespace LIMS.DDD.Service.Application.StudyTemplates.StudyTemplateObservations.Commands;
+namespace LIMS.DDD.Service.Application.StudyTemplates.ResultDefinitions.Commands;
 
-public sealed class StudyTemplateObservationCommands(IStudyTemplateRepository repository)
+public sealed class ResultDefinitionCommands(IStudyTemplateRepository repository)
 {
-    public async Task<Result<Guid, Exception>> AddAddStudyTemplateObservationAsync(
+    public async Task<Result<Guid, Exception>> AddResultDefinitionAsync(
         Guid studyTemplateId,
-        CreateStudyTemplateObservationCommand command,
+        CreateResultDefinitionCommand command,
         CancellationToken cancellationToken = default)
     {
         var studyTemplate = await repository.GetByIdForChangeAsync(
@@ -21,13 +20,8 @@ public sealed class StudyTemplateObservationCommands(IStudyTemplateRepository re
                 new KeyNotFoundException($"StudyTemplate with id {studyTemplateId} not found."));
         }
 
-        return await Name.Create(command.Name)
-            .Bind(name => Description.Create(command.Description)
-                .Map(description => (name, description)))
-            .Bind(tuple => AliasName.Create(command.AliasName)
-                .Map(aliasName => (tuple.name, tuple.description, aliasName)))
-            .Bind(tuple => studyTemplate.AddStudyTemplateObservation(tuple.name, tuple.description, tuple.aliasName,
-                new Specification(command.MinValue, command.MaxValue)))
+        return await studyTemplate.AddResultDefinition(command.ResultInstance, command.Unit,
+                new Specification(command.MinValue, command.MaxValue))
             .Bind(async result =>
             {
                 try
@@ -37,15 +31,14 @@ public sealed class StudyTemplateObservationCommands(IStudyTemplateRepository re
                 }
                 catch (Exception ex)
                 {
-                    return Result<Guid, Exception>.Failure(new Exception($"Failed to save parameter: {ex.Message}",
-                        ex));
+                    return Result<Guid, Exception>.Failure(new Exception($"Failed to save ResultDefinition: {ex.Message}", ex));
                 }
             });
     }
 
-    public async Task<Result<Exception>> RemoveRemoveStudyTemplateObservationAsync(
+    public async Task<Result<Exception>> RemoveResultDefinitionAsync(
         Guid studyTemplateId,
-        Guid parameterId,
+        Guid resultId,
         CancellationToken cancellationToken = default)
     {
         var studyTemplate = await repository.GetByIdForChangeAsync(
@@ -57,7 +50,7 @@ public sealed class StudyTemplateObservationCommands(IStudyTemplateRepository re
                 new KeyNotFoundException($"StudyTemplate with id {studyTemplateId} not found."));
         }
 
-        var removeResult = studyTemplate.RemoveStudyTemplateObservation(new StudyTemplateObservationId(parameterId));
+        var removeResult = studyTemplate.RemoveResultDefinition(new ResultDefinitionId(resultId));
 
         if (removeResult.IsFailure)
         {
@@ -71,7 +64,7 @@ public sealed class StudyTemplateObservationCommands(IStudyTemplateRepository re
         }
         catch (Exception ex)
         {
-            return Result<Exception>.Failure(new Exception($"Failed to remove parameter: {ex.Message}", ex));
+            return Result<Exception>.Failure(new Exception($"Failed to remove ResultDefinition: {ex.Message}", ex));
         }
     }
 }

@@ -1,27 +1,27 @@
 ﻿using LIMS.DDD.Service.Domain.SeedWork;
 
-namespace LIMS.DDD.Service.Domain.StudyTemplateAggregate.StudyTemplateDeterminations;
+namespace LIMS.DDD.Service.Domain.StudyTemplateAggregate.ResultDefinitions;
 
-public readonly record struct StudyTemplateDeterminationId(Guid Value) : IValueObjectId
+public readonly record struct ResultDefinitionId(Guid Value) : IValueObjectId
 {
     public Guid Value { get; } = Value;
 }
 
-public sealed class StudyTemplateDetermination
+public sealed class ResultDefinition
 {
-    private StudyTemplateDetermination()
+    private ResultDefinition()
     {
     }
 
-    internal static StudyTemplateDetermination Create(
+    internal static ResultDefinition Create(
         StudyTemplateId studyTemplateId,
         string resultInstance,
         string unit,
         Specification specification)
     {
-        var result = new StudyTemplateDetermination
+        var result = new ResultDefinition
         {
-            Id = new StudyTemplateDeterminationId(Guid.NewGuid()),
+            Id = new ResultDefinitionId(Guid.NewGuid()),
             StudyTemplateId = studyTemplateId,
             ResultInstance = resultInstance,
             Unit = unit,
@@ -33,7 +33,7 @@ public sealed class StudyTemplateDetermination
 
     public string ResultInstance { get; private set; } = string.Empty;
 
-    public StudyTemplateDeterminationId Id { get; private set; }
+    public ResultDefinitionId Id { get; private set; }
 
     public StudyTemplateId StudyTemplateId { get; private set; }
 

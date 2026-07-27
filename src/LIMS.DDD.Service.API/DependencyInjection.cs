@@ -1,6 +1,6 @@
 ﻿using LIMS.DDD.Service.API.Apis.CalculationRules;
-using LIMS.DDD.Service.API.Apis.StudyTemplateDeterminations;
-using LIMS.DDD.Service.API.Apis.StudyTemplateObservations;
+using LIMS.DDD.Service.API.Apis.ResultDefinitions;
+using LIMS.DDD.Service.API.Apis.InputParameters;
 using LIMS.DDD.Service.API.Apis.StudyTemplates;
 using LIMS.DDD.Service.Application;
 using LIMS.DDD.Service.Persistence;
@@ -16,8 +16,8 @@ public static class DependencyInjection
         services.AddPersistence(configuration);
         services.AddApplication();
 
-        services.AddScoped<StudyTemplateObservationServices>();
-        services.AddScoped<StudyTemplateDeterminationServices>();
+        services.AddScoped<InputParameterServices>();
+        services.AddScoped<ResultDefinitionServices>();
         services.AddScoped<StudyTemplateServices>();
         services.AddScoped<CalculationRuleServices>();
     }

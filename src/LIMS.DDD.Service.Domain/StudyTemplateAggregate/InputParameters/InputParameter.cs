@@ -1,28 +1,28 @@
 ﻿using LIMS.DDD.Service.Domain.SeedWork;
 
-namespace LIMS.DDD.Service.Domain.StudyTemplateAggregate.StudyTemplateObservations;
+namespace LIMS.DDD.Service.Domain.StudyTemplateAggregate.InputParameters;
 
-public readonly record struct StudyTemplateObservationId(Guid Value) : IValueObjectId
+public readonly record struct InputParameterId(Guid Value) : IValueObjectId
 {
     public Guid Value { get; } = Value;
 }
 
-public sealed class StudyTemplateObservation
+public sealed class InputParameter
 {
-    private StudyTemplateObservation()
+    private InputParameter()
     {
     }
 
-    internal static StudyTemplateObservation Create(
+    internal static InputParameter Create(
         StudyTemplateId studyTemplateId,
         Name name,
         Description description,
         AliasName aliasName,
         Specification specification)
     {
-        var parameter = new StudyTemplateObservation
+        var parameter = new InputParameter
         {
-            Id = new StudyTemplateObservationId(Guid.NewGuid()),
+            Id = new InputParameterId(Guid.NewGuid()),
             StudyTemplateId = studyTemplateId,
             Name = name,
             Description = description,
@@ -33,7 +33,7 @@ public sealed class StudyTemplateObservation
         return parameter;
     }
 
-    public StudyTemplateObservationId Id { get; private set; }
+    public InputParameterId Id { get; private set; }
 
     public StudyTemplateId StudyTemplateId { get; private set; }
 
