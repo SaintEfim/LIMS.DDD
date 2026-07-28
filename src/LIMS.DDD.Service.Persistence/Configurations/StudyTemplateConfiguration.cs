@@ -46,6 +46,11 @@ public class StudyTemplateConfiguration : IEntityTypeConfiguration<StudyTemplate
             .HasForeignKey(x => x.StudyTemplateId)
             .OnDelete(DeleteBehavior.Cascade);
 
+        builder.Property(x => x.ParentId)
+            .HasConversion(id => id.HasValue ? id.Value.Value : (Guid?) null,
+                id => id.HasValue ? new StudyTemplateId(id.Value) : null)
+            .IsRequired(false);
+
         builder.HasIndex(x => new
             {
                 x.Name,

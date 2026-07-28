@@ -9,7 +9,7 @@ public class ResultDefinitionModule : ICarterModule
     public void AddRoutes(
         IEndpointRouteBuilder app)
     {
-        var group = app.MapGroup("/api/studyTemplates/{studyTemplateId:guid}/result-definitions")
+        var group = app.MapGroup("/api/study-templates/{studyTemplateId:guid}/result-definitions")
             .WithTags("ResultDefinitions");
 
         group.MapGet("/", GetAllResultDefinitions)

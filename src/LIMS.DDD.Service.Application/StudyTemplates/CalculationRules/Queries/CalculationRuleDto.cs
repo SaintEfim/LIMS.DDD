@@ -7,16 +7,16 @@ public sealed record CalculationRuleDto(
     string Name,
     string FormulaExpression,
     string? Description,
+    Guid ResultDefinitionId,
     ICollection<CalculationInputDto> Inputs)
 {
-    public static CalculationRuleDto FromDomain(CalculationRule rule)
+    public static CalculationRuleDto FromDomain(
+        CalculationRule rule)
     {
-        return new CalculationRuleDto(
-            Id: rule.Id.Value,
-            Name: rule.Name.Value,
-            FormulaExpression: rule.FormulaExpression.Value,
-            Description: rule.Description.Value,
-            Inputs: rule.CalculationInputs.Select(CalculationInputDto.FromDomain).ToList()
-        );
+        return new CalculationRuleDto(Id: rule.Id.Value, Name: rule.Name.Value,
+            FormulaExpression: rule.FormulaExpression.Value, Description: rule.Description.Value,
+            ResultDefinitionId: rule.ResultDefinitionId.Value, Inputs: rule.CalculationInputs
+                .Select(CalculationInputDto.FromDomain)
+                .ToList());
     }
 }

@@ -17,6 +17,14 @@ public sealed class StudyTemplate : IAggregateRoot
     {
     }
 
+    public StudyTemplateId? ParentId { get; private set; }
+
+    internal void SetParentId(
+        StudyTemplateId parentId)
+    {
+        ParentId = parentId;
+    }
+
     public StudyTemplateId Id { get; private set; }
 
     public Name Name { get; private set; }
@@ -180,6 +188,7 @@ public sealed class StudyTemplate : IAggregateRoot
     public Result<Exception> ChangeStatus(
         Status newStatus)
     {
+        // Идемпотентность: если статус не меняется — успех
         if (Status == newStatus) return Result<Exception>.Success();
 
         switch (newStatus)
@@ -189,10 +198,17 @@ public sealed class StudyTemplate : IAggregateRoot
                     return Result<Exception>.Failure(
                         new InvalidOperationException("Only Draft templates can be activated."));
 
-                if (_inputParameters.Count == 0 && _resultDefinitions.Count == 0 && _calculationRules.Count != 0)
+                if (_inputParameters.Count == 0)
                     return Result<Exception>.Failure(
-                        new InvalidOperationException("Cannot activate an empty template."));
+                        new InvalidOperationException("Cannot activate a template without input parameters."));
 
+                if (_resultDefinitions.Count == 0)
+                    return Result<Exception>.Failure(
+                        new InvalidOperationException("Cannot activate a template without result definitions."));
+
+                if (_calculationRules.Count == 0)
+                    return Result<Exception>.Failure(
+                        new InvalidOperationException("Cannot activate a template without calculation rules."));
                 break;
 
             case Status.Archived:
@@ -205,6 +221,10 @@ public sealed class StudyTemplate : IAggregateRoot
                 if (Status == Status.Active)
                     return Result<Exception>.Failure(new InvalidOperationException(
                         "Active templates cannot be reverted to Draft. Create a new revision instead."));
+
+                if (Status == Status.Archived)
+                    return Result<Exception>.Failure(new InvalidOperationException(
+                        "Archived templates cannot be reverted to Draft. Create a new revision instead."));
                 break;
 
             default:

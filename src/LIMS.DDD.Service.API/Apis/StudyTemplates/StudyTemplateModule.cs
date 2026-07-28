@@ -34,6 +34,13 @@ public class StudyTemplateModule : ICarterModule
             .Produces(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status404NotFound)
             .Produces(StatusCodes.Status400BadRequest);
+
+        group.MapPost("/{id:guid}/create-revision", CreateStudyTemplateRevision)
+            .WithName("CreateStudyTemplateRevision")
+            .Produces(StatusCodes.Status201Created)
+            .Produces(StatusCodes.Status404NotFound)
+            .Produces(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status500InternalServerError);
     }
 
     private static async Task<IResult> GetAllStudyTemplates(
@@ -84,6 +91,20 @@ public class StudyTemplateModule : ICarterModule
     {
         var result = await services.Commands.ChangeStatusAsync(id, newStatus, ct);
         return result.IsFailure ? HandleFailure(result.Error!) : Results.Ok();
+    }
+
+    private static async Task<IResult> CreateStudyTemplateRevision(
+        Guid id,
+        CreateStudyTemplateRevisionCommand command,
+        [AsParameters] StudyTemplateServices services,
+        CancellationToken ct)
+    {
+        var result = await services.Commands.CreateRevisionAsync(id, command, ct);
+
+        if (result.IsFailure) return HandleFailure(result.Error!);
+
+        var newTemplateId = result.Value;
+        return Results.Created($"/api/study-templates/{newTemplateId}", new { id = newTemplateId });
     }
 
     private static IResult HandleFailure(
