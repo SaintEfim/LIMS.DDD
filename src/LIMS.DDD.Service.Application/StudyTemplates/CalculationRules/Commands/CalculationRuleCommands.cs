@@ -92,14 +92,10 @@ public sealed class CalculationRuleCommands(IStudyTemplateRepository repository)
                 new KeyNotFoundException($"StudyTemplate with id {studyTemplateId} not found."));
         }
 
-        var variableAlias = AliasName.Create(command.VariableAlias);
-        if (variableAlias.IsFailure) return Result<Exception>.Failure(variableAlias.Error!);
-
         var inputParameterId = new InputParameterId(command.InputParameterId);
         var calculationRuleId = new CalculationRuleId(ruleId);
 
-        var resAddCalculationInput =
-            studyTemplate.AddCalculationInput(calculationRuleId, variableAlias.Value, inputParameterId);
+        var resAddCalculationInput = studyTemplate.AddCalculationInput(calculationRuleId, inputParameterId);
 
         if (resAddCalculationInput.IsFailure) return Result<Exception>.Failure(resAddCalculationInput.Error!);
 

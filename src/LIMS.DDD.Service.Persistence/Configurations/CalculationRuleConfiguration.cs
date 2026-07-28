@@ -45,19 +45,18 @@ public class CalculationRuleConfiguration : IEntityTypeConfiguration<Calculation
 
         builder.OwnsMany(x => x.CalculationInputs, inputBuilder =>
         {
+            inputBuilder.ToTable("CalculationInputs");
+
+            inputBuilder.WithOwner()
+                .HasForeignKey("CalculationRuleId");
+
             inputBuilder.Property(x => x.VariableAlias)
-                .HasConversion(
-                    vo => vo.Value,
-                    db => AliasName.Create(db).Value
-                )
-                .HasMaxLength(100)
-                .IsRequired();
+                .HasConversion(a => a.Value, a => AliasName.Create(a)
+                    .Value)
+                .HasMaxLength(100);
 
             inputBuilder.Property(x => x.ParameterId)
-                .HasConversion(
-                    id => id.Value,
-                    id => new InputParameterId(id)
-                )
+                .HasConversion(id => id.Value, id => new InputParameterId(id))
                 .IsRequired();
         });
     }

@@ -171,7 +171,7 @@ namespace LIMS.DDD.Service.Persistence.Migrations
 
                             b1.HasKey("CalculationRuleId", "Id");
 
-                            b1.ToTable("CalculationInput");
+                            b1.ToTable("CalculationInputs", (string)null);
 
                             b1.WithOwner()
                                 .HasForeignKey("CalculationRuleId");

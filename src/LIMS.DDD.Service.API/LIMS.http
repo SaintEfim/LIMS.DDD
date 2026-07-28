@@ -1,0 +1,454 @@
+### Переменные для тестирования
+@baseUrl = http://localhost:5297
+@studyTemplateId = 00000000-0000-0000-0000-000000000000
+
+### ============================================
+### СОЗДАНИЕ МЕТОДИКИ 1: Определение влажности
+### ============================================
+
+# @name createMoistureTemplate
+POST {{baseUrl}}/api/study-templates
+Content-Type: application/json
+
+{
+  "name": "Определение влажности зерна",
+  "description": "Методика определения массовой доли влаги в зерне воздушно-тепловым способом",
+  "revision": "v1.0"
+}
+
+### Сохраняем ID созданной методики
+@moistureTemplateId = {{createMoistureTemplate.response.body.id}}
+
+### ============================================
+### ДОБАВЛЕНИЕ ВХОДНЫХ ПАРАМЕТРОВ (Input Parameters)
+### ============================================
+
+# @name addMassBefore
+POST {{baseUrl}}/api/studyTemplates/{{moistureTemplateId}}/input-parameters
+Content-Type: application/json
+
+{
+  "name": "Масса бюксы с зерном до высушивания",
+  "description": "Масса бюксы с навеской зерна до высушивания в сушильном шкафу",
+  "unit": "г",
+  "minValue": 10.0,
+  "maxValue": 50.0
+}
+
+###
+
+# @name addMassAfter
+POST {{baseUrl}}/api/studyTemplates/{{moistureTemplateId}}/input-parameters
+Content-Type: application/json
+
+{
+  "name": "Масса бюксы с зерном после высушивания",
+  "description": "Масса бюксы с навеской зерна после высушивания при 130°C в течение 1 часа",
+  "unit": "г",
+  "minValue": 8.0,
+  "maxValue": 48.0
+}
+
+###
+
+# @name addEmptyMass
+POST {{baseUrl}}/api/studyTemplates/{{moistureTemplateId}}/input-parameters
+Content-Type: application/json
+
+{
+  "name": "Масса пустой бюксы",
+  "description": "Масса чистой сухой бюксы",
+  "unit": "г",
+  "minValue": 5.0,
+  "maxValue": 20.0
+}
+
+### Сохраняем ID параметров
+@massBeforeId = {{addMassBefore.response.body.id}}
+@massAfterId = {{addMassAfter.response.body.id}}
+@emptyMassId = {{addEmptyMass.response.body.id}}
+
+### ============================================
+### ДОБАВЛЕНИЕ ОПРЕДЕЛЯЕМЫХ ПОКАЗАТЕЛЕЙ (Result Definitions)
+### ============================================
+
+# @name addMoistureResult
+POST {{baseUrl}}/api/studyTemplates/{{moistureTemplateId}}/result-definitions
+Content-Type: application/json
+
+{
+  "name": "Массовая доля влаги",
+  "description": "Процентное содержание влаги в зерне",
+  "unit": "%",
+  "minValue": 5.0,
+  "maxValue": 20.0
+}
+
+###
+
+# @name addDryMatterResult
+POST {{baseUrl}}/api/studyTemplates/{{moistureTemplateId}}/result-definitions
+Content-Type: application/json
+
+{
+  "name": "Массовая доля сухого вещества",
+  "description": "Процентное содержание сухого вещества в зерне",
+  "unit": "%",
+  "minValue": 80.0,
+  "maxValue": 95.0
+}
+
+### Сохраняем ID результатов
+@moistureResultId = {{addMoistureResult.response.body.id}}
+@dryMatterResultId = {{addDryMatterResult.response.body.id}}
+
+### ============================================
+### ДОБАВЛЕНИЕ ПРАВИЛ РАСЧЕТА (Calculation Rules)
+### ============================================
+
+# @name addMoistureCalculation
+POST {{baseUrl}}/api/studyTemplates/{{moistureTemplateId}}/calculation-rules
+Content-Type: application/json
+
+{
+  "name": "Расчет влажности",
+  "formulaExpression": "((m1 - m2) / (m1 - m0)) * 100",
+  "description": "Формула расчета массовой доли влаги: (масса до - масса после) / (масса до - масса бюксы) * 100",
+  "resultDefinitionId": "{{moistureResultId}}"
+}
+
+###
+
+# @name addDryMatterCalculation
+POST {{baseUrl}}/api/studyTemplates/{{moistureTemplateId}}/calculation-rules
+Content-Type: application/json
+
+{
+  "name": "Расчет сухого вещества",
+  "formulaExpression": "100 - W",
+  "description": "Массовая доля сухого вещества = 100% - влажность",
+  "resultDefinitionId": "{{dryMatterResultId}}"
+}
+
+### Сохраняем ID правил расчета
+@moistureCalcId = {{addMoistureCalculation.response.body.id}}
+@dryMatterCalcId = {{addDryMatterCalculation.response.body.id}}
+
+### ============================================
+### ПРИВЯЗКА ПАРАМЕТРОВ К ФОРМУЛАМ (Calculation Inputs)
+### ============================================
+
+# Привязываем параметры к формуле расчета влажности
+POST {{baseUrl}}/api/studyTemplates/{{moistureTemplateId}}/calculation-rules/{{moistureCalcId}}/inputs
+Content-Type: application/json
+
+{
+  "variableAlias": "m1",
+  "inputParameterId": "{{massBeforeId}}"
+}
+
+###
+
+POST {{baseUrl}}/api/studyTemplates/{{moistureTemplateId}}/calculation-rules/{{moistureCalcId}}/inputs
+Content-Type: application/json
+
+{
+  "variableAlias": "m2",
+  "inputParameterId": "{{massAfterId}}"
+}
+
+###
+
+POST {{baseUrl}}/api/studyTemplates/{{moistureTemplateId}}/calculation-rules/{{moistureCalcId}}/inputs
+Content-Type: application/json
+
+{
+  "variableAlias": "m0",
+  "inputParameterId": "{{emptyMassId}}"
+}
+
+###
+
+# Привязываем параметр к формуле расчета сухого вещества
+POST {{baseUrl}}/api/studyTemplates/{{moistureTemplateId}}/calculation-rules/{{dryMatterCalcId}}/inputs
+Content-Type: application/json
+
+{
+  "variableAlias": "W",
+  "inputParameterId": "{{moistureResultId}}"
+}
+
+### ============================================
+### ПОЛУЧЕНИЕ ПОЛНОЙ ИНФОРМАЦИИ О МЕТОДИКЕ
+### ============================================
+
+GET {{baseUrl}}/api/study-templates/{{moistureTemplateId}}
+
+###
+
+GET {{baseUrl}}/api/studyTemplates/{{moistureTemplateId}}/input-parameters
+
+###
+
+GET {{baseUrl}}/api/studyTemplates/{{moistureTemplateId}}/result-definitions
+
+###
+
+GET {{baseUrl}}/api/studyTemplates/{{moistureTemplateId}}/calculation-rules
+
+### ============================================
+### МЕТОДИКА 2: Определение pH раствора
+### ============================================
+
+# @name createPhTemplate
+POST {{baseUrl}}/api/study-templates
+Content-Type: application/json
+
+{
+  "name": "Определение pH водного раствора",
+  "description": "Потенциометрический метод определения водородного показателя",
+  "revision": "v2.1"
+}
+
+###
+
+@phTemplateId = {{createPhTemplate.response.body.id}}
+
+###
+
+# @name addTemperature
+POST {{baseUrl}}/api/studyTemplates/{{phTemplateId}}/input-parameters
+Content-Type: application/json
+
+{
+  "name": "Температура раствора",
+  "description": "Температура исследуемого раствора в момент измерения",
+  "unit": "°C",
+  "minValue": 15.0,
+  "maxValue": 30.0
+}
+
+###
+
+# @name addVoltage
+POST {{baseUrl}}/api/studyTemplates/{{phTemplateId}}/input-parameters
+Content-Type: application/json
+
+{
+  "name": "ЭДС электрода",
+  "description": "Электродвижущая сила измерительного электрода",
+  "unit": "мВ",
+  "minValue": -400.0,
+  "maxValue": 400.0
+}
+
+###
+
+# @name addPhResult
+POST {{baseUrl}}/api/studyTemplates/{{phTemplateId}}/result-definitions
+Content-Type: application/json
+
+{
+  "name": "Водородный показатель",
+  "description": "Значение pH раствора",
+  "unit": "pH",
+  "minValue": 1.0,
+  "maxValue": 14.0
+}
+
+###
+
+@phResultId = {{addPhResult.response.body.id}}
+
+###
+
+# @name addPhCalculation
+POST {{baseUrl}}/api/studyTemplates/{{phTemplateId}}/calculation-rules
+Content-Type: application/json
+
+{
+  "name": "Расчет pH с температурной компенсацией",
+  "formulaExpression": "7.0 - (E / (54.2 + 0.198 * T))",
+  "description": "Расчет pH с учетом температуры и ЭДС электрода",
+  "resultDefinitionId": "{{phResultId}}"
+}
+
+###
+
+@phCalcId = {{addPhCalculation.response.body.id}}
+
+###
+
+@tempId = {{addTemperature.response.body.id}}
+@voltageId = {{addVoltage.response.body.id}}
+
+###
+
+POST {{baseUrl}}/api/studyTemplates/{{phTemplateId}}/calculation-rules/{{phCalcId}}/inputs
+Content-Type: application/json
+
+{
+  "variableAlias": "E",
+  "inputParameterId": "{{voltageId}}"
+}
+
+###
+
+POST {{baseUrl}}/api/studyTemplates/{{phTemplateId}}/calculation-rules/{{phCalcId}}/inputs
+Content-Type: application/json
+
+{
+  "variableAlias": "T",
+  "inputParameterId": "{{tempId}}"
+}
+
+### ============================================
+### МЕТОДИКА 3: Определение концентрации белка
+### ============================================
+
+# @name createProteinTemplate
+POST {{baseUrl}}/api/study-templates
+Content-Type: application/json
+
+{
+  "name": "Определение массовой доли белка по Кьельдалю",
+  "description": "Метод определения общего азота с последующим пересчетом на белок",
+  "revision": "v1.3"
+}
+
+###
+
+@proteinTemplateId = {{createProteinTemplate.response.body.id}}
+
+###
+
+# @name addSampleMass
+POST {{baseUrl}}/api/studyTemplates/{{proteinTemplateId}}/input-parameters
+Content-Type: application/json
+
+{
+  "name": "Масса навески",
+  "description": "Масса образца для анализа",
+  "unit": "г",
+  "minValue": 0.5,
+  "maxValue": 5.0
+}
+
+###
+
+# @name addAcidVolume
+POST {{baseUrl}}/api/studyTemplates/{{proteinTemplateId}}/input-parameters
+Content-Type: application/json
+
+{
+  "name": "Объем кислоты на титрование",
+  "description": "Объем 0.1Н HCl, пошедший на титрование",
+  "unit": "мл",
+  "minValue": 1.0,
+  "maxValue": 50.0
+}
+
+###
+
+# @name addFactor
+POST {{baseUrl}}/api/studyTemplates/{{proteinTemplateId}}/input-parameters
+Content-Type: application/json
+
+{
+  "name": "Коэффициент пересчета",
+  "description": "Коэффициент пересчета азота на белок (для зерна 5.7, для молока 6.38)",
+  "unit": "",
+  "minValue": 5.0,
+  "maxValue": 7.0
+}
+
+###
+
+# @name addProteinResult
+POST {{baseUrl}}/api/studyTemplates/{{proteinTemplateId}}/result-definitions
+Content-Type: application/json
+
+{
+  "name": "Массовая доля белка",
+  "description": "Процентное содержание белка в образце",
+  "unit": "%",
+  "minValue": 5.0,
+  "maxValue": 40.0
+}
+
+###
+
+@proteinResultId = {{addProteinResult.response.body.id}}
+
+###
+
+# @name addProteinCalculation
+POST {{baseUrl}}/api/studyTemplates/{{proteinTemplateId}}/calculation-rules
+Content-Type: application/json
+
+{
+  "name": "Расчет белка по Кьельдалю",
+  "formulaExpression": "(V * 0.0014 * K * 100) / m",
+  "description": "X = (V * 0.0014 * K * 100) / m, где V - объем кислоты, K - коэффициент, m - масса навески",
+  "resultDefinitionId": "{{proteinResultId}}"
+}
+
+###
+
+@proteinCalcId = {{addProteinCalculation.response.body.id}}
+
+###
+
+@sampleMassId = {{addSampleMass.response.body.id}}
+@acidVolumeId = {{addAcidVolume.response.body.id}}
+@factorId = {{addFactor.response.body.id}}
+
+###
+
+POST {{baseUrl}}/api/studyTemplates/{{proteinTemplateId}}/calculation-rules/{{proteinCalcId}}/inputs
+Content-Type: application/json
+
+{
+  "variableAlias": "V",
+  "inputParameterId": "{{acidVolumeId}}"
+}
+
+###
+
+POST {{baseUrl}}/api/studyTemplates/{{proteinTemplateId}}/calculation-rules/{{proteinCalcId}}/inputs
+Content-Type: application/json
+
+{
+  "variableAlias": "K",
+  "inputParameterId": "{{factorId}}"
+}
+
+###
+
+POST {{baseUrl}}/api/studyTemplates/{{proteinTemplateId}}/calculation-rules/{{proteinCalcId}}/inputs
+Content-Type: application/json
+
+{
+  "variableAlias": "m",
+  "inputParameterId": "{{sampleMassId}}"
+}
+
+### ============================================
+### ПОЛУЧЕНИЕ СПИСКА ВСЕХ МЕТОДИК
+### ============================================
+
+GET {{baseUrl}}/api/study-templates
+
+### ============================================
+### ИЗМЕНЕНИЕ СТАТУСА МЕТОДИКИ (Утверждение)
+### ============================================
+
+POST {{baseUrl}}/api/study-templates/{{moistureTemplateId}}/change-status?newStatus=Active
+
+###
+
+POST {{baseUrl}}/api/study-templates/{{phTemplateId}}/change-status?newStatus=Active
+
+###
+
+POST {{baseUrl}}/api/study-templates/{{proteinTemplateId}}/change-status?newStatus=Active

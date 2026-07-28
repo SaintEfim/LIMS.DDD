@@ -132,7 +132,6 @@ public sealed class StudyTemplate : IAggregateRoot
 
     public Result<Exception> AddCalculationInput(
         CalculationRuleId ruleId,
-        AliasName variableAlias,
         InputParameterId inputParameterId)
     {
         if (Status != Status.Draft)
@@ -143,9 +142,11 @@ public sealed class StudyTemplate : IAggregateRoot
         if (rule == null)
             return Result<Exception>.Failure(new InvalidOperationException("Calculation rule not found."));
 
-        return _inputParameters.All(p => p.Id != inputParameterId)
+        var parameter = _inputParameters.SingleOrDefault(p => p.Id == inputParameterId);
+
+        return parameter is null
             ? Result<Exception>.Failure(new InvalidOperationException("InputParameter not found in template."))
-            : rule.AddInput(variableAlias, inputParameterId);
+            : rule.AddInput(parameter.AliasName, inputParameterId);
     }
 
     public Result<Exception> RemoveCalculationInput(
