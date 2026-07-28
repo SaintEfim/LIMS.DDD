@@ -47,20 +47,7 @@ public class CalculationRuleConfiguration : IEntityTypeConfiguration<Calculation
 
         builder.OwnsMany(x => x.CalculationInputs, inputBuilder =>
         {
-            inputBuilder.HasIndex(x => new
-                {
-                    x.ParameterId,
-                    x.VariableAlias
-                })
-                .IsUnique();
-
-            inputBuilder.ToTable("CalculationInputs");
-
-            inputBuilder.Property(x => x.Id)
-                .HasConversion(id => id.Value, id => new CalculationInputId(id));
-
-            inputBuilder.WithOwner()
-                .HasForeignKey("CalculationRuleId");
+            inputBuilder.ToJson();
 
             inputBuilder.Property(x => x.VariableAlias)
                 .HasConversion(a => a.Value, a => AliasName.Create(a)

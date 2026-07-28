@@ -40,9 +40,9 @@ public sealed class CalculationRule
 
     public ResultDefinitionId ResultDefinitionId;
 
-    public IReadOnlyList<CalculationInput> CalculationInputs => _calculationInputs.AsReadOnly();
+    public IReadOnlyCollection<CalculationInput> CalculationInputs => _calculationInputs.AsReadOnly();
 
-    private readonly List<CalculationInput> _calculationInputs = [];
+    private readonly HashSet<CalculationInput> _calculationInputs = [];
 
     public Name Name { get; private set; }
 

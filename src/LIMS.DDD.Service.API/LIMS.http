@@ -1,12 +1,10 @@
 @baseUrl = http://localhost:5297
 
-
 ### ============================================
 ### СОЗДАНИЕ МЕТОДИКИ 1: Определение влажности
 ### ============================================
 
 # @name createMoistureTemplate
-
 POST {{baseUrl}}/api/study-templates
 Content-Type: application/json
 
@@ -17,34 +15,18 @@ Content-Type: application/json
 }
 
 > {%
-
   client.test("Create moisture template", function () {
-    client.assert(
-      response.status === 201,
-      "Template creation failed: " + response.status
-    );
+    client.assert(response.status === 201, "Template creation failed: " + response.status);
   });
-
-  client.global.set(
-    "moistureTemplateId",
-    response.body.id
-  );
-
-  client.log(
-    "Moisture Template ID: " + response.body.id
-  );
-
+  client.global.set("moistureTemplateId", response.body.id);
+  client.log("Moisture Template ID: " + response.body.id);
 %}
-
-
 
 ### ============================================
 ### ДОБАВЛЕНИЕ ВХОДНЫХ ПАРАМЕТРОВ
 ### ============================================
 
-
 # @name addMassBefore
-
 POST {{baseUrl}}/api/study-templates/{{moistureTemplateId}}/input-parameters
 Content-Type: application/json
 
@@ -58,27 +40,15 @@ Content-Type: application/json
 }
 
 > {%
-
   client.test("Add mass before", function () {
-    client.assert(
-      response.status === 201,
-      "Input parameter creation failed"
-    );
+    client.assert(response.status === 201, "Input parameter creation failed");
   });
-
-  client.global.set(
-    "massBeforeId",
-    response.body.id
-  );
-
+  client.global.set("massBeforeId", response.body.id);
 %}
-
-
 
 ###
 
 # @name addMassAfter
-
 POST {{baseUrl}}/api/study-templates/{{moistureTemplateId}}/input-parameters
 Content-Type: application/json
 
@@ -92,27 +62,15 @@ Content-Type: application/json
 }
 
 > {%
-
   client.test("Add mass after", function () {
-    client.assert(
-      response.status === 201,
-      "Input parameter creation failed"
-    );
+    client.assert(response.status === 201, "Input parameter creation failed");
   });
-
-  client.global.set(
-    "massAfterId",
-    response.body.id
-  );
-
+  client.global.set("massAfterId", response.body.id);
 %}
-
-
 
 ###
 
 # @name addEmptyMass
-
 POST {{baseUrl}}/api/study-templates/{{moistureTemplateId}}/input-parameters
 Content-Type: application/json
 
@@ -126,28 +84,17 @@ Content-Type: application/json
 }
 
 > {%
-
   client.test("Add empty mass", function () {
-    client.assert(
-      response.status === 201,
-      "Input parameter creation failed"
-    );
+    client.assert(response.status === 201, "Input parameter creation failed");
   });
-
-  client.global.set(
-    "emptyMassId",
-    response.body.id
-  );
-
+  client.global.set("emptyMassId", response.body.id);
 %}
 
 ### ============================================
 ### ДОБАВЛЕНИЕ ОПРЕДЕЛЯЕМЫХ ПОКАЗАТЕЛЕЙ
 ### ============================================
 
-
 # @name addMoistureResult
-
 POST {{baseUrl}}/api/study-templates/{{moistureTemplateId}}/result-definitions
 Content-Type: application/json
 
@@ -159,27 +106,15 @@ Content-Type: application/json
 }
 
 > {%
-
   client.test("Add moisture result", function () {
-    client.assert(
-      response.status === 201,
-      "Result definition creation failed"
-    );
+    client.assert(response.status === 201, "Result definition creation failed");
   });
-
-  client.global.set(
-    "moistureResultId",
-    response.body.id
-  );
-
+  client.global.set("moistureResultId", response.body.id);
 %}
-
-
 
 ###
 
 # @name addDryMatterResult
-
 POST {{baseUrl}}/api/study-templates/{{moistureTemplateId}}/result-definitions
 Content-Type: application/json
 
@@ -191,30 +126,17 @@ Content-Type: application/json
 }
 
 > {%
-
   client.test("Add dry matter result", function () {
-    client.assert(
-      response.status === 201,
-      "Result definition creation failed"
-    );
+    client.assert(response.status === 201, "Result definition creation failed");
   });
-
-  client.global.set(
-    "dryMatterResultId",
-    response.body.id
-  );
-
+  client.global.set("dryMatterResultId", response.body.id);
 %}
-
-
 
 ### ============================================
 ### ДОБАВЛЕНИЕ ПРАВИЛ РАСЧЁТА
 ### ============================================
 
-
 # @name addMoistureCalculation
-
 POST {{baseUrl}}/api/study-templates/{{moistureTemplateId}}/calculation-rules
 Content-Type: application/json
 
@@ -226,25 +148,15 @@ Content-Type: application/json
 }
 
 > {%
-
   client.test("Add moisture calculation", function () {
-    client.assert(
-      response.status === 201,
-      "Calculation rule creation failed"
-    );
+    client.assert(response.status === 201, "Calculation rule creation failed");
   });
-
-  client.global.set(
-    "moistureCalcId",
-    response.body.id
-  );
-
+  client.global.set("moistureCalcId", response.body.id);
 %}
 
 ### ============================================
 ### ПРИВЯЗКА INPUT ПАРАМЕТРОВ К ФОРМУЛЕ ВЛАЖНОСТИ
 ### ============================================
-
 
 POST {{baseUrl}}/api/study-templates/{{moistureTemplateId}}/calculation-rules/{{moistureCalcId}}/inputs
 Content-Type: application/json
@@ -254,9 +166,7 @@ Content-Type: application/json
   "inputParameterId": "{{massBeforeId}}"
 }
 
-
 ###
-
 
 POST {{baseUrl}}/api/study-templates/{{moistureTemplateId}}/calculation-rules/{{moistureCalcId}}/inputs
 Content-Type: application/json
@@ -266,9 +176,7 @@ Content-Type: application/json
   "inputParameterId": "{{massAfterId}}"
 }
 
-
 ###
-
 
 POST {{baseUrl}}/api/study-templates/{{moistureTemplateId}}/calculation-rules/{{moistureCalcId}}/inputs
 Content-Type: application/json
@@ -277,3 +185,65 @@ Content-Type: application/json
   "variableAlias": "m0",
   "inputParameterId": "{{emptyMassId}}"
 }
+
+### ============================================
+### ИЗМЕНЕНИЕ СТАТУСА (УТВЕРЖДЕНИЕ МЕТОДИКИ)
+### Переводим из Draft в Active
+### ============================================
+
+# @name approveMoistureTemplate
+POST {{baseUrl}}/api/study-templates/{{moistureTemplateId}}/change-status?newStatus=Active
+
+> {%
+  client.test("Approve moisture template", function () {
+    client.assert(response.status === 200, "Status change failed: " + response.status);
+  });
+  client.log("✅ Moisture Template approved (Active)");
+%}
+
+### ============================================
+### СОЗДАНИЕ НОВОЙ РЕДАКЦИИ (РЕВИЗИИ)
+### Старая уйдет в Archived, новая создастся в Draft
+### ============================================
+
+# @name createMoistureRevision
+POST {{baseUrl}}/api/study-templates/{{moistureTemplateId}}/create-revision
+Content-Type: application/json
+
+{
+  "newRevision": "v1.1-{{$random.book.title}}"
+}
+
+> {%
+  client.test("Create revision", function () {
+    client.assert(response.status === 201, "Revision creation failed: " + response.status);
+  });
+
+  client.global.set("moistureTemplateV2Id", response.body.id);
+  client.log("✅ Moisture Template V2 ID: " + response.body.id);
+%}
+
+### ============================================
+### ПРОВЕРКА ЖИЗНЕННОГО ЦИКЛА (GET ЗАПРОСЫ)
+### ============================================
+
+# 1. Старая версия теперь должна иметь статус "Archived" и ParentId = null
+GET {{baseUrl}}/api/study-templates/{{moistureTemplateId}}
+
+###
+
+# 2. Новая версия должна иметь статус "Draft" и ParentId = ID старой версии
+GET {{baseUrl}}/api/study-templates/{{moistureTemplateV2Id}}
+
+### ============================================
+### УТВЕРЖДЕНИЕ НОВОЙ РЕДАКЦИИ (V2)
+### ============================================
+
+POST {{baseUrl}}/api/study-templates/{{moistureTemplateV2Id}}/change-status?newStatus=Active
+
+> {%
+  client.test("Approve moisture template V2", function () {
+    client.assert(response.status === 200, "Status change for V2 failed: " + response.status);
+  });
+  client.log("✅ Moisture Template V2 approved (Active)");
+%}
