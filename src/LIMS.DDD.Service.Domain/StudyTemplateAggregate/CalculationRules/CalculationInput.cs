@@ -1,6 +1,12 @@
-﻿using LIMS.DDD.Service.Domain.StudyTemplateAggregate.InputParameters;
+﻿using LIMS.DDD.Service.Domain.SeedWork;
+using LIMS.DDD.Service.Domain.StudyTemplateAggregate.InputParameters;
 
 namespace LIMS.DDD.Service.Domain.StudyTemplateAggregate.CalculationRules;
+
+public readonly record struct CalculationInputId(Guid Value) : IValueObjectId
+{
+    public Guid Value { get; } = Value;
+}
 
 public sealed record CalculationInput
 {
@@ -12,9 +18,12 @@ public sealed record CalculationInput
         AliasName variableAlias,
         InputParameterId parameterId)
     {
+        Id = new CalculationInputId(Guid.NewGuid());
         VariableAlias = variableAlias;
         ParameterId = parameterId;
     }
+
+    public CalculationInputId Id { get; private set; }
 
     public AliasName VariableAlias { get; private set; }
 

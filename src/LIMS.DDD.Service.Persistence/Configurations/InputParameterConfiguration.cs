@@ -42,5 +42,12 @@ public class InputParameterConfiguration : IEntityTypeConfiguration<InputParamet
             vr.Property(p => p.MaxValue);
             vr.Property(p => p.MinValue);
         });
+
+        builder.HasIndex(x => new
+            {
+                x.StudyTemplateId,
+                x.AliasName
+            })
+            .IsUnique();
     }
 }

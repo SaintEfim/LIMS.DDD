@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace LIMS.DDD.Service.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260727180113_Initial")]
+    [Migration("20260728133445_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -45,15 +45,16 @@ namespace LIMS.DDD.Service.Persistence.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
+                    b.Property<Guid>("ResultDefinitionId")
+                        .HasColumnType("uuid");
+
                     b.Property<Guid>("StudyTemplateId")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Name")
+                    b.HasIndex("StudyTemplateId", "Name")
                         .IsUnique();
-
-                    b.HasIndex("StudyTemplateId");
 
                     b.ToTable("CalculationRules", (string)null);
                 });
@@ -83,7 +84,8 @@ namespace LIMS.DDD.Service.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("StudyTemplateId");
+                    b.HasIndex("StudyTemplateId", "AliasName")
+                        .IsUnique();
 
                     b.ToTable("InputParameters", (string)null);
                 });
@@ -107,9 +109,7 @@ namespace LIMS.DDD.Service.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("StudyTemplateId");
-
-                    b.HasIndex("Unit", "ResultInstance")
+                    b.HasIndex("StudyTemplateId", "Unit", "ResultInstance")
                         .IsUnique();
 
                     b.ToTable("ResultDefinitions", (string)null);
@@ -129,6 +129,9 @@ namespace LIMS.DDD.Service.Persistence.Migrations
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
+
+                    b.Property<Guid?>("ParentId")
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Revision")
                         .IsRequired()
@@ -158,11 +161,8 @@ namespace LIMS.DDD.Service.Persistence.Migrations
                             b1.Property<Guid>("CalculationRuleId")
                                 .HasColumnType("uuid");
 
-                            b1.Property<int>("Id")
-                                .ValueGeneratedOnAdd()
-                                .HasColumnType("integer");
-
-                            NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b1.Property<int>("Id"));
+                            b1.Property<Guid>("Id")
+                                .HasColumnType("uuid");
 
                             b1.Property<Guid>("ParameterId")
                                 .HasColumnType("uuid");
@@ -173,6 +173,9 @@ namespace LIMS.DDD.Service.Persistence.Migrations
                                 .HasColumnType("character varying(100)");
 
                             b1.HasKey("CalculationRuleId", "Id");
+
+                            b1.HasIndex("ParameterId", "VariableAlias")
+                                .IsUnique();
 
                             b1.ToTable("CalculationInputs", (string)null);
 

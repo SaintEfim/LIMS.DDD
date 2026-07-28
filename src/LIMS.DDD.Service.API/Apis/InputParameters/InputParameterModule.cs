@@ -9,10 +9,10 @@ public class InputParameterModule : ICarterModule
     public void AddRoutes(
         IEndpointRouteBuilder app)
     {
-        var group = app.MapGroup("/api/studyTemplates/{studyTemplateId:guid}/input-parameters")
+        var group = app.MapGroup("/api/study-templates/{studyTemplateId:guid}/input-parameters")
             .WithTags("InputParameters");
 
-        group.MapGet("/", GetAllInputParameterS)
+        group.MapGet("/", GetAllInputParameters)
             .Produces<ICollection<InputParameterDto>>();
 
         group.MapGet("/{parameterId:guid}", GetInputParameterById)
@@ -32,7 +32,7 @@ public class InputParameterModule : ICarterModule
             .Produces(StatusCodes.Status500InternalServerError);
     }
 
-    private static async Task<IResult> GetAllInputParameterS(
+    private static async Task<IResult> GetAllInputParameters(
         Guid studyTemplateId,
         [AsParameters] InputParameterServices services,
         CancellationToken ct)

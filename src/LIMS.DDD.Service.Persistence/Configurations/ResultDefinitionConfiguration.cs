@@ -32,6 +32,7 @@ public class ResultDefinitionConfiguration : IEntityTypeConfiguration<ResultDefi
 
         builder.HasIndex(x => new
             {
+                x.StudyTemplateId,
                 x.Unit,
                 x.ResultInstance
             })

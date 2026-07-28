@@ -2,6 +2,7 @@
 using LIMS.DDD.Service.Domain.StudyTemplateAggregate;
 using LIMS.DDD.Service.Domain.StudyTemplateAggregate.CalculationRules;
 using LIMS.DDD.Service.Domain.StudyTemplateAggregate.InputParameters;
+using LIMS.DDD.Service.Domain.StudyTemplateAggregate.ResultDefinitions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -23,6 +24,10 @@ public class CalculationRuleConfiguration : IEntityTypeConfiguration<Calculation
             .HasConversion(id => id.Value, id => new StudyTemplateId(id))
             .IsRequired();
 
+        builder.Property(x => x.ResultDefinitionId)
+            .HasConversion(id => id.Value, id => new ResultDefinitionId(id))
+            .IsRequired();
+
         builder.Property(x => x.Name)
             .HasConversion(n => n.Value, n => Name.Create(n)
                 .Value)
@@ -40,12 +45,19 @@ public class CalculationRuleConfiguration : IEntityTypeConfiguration<Calculation
                 .Value)
             .HasMaxLength(1000);
 
-        builder.HasIndex(x => x.Name)
-            .IsUnique();
-
         builder.OwnsMany(x => x.CalculationInputs, inputBuilder =>
         {
+            inputBuilder.HasIndex(x => new
+                {
+                    x.ParameterId,
+                    x.VariableAlias
+                })
+                .IsUnique();
+
             inputBuilder.ToTable("CalculationInputs");
+
+            inputBuilder.Property(x => x.Id)
+                .HasConversion(id => id.Value, id => new CalculationInputId(id));
 
             inputBuilder.WithOwner()
                 .HasForeignKey("CalculationRuleId");
@@ -59,5 +71,12 @@ public class CalculationRuleConfiguration : IEntityTypeConfiguration<Calculation
                 .HasConversion(id => id.Value, id => new InputParameterId(id))
                 .IsRequired();
         });
+
+        builder.HasIndex(x => new
+            {
+                x.StudyTemplateId,
+                x.Name
+            })
+            .IsUnique();
     }
 }

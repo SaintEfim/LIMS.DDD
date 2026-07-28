@@ -22,7 +22,6 @@ public class Result<TError>
         new(false, error);
 }
 
-// TODO make not nullable field
 public class Result<TValue, TError>
     where TError : Exception
 {
