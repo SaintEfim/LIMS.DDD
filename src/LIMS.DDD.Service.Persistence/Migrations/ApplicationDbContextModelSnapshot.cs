@@ -22,7 +22,7 @@ namespace LIMS.DDD.Service.Persistence.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("LIMS.DDD.Service.Domain.StudyTemplateAggregate.CalculationRules.StudyTemplateCalculations", b =>
+            modelBuilder.Entity("LIMS.DDD.Service.Domain.StudyTemplateAggregate.CalculationRules.CalculationRule", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
@@ -46,6 +46,9 @@ namespace LIMS.DDD.Service.Persistence.Migrations
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
 
                     b.HasIndex("StudyTemplateId");
 
@@ -139,13 +142,42 @@ namespace LIMS.DDD.Service.Persistence.Migrations
                     b.ToTable("StudyTemplates");
                 });
 
-            modelBuilder.Entity("LIMS.DDD.Service.Domain.StudyTemplateAggregate.CalculationRules.StudyTemplateCalculations", b =>
+            modelBuilder.Entity("LIMS.DDD.Service.Domain.StudyTemplateAggregate.CalculationRules.CalculationRule", b =>
                 {
                     b.HasOne("LIMS.DDD.Service.Domain.StudyTemplateAggregate.StudyTemplate", null)
                         .WithMany("CalculationRules")
                         .HasForeignKey("StudyTemplateId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.OwnsMany("LIMS.DDD.Service.Domain.StudyTemplateAggregate.CalculationRules.CalculationInput", "CalculationInputs", b1 =>
+                        {
+                            b1.Property<Guid>("CalculationRuleId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<int>("Id")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("integer");
+
+                            NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b1.Property<int>("Id"));
+
+                            b1.Property<Guid>("ParameterId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<string>("VariableAlias")
+                                .IsRequired()
+                                .HasMaxLength(100)
+                                .HasColumnType("character varying(100)");
+
+                            b1.HasKey("CalculationRuleId", "Id");
+
+                            b1.ToTable("CalculationInputs", (string)null);
+
+                            b1.WithOwner()
+                                .HasForeignKey("CalculationRuleId");
+                        });
+
+                    b.Navigation("CalculationInputs");
                 });
 
             modelBuilder.Entity("LIMS.DDD.Service.Domain.StudyTemplateAggregate.InputParameters.InputParameter", b =>

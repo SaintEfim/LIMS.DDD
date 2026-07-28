@@ -38,8 +38,4 @@ public readonly record struct FormulaExpression
         var formula = new FormulaExpression(value.Trim());
         return Result<FormulaExpression, Exception>.Success(formula);
     }
-
-    public static implicit operator string(
-        FormulaExpression formula) =>
-        formula.Value;
 }

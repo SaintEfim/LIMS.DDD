@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
@@ -27,7 +28,7 @@ namespace LIMS.DDD.Service.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "StudyTemplateCalculations",
+                name: "CalculationRules",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -38,9 +39,9 @@ namespace LIMS.DDD.Service.Persistence.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_StudyTemplateCalculations", x => x.Id);
+                    table.PrimaryKey("PK_CalculationRules", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_StudyTemplateCalculations_StudyTemplates_StudyTemplateId",
+                        name: "FK_CalculationRules_StudyTemplates_StudyTemplateId",
                         column: x => x.StudyTemplateId,
                         principalTable: "StudyTemplates",
                         principalColumn: "Id",
@@ -48,29 +49,7 @@ namespace LIMS.DDD.Service.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "StudyTemplateDeterminations",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    ResultInstance = table.Column<string>(type: "text", nullable: false),
-                    StudyTemplateId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Unit = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
-                    Specification_MinValue = table.Column<double>(type: "double precision", nullable: true),
-                    Specification_MaxValue = table.Column<double>(type: "double precision", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_StudyTemplateDeterminations", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_StudyTemplateDeterminations_StudyTemplates_StudyTemplateId",
-                        column: x => x.StudyTemplateId,
-                        principalTable: "StudyTemplates",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "StudyTemplateObservations",
+                name: "InputParameters",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -83,35 +62,84 @@ namespace LIMS.DDD.Service.Persistence.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_StudyTemplateObservations", x => x.Id);
+                    table.PrimaryKey("PK_InputParameters", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_StudyTemplateObservations_StudyTemplates_StudyTemplateId",
+                        name: "FK_InputParameters_StudyTemplates_StudyTemplateId",
                         column: x => x.StudyTemplateId,
                         principalTable: "StudyTemplates",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
-            migrationBuilder.CreateIndex(
-                name: "IX_StudyTemplateCalculations_StudyTemplateId",
-                table: "StudyTemplateCalculations",
-                column: "StudyTemplateId");
+            migrationBuilder.CreateTable(
+                name: "ResultDefinitions",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    ResultInstance = table.Column<string>(type: "text", nullable: false),
+                    StudyTemplateId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Unit = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    Specification_MinValue = table.Column<double>(type: "double precision", nullable: true),
+                    Specification_MaxValue = table.Column<double>(type: "double precision", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ResultDefinitions", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ResultDefinitions_StudyTemplates_StudyTemplateId",
+                        column: x => x.StudyTemplateId,
+                        principalTable: "StudyTemplates",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "CalculationInputs",
+                columns: table => new
+                {
+                    CalculationRuleId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    VariableAlias = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    ParameterId = table.Column<Guid>(type: "uuid", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CalculationInputs", x => new { x.CalculationRuleId, x.Id });
+                    table.ForeignKey(
+                        name: "FK_CalculationInputs_CalculationRules_CalculationRuleId",
+                        column: x => x.CalculationRuleId,
+                        principalTable: "CalculationRules",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
 
             migrationBuilder.CreateIndex(
-                name: "IX_StudyTemplateDeterminations_StudyTemplateId",
-                table: "StudyTemplateDeterminations",
-                column: "StudyTemplateId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_StudyTemplateDeterminations_Unit_ResultInstance",
-                table: "StudyTemplateDeterminations",
-                columns: new[] { "Unit", "ResultInstance" },
+                name: "IX_CalculationRules_Name",
+                table: "CalculationRules",
+                column: "Name",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_StudyTemplateObservations_StudyTemplateId",
-                table: "StudyTemplateObservations",
+                name: "IX_CalculationRules_StudyTemplateId",
+                table: "CalculationRules",
                 column: "StudyTemplateId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_InputParameters_StudyTemplateId",
+                table: "InputParameters",
+                column: "StudyTemplateId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ResultDefinitions_StudyTemplateId",
+                table: "ResultDefinitions",
+                column: "StudyTemplateId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ResultDefinitions_Unit_ResultInstance",
+                table: "ResultDefinitions",
+                columns: new[] { "Unit", "ResultInstance" },
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_StudyTemplates_Name_Revision",
@@ -124,13 +152,16 @@ namespace LIMS.DDD.Service.Persistence.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "StudyTemplateCalculations");
+                name: "CalculationInputs");
 
             migrationBuilder.DropTable(
-                name: "StudyTemplateDeterminations");
+                name: "InputParameters");
 
             migrationBuilder.DropTable(
-                name: "StudyTemplateObservations");
+                name: "ResultDefinitions");
+
+            migrationBuilder.DropTable(
+                name: "CalculationRules");
 
             migrationBuilder.DropTable(
                 name: "StudyTemplates");
