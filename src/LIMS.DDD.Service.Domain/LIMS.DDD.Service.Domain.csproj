@@ -7,10 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Update="Description.cs">
+    <Compile Update="StudyTemplateAggregate\ValueObjects\Description.cs">
       <Generator>MSBuild:GenerateCodeFromAttributes</Generator>
     </Compile>
-    <Compile Update="Name.cs">
+    <Compile Update="StudyTemplateAggregate\ValueObjects\Name.cs">
       <Generator>MSBuild:GenerateCodeFromAttributes</Generator>
     </Compile>
   </ItemGroup>

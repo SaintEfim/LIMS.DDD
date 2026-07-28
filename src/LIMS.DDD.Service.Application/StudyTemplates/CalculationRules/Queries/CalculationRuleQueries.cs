@@ -1,5 +1,5 @@
 ﻿using LIMS.DDD.Service.Domain.StudyTemplateAggregate;
-using LIMS.DDD.Service.Domain.StudyTemplateAggregate.CalculationRules;
+using LIMS.DDD.Service.Domain.StudyTemplateAggregate.Ids;
 
 namespace LIMS.DDD.Service.Application.StudyTemplates.CalculationRules.Queries;
 

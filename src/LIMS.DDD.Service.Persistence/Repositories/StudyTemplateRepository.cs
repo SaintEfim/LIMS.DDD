@@ -1,5 +1,6 @@
-﻿using LIMS.DDD.Service.Domain;
-using LIMS.DDD.Service.Domain.StudyTemplateAggregate;
+﻿using LIMS.DDD.Service.Domain.StudyTemplateAggregate;
+using LIMS.DDD.Service.Domain.StudyTemplateAggregate.Ids;
+using LIMS.DDD.Service.Domain.StudyTemplateAggregate.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 
 namespace LIMS.DDD.Service.Persistence.Repositories;
@@ -71,12 +72,6 @@ public class StudyTemplateRepository : IStudyTemplateRepository
         StudyTemplate studyTemplate)
     {
         _context.StudyTemplates.Remove(studyTemplate);
-    }
-
-    public void Update(
-        StudyTemplate entity)
-    {
-        _context.StudyTemplates.Update(entity);
     }
 
     public async Task<int> SaveChangesAsync(
