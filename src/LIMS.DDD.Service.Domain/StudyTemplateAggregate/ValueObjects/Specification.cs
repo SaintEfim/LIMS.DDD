@@ -1,4 +1,4 @@
-namespace LIMS.DDD.Service.Domain.StudyTemplateAggregate;
+namespace LIMS.DDD.Service.Domain.StudyTemplateAggregate.ValueObjects;
 
 public record Specification(double? MinValue, double? MaxValue)
 {

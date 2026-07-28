@@ -1,11 +1,7 @@
-﻿using LIMS.DDD.Service.Domain.SeedWork;
+﻿using LIMS.DDD.Service.Domain.StudyTemplateAggregate.Ids;
+using LIMS.DDD.Service.Domain.StudyTemplateAggregate.ValueObjects;
 
-namespace LIMS.DDD.Service.Domain.StudyTemplateAggregate.ResultDefinitions;
-
-public readonly record struct ResultDefinitionId(Guid Value) : IValueObjectId
-{
-    public Guid Value { get; } = Value;
-}
+namespace LIMS.DDD.Service.Domain.StudyTemplateAggregate.Entities;
 
 public sealed class ResultDefinition
 {

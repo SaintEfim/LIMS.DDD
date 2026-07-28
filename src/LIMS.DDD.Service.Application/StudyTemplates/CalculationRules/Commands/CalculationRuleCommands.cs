@@ -1,9 +1,9 @@
-﻿using LIMS.DDD.Service.Domain;
-using LIMS.DDD.Service.Domain.SeedWork.Result;
+﻿using LIMS.DDD.Service.Domain.SeedWork.Result;
 using LIMS.DDD.Service.Domain.StudyTemplateAggregate;
-using LIMS.DDD.Service.Domain.StudyTemplateAggregate.CalculationRules;
-using LIMS.DDD.Service.Domain.StudyTemplateAggregate.InputParameters;
-using LIMS.DDD.Service.Domain.StudyTemplateAggregate.ResultDefinitions;
+using LIMS.DDD.Service.Domain.StudyTemplateAggregate.Entities.CalculationRules;
+using LIMS.DDD.Service.Domain.StudyTemplateAggregate.Entities.InputParameters;
+using LIMS.DDD.Service.Domain.StudyTemplateAggregate.Ids;
+using LIMS.DDD.Service.Domain.StudyTemplateAggregate.ValueObjects;
 
 namespace LIMS.DDD.Service.Application.StudyTemplates.CalculationRules.Commands;
 

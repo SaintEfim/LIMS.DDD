@@ -1,8 +1,8 @@
-﻿using LIMS.DDD.Service.Domain;
-using LIMS.DDD.Service.Domain.StudyTemplateAggregate;
-using LIMS.DDD.Service.Domain.StudyTemplateAggregate.CalculationRules;
-using LIMS.DDD.Service.Domain.StudyTemplateAggregate.InputParameters;
-using LIMS.DDD.Service.Domain.StudyTemplateAggregate.ResultDefinitions;
+﻿using LIMS.DDD.Service.Domain.StudyTemplateAggregate.Entities;
+using LIMS.DDD.Service.Domain.StudyTemplateAggregate.Entities.CalculationRules;
+using LIMS.DDD.Service.Domain.StudyTemplateAggregate.Entities.InputParameters;
+using LIMS.DDD.Service.Domain.StudyTemplateAggregate.Ids;
+using LIMS.DDD.Service.Domain.StudyTemplateAggregate.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

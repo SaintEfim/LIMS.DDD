@@ -1,4 +1,4 @@
-﻿using LIMS.DDD.Service.Domain.StudyTemplateAggregate.ResultDefinitions;
+﻿using LIMS.DDD.Service.Domain.StudyTemplateAggregate.Entities;
 
 namespace LIMS.DDD.Service.Application.StudyTemplates.ResultDefinitions.Queries;
 

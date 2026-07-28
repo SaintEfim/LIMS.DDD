@@ -1,6 +1,6 @@
 ﻿using LIMS.DDD.Service.Domain.SeedWork.Result;
 
-namespace LIMS.DDD.Service.Domain.StudyTemplateAggregate.InputParameters;
+namespace LIMS.DDD.Service.Domain.StudyTemplateAggregate.Entities.InputParameters;
 
 public readonly record struct AliasName
 {

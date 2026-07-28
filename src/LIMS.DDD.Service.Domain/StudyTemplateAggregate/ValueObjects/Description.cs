@@ -1,6 +1,6 @@
 ﻿using LIMS.DDD.Service.Domain.SeedWork.Result;
 
-namespace LIMS.DDD.Service.Domain;
+namespace LIMS.DDD.Service.Domain.StudyTemplateAggregate.ValueObjects;
 
 public readonly record struct Description
 {
