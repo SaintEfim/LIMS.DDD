@@ -155,26 +155,24 @@ namespace LIMS.DDD.Service.Persistence.Migrations
 
                     b.OwnsMany("LIMS.DDD.Service.Domain.StudyTemplateAggregate.CalculationRules.CalculationInput", "CalculationInputs", b1 =>
                         {
-                            b1.Property<Guid>("CalculationRuleId")
-                                .HasColumnType("uuid");
+                            b1.Property<Guid>("CalculationRuleId");
 
-                            b1.Property<Guid>("Id")
-                                .HasColumnType("uuid");
+                            b1.Property<int>("__synthesizedOrdinal")
+                                .ValueGeneratedOnAdd();
 
-                            b1.Property<Guid>("ParameterId")
-                                .HasColumnType("uuid");
+                            b1.Property<Guid>("ParameterId");
 
                             b1.Property<string>("VariableAlias")
                                 .IsRequired()
-                                .HasMaxLength(100)
-                                .HasColumnType("character varying(100)");
+                                .HasMaxLength(100);
 
-                            b1.HasKey("CalculationRuleId", "Id");
+                            b1.HasKey("CalculationRuleId", "__synthesizedOrdinal");
 
-                            b1.HasIndex("ParameterId", "VariableAlias")
-                                .IsUnique();
+                            b1.ToTable("CalculationRules");
 
-                            b1.ToTable("CalculationInputs", (string)null);
+                            b1
+                                .ToJson("CalculationInputs")
+                                .HasColumnType("jsonb");
 
                             b1.WithOwner()
                                 .HasForeignKey("CalculationRuleId");

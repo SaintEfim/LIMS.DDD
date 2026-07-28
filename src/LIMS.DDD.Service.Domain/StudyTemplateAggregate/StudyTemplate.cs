@@ -188,7 +188,6 @@ public sealed class StudyTemplate : IAggregateRoot
     public Result<Exception> ChangeStatus(
         Status newStatus)
     {
-        // Идемпотентность: если статус не меняется — успех
         if (Status == newStatus) return Result<Exception>.Success();
 
         switch (newStatus)

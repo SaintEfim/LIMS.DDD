@@ -36,7 +36,8 @@ namespace LIMS.DDD.Service.Persistence.Migrations
                     Name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     FormulaExpression = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: false),
                     Description = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: false),
-                    ResultDefinitionId = table.Column<Guid>(type: "uuid", nullable: false)
+                    ResultDefinitionId = table.Column<Guid>(type: "uuid", nullable: false),
+                    CalculationInputs = table.Column<string>(type: "jsonb", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -94,32 +95,6 @@ namespace LIMS.DDD.Service.Persistence.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
-            migrationBuilder.CreateTable(
-                name: "CalculationInputs",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    CalculationRuleId = table.Column<Guid>(type: "uuid", nullable: false),
-                    VariableAlias = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
-                    ParameterId = table.Column<Guid>(type: "uuid", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_CalculationInputs", x => new { x.CalculationRuleId, x.Id });
-                    table.ForeignKey(
-                        name: "FK_CalculationInputs_CalculationRules_CalculationRuleId",
-                        column: x => x.CalculationRuleId,
-                        principalTable: "CalculationRules",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_CalculationInputs_ParameterId_VariableAlias",
-                table: "CalculationInputs",
-                columns: new[] { "ParameterId", "VariableAlias" },
-                unique: true);
-
             migrationBuilder.CreateIndex(
                 name: "IX_CalculationRules_StudyTemplateId_Name",
                 table: "CalculationRules",
@@ -149,16 +124,13 @@ namespace LIMS.DDD.Service.Persistence.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "CalculationInputs");
+                name: "CalculationRules");
 
             migrationBuilder.DropTable(
                 name: "InputParameters");
 
             migrationBuilder.DropTable(
                 name: "ResultDefinitions");
-
-            migrationBuilder.DropTable(
-                name: "CalculationRules");
 
             migrationBuilder.DropTable(
                 name: "StudyTemplates");
