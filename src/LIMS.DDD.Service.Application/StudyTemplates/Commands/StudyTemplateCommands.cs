@@ -10,72 +10,66 @@ namespace LIMS.DDD.Service.Application.StudyTemplates.Commands;
 public sealed class StudyTemplateCommands(IStudyTemplateRepository repository)
 {
     public async Task<Result<StudyTemplate, Exception>> CreateAsync(
-        CreateStudyTemplateCommand createCommand,
+        CreateStudyTemplateCommand command,
         CancellationToken cancellationToken = default)
     {
-        var nameResult = Name.Create(createCommand.Name);
-        var descResult = Description.Create(createCommand.Description);
-        var revResult = Revision.Create(createCommand.Revision);
+        var nameResult = Name.Create(command.Name);
+        if (nameResult.IsFailure) return Result<StudyTemplate, Exception>.Failure(nameResult.Error!);
 
-        return await nameResult.Bind(name => descResult.Map(desc => (name, desc)))
-            .Bind(tuple => revResult.Map(rev => (tuple.name, tuple.desc, rev)))
-            .Bind(async tuple =>
-            {
-                var (name, desc, rev) = tuple;
+        var descResult = Description.Create(command.Description);
+        if (descResult.IsFailure) return Result<StudyTemplate, Exception>.Failure(descResult.Error!);
 
-                var isDuplicate = await repository.ExistsByNameAndRevisionAsync(name, rev, cancellationToken);
+        var revResult = Revision.Create(command.Revision);
+        if (revResult.IsFailure) return Result<StudyTemplate, Exception>.Failure(revResult.Error!);
 
-                if (isDuplicate)
-                    return Result<StudyTemplate, Exception>.Failure(
-                        new Exception("Duplicate study template name and revision"));
+        var duplicateResult = await CheckDuplicateAsync(nameResult.Value, revResult.Value, cancellationToken);
+        if (duplicateResult.IsFailure) return Result<StudyTemplate, Exception>.Failure(duplicateResult.Error!);
 
-                return StudyTemplate.Create(name, desc, rev);
-            })
-            .Bind(async template =>
-            {
-                repository.Add(template);
-                await repository.SaveChangesAsync(cancellationToken);
-                return Result<StudyTemplate, Exception>.Success(template);
-            });
+        var createResult = StudyTemplate.Create(nameResult.Value, descResult.Value, revResult.Value);
+        if (createResult.IsFailure) return Result<StudyTemplate, Exception>.Failure(createResult.Error!);
+
+        return await SaveNewAsync(createResult.Value!, cancellationToken);
     }
 
     public async Task<Result<StudyTemplate, Exception>> UpdateAsync(
         Guid id,
-        UpdateStudyTemplateCommand updateCommand,
+        UpdateStudyTemplateCommand command,
         CancellationToken cancellationToken = default)
     {
-        var studyTemplateId = new StudyTemplateId(id);
-        var studyTemplate = await repository.GetByIdForChangeAsync(studyTemplateId, cancellationToken);
+        var templateResult = await GetTemplateForChangeAsync(id, cancellationToken);
+        if (templateResult.IsFailure) return templateResult;
 
-        if (studyTemplate is null)
-            return Result<StudyTemplate, Exception>.Failure(
-                new KeyNotFoundException($"StudyTemplate with id {id} not found."));
+        var template = templateResult.Value!;
 
-        var nameResult = updateCommand.Name is null
-            ? Result<Name?, Exception>.Success(null)
-            : Name.Create(updateCommand.Name)
-                .Map(n => (Name?) n);
+        Name? name = null;
+        if (command.Name is not null)
+        {
+            var nameResult = Name.Create(command.Name);
+            if (nameResult.IsFailure) return Result<StudyTemplate, Exception>.Failure(nameResult.Error!);
+            name = nameResult.Value;
+        }
 
-        var descResult = updateCommand.Description is null
-            ? Result<Description?, Exception>.Success(null)
-            : Description.Create(updateCommand.Description)
-                .Map(d => (Description?) d);
+        Description? description = null;
+        if (command.Description is not null)
+        {
+            var descResult = Description.Create(command.Description);
+            if (descResult.IsFailure) return Result<StudyTemplate, Exception>.Failure(descResult.Error!);
+            description = descResult.Value;
+        }
 
-        return await studyTemplate.UpdatePartial(nameResult.Value, descResult.Value)
-            .Bind(async template =>
-            {
-                try
-                {
-                    await repository.SaveChangesAsync(cancellationToken);
+        if (name is not null && name != template.Name)
+        {
+            var duplicateResult = await CheckDuplicateAsync(name.Value, template.Revision, cancellationToken);
+            if (duplicateResult.IsFailure) return Result<StudyTemplate, Exception>.Failure(duplicateResult.Error!);
+        }
 
-                    return Result<StudyTemplate, Exception>.Success(template);
-                }
-                catch (Exception ex)
-                {
-                    return Result<StudyTemplate, Exception>.Failure(
-                        new Exception($"Failed to save study template: {ex.Message}"));
-                }
-            });
+        var effectiveName = name ?? template.Name;
+        var effectiveDescription = description ?? template.Description;
+
+        var updateResult = template.UpdatePartial(effectiveName, effectiveDescription);
+        if (updateResult.IsFailure) return Result<StudyTemplate, Exception>.Failure(updateResult.Error!);
+
+        return await SaveChangesAsync(template, cancellationToken);
     }
 
     public async Task<Result<StudyTemplate, Exception>> ChangeStatusAsync(
@@ -83,69 +77,96 @@ public sealed class StudyTemplateCommands(IStudyTemplateRepository repository)
         string statusCommand,
         CancellationToken cancellationToken = default)
     {
-        var studyTemplateId = new StudyTemplateId(id);
-        var studyTemplate = await repository.GetByIdForChangeAsync(studyTemplateId, cancellationToken);
+        var templateResult = await GetTemplateForChangeAsync(id, cancellationToken);
+        if (templateResult.IsFailure) return templateResult;
 
-        if (studyTemplate is null)
+        if (!Enum.TryParse<Status>(statusCommand, true, out var status))
             return Result<StudyTemplate, Exception>.Failure(
-                new KeyNotFoundException($"StudyTemplate with id {id} not found."));
+                new InvalidOperationException($"Unknown status '{statusCommand}'."));
 
-        if (!Enum.TryParse<Status>(statusCommand, out var newStatus))
-            return Result<StudyTemplate, Exception>.Failure(new KeyNotFoundException("Not found status"));
+        var changeStatusResult = templateResult.Value!.ChangeStatus(status);
+        if (changeStatusResult.IsFailure) return Result<StudyTemplate, Exception>.Failure(changeStatusResult.Error!);
 
-        var studyTemplateApproveResult = studyTemplate.ChangeStatus(newStatus);
-
-        if (studyTemplateApproveResult.IsFailure)
-            return Result<StudyTemplate, Exception>.Failure(studyTemplateApproveResult.Error!);
-
-        try
-        {
-            await repository.SaveChangesAsync(cancellationToken);
-            return Result<StudyTemplate, Exception>.Success(studyTemplate);
-        }
-        catch (Exception ex)
-        {
-            return Result<StudyTemplate, Exception>.Failure(
-                new Exception($"Failed to approve study template: {ex.Message}"));
-        }
+        return await SaveChangesAsync(templateResult.Value!, cancellationToken);
     }
 
     public async Task<Result<Guid, Exception>> CreateRevisionAsync(
-        Guid originalStudyTemplateId,
+        Guid originalId,
         CreateStudyTemplateRevisionCommand command,
         CancellationToken cancellationToken = default)
     {
-        var original = await repository.GetByIdForChangeAsync(new StudyTemplateId(originalStudyTemplateId),
-            cancellationToken);
-
-        if (original is null)
-            return Result<Guid, Exception>.Failure(
-                new KeyNotFoundException($"StudyTemplate with id {originalStudyTemplateId} not found."));
+        var originalResult = await GetTemplateForChangeAsync(originalId, cancellationToken);
+        if (originalResult.IsFailure) return Result<Guid, Exception>.Failure(originalResult.Error!);
 
         var revisionResult = Revision.Create(command.NewRevision);
         if (revisionResult.IsFailure) return Result<Guid, Exception>.Failure(revisionResult.Error!);
 
-        var isDuplicate = await repository.ExistsByNameAndRevisionAsync(
-            original.Name, revisionResult.Value, cancellationToken);
+        var duplicateResult = await CheckDuplicateAsync(
+            originalResult.Value!.Name, revisionResult.Value, cancellationToken);
+        if (duplicateResult.IsFailure) return Result<Guid, Exception>.Failure(duplicateResult.Error!);
 
-        if (isDuplicate)
-            return Result<Guid, Exception>.Failure(new InvalidOperationException(
-                $"StudyTemplate with name '{original.Name.Value}' and revision '{command.NewRevision}' already exists."));
+        var createResult =
+            StudyTemplateVersioningService.CreateNewRevisionAsync(originalResult.Value!, revisionResult.Value);
+        if (createResult.IsFailure) return Result<Guid, Exception>.Failure(createResult.Error!);
 
-        return await StudyTemplateVersioningService.CreateNewRevisionAsync(original, revisionResult.Value)
-            .Bind(async template =>
-            {
-                try
-                {
-                    repository.Add(template);
-                    await repository.SaveChangesAsync(cancellationToken);
-                    return Result<Guid, Exception>.Success(template.Id.Value);
-                }
-                catch (Exception ex)
-                {
-                    return Result<Guid, Exception>.Failure(
-                        new Exception($"Failed to create revision: {ex.Message}", ex));
-                }
-            });
+        var saveResult = await SaveNewAsync(createResult.Value!, cancellationToken);
+        return saveResult.IsFailure
+            ? Result<Guid, Exception>.Failure(saveResult.Error!)
+            : Result<Guid, Exception>.Success(createResult.Value!.Id.Value);
+    }
+
+    private async Task<Result<StudyTemplate, Exception>> GetTemplateForChangeAsync(
+        Guid id,
+        CancellationToken cancellationToken)
+    {
+        var template = await repository.GetByIdForChangeAsync(new StudyTemplateId(id), cancellationToken);
+        return template is null
+            ? Result<StudyTemplate, Exception>.Failure(
+                new KeyNotFoundException($"StudyTemplate with id {id} not found."))
+            : Result<StudyTemplate, Exception>.Success(template);
+    }
+
+    private async Task<Result<bool, Exception>> CheckDuplicateAsync(
+        Name name,
+        Revision revision,
+        CancellationToken cancellationToken)
+    {
+        var exists = await repository.ExistsByNameAndRevisionAsync(name, revision, cancellationToken);
+        return exists
+            ? Result<bool, Exception>.Failure(new InvalidOperationException(
+                $"StudyTemplate with name '{name.Value}' and revision '{revision.Value}' already exists."))
+            : Result<bool, Exception>.Success(false);
+    }
+
+    private async Task<Result<StudyTemplate, Exception>> SaveNewAsync(
+        StudyTemplate template,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            repository.Add(template);
+            await repository.SaveChangesAsync(cancellationToken);
+            return Result<StudyTemplate, Exception>.Success(template);
+        }
+        catch (Exception ex)
+        {
+            return Result<StudyTemplate, Exception>.Failure(new Exception("Failed to save StudyTemplate.", ex));
+        }
+    }
+
+    private async Task<Result<StudyTemplate, Exception>> SaveChangesAsync(
+        StudyTemplate template,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            await repository.SaveChangesAsync(cancellationToken);
+            return Result<StudyTemplate, Exception>.Success(template);
+        }
+        catch (Exception ex)
+        {
+            return Result<StudyTemplate, Exception>.Failure(new Exception($"Failed to save StudyTemplate: {ex.Message}",
+                ex));
+        }
     }
 }

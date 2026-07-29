@@ -12,30 +12,18 @@ public sealed class ResultDefinitionCommands(IStudyTemplateRepository repository
         CreateResultDefinitionCommand command,
         CancellationToken cancellationToken = default)
     {
-        var studyTemplate = await repository.GetByIdForChangeAsync(
-            new StudyTemplateId(studyTemplateId), cancellationToken);
+        var templateResult = await GetTemplateForChangeAsync(studyTemplateId, cancellationToken);
+        if (templateResult.IsFailure) return Result<Guid, Exception>.Failure(templateResult.Error!);
 
-        if (studyTemplate is null)
-        {
-            return Result<Guid, Exception>.Failure(
-                new KeyNotFoundException($"StudyTemplate with id {studyTemplateId} not found."));
-        }
+        var specification = new Specification(command.MinValue, command.MaxValue);
 
-        return await studyTemplate.AddResultDefinition(command.ResultInstance, command.Unit,
-                new Specification(command.MinValue, command.MaxValue))
-            .Bind(async result =>
-            {
-                try
-                {
-                    await repository.SaveChangesAsync(cancellationToken);
-                    return Result<Guid, Exception>.Success(result.Id.Value);
-                }
-                catch (Exception ex)
-                {
-                    return Result<Guid, Exception>.Failure(
-                        new Exception($"Failed to save ResultDefinition: {ex.Message}", ex));
-                }
-            });
+        var addResult = templateResult.Value!.AddResultDefinition(command.ResultInstance, command.Unit, specification);
+        if (addResult.IsFailure) return Result<Guid, Exception>.Failure(addResult.Error!);
+
+        var saveResult = await SaveChangesAsync(cancellationToken);
+        return saveResult.IsFailure
+            ? Result<Guid, Exception>.Failure(saveResult.Error!)
+            : Result<Guid, Exception>.Success(addResult.Value!.Id.Value);
     }
 
     public async Task<Result<Exception>> RemoveResultDefinitionAsync(
@@ -43,31 +31,13 @@ public sealed class ResultDefinitionCommands(IStudyTemplateRepository repository
         Guid resultId,
         CancellationToken cancellationToken = default)
     {
-        var studyTemplate = await repository.GetByIdForChangeAsync(
-            new StudyTemplateId(studyTemplateId), cancellationToken);
+        var templateResult = await GetTemplateForChangeAsync(studyTemplateId, cancellationToken);
+        if (templateResult.IsFailure) return Result<Exception>.Failure(templateResult.Error!);
 
-        if (studyTemplate is null)
-        {
-            return Result<Exception>.Failure(
-                new KeyNotFoundException($"StudyTemplate with id {studyTemplateId} not found."));
-        }
+        var removeResult = templateResult.Value!.RemoveResultDefinition(new ResultDefinitionId(resultId));
+        if (removeResult.IsFailure) return Result<Exception>.Failure(removeResult.Error!);
 
-        var removeResult = studyTemplate.RemoveResultDefinition(new ResultDefinitionId(resultId));
-
-        if (removeResult.IsFailure)
-        {
-            return Result<Exception>.Failure(removeResult.Error!);
-        }
-
-        try
-        {
-            await repository.SaveChangesAsync(cancellationToken);
-            return Result<Exception>.Success();
-        }
-        catch (Exception ex)
-        {
-            return Result<Exception>.Failure(new Exception($"Failed to remove ResultDefinition: {ex.Message}", ex));
-        }
+        return await SaveChangesAsync(cancellationToken);
     }
 
     public async Task<Result<Exception>> UpdateResultDefinitionAsync(
@@ -76,24 +46,34 @@ public sealed class ResultDefinitionCommands(IStudyTemplateRepository repository
         UpdateResultDefinitionCommand command,
         CancellationToken cancellationToken = default)
     {
-        var studyTemplate = await repository.GetByIdForChangeAsync(
-            new StudyTemplateId(studyTemplateId), cancellationToken);
-
-        if (studyTemplate is null)
-            return Result<Exception>.Failure(
-                new KeyNotFoundException($"StudyTemplate with id {studyTemplateId} not found."));
+        var templateResult = await GetTemplateForChangeAsync(studyTemplateId, cancellationToken);
+        if (templateResult.IsFailure) return Result<Exception>.Failure(templateResult.Error!);
 
         Specification? specification = null;
         if (command.MinValue is not null || command.MaxValue is not null)
-        {
             specification = new Specification(command.MinValue, command.MaxValue);
-        }
 
-        var updateResult = studyTemplate.UpdateResultDefinition(new ResultDefinitionId(resultDefinitionId),
+        var updateResult = templateResult.Value!.UpdateResultDefinition(new ResultDefinitionId(resultDefinitionId),
             command.ResultInstance, command.Unit, specification);
+        if (updateResult.IsFailure) return Result<Exception>.Failure(updateResult.Error!);
 
-        if (updateResult.IsFailure) return updateResult;
+        return await SaveChangesAsync(cancellationToken);
+    }
 
+    private async Task<Result<StudyTemplate, Exception>> GetTemplateForChangeAsync(
+        Guid studyTemplateId,
+        CancellationToken cancellationToken)
+    {
+        var template = await repository.GetByIdForChangeAsync(new StudyTemplateId(studyTemplateId), cancellationToken);
+        return template is null
+            ? Result<StudyTemplate, Exception>.Failure(
+                new KeyNotFoundException($"StudyTemplate with id {studyTemplateId} not found."))
+            : Result<StudyTemplate, Exception>.Success(template);
+    }
+
+    private async Task<Result<Exception>> SaveChangesAsync(
+        CancellationToken cancellationToken)
+    {
         try
         {
             await repository.SaveChangesAsync(cancellationToken);
@@ -101,7 +81,7 @@ public sealed class ResultDefinitionCommands(IStudyTemplateRepository repository
         }
         catch (Exception ex)
         {
-            return Result<Exception>.Failure(new Exception($"Failed to update ResultDefinition: {ex.Message}", ex));
+            return Result<Exception>.Failure(new Exception($"Failed to save changes: {ex.Message}", ex));
         }
     }
 }
