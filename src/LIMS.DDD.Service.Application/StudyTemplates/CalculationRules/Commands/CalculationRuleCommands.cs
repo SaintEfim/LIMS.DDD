@@ -13,35 +13,26 @@ public sealed class CalculationRuleCommands(IStudyTemplateRepository repository)
         CreateCalculationRuleCommand command,
         CancellationToken cancellationToken = default)
     {
-        var studyTemplate = await repository.GetByIdForChangeAsync(
-            new StudyTemplateId(studyTemplateId), cancellationToken);
+        var templateResult = await GetTemplateForChangeAsync(studyTemplateId, cancellationToken);
+        if (templateResult.IsFailure) return Result<Guid, Exception>.Failure(templateResult.Error!);
 
-        if (studyTemplate is null)
-        {
-            return Result<Guid, Exception>.Failure(
-                new KeyNotFoundException($"StudyTemplate with id {studyTemplateId} not found."));
-        }
+        var nameResult = Name.Create(command.Name);
+        if (nameResult.IsFailure) return Result<Guid, Exception>.Failure(nameResult.Error!);
 
-        return await Name.Create(command.Name)
-            .Bind(name => Description.Create(command.Description)
-                .Map(description => (name, description)))
-            .Bind(tuple => FormulaExpression.Create(command.FormulaExpression)
-                .Map(formula => (tuple.name, tuple.description, formula)))
-            .Bind(tuple => studyTemplate.AddCalculationRule(tuple.name, tuple.formula, tuple.description,
-                new ResultDefinitionId(command.ResultDefinitionId)))
-            .Bind(async result =>
-            {
-                try
-                {
-                    await repository.SaveChangesAsync(cancellationToken);
-                    return Result<Guid, Exception>.Success(result.Id.Value);
-                }
-                catch (Exception ex)
-                {
-                    return Result<Guid, Exception>.Failure(
-                        new Exception($"Failed to save CalculationRule: {ex.Message}", ex));
-                }
-            });
+        var descResult = Description.Create(command.Description);
+        if (descResult.IsFailure) return Result<Guid, Exception>.Failure(descResult.Error!);
+
+        var formulaResult = FormulaExpression.Create(command.FormulaExpression);
+        if (formulaResult.IsFailure) return Result<Guid, Exception>.Failure(formulaResult.Error!);
+
+        var addResult = templateResult.Value!.AddCalculationRule(nameResult.Value, formulaResult.Value,
+            descResult.Value, new ResultDefinitionId(command.ResultDefinitionId));
+        if (addResult.IsFailure) return Result<Guid, Exception>.Failure(addResult.Error!);
+
+        var saveResult = await SaveChangesAsync(cancellationToken);
+        return saveResult.IsFailure
+            ? Result<Guid, Exception>.Failure(saveResult.Error!)
+            : Result<Guid, Exception>.Success(addResult.Value!.Id.Value);
     }
 
     public async Task<Result<Exception>> RemoveCalculationRuleAsync(
@@ -49,31 +40,13 @@ public sealed class CalculationRuleCommands(IStudyTemplateRepository repository)
         Guid ruleId,
         CancellationToken cancellationToken = default)
     {
-        var studyTemplate = await repository.GetByIdForChangeAsync(
-            new StudyTemplateId(studyTemplateId), cancellationToken);
+        var templateResult = await GetTemplateForChangeAsync(studyTemplateId, cancellationToken);
+        if (templateResult.IsFailure) return Result<Exception>.Failure(templateResult.Error!);
 
-        if (studyTemplate is null)
-        {
-            return Result<Exception>.Failure(
-                new KeyNotFoundException($"StudyTemplate with id {studyTemplateId} not found."));
-        }
+        var removeResult = templateResult.Value!.RemoveCalculationRule(new CalculationRuleId(ruleId));
+        if (removeResult.IsFailure) return Result<Exception>.Failure(removeResult.Error!);
 
-        var removeResult = studyTemplate.RemoveCalculationRule(new CalculationRuleId(ruleId));
-
-        if (removeResult.IsFailure)
-        {
-            return Result<Exception>.Failure(removeResult.Error!);
-        }
-
-        try
-        {
-            await repository.SaveChangesAsync(cancellationToken);
-            return Result<Exception>.Success();
-        }
-        catch (Exception ex)
-        {
-            return Result<Exception>.Failure(new Exception($"Failed to remove CalculationRule: {ex.Message}", ex));
-        }
+        return await SaveChangesAsync(cancellationToken);
     }
 
     public async Task<Result<Exception>> AddCalculationInputAsync(
@@ -82,31 +55,16 @@ public sealed class CalculationRuleCommands(IStudyTemplateRepository repository)
         AddCalculationInputCommand command,
         CancellationToken cancellationToken = default)
     {
-        var studyTemplate = await repository.GetByIdForChangeAsync(
-            new StudyTemplateId(studyTemplateId), cancellationToken);
-
-        if (studyTemplate is null)
-        {
-            return Result<Exception>.Failure(
-                new KeyNotFoundException($"StudyTemplate with id {studyTemplateId} not found."));
-        }
+        var templateResult = await GetTemplateForChangeAsync(studyTemplateId, cancellationToken);
+        if (templateResult.IsFailure) return Result<Exception>.Failure(templateResult.Error!);
 
         var inputParameterId = new InputParameterId(command.InputParameterId);
         var calculationRuleId = new CalculationRuleId(ruleId);
 
-        var resAddCalculationInput = studyTemplate.AddCalculationInput(calculationRuleId, inputParameterId);
+        var addResult = templateResult.Value!.AddCalculationInput(calculationRuleId, inputParameterId);
+        if (addResult.IsFailure) return Result<Exception>.Failure(addResult.Error!);
 
-        if (resAddCalculationInput.IsFailure) return Result<Exception>.Failure(resAddCalculationInput.Error!);
-
-        try
-        {
-            await repository.SaveChangesAsync(cancellationToken);
-            return Result<Exception>.Success();
-        }
-        catch (Exception ex)
-        {
-            return Result<Exception>.Failure(new Exception($"Failed to save CalculationInput: {ex.Message}", ex));
-        }
+        return await SaveChangesAsync(cancellationToken);
     }
 
     public async Task<Result<Exception>> RemoveCalculationInputAsync(
@@ -115,33 +73,18 @@ public sealed class CalculationRuleCommands(IStudyTemplateRepository repository)
         RemoveCalculationInputCommand command,
         CancellationToken cancellationToken = default)
     {
-        var studyTemplate = await repository.GetByIdForChangeAsync(
-            new StudyTemplateId(studyTemplateId), cancellationToken);
+        var templateResult = await GetTemplateForChangeAsync(studyTemplateId, cancellationToken);
+        if (templateResult.IsFailure) return Result<Exception>.Failure(templateResult.Error!);
 
-        if (studyTemplate is null)
-        {
-            return Result<Exception>.Failure(
-                new KeyNotFoundException($"StudyTemplate with id {studyTemplateId} not found."));
-        }
-
-        var variableAlias = AliasName.Create(command.VariableAlias);
-        if (variableAlias.IsFailure) return Result<Exception>.Failure(variableAlias.Error!);
+        var variableAliasResult = AliasName.Create(command.VariableAlias);
+        if (variableAliasResult.IsFailure) return Result<Exception>.Failure(variableAliasResult.Error!);
 
         var calculationRuleId = new CalculationRuleId(ruleId);
 
-        var resRemoveCalculationInput = studyTemplate.RemoveCalculationInput(calculationRuleId, variableAlias.Value);
+        var removeResult = templateResult.Value!.RemoveCalculationInput(calculationRuleId, variableAliasResult.Value);
+        if (removeResult.IsFailure) return Result<Exception>.Failure(removeResult.Error!);
 
-        if (resRemoveCalculationInput.IsFailure) return Result<Exception>.Failure(resRemoveCalculationInput.Error!);
-
-        try
-        {
-            await repository.SaveChangesAsync(cancellationToken);
-            return Result<Exception>.Success();
-        }
-        catch (Exception ex)
-        {
-            return Result<Exception>.Failure(new Exception($"Failed to remove CalculationInput: {ex.Message}", ex));
-        }
+        return await SaveChangesAsync(cancellationToken);
     }
 
     public async Task<Result<Exception>> UpdateCalculationRuleAsync(
@@ -150,12 +93,8 @@ public sealed class CalculationRuleCommands(IStudyTemplateRepository repository)
         UpdateCalculationRuleCommand command,
         CancellationToken cancellationToken = default)
     {
-        var studyTemplate = await repository.GetByIdForChangeAsync(
-            new StudyTemplateId(studyTemplateId), cancellationToken);
-
-        if (studyTemplate is null)
-            return Result<Exception>.Failure(
-                new KeyNotFoundException($"StudyTemplate with id {studyTemplateId} not found."));
+        var templateResult = await GetTemplateForChangeAsync(studyTemplateId, cancellationToken);
+        if (templateResult.IsFailure) return Result<Exception>.Failure(templateResult.Error!);
 
         Name? name = null;
         if (command.Name is not null)
@@ -185,11 +124,27 @@ public sealed class CalculationRuleCommands(IStudyTemplateRepository repository)
             ? new ResultDefinitionId(command.ResultDefinitionId.Value)
             : null;
 
-        var updateResult = studyTemplate.UpdateCalculationRule(new CalculationRuleId(ruleId), name, formula,
+        var updateResult = templateResult.Value!.UpdateCalculationRule(new CalculationRuleId(ruleId), name, formula,
             description, resultDefinitionId);
+        if (updateResult.IsFailure) return Result<Exception>.Failure(updateResult.Error!);
 
-        if (updateResult.IsFailure) return updateResult;
+        return await SaveChangesAsync(cancellationToken);
+    }
 
+    private async Task<Result<StudyTemplate, Exception>> GetTemplateForChangeAsync(
+        Guid studyTemplateId,
+        CancellationToken cancellationToken)
+    {
+        var template = await repository.GetByIdForChangeAsync(new StudyTemplateId(studyTemplateId), cancellationToken);
+        return template is null
+            ? Result<StudyTemplate, Exception>.Failure(
+                new KeyNotFoundException($"StudyTemplate with id {studyTemplateId} not found."))
+            : Result<StudyTemplate, Exception>.Success(template);
+    }
+
+    private async Task<Result<Exception>> SaveChangesAsync(
+        CancellationToken cancellationToken)
+    {
         try
         {
             await repository.SaveChangesAsync(cancellationToken);
@@ -197,7 +152,7 @@ public sealed class CalculationRuleCommands(IStudyTemplateRepository repository)
         }
         catch (Exception ex)
         {
-            return Result<Exception>.Failure(new Exception($"Failed to update CalculationRule: {ex.Message}", ex));
+            return Result<Exception>.Failure(new Exception($"Failed to save changes: {ex.Message}", ex));
         }
     }
 }
