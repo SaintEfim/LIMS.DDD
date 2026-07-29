@@ -1,7 +1,6 @@
 ﻿using LIMS.DDD.Service.Domain.SeedWork;
 using LIMS.DDD.Service.Domain.SeedWork.Result;
 using LIMS.DDD.Service.Domain.StudyTemplateAggregate.Entities;
-using LIMS.DDD.Service.Domain.StudyTemplateAggregate.Entities.CalculationRules;
 using LIMS.DDD.Service.Domain.StudyTemplateAggregate.Entities.InputParameters;
 using LIMS.DDD.Service.Domain.StudyTemplateAggregate.Enums;
 using LIMS.DDD.Service.Domain.StudyTemplateAggregate.Ids;

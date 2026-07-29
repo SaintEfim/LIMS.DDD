@@ -54,4 +54,13 @@ public static class ResultExtensions
         if (result.IsFailure) return Result<TNext, TError>.Failure(result.Error!);
         return await func(result.Value!);
     }
+
+    public static async Task<Result<TNext, TError>> Bind<TValue, TNext, TError>(
+        this Task<Result<TValue, TError>> resultTask,
+        Func<TValue, Result<TNext, TError>> func)
+        where TError : Exception
+    {
+        var result = await resultTask;
+        return result.IsFailure ? Result<TNext, TError>.Failure(result.Error!) : func(result.Value!);
+    }
 }
