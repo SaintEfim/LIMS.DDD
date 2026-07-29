@@ -30,6 +30,11 @@ public class ResultDefinitionModule : ICarterModule
             .Produces(StatusCodes.Status404NotFound)
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status500InternalServerError);
+
+        group.MapPatch("/{determinationId:guid}", UpdateResultDefinition)
+            .Produces(StatusCodes.Status204NoContent)
+            .Produces(StatusCodes.Status404NotFound)
+            .Produces(StatusCodes.Status400BadRequest);
     }
 
     private static async Task<IResult> GetAllResultDefinitions(
@@ -73,6 +78,18 @@ public class ResultDefinitionModule : ICarterModule
     {
         var result = await services.Commands.RemoveResultDefinitionAsync(studyTemplateId, resultId, ct);
 
+        return result.IsFailure ? HandleFailure(result.Error!) : Results.NoContent();
+    }
+
+    private static async Task<IResult> UpdateResultDefinition(
+        Guid studyTemplateId,
+        Guid determinationId,
+        UpdateResultDefinitionCommand command,
+        [AsParameters] ResultDefinitionServices services,
+        CancellationToken ct)
+    {
+        var result = await services.Commands.UpdateResultDefinitionAsync(
+            studyTemplateId, determinationId, command, ct);
         return result.IsFailure ? HandleFailure(result.Error!) : Results.NoContent();
     }
 

@@ -30,6 +30,18 @@ public sealed class CalculationRule
         };
     }
 
+    internal void Update(
+        Name? name,
+        FormulaExpression? formulaExpression,
+        Description? description,
+        ResultDefinitionId? resultDefinitionId)
+    {
+        if (name is not null) Name = name.Value;
+        if (formulaExpression is not null) FormulaExpression = formulaExpression.Value;
+        if (description is not null) Description = description.Value;
+        if (resultDefinitionId is not null) ResultDefinitionId = resultDefinitionId.Value;
+    }
+
     public CalculationRuleId Id { get; private set; }
 
     public StudyTemplateId StudyTemplateId { get; private set; }

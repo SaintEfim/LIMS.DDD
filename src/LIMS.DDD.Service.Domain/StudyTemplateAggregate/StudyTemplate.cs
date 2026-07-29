@@ -271,4 +271,81 @@ public sealed class StudyTemplate : IAggregateRoot
         _resultDefinitions.Remove(result);
         return Result<Exception>.Success();
     }
+
+    public Result<Exception> UpdateInputParameter(
+        InputParameterId parameterId,
+        Name? name,
+        Description? description,
+        AliasName? aliasName,
+        Specification? specification)
+    {
+        if (Status != Status.Draft)
+            return Result<Exception>.Failure(
+                new InvalidOperationException("Cannot modify input parameters in an Active or Archived template."));
+
+        var parameter = _inputParameters.FirstOrDefault(p => p.Id == parameterId);
+        if (parameter is null)
+            return Result<Exception>.Failure(new InvalidOperationException("Input parameter not found."));
+
+        if (aliasName is not null && parameter.AliasName != aliasName)
+        {
+            if (_inputParameters.Any(p => p.AliasName == aliasName && p.Id != parameterId))
+                return Result<Exception>.Failure(
+                    new InvalidOperationException("Alias name must be unique within the template."));
+        }
+
+        parameter.Update(name, description, aliasName, specification);
+        return Result<Exception>.Success();
+    }
+
+    public Result<Exception> UpdateResultDefinition(
+        ResultDefinitionId resultDefinitionId,
+        string? resultInstance,
+        string? unit,
+        Specification? specification)
+    {
+        if (Status != Status.Draft)
+            return Result<Exception>.Failure(
+                new InvalidOperationException("Cannot modify result definitions in an Active or Archived template."));
+
+        var resultDef = _resultDefinitions.FirstOrDefault(r => r.Id == resultDefinitionId);
+        if (resultDef is null)
+            return Result<Exception>.Failure(new InvalidOperationException("Result definition not found."));
+
+        resultDef.Update(resultInstance, unit, specification);
+        return Result<Exception>.Success();
+    }
+
+    public Result<Exception> UpdateCalculationRule(
+        CalculationRuleId ruleId,
+        Name? name,
+        FormulaExpression? formulaExpression,
+        Description? description,
+        ResultDefinitionId? resultDefinitionId)
+    {
+        if (Status != Status.Draft)
+            return Result<Exception>.Failure(
+                new InvalidOperationException("Cannot modify calculation rules in an Active or Archived template."));
+
+        var rule = _calculationRules.FirstOrDefault(r => r.Id == ruleId);
+        if (rule is null)
+            return Result<Exception>.Failure(new InvalidOperationException("Calculation rule not found."));
+
+        if (name is not null && rule.Name != name)
+        {
+            if (_calculationRules.Any(r => r.Name == name && r.Id != ruleId))
+                return Result<Exception>.Failure(
+                    new InvalidOperationException("Calculation rule name must be unique within the template."));
+        }
+
+        if (resultDefinitionId is not null && rule.ResultDefinitionId != resultDefinitionId)
+        {
+            if (_resultDefinitions.All(r => r.Id != resultDefinitionId))
+                return Result<Exception>.Failure(
+                    new InvalidOperationException("Result definition not found in template."));
+        }
+
+        rule.Update(name, formulaExpression, description, resultDefinitionId);
+        return Result<Exception>.Success();
+    }
 }

@@ -30,6 +30,18 @@ public sealed class InputParameter
         return parameter;
     }
 
+    internal void Update(
+        Name? name,
+        Description? description,
+        AliasName? aliasName,
+        Specification? specification)
+    {
+        if (name is not null) Name = name.Value;
+        if (description is not null) Description = description.Value;
+        if (aliasName is not null) AliasName = aliasName.Value;
+        if (specification is not null) Specification = specification;
+    }
+
     public InputParameterId Id { get; private set; }
 
     public StudyTemplateId StudyTemplateId { get; private set; }
