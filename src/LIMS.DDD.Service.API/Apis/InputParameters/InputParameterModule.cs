@@ -30,6 +30,11 @@ public class InputParameterModule : ICarterModule
             .Produces(StatusCodes.Status404NotFound)
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status500InternalServerError);
+
+        group.MapPatch("/{parameterId:guid}", UpdateInputParameter)
+            .Produces(StatusCodes.Status204NoContent)
+            .Produces(StatusCodes.Status404NotFound)
+            .Produces(StatusCodes.Status400BadRequest);
     }
 
     private static async Task<IResult> GetAllInputParameters(
@@ -74,6 +79,18 @@ public class InputParameterModule : ICarterModule
     {
         var result = await services.Commands.RemoveInputParameterAsync(studyTemplateId, parameterId, ct);
 
+        return result.IsFailure ? HandleFailure(result.Error!) : Results.NoContent();
+    }
+
+    private static async Task<IResult> UpdateInputParameter(
+        Guid studyTemplateId,
+        Guid parameterId,
+        UpdateInputParameterCommand command,
+        [AsParameters] InputParameterServices services,
+        CancellationToken ct)
+    {
+        var result = await services.Commands.UpdateInputParameterAsync(
+            studyTemplateId, parameterId, command, ct);
         return result.IsFailure ? HandleFailure(result.Error!) : Results.NoContent();
     }
 

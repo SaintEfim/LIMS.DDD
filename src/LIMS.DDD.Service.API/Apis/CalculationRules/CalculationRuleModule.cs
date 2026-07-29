@@ -45,6 +45,11 @@ public class CalculationRuleModule : ICarterModule
             .Produces(StatusCodes.Status404NotFound)
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status500InternalServerError);
+
+        group.MapPatch("/{ruleId:guid}", UpdateCalculation)
+            .Produces(StatusCodes.Status204NoContent)
+            .Produces(StatusCodes.Status404NotFound)
+            .Produces(StatusCodes.Status400BadRequest);
     }
 
     private static async Task<IResult> GetAllCalculations(
@@ -111,6 +116,17 @@ public class CalculationRuleModule : ICarterModule
     {
         var command = new RemoveCalculationInputCommand(variableAlias);
         var result = await services.Commands.RemoveCalculationInputAsync(studyTemplateId, ruleId, command, ct);
+        return result.IsFailure ? HandleFailure(result.Error!) : Results.NoContent();
+    }
+
+    private static async Task<IResult> UpdateCalculation(
+        Guid studyTemplateId,
+        Guid ruleId,
+        UpdateCalculationRuleCommand command,
+        [AsParameters] CalculationRuleServices services,
+        CancellationToken ct)
+    {
+        var result = await services.Commands.UpdateCalculationRuleAsync(studyTemplateId, ruleId, command, ct);
         return result.IsFailure ? HandleFailure(result.Error!) : Results.NoContent();
     }
 

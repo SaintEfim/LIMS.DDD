@@ -1,6 +1,5 @@
 ﻿using LIMS.DDD.Service.Domain.SeedWork.Result;
 using LIMS.DDD.Service.Domain.StudyTemplateAggregate;
-using LIMS.DDD.Service.Domain.StudyTemplateAggregate.Entities.CalculationRules;
 using LIMS.DDD.Service.Domain.StudyTemplateAggregate.Entities.InputParameters;
 using LIMS.DDD.Service.Domain.StudyTemplateAggregate.Ids;
 using LIMS.DDD.Service.Domain.StudyTemplateAggregate.ValueObjects;
@@ -142,6 +141,63 @@ public sealed class CalculationRuleCommands(IStudyTemplateRepository repository)
         catch (Exception ex)
         {
             return Result<Exception>.Failure(new Exception($"Failed to remove CalculationInput: {ex.Message}", ex));
+        }
+    }
+
+    public async Task<Result<Exception>> UpdateCalculationRuleAsync(
+        Guid studyTemplateId,
+        Guid ruleId,
+        UpdateCalculationRuleCommand command,
+        CancellationToken cancellationToken = default)
+    {
+        var studyTemplate = await repository.GetByIdForChangeAsync(
+            new StudyTemplateId(studyTemplateId), cancellationToken);
+
+        if (studyTemplate is null)
+            return Result<Exception>.Failure(
+                new KeyNotFoundException($"StudyTemplate with id {studyTemplateId} not found."));
+
+        Name? name = null;
+        if (command.Name is not null)
+        {
+            var nameResult = Name.Create(command.Name);
+            if (nameResult.IsFailure) return Result<Exception>.Failure(nameResult.Error!);
+            name = nameResult.Value;
+        }
+
+        FormulaExpression? formula = null;
+        if (command.FormulaExpression is not null)
+        {
+            var formulaResult = FormulaExpression.Create(command.FormulaExpression);
+            if (formulaResult.IsFailure) return Result<Exception>.Failure(formulaResult.Error!);
+            formula = formulaResult.Value;
+        }
+
+        Description? description = null;
+        if (command.Description is not null)
+        {
+            var descResult = Description.Create(command.Description);
+            if (descResult.IsFailure) return Result<Exception>.Failure(descResult.Error!);
+            description = descResult.Value;
+        }
+
+        ResultDefinitionId? resultDefinitionId = command.ResultDefinitionId.HasValue
+            ? new ResultDefinitionId(command.ResultDefinitionId.Value)
+            : null;
+
+        var updateResult = studyTemplate.UpdateCalculationRule(new CalculationRuleId(ruleId), name, formula,
+            description, resultDefinitionId);
+
+        if (updateResult.IsFailure) return updateResult;
+
+        try
+        {
+            await repository.SaveChangesAsync(cancellationToken);
+            return Result<Exception>.Success();
+        }
+        catch (Exception ex)
+        {
+            return Result<Exception>.Failure(new Exception($"Failed to update CalculationRule: {ex.Message}", ex));
         }
     }
 }

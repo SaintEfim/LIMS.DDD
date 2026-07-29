@@ -27,6 +27,16 @@ public sealed class ResultDefinition
         return result;
     }
 
+    internal void Update(
+        string? resultInstance,
+        string? unit,
+        Specification? specification)
+    {
+        if (resultInstance is not null) ResultInstance = resultInstance;
+        if (unit is not null) Unit = unit;
+        if (specification is not null) Specification = specification;
+    }
+
     public string ResultInstance { get; private set; } = string.Empty;
 
     public ResultDefinitionId Id { get; private set; }

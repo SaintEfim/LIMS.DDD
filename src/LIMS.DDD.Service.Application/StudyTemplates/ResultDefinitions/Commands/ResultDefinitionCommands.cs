@@ -32,7 +32,8 @@ public sealed class ResultDefinitionCommands(IStudyTemplateRepository repository
                 }
                 catch (Exception ex)
                 {
-                    return Result<Guid, Exception>.Failure(new Exception($"Failed to save ResultDefinition: {ex.Message}", ex));
+                    return Result<Guid, Exception>.Failure(
+                        new Exception($"Failed to save ResultDefinition: {ex.Message}", ex));
                 }
             });
     }
@@ -66,6 +67,41 @@ public sealed class ResultDefinitionCommands(IStudyTemplateRepository repository
         catch (Exception ex)
         {
             return Result<Exception>.Failure(new Exception($"Failed to remove ResultDefinition: {ex.Message}", ex));
+        }
+    }
+
+    public async Task<Result<Exception>> UpdateResultDefinitionAsync(
+        Guid studyTemplateId,
+        Guid resultDefinitionId,
+        UpdateResultDefinitionCommand command,
+        CancellationToken cancellationToken = default)
+    {
+        var studyTemplate = await repository.GetByIdForChangeAsync(
+            new StudyTemplateId(studyTemplateId), cancellationToken);
+
+        if (studyTemplate is null)
+            return Result<Exception>.Failure(
+                new KeyNotFoundException($"StudyTemplate with id {studyTemplateId} not found."));
+
+        Specification? specification = null;
+        if (command.MinValue is not null || command.MaxValue is not null)
+        {
+            specification = new Specification(command.MinValue, command.MaxValue);
+        }
+
+        var updateResult = studyTemplate.UpdateResultDefinition(new ResultDefinitionId(resultDefinitionId),
+            command.ResultInstance, command.Unit, specification);
+
+        if (updateResult.IsFailure) return updateResult;
+
+        try
+        {
+            await repository.SaveChangesAsync(cancellationToken);
+            return Result<Exception>.Success();
+        }
+        catch (Exception ex)
+        {
+            return Result<Exception>.Failure(new Exception($"Failed to update ResultDefinition: {ex.Message}", ex));
         }
     }
 }
