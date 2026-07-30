@@ -2,11 +2,18 @@ LIMS.DDD
 
 <img width="888" height="618" alt="image" src="https://github.com/user-attachments/assets/4eff43e9-3d40-40c7-9dbb-656b6fc455c0" />
 
-Жизненный цикл методики
+## Жизненный цикл методики
 
-Draft ──► Active ──► Archived
-  │                     │
-  └── Delete            └── Create Revision ──► новый Draft
+```mermaid
+stateDiagram-v2
+    [*] --> Draft
+
+    Draft --> Active : Утверждение
+    Draft --> [*] : Удаление
+
+    Active --> Archived : Архивирование
+    Archived --> Draft : Создание новой ревизии
+```
 
 ## Бизнес-процессы
 
