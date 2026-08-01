@@ -4,18 +4,18 @@ using LIMS.DDD.Service.Domain.SeedWork.ValueObjects;
 
 namespace LIMS.DDD.Service.Domain.LaboratoryOperationsContext.OrderAggregate.ValueObject;
 
-public sealed record StatusOrder : StatusBase<IState<Order>, Order>
+public sealed record OrderStatus : StatusBase<IState<Order>, Order>
 {
-    public static StatusOrder Draft { get; } = new(new DraftState());
-    public static StatusOrder Completed { get; } = new(new CompletedState());
+    public static OrderStatus Draft { get; } = new(new DraftState());
+    public static OrderStatus Completed { get; } = new(new CompletedState());
 
-    private static readonly Dictionary<string, StatusOrder> Registry = new(StringComparer.OrdinalIgnoreCase)
+    private static readonly Dictionary<string, OrderStatus> Registry = new(StringComparer.OrdinalIgnoreCase)
     {
         ["Draft"] = Draft,
         ["Completed"] = Completed
     };
 
-    private StatusOrder(
+    private OrderStatus(
         IState<Order> state)
         : base(state)
     {
@@ -23,12 +23,12 @@ public sealed record StatusOrder : StatusBase<IState<Order>, Order>
 
     public static bool TryParse(
         string name,
-        out StatusOrder? status)
+        out OrderStatus? status)
     {
         return Registry.TryGetValue(name, out status);
     }
 
-    public static StatusOrder ConvertStatus(
+    public static OrderStatus ConvertStatus(
         string value)
     {
         return TryParse(value, out var status)

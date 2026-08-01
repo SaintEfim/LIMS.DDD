@@ -13,9 +13,9 @@ public class Order
 
     public Description Description { get; private set; }
 
-    public string Contractor { get; private set; }
+    public string Contractor { get; private set; } = string.Empty;
 
-    public StatusOrder Status { get; private set; } = StatusOrder.Draft;
+    public OrderStatus OrderStatus { get; private set; } = OrderStatus.Draft;
 
     private Order()
     {
@@ -41,7 +41,7 @@ public class Order
         Description? description,
         string? contractor)
     {
-        if (!Status.CanEdit)
+        if (!OrderStatus.CanEdit)
             return Result<Order, Exception>.Failure(
                 new InvalidOperationException(
                     "Cannot modify details of an Active or Archived template. Create a new revision."));
@@ -51,5 +51,17 @@ public class Order
         if (contractor is not null) Contractor = contractor;
 
         return Result<Order, Exception>.Success(this);
+    }
+
+    public Result<Exception> ChangeStatus(
+        OrderStatus newOrderStatus)
+    {
+        var result = OrderStatus.CanTransitionTo(newOrderStatus, this);
+
+        if (result.IsFailure) return result;
+
+        OrderStatus = newOrderStatus;
+
+        return Result<Exception>.Success();
     }
 }
