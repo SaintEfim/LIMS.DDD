@@ -1,12 +1,11 @@
 ﻿using LIMS.DDD.Service.Domain.SeedWork;
 using LIMS.DDD.Service.Domain.SeedWork.Result;
-using LIMS.DDD.Service.Domain.StudyTemplateAggregate.Entities;
-using LIMS.DDD.Service.Domain.StudyTemplateAggregate.Entities.InputParameters;
-using LIMS.DDD.Service.Domain.StudyTemplateAggregate.Enums;
-using LIMS.DDD.Service.Domain.StudyTemplateAggregate.Ids;
-using LIMS.DDD.Service.Domain.StudyTemplateAggregate.ValueObjects;
+using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.Entities;
+using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.Enums;
+using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.Ids;
+using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.ValueObjects;
 
-namespace LIMS.DDD.Service.Domain.StudyTemplateAggregate;
+namespace LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate;
 
 public sealed class StudyTemplate : IAggregateRoot
 {

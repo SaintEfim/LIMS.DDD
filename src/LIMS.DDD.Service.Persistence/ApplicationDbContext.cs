@@ -1,4 +1,4 @@
-﻿using LIMS.DDD.Service.Domain.StudyTemplateAggregate;
+﻿using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate;
 using Microsoft.EntityFrameworkCore;
 
 namespace LIMS.DDD.Service.Persistence;

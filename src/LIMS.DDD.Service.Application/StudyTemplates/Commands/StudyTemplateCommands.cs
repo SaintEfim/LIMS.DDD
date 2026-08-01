@@ -1,9 +1,9 @@
 ﻿using LIMS.DDD.Service.Domain.SeedWork.Result;
-using LIMS.DDD.Service.Domain.StudyTemplateAggregate;
-using LIMS.DDD.Service.Domain.StudyTemplateAggregate.Enums;
-using LIMS.DDD.Service.Domain.StudyTemplateAggregate.Ids;
-using LIMS.DDD.Service.Domain.StudyTemplateAggregate.Services;
-using LIMS.DDD.Service.Domain.StudyTemplateAggregate.ValueObjects;
+using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate;
+using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.Enums;
+using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.Ids;
+using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.Services;
+using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.ValueObjects;
 
 namespace LIMS.DDD.Service.Application.StudyTemplates.Commands;
 

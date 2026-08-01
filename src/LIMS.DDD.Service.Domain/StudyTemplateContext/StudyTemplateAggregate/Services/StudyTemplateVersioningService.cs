@@ -1,8 +1,8 @@
 ﻿using LIMS.DDD.Service.Domain.SeedWork.Result;
-using LIMS.DDD.Service.Domain.StudyTemplateAggregate.Enums;
-using LIMS.DDD.Service.Domain.StudyTemplateAggregate.ValueObjects;
+using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.Enums;
+using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.ValueObjects;
 
-namespace LIMS.DDD.Service.Domain.StudyTemplateAggregate.Services;
+namespace LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.Services;
 
 public class StudyTemplateVersioningService
 {

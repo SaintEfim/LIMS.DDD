@@ -1,8 +1,7 @@
-﻿using LIMS.DDD.Service.Domain.StudyTemplateAggregate.Entities.InputParameters;
-using LIMS.DDD.Service.Domain.StudyTemplateAggregate.Ids;
-using LIMS.DDD.Service.Domain.StudyTemplateAggregate.ValueObjects;
+﻿using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.Ids;
+using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.ValueObjects;
 
-namespace LIMS.DDD.Service.Domain.StudyTemplateAggregate.Entities;
+namespace LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.Entities;
 
 public sealed class InputParameter
 {

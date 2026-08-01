@@ -1,4 +1,4 @@
-﻿using LIMS.DDD.Service.Domain.StudyTemplateAggregate;
+﻿using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate;
 using LIMS.DDD.Service.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;

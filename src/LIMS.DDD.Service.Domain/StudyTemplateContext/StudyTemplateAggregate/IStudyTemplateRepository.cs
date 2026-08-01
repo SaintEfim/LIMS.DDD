@@ -1,8 +1,8 @@
 ﻿using LIMS.DDD.Service.Domain.SeedWork;
-using LIMS.DDD.Service.Domain.StudyTemplateAggregate.Ids;
-using LIMS.DDD.Service.Domain.StudyTemplateAggregate.ValueObjects;
+using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.Ids;
+using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.ValueObjects;
 
-namespace LIMS.DDD.Service.Domain.StudyTemplateAggregate;
+namespace LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate;
 
 public interface IStudyTemplateRepository : IRepository<StudyTemplate>
 {
