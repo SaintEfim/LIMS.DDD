@@ -11,13 +11,13 @@ public sealed class DraftState : IState<Order>
     {
         return newState switch
         {
-            CompletedState => ValidateForComplition(template),
+            CompletedState => ValidateForComplete(template),
             DraftState => Result<Exception>.Success(),
             _ => Result<Exception>.Failure(new InvalidOperationException("Invalid transition from Draft"))
         };
     }
 
-    private static Result<Exception> ValidateForComplition(Order template)
+    private static Result<Exception> ValidateForComplete(Order template)
     {
         return Result<Exception>.Success();
     }
