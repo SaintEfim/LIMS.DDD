@@ -1,9 +1,10 @@
-﻿using LIMS.DDD.Service.Domain.SeedWork.Result;
+﻿using LIMS.DDD.Service.Domain.SeedWork;
+using LIMS.DDD.Service.Domain.SeedWork.ValueObjects;
 using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.States;
 
 namespace LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.ValueObjects;
 
-public sealed record Status
+public sealed record Status : StatusBase<IState<StudyTemplate>, StudyTemplate>
 {
     public static Status Draft { get; } = new(new DraftState());
     public static Status Active { get; } = new(new ActiveState());
@@ -24,32 +25,17 @@ public sealed record Status
         return Registry.TryGetValue(name, out status!);
     }
 
-    private readonly IState<StudyTemplate> _state;
-
     private Status(
         IState<StudyTemplate> state)
+        : base(state)
     {
-        _state = state;
     }
 
-    public string Name => _state.Name;
-    public bool CanEdit => _state.CanEdit;
-
-    public Result<Exception> CanTransitionTo(
-        Status newStatus,
-        StudyTemplate template)
+    public static Status ConvertStatus(
+        string value)
     {
-        return _state.CanTransitionTo(newStatus._state, template);
-    }
-
-    public override string ToString() => Name;
-
-    public static Status ConvertStatus(string value)
-    {
-        if (TryParse(value, out var status))
-            return status;
-
-        throw new InvalidOperationException(
-            $"Unknown status '{value}'");
+        return TryParse(value, out var status)
+            ? status
+            : throw new InvalidOperationException($"Unknown status '{value}'");
     }
 }
