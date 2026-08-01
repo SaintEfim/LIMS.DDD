@@ -22,6 +22,11 @@ public class StudyTemplateConfiguration : IEntityTypeConfiguration<StudyTemplate
             .HasMaxLength(100)
             .IsRequired();
 
+        builder.Property(x => x.Status)
+            .HasConversion(status => status.Name, value => Status.ConvertStatus(value))
+            .HasMaxLength(50)
+            .IsRequired();
+
         builder.Property(x => x.Description)
             .HasConversion(d => d.Value, d => Description.Create(d)
                 .Value)

@@ -23,6 +23,7 @@
 
   <ItemGroup>
     <Folder Include="StudyTemplateContext\" />
+    <Folder Include="StudyTemplateContext\StudyTemplateAggregate\ValueObjects\StatusState\" />
   </ItemGroup>
 
 </Project>

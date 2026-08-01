@@ -1,6 +1,5 @@
 ﻿using LIMS.DDD.Service.Domain.SeedWork.Result;
 using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate;
-using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.Enums;
 using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.Ids;
 using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.Services;
 using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.ValueObjects;
@@ -78,16 +77,22 @@ public sealed class StudyTemplateCommands(IStudyTemplateRepository repository)
         CancellationToken cancellationToken = default)
     {
         var templateResult = await GetTemplateForChangeAsync(id, cancellationToken);
-        if (templateResult.IsFailure) return templateResult;
 
-        if (!Enum.TryParse<Status>(statusCommand, true, out var status))
+        if (templateResult.IsFailure) return Result<StudyTemplate, Exception>.Failure(templateResult.Error!);
+
+        var template = templateResult.Value!;
+
+        if (!Status.TryParse(statusCommand, out var newStatus))
+        {
             return Result<StudyTemplate, Exception>.Failure(
                 new InvalidOperationException($"Unknown status '{statusCommand}'."));
+        }
 
-        var changeStatusResult = templateResult.Value!.ChangeStatus(status);
-        if (changeStatusResult.IsFailure) return Result<StudyTemplate, Exception>.Failure(changeStatusResult.Error!);
+        var changeResult = template.ChangeStatus(newStatus);
 
-        return await SaveChangesAsync(templateResult.Value!, cancellationToken);
+        if (changeResult.IsFailure) return Result<StudyTemplate, Exception>.Failure(changeResult.Error!);
+
+        return await SaveChangesAsync(template, cancellationToken);
     }
 
     public async Task<Result<Guid, Exception>> CreateRevisionAsync(
