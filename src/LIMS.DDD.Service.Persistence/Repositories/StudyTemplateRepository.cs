@@ -1,6 +1,6 @@
-﻿using LIMS.DDD.Service.Domain.StudyTemplateAggregate;
-using LIMS.DDD.Service.Domain.StudyTemplateAggregate.Ids;
-using LIMS.DDD.Service.Domain.StudyTemplateAggregate.ValueObjects;
+﻿using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate;
+using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.Ids;
+using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 
 namespace LIMS.DDD.Service.Persistence.Repositories;

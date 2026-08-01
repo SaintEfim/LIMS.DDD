@@ -1,7 +1,6 @@
-﻿using LIMS.DDD.Service.Domain.StudyTemplateAggregate.Entities;
-using LIMS.DDD.Service.Domain.StudyTemplateAggregate.Entities.InputParameters;
-using LIMS.DDD.Service.Domain.StudyTemplateAggregate.Ids;
-using LIMS.DDD.Service.Domain.StudyTemplateAggregate.ValueObjects;
+﻿using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.Entities;
+using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.Ids;
+using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

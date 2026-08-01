@@ -1,4 +1,4 @@
-﻿namespace LIMS.DDD.Service.Domain.StudyTemplateAggregate.Enums;
+﻿namespace LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.Enums;
 
 public enum Status
 {

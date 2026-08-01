@@ -1,7 +1,7 @@
 ﻿using LIMS.DDD.Service.Application.StudyTemplates.CalculationRules.Queries;
 using LIMS.DDD.Service.Application.StudyTemplates.InputParameters.Queries;
 using LIMS.DDD.Service.Application.StudyTemplates.ResultDefinitions.Queries;
-using LIMS.DDD.Service.Domain.StudyTemplateAggregate;
+using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate;
 
 namespace LIMS.DDD.Service.Application.StudyTemplates.Queries;
 

@@ -13,6 +13,16 @@
     <Compile Update="StudyTemplateAggregate\ValueObjects\Name.cs">
       <Generator>MSBuild:GenerateCodeFromAttributes</Generator>
     </Compile>
+    <Compile Update="StudyTemplateContext\StudyTemplateAggregate\ValueObjects\Name.cs">
+      <Generator>MSBuild:GenerateCodeFromAttributes</Generator>
+    </Compile>
+    <Compile Update="StudyTemplateContext\StudyTemplateAggregate\ValueObjects\Description.cs">
+      <Generator>MSBuild:GenerateCodeFromAttributes</Generator>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="StudyTemplateContext\" />
   </ItemGroup>
 
 </Project>
