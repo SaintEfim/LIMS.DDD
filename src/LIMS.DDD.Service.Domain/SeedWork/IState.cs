@@ -1,5 +1,7 @@
 ﻿using LIMS.DDD.Service.Domain.SeedWork.Result;
 
+namespace LIMS.DDD.Service.Domain.SeedWork;
+
 public interface IState<T>
 {
     string Name { get; }
