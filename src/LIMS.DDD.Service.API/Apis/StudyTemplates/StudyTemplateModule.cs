@@ -12,30 +12,30 @@ public class StudyTemplateModule : ICarterModule
         var group = app.MapGroup("/api/study-templates")
             .WithTags("StudyTemplates");
 
-        group.MapGet("/", GetAllStudyTemplates)
+        group.MapGet("/", GetAl)
             .Produces<ICollection<StudyTemplateDto>>();
 
-        group.MapGet("/{id:guid}", GetStudyTemplateById)
+        group.MapGet("/{id:guid}", GetById)
             .Produces<StudyTemplateDto>()
             .Produces(StatusCodes.Status404NotFound);
 
-        group.MapPost("/", CreateStudyTemplate)
+        group.MapPost("/", Create)
             .Produces(StatusCodes.Status201Created)
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status500InternalServerError);
 
-        group.MapPatch("/{id:guid}", UpdateStudyTemplate)
+        group.MapPatch("/{id:guid}", Update)
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status404NotFound)
             .Produces(StatusCodes.Status400BadRequest);
 
-        group.MapPost("/{id:guid}/change-status", ChangeStatusStudyTemplate)
+        group.MapPost("/{id:guid}/change-status", ChangeStatus)
             .WithName("ApproveStudyTemplate")
             .Produces(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status404NotFound)
             .Produces(StatusCodes.Status400BadRequest);
 
-        group.MapPost("/{id:guid}/create-revision", CreateStudyTemplateRevision)
+        group.MapPost("/{id:guid}/create-revision", CreateRevision)
             .WithName("CreateStudyTemplateRevision")
             .Produces(StatusCodes.Status201Created)
             .Produces(StatusCodes.Status404NotFound)
@@ -43,7 +43,7 @@ public class StudyTemplateModule : ICarterModule
             .Produces(StatusCodes.Status500InternalServerError);
     }
 
-    private static async Task<IResult> GetAllStudyTemplates(
+    private static async Task<IResult> GetAl(
         [AsParameters] StudyTemplateServices services,
         CancellationToken ct)
     {
@@ -51,7 +51,7 @@ public class StudyTemplateModule : ICarterModule
         return Results.Ok(studyTemplates);
     }
 
-    private static async Task<IResult> GetStudyTemplateById(
+    private static async Task<IResult> GetById(
         Guid id,
         [AsParameters] StudyTemplateServices services,
         CancellationToken ct)
@@ -60,7 +60,7 @@ public class StudyTemplateModule : ICarterModule
         return dto is null ? Results.NotFound() : Results.Ok(dto);
     }
 
-    private static async Task<IResult> CreateStudyTemplate(
+    private static async Task<IResult> Create(
         CreateStudyTemplateCommand createCommand,
         [AsParameters] StudyTemplateServices services,
         CancellationToken ct)
@@ -73,7 +73,7 @@ public class StudyTemplateModule : ICarterModule
         return Results.Created($"/api/studyTemplates/{createdId}", new { id = createdId });
     }
 
-    private static async Task<IResult> UpdateStudyTemplate(
+    private static async Task<IResult> Update(
         Guid id,
         UpdateStudyTemplateCommand updateCommand,
         [AsParameters] StudyTemplateServices services,
@@ -83,7 +83,7 @@ public class StudyTemplateModule : ICarterModule
         return result.IsFailure ? HandleFailure(result.Error!) : Results.NoContent();
     }
 
-    private static async Task<IResult> ChangeStatusStudyTemplate(
+    private static async Task<IResult> ChangeStatus(
         Guid id,
         string newStatus,
         [AsParameters] StudyTemplateServices services,
@@ -93,7 +93,7 @@ public class StudyTemplateModule : ICarterModule
         return result.IsFailure ? HandleFailure(result.Error!) : Results.Ok();
     }
 
-    private static async Task<IResult> CreateStudyTemplateRevision(
+    private static async Task<IResult> CreateRevision(
         Guid id,
         CreateStudyTemplateRevisionCommand command,
         [AsParameters] StudyTemplateServices services,

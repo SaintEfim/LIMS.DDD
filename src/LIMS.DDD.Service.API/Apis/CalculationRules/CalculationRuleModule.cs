@@ -12,20 +12,20 @@ public class CalculationRuleModule : ICarterModule
         var group = app.MapGroup("/api/study-templates/{studyTemplateId:guid}/calculation-rules")
             .WithTags("CalculationRules");
 
-        group.MapGet("/", GetAllCalculations)
+        group.MapGet("/", GetAll)
             .Produces<ICollection<CalculationRuleDto>>();
 
-        group.MapGet("/{ruleId:guid}", GetCalculationById)
+        group.MapGet("/{ruleId:guid}", GetById)
             .Produces<CalculationRuleDto>()
             .Produces(StatusCodes.Status404NotFound);
 
-        group.MapPost("/", CreateCalculation)
+        group.MapPost("/", Create)
             .Produces(StatusCodes.Status201Created)
             .Produces(StatusCodes.Status404NotFound)
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status500InternalServerError);
 
-        group.MapDelete("/{ruleId:guid}", DeleteCalculation)
+        group.MapDelete("/{ruleId:guid}", Delete)
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status404NotFound)
             .Produces(StatusCodes.Status400BadRequest)
@@ -34,25 +34,25 @@ public class CalculationRuleModule : ICarterModule
         var inputsGroup = group.MapGroup("/{ruleId:guid}/inputs")
             .WithTags("CalculationRuleInputs");
 
-        inputsGroup.MapPost("/", AddCalculationInput)
+        inputsGroup.MapPost("/", CreateInput)
             .Produces(StatusCodes.Status201Created)
             .Produces(StatusCodes.Status404NotFound)
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status500InternalServerError);
 
-        inputsGroup.MapDelete("/{variableAlias}", RemoveCalculationInput)
+        inputsGroup.MapDelete("/{variableAlias}", RemoveInput)
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status404NotFound)
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status500InternalServerError);
 
-        group.MapPatch("/{ruleId:guid}", UpdateCalculation)
+        group.MapPatch("/{ruleId:guid}", Update)
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status404NotFound)
             .Produces(StatusCodes.Status400BadRequest);
     }
 
-    private static async Task<IResult> GetAllCalculations(
+    private static async Task<IResult> GetAll(
         Guid studyTemplateId,
         [AsParameters] CalculationRuleServices services,
         CancellationToken ct)
@@ -61,7 +61,7 @@ public class CalculationRuleModule : ICarterModule
         return Results.Ok(results);
     }
 
-    private static async Task<IResult> GetCalculationById(
+    private static async Task<IResult> GetById(
         Guid studyTemplateId,
         Guid ruleId,
         [AsParameters] CalculationRuleServices services,
@@ -71,13 +71,13 @@ public class CalculationRuleModule : ICarterModule
         return result is not null ? Results.Ok(result) : Results.NotFound();
     }
 
-    private static async Task<IResult> CreateCalculation(
+    private static async Task<IResult> Create(
         Guid studyTemplateId,
         CreateCalculationRuleCommand command,
         [AsParameters] CalculationRuleServices services,
         CancellationToken ct)
     {
-        var result = await services.Commands.AddCalculationRuleAsync(studyTemplateId, command, ct);
+        var result = await services.Commands.CreateAsync(studyTemplateId, command, ct);
 
         if (result.IsFailure) return HandleFailure(result.Error!);
 
@@ -86,28 +86,28 @@ public class CalculationRuleModule : ICarterModule
             new { id = ruleId });
     }
 
-    private static async Task<IResult> DeleteCalculation(
+    private static async Task<IResult> Delete(
         Guid studyTemplateId,
         Guid ruleId,
         [AsParameters] CalculationRuleServices services,
         CancellationToken ct)
     {
-        var result = await services.Commands.RemoveCalculationRuleAsync(studyTemplateId, ruleId, ct);
+        var result = await services.Commands.RemoveAsync(studyTemplateId, ruleId, ct);
         return result.IsFailure ? HandleFailure(result.Error!) : Results.NoContent();
     }
 
-    private static async Task<IResult> AddCalculationInput(
+    private static async Task<IResult> CreateInput(
         Guid studyTemplateId,
         Guid ruleId,
         AddCalculationInputCommand command,
         [AsParameters] CalculationRuleServices services,
         CancellationToken ct)
     {
-        var result = await services.Commands.AddCalculationInputAsync(studyTemplateId, ruleId, command, ct);
+        var result = await services.Commands.CreateInputAsync(studyTemplateId, ruleId, command, ct);
         return result.IsFailure ? HandleFailure(result.Error!) : Results.Created();
     }
 
-    private static async Task<IResult> RemoveCalculationInput(
+    private static async Task<IResult> RemoveInput(
         Guid studyTemplateId,
         Guid ruleId,
         string variableAlias,
@@ -115,18 +115,18 @@ public class CalculationRuleModule : ICarterModule
         CancellationToken ct)
     {
         var command = new RemoveCalculationInputCommand(variableAlias);
-        var result = await services.Commands.RemoveCalculationInputAsync(studyTemplateId, ruleId, command, ct);
+        var result = await services.Commands.RemoveInputAsync(studyTemplateId, ruleId, command, ct);
         return result.IsFailure ? HandleFailure(result.Error!) : Results.NoContent();
     }
 
-    private static async Task<IResult> UpdateCalculation(
+    private static async Task<IResult> Update(
         Guid studyTemplateId,
         Guid ruleId,
         UpdateCalculationRuleCommand command,
         [AsParameters] CalculationRuleServices services,
         CancellationToken ct)
     {
-        var result = await services.Commands.UpdateCalculationRuleAsync(studyTemplateId, ruleId, command, ct);
+        var result = await services.Commands.UpdateAsync(studyTemplateId, ruleId, command, ct);
         return result.IsFailure ? HandleFailure(result.Error!) : Results.NoContent();
     }
 

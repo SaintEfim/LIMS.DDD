@@ -8,7 +8,7 @@ namespace LIMS.DDD.Service.Application.StudyTemplates.InputParameters.Commands;
 
 public sealed class InputParameterCommands(IStudyTemplateRepository repository)
 {
-    public async Task<Result<Guid, Exception>> AddInputParameterAsync(
+    public async Task<Result<Guid, Exception>> CreateAsync(
         Guid studyTemplateId,
         CreateInputParameterCommand command,
         CancellationToken cancellationToken = default)
@@ -37,7 +37,7 @@ public sealed class InputParameterCommands(IStudyTemplateRepository repository)
             : Result<Guid, Exception>.Success(addResult.Value!.Id.Value);
     }
 
-    public async Task<Result<Exception>> RemoveInputParameterAsync(
+    public async Task<Result<Exception>> RemoveAsync(
         Guid studyTemplateId,
         Guid parameterId,
         CancellationToken cancellationToken = default)
@@ -51,7 +51,7 @@ public sealed class InputParameterCommands(IStudyTemplateRepository repository)
         return await SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<Result<Exception>> UpdateInputParameterAsync(
+    public async Task<Result<Exception>> UpdateAsync(
         Guid studyTemplateId,
         Guid parameterId,
         UpdateInputParameterCommand command,

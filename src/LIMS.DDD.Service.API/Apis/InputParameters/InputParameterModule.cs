@@ -12,32 +12,32 @@ public class InputParameterModule : ICarterModule
         var group = app.MapGroup("/api/study-templates/{studyTemplateId:guid}/input-parameters")
             .WithTags("InputParameters");
 
-        group.MapGet("/", GetAllInputParameters)
+        group.MapGet("/", GetAll)
             .Produces<ICollection<InputParameterDto>>();
 
-        group.MapGet("/{parameterId:guid}", GetInputParameterById)
+        group.MapGet("/{parameterId:guid}", GetById)
             .Produces<InputParameterDto>()
             .Produces(StatusCodes.Status404NotFound);
 
-        group.MapPost("/", CreateInputParameter)
+        group.MapPost("/", Create)
             .Produces(StatusCodes.Status201Created)
             .Produces(StatusCodes.Status404NotFound)
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status500InternalServerError);
 
-        group.MapDelete("/{parameterId:guid}", DeleteInputParameter)
+        group.MapDelete("/{parameterId:guid}", Delete)
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status404NotFound)
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status500InternalServerError);
 
-        group.MapPatch("/{parameterId:guid}", UpdateInputParameter)
+        group.MapPatch("/{parameterId:guid}", Update)
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status404NotFound)
             .Produces(StatusCodes.Status400BadRequest);
     }
 
-    private static async Task<IResult> GetAllInputParameters(
+    private static async Task<IResult> GetAll(
         Guid studyTemplateId,
         [AsParameters] InputParameterServices services,
         CancellationToken ct)
@@ -46,7 +46,7 @@ public class InputParameterModule : ICarterModule
         return Results.Ok(parameters);
     }
 
-    private static async Task<IResult> GetInputParameterById(
+    private static async Task<IResult> GetById(
         Guid studyTemplateId,
         Guid parameterId,
         [AsParameters] InputParameterServices services,
@@ -56,13 +56,13 @@ public class InputParameterModule : ICarterModule
         return parameter is not null ? Results.Ok(parameter) : Results.NotFound();
     }
 
-    private static async Task<IResult> CreateInputParameter(
+    private static async Task<IResult> Create(
         Guid studyTemplateId,
         CreateInputParameterCommand command,
         [AsParameters] InputParameterServices services,
         CancellationToken ct)
     {
-        var result = await services.Commands.AddInputParameterAsync(studyTemplateId, command, ct);
+        var result = await services.Commands.CreateAsync(studyTemplateId, command, ct);
 
         if (result.IsFailure) return HandleFailure(result.Error!);
 
@@ -71,25 +71,25 @@ public class InputParameterModule : ICarterModule
             new { id = parameterId });
     }
 
-    private static async Task<IResult> DeleteInputParameter(
+    private static async Task<IResult> Delete(
         Guid studyTemplateId,
         Guid parameterId,
         [AsParameters] InputParameterServices services,
         CancellationToken ct)
     {
-        var result = await services.Commands.RemoveInputParameterAsync(studyTemplateId, parameterId, ct);
+        var result = await services.Commands.RemoveAsync(studyTemplateId, parameterId, ct);
 
         return result.IsFailure ? HandleFailure(result.Error!) : Results.NoContent();
     }
 
-    private static async Task<IResult> UpdateInputParameter(
+    private static async Task<IResult> Update(
         Guid studyTemplateId,
         Guid parameterId,
         UpdateInputParameterCommand command,
         [AsParameters] InputParameterServices services,
         CancellationToken ct)
     {
-        var result = await services.Commands.UpdateInputParameterAsync(
+        var result = await services.Commands.UpdateAsync(
             studyTemplateId, parameterId, command, ct);
         return result.IsFailure ? HandleFailure(result.Error!) : Results.NoContent();
     }
