@@ -7,7 +7,7 @@ namespace LIMS.DDD.Service.Application.StudyTemplates.ResultDefinitions.Commands
 
 public sealed class ResultDefinitionCommands(IStudyTemplateRepository repository)
 {
-    public async Task<Result<Guid, Exception>> AddResultDefinitionAsync(
+    public async Task<Result<Guid, Exception>> AddAsync(
         Guid studyTemplateId,
         CreateResultDefinitionCommand command,
         CancellationToken cancellationToken = default)
@@ -26,7 +26,7 @@ public sealed class ResultDefinitionCommands(IStudyTemplateRepository repository
             : Result<Guid, Exception>.Success(addResult.Value!.Id.Value);
     }
 
-    public async Task<Result<Exception>> RemoveResultDefinitionAsync(
+    public async Task<Result<Exception>> RemoveAsync(
         Guid studyTemplateId,
         Guid resultId,
         CancellationToken cancellationToken = default)
@@ -40,7 +40,7 @@ public sealed class ResultDefinitionCommands(IStudyTemplateRepository repository
         return await SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<Result<Exception>> UpdateResultDefinitionAsync(
+    public async Task<Result<Exception>> UpdateAsync(
         Guid studyTemplateId,
         Guid resultDefinitionId,
         UpdateResultDefinitionCommand command,

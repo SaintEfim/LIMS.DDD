@@ -8,7 +8,7 @@ namespace LIMS.DDD.Service.Application.StudyTemplates.CalculationRules.Commands;
 
 public sealed class CalculationRuleCommands(IStudyTemplateRepository repository)
 {
-    public async Task<Result<Guid, Exception>> AddCalculationRuleAsync(
+    public async Task<Result<Guid, Exception>> AddAsync(
         Guid studyTemplateId,
         CreateCalculationRuleCommand command,
         CancellationToken cancellationToken = default)
@@ -35,7 +35,7 @@ public sealed class CalculationRuleCommands(IStudyTemplateRepository repository)
             : Result<Guid, Exception>.Success(addResult.Value!.Id.Value);
     }
 
-    public async Task<Result<Exception>> RemoveCalculationRuleAsync(
+    public async Task<Result<Exception>> RemoveAsync(
         Guid studyTemplateId,
         Guid ruleId,
         CancellationToken cancellationToken = default)
@@ -49,7 +49,7 @@ public sealed class CalculationRuleCommands(IStudyTemplateRepository repository)
         return await SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<Result<Exception>> AddCalculationInputAsync(
+    public async Task<Result<Exception>> AddInputAsync(
         Guid studyTemplateId,
         Guid ruleId,
         AddCalculationInputCommand command,
@@ -67,7 +67,7 @@ public sealed class CalculationRuleCommands(IStudyTemplateRepository repository)
         return await SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<Result<Exception>> RemoveCalculationInputAsync(
+    public async Task<Result<Exception>> RemoveInputAsync(
         Guid studyTemplateId,
         Guid ruleId,
         RemoveCalculationInputCommand command,
@@ -87,7 +87,7 @@ public sealed class CalculationRuleCommands(IStudyTemplateRepository repository)
         return await SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<Result<Exception>> UpdateCalculationRuleAsync(
+    public async Task<Result<Exception>> UpdateAsync(
         Guid studyTemplateId,
         Guid ruleId,
         UpdateCalculationRuleCommand command,

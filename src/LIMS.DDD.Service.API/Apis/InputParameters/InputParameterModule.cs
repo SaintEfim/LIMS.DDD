@@ -62,7 +62,7 @@ public class InputParameterModule : ICarterModule
         [AsParameters] InputParameterServices services,
         CancellationToken ct)
     {
-        var result = await services.Commands.AddInputParameterAsync(studyTemplateId, command, ct);
+        var result = await services.Commands.AddAsync(studyTemplateId, command, ct);
 
         if (result.IsFailure) return HandleFailure(result.Error!);
 
@@ -77,7 +77,7 @@ public class InputParameterModule : ICarterModule
         [AsParameters] InputParameterServices services,
         CancellationToken ct)
     {
-        var result = await services.Commands.RemoveInputParameterAsync(studyTemplateId, parameterId, ct);
+        var result = await services.Commands.RemoveAsync(studyTemplateId, parameterId, ct);
 
         return result.IsFailure ? HandleFailure(result.Error!) : Results.NoContent();
     }
@@ -89,7 +89,7 @@ public class InputParameterModule : ICarterModule
         [AsParameters] InputParameterServices services,
         CancellationToken ct)
     {
-        var result = await services.Commands.UpdateInputParameterAsync(
+        var result = await services.Commands.UpdateAsync(
             studyTemplateId, parameterId, command, ct);
         return result.IsFailure ? HandleFailure(result.Error!) : Results.NoContent();
     }

@@ -77,7 +77,7 @@ public class CalculationRuleModule : ICarterModule
         [AsParameters] CalculationRuleServices services,
         CancellationToken ct)
     {
-        var result = await services.Commands.AddCalculationRuleAsync(studyTemplateId, command, ct);
+        var result = await services.Commands.AddAsync(studyTemplateId, command, ct);
 
         if (result.IsFailure) return HandleFailure(result.Error!);
 
@@ -92,7 +92,7 @@ public class CalculationRuleModule : ICarterModule
         [AsParameters] CalculationRuleServices services,
         CancellationToken ct)
     {
-        var result = await services.Commands.RemoveCalculationRuleAsync(studyTemplateId, ruleId, ct);
+        var result = await services.Commands.RemoveAsync(studyTemplateId, ruleId, ct);
         return result.IsFailure ? HandleFailure(result.Error!) : Results.NoContent();
     }
 
@@ -103,7 +103,7 @@ public class CalculationRuleModule : ICarterModule
         [AsParameters] CalculationRuleServices services,
         CancellationToken ct)
     {
-        var result = await services.Commands.AddCalculationInputAsync(studyTemplateId, ruleId, command, ct);
+        var result = await services.Commands.AddInputAsync(studyTemplateId, ruleId, command, ct);
         return result.IsFailure ? HandleFailure(result.Error!) : Results.Created();
     }
 
@@ -115,7 +115,7 @@ public class CalculationRuleModule : ICarterModule
         CancellationToken ct)
     {
         var command = new RemoveCalculationInputCommand(variableAlias);
-        var result = await services.Commands.RemoveCalculationInputAsync(studyTemplateId, ruleId, command, ct);
+        var result = await services.Commands.RemoveInputAsync(studyTemplateId, ruleId, command, ct);
         return result.IsFailure ? HandleFailure(result.Error!) : Results.NoContent();
     }
 
@@ -126,7 +126,7 @@ public class CalculationRuleModule : ICarterModule
         [AsParameters] CalculationRuleServices services,
         CancellationToken ct)
     {
-        var result = await services.Commands.UpdateCalculationRuleAsync(studyTemplateId, ruleId, command, ct);
+        var result = await services.Commands.UpdateAsync(studyTemplateId, ruleId, command, ct);
         return result.IsFailure ? HandleFailure(result.Error!) : Results.NoContent();
     }
 

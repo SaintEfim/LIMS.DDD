@@ -62,7 +62,7 @@ public class ResultDefinitionModule : ICarterModule
         [AsParameters] ResultDefinitionServices services,
         CancellationToken ct)
     {
-        var result = await services.Commands.AddResultDefinitionAsync(studyTemplateId, command, ct);
+        var result = await services.Commands.AddAsync(studyTemplateId, command, ct);
 
         if (result.IsFailure) return HandleFailure(result.Error!);
 
@@ -76,7 +76,7 @@ public class ResultDefinitionModule : ICarterModule
         [AsParameters] ResultDefinitionServices services,
         CancellationToken ct)
     {
-        var result = await services.Commands.RemoveResultDefinitionAsync(studyTemplateId, resultId, ct);
+        var result = await services.Commands.RemoveAsync(studyTemplateId, resultId, ct);
 
         return result.IsFailure ? HandleFailure(result.Error!) : Results.NoContent();
     }
@@ -88,7 +88,7 @@ public class ResultDefinitionModule : ICarterModule
         [AsParameters] ResultDefinitionServices services,
         CancellationToken ct)
     {
-        var result = await services.Commands.UpdateResultDefinitionAsync(
+        var result = await services.Commands.UpdateAsync(
             studyTemplateId, determinationId, command, ct);
         return result.IsFailure ? HandleFailure(result.Error!) : Results.NoContent();
     }
