@@ -1,7 +1,6 @@
 ﻿using LIMS.DDD.Service.Domain.SeedWork;
 using LIMS.DDD.Service.Domain.SeedWork.Result;
 using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.Entities;
-using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.Enums;
 using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.Ids;
 using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.ValueObjects;
 
@@ -29,7 +28,7 @@ public sealed class StudyTemplate : IAggregateRoot
 
     public Revision Revision { get; private set; }
 
-    public Status Status { get; private set; }
+    public Status Status { get; private set; } = Status.Draft;
 
     public IReadOnlyList<InputParameter> InputParameters => _inputParameters.AsReadOnly();
 
@@ -63,7 +62,7 @@ public sealed class StudyTemplate : IAggregateRoot
         Name? name,
         Description? description)
     {
-        if (Status != Status.Draft)
+        if (!Status.CanEdit)
             return Result<StudyTemplate, Exception>.Failure(
                 new InvalidOperationException(
                     "Cannot modify details of an Active or Archived template. Create a new revision."));
@@ -80,7 +79,7 @@ public sealed class StudyTemplate : IAggregateRoot
         AliasName aliasName,
         Specification specification)
     {
-        if (Status != Status.Draft)
+        if (!Status.CanEdit)
             return Result<InputParameter, Exception>.Failure(
                 new InvalidOperationException("Cannot add observation to an Active template."));
 
@@ -100,7 +99,7 @@ public sealed class StudyTemplate : IAggregateRoot
         Description description,
         ResultDefinitionId resultDefinitionId)
     {
-        if (Status != Status.Draft)
+        if (!Status.CanEdit)
             return Result<CalculationRule, Exception>.Failure(
                 new InvalidOperationException("Cannot add calculation rules to an Active template."));
 
@@ -120,7 +119,7 @@ public sealed class StudyTemplate : IAggregateRoot
     public Result<Exception> RemoveCalculationRule(
         CalculationRuleId ruleId)
     {
-        if (Status != Status.Draft)
+        if (!Status.CanEdit)
             return Result<Exception>.Failure(
                 new InvalidOperationException("Cannot add calculation rule to an Active template."));
 
@@ -138,7 +137,7 @@ public sealed class StudyTemplate : IAggregateRoot
         CalculationRuleId ruleId,
         InputParameterId inputParameterId)
     {
-        if (Status != Status.Draft)
+        if (!Status.CanEdit)
             return Result<Exception>.Failure(
                 new InvalidOperationException("Cannot modify calculation rules in an Active template."));
 
@@ -157,7 +156,7 @@ public sealed class StudyTemplate : IAggregateRoot
         CalculationRuleId ruleId,
         AliasName variableAlias)
     {
-        if (Status != Status.Draft)
+        if (!Status.CanEdit)
             return Result<Exception>.Failure(
                 new InvalidOperationException("Cannot modify calculation rules in an Active template."));
 
@@ -170,7 +169,7 @@ public sealed class StudyTemplate : IAggregateRoot
     public Result<Exception> RemoveInputParameter(
         InputParameterId observationId)
     {
-        if (Status != Status.Draft)
+        if (!Status.CanEdit)
             return Result<Exception>.Failure(
                 new InvalidOperationException("Cannot remove observation from an Active template."));
 
@@ -184,47 +183,9 @@ public sealed class StudyTemplate : IAggregateRoot
     public Result<Exception> ChangeStatus(
         Status newStatus)
     {
-        if (Status == newStatus) return Result<Exception>.Success();
+        var result = Status.CanTransitionTo(newStatus, this);
 
-        switch (newStatus)
-        {
-            case Status.Active:
-                if (Status != Status.Draft)
-                    return Result<Exception>.Failure(
-                        new InvalidOperationException("Only Draft templates can be activated."));
-
-                if (_inputParameters.Count == 0)
-                    return Result<Exception>.Failure(
-                        new InvalidOperationException("Cannot activate a template without input parameters."));
-
-                if (_resultDefinitions.Count == 0)
-                    return Result<Exception>.Failure(
-                        new InvalidOperationException("Cannot activate a template without result definitions."));
-
-                if (_calculationRules.Count == 0)
-                    return Result<Exception>.Failure(
-                        new InvalidOperationException("Cannot activate a template without calculation rules."));
-                break;
-
-            case Status.Archived:
-                if (Status != Status.Active && Status != Status.Draft)
-                    return Result<Exception>.Failure(
-                        new InvalidOperationException("Only Active or Draft templates can be archived."));
-                break;
-
-            case Status.Draft:
-                if (Status == Status.Active)
-                    return Result<Exception>.Failure(new InvalidOperationException(
-                        "Active templates cannot be reverted to Draft. Create a new revision instead."));
-
-                if (Status == Status.Archived)
-                    return Result<Exception>.Failure(new InvalidOperationException(
-                        "Archived templates cannot be reverted to Draft. Create a new revision instead."));
-                break;
-
-            default:
-                return Result<Exception>.Failure(new ArgumentException($"Unknown status: {newStatus}"));
-        }
+        if (result.IsFailure) return result;
 
         Status = newStatus;
 
@@ -236,7 +197,7 @@ public sealed class StudyTemplate : IAggregateRoot
         string unit,
         Specification valueRange)
     {
-        if (Status != Status.Draft)
+        if (!Status.CanEdit)
             return Result<ResultDefinition, Exception>.Failure(
                 new InvalidOperationException("Cannot add determination to an Active template."));
 
@@ -256,7 +217,7 @@ public sealed class StudyTemplate : IAggregateRoot
     public Result<Exception> RemoveResultDefinition(
         ResultDefinitionId determinationId)
     {
-        if (Status != Status.Draft)
+        if (!Status.CanEdit)
             return Result<Exception>.Failure(
                 new InvalidOperationException("Cannot add determination to an Active template."));
 
@@ -277,7 +238,7 @@ public sealed class StudyTemplate : IAggregateRoot
         AliasName? aliasName,
         Specification? specification)
     {
-        if (Status != Status.Draft)
+        if (!Status.CanEdit)
             return Result<Exception>.Failure(
                 new InvalidOperationException("Cannot modify input parameters in an Active or Archived template."));
 
@@ -302,7 +263,7 @@ public sealed class StudyTemplate : IAggregateRoot
         string? unit,
         Specification? specification)
     {
-        if (Status != Status.Draft)
+        if (!Status.CanEdit)
             return Result<Exception>.Failure(
                 new InvalidOperationException("Cannot modify result definitions in an Active or Archived template."));
 
@@ -321,7 +282,7 @@ public sealed class StudyTemplate : IAggregateRoot
         Description? description,
         ResultDefinitionId? resultDefinitionId)
     {
-        if (Status != Status.Draft)
+        if (!Status.CanEdit)
             return Result<Exception>.Failure(
                 new InvalidOperationException("Cannot modify calculation rules in an Active or Archived template."));
 
