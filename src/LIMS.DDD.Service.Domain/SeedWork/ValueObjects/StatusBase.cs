@@ -8,23 +8,21 @@ namespace LIMS.DDD.Service.Domain.SeedWork.ValueObjects;
 public abstract record StatusBase<TState, TEntity>
     where TState : class, IState<TEntity>
 {
-    protected readonly TState State;
+    private readonly TState _state;
 
     protected StatusBase(
         TState state)
     {
-        State = state ?? throw new ArgumentNullException(nameof(state));
+        _state = state ?? throw new ArgumentNullException(nameof(state));
     }
 
-    private string Name => State.Name;
-    public bool CanEdit => State.CanEdit;
+    public string Name => _state.Name;
+    public bool CanEdit => _state.CanEdit;
 
     public Result<Exception> CanTransitionTo(
         StatusBase<TState, TEntity> newStatus,
         TEntity entity)
     {
-        return State.CanTransitionTo(newStatus.State, entity);
+        return _state.CanTransitionTo(newStatus._state, entity);
     }
-
-    public override string ToString() => Name;
 }

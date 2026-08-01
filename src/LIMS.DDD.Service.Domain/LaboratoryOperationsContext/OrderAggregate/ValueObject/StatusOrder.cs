@@ -30,7 +30,8 @@ public sealed record StatusOrder : StatusBase<IState<Order>, Order>
     public static StatusOrder ConvertStatus(
         string value)
     {
-        if (TryParse(value, out var status)) return status!;
-        throw new InvalidOperationException($"Unknown status '{value}'");
+        return TryParse(value, out var status)
+            ? status!
+            : throw new InvalidOperationException($"Unknown status '{value}'");
     }
 }
