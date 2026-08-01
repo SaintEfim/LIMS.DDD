@@ -1,5 +1,4 @@
 ﻿using LIMS.DDD.Service.Domain.StudyTemplateAggregate.Entities;
-using LIMS.DDD.Service.Domain.StudyTemplateAggregate.Entities.CalculationRules;
 using LIMS.DDD.Service.Domain.StudyTemplateAggregate.Entities.InputParameters;
 using LIMS.DDD.Service.Domain.StudyTemplateAggregate.Ids;
 using LIMS.DDD.Service.Domain.StudyTemplateAggregate.ValueObjects;

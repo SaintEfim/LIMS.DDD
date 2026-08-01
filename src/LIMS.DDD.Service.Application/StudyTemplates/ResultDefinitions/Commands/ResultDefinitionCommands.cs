@@ -7,7 +7,7 @@ namespace LIMS.DDD.Service.Application.StudyTemplates.ResultDefinitions.Commands
 
 public sealed class ResultDefinitionCommands(IStudyTemplateRepository repository)
 {
-    public async Task<Result<Guid, Exception>> AddAsync(
+    public async Task<Result<Guid, Exception>> CreateAsync(
         Guid studyTemplateId,
         CreateResultDefinitionCommand command,
         CancellationToken cancellationToken = default)

@@ -8,7 +8,7 @@ namespace LIMS.DDD.Service.Application.StudyTemplates.CalculationRules.Commands;
 
 public sealed class CalculationRuleCommands(IStudyTemplateRepository repository)
 {
-    public async Task<Result<Guid, Exception>> AddAsync(
+    public async Task<Result<Guid, Exception>> CreateAsync(
         Guid studyTemplateId,
         CreateCalculationRuleCommand command,
         CancellationToken cancellationToken = default)
@@ -49,7 +49,7 @@ public sealed class CalculationRuleCommands(IStudyTemplateRepository repository)
         return await SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<Result<Exception>> AddInputAsync(
+    public async Task<Result<Exception>> CreateInputAsync(
         Guid studyTemplateId,
         Guid ruleId,
         AddCalculationInputCommand command,

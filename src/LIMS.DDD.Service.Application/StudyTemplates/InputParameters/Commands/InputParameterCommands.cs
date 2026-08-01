@@ -8,7 +8,7 @@ namespace LIMS.DDD.Service.Application.StudyTemplates.InputParameters.Commands;
 
 public sealed class InputParameterCommands(IStudyTemplateRepository repository)
 {
-    public async Task<Result<Guid, Exception>> AddAsync(
+    public async Task<Result<Guid, Exception>> CreateAsync(
         Guid studyTemplateId,
         CreateInputParameterCommand command,
         CancellationToken cancellationToken = default)
