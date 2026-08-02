@@ -15,7 +15,7 @@ public sealed class OrderCompletedState : IState<Order>
         return newState switch
         {
             OrderCompletedState => Result<Exception>.Success(),
-            _ => Result<Exception>.Failure(new InvalidOperationException("Completed templates cannot change status."))
+            _ => Result<Exception>.Failure(new InvalidOperationException("Completed order cannot change status."))
         };
     }
 }
