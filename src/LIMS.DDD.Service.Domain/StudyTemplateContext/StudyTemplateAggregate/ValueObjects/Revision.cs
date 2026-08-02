@@ -17,7 +17,7 @@ public readonly record struct Revision
     {
         if (string.IsNullOrWhiteSpace(value))
         {
-            return Result<Revision, Exception>.Failure(new ArgumentException("Invalid name.", nameof(value)));
+            return Result<Revision, Exception>.Failure(new ArgumentException("Invalid revision.", nameof(value)));
         }
 
         if (value.Length > MaxRevisionLength)
