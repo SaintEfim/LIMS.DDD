@@ -16,5 +16,5 @@ public class Sample
 
     public double? Value { get; set; }
 
-    public Guid? UnitId { get; set; }
+    public string? Unit { get; set; }
 }
