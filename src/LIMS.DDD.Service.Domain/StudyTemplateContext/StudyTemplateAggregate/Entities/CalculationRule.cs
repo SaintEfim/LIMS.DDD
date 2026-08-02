@@ -35,9 +35,9 @@ public sealed class CalculationRule
         Description? description,
         ResultDefinitionId? resultDefinitionId)
     {
-        if (name is not null) Name = name.Value;
-        if (formulaExpression is not null) FormulaExpression = formulaExpression.Value;
-        if (description is not null) Description = description.Value;
+        if (name is not null) Name = name;
+        if (formulaExpression is not null) FormulaExpression = formulaExpression;
+        if (description is not null) Description = description;
         if (resultDefinitionId is not null) ResultDefinitionId = resultDefinitionId.Value;
     }
 

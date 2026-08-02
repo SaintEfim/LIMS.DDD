@@ -66,7 +66,7 @@ public class ResultDefinitionModule : ICarterModule
 
         if (result.IsFailure) return HandleFailure(result.Error!);
 
-        var resultId = result.Value;
+        var resultId = result.GetValue();
         return Results.Created($"/api/studyTemplates/{studyTemplateId}/results/{resultId}", new { id = resultId });
     }
 

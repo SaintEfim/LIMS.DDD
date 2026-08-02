@@ -2,7 +2,7 @@
 
 namespace LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.ValueObjects;
 
-public readonly record struct Revision
+public sealed record Revision
 {
     private const int MaxRevisionLength = 100;
 
@@ -17,14 +17,14 @@ public readonly record struct Revision
     {
         if (string.IsNullOrWhiteSpace(value))
         {
-            throw new ArgumentException("Invalid name.", nameof(value));
+            return Result<Revision, Exception>.Failure(new ArgumentException("Invalid revision.", nameof(value)));
         }
 
         if (value.Length > MaxRevisionLength)
         {
-            throw new ArgumentException(
+            return Result<Revision, Exception>.Failure(new ArgumentException(
                 $"Revision length cannot exceed {MaxRevisionLength} characters. " + $"Current length: {value.Length}.",
-                nameof(value));
+                nameof(value)));
         }
 
         var revision = new Revision(value);

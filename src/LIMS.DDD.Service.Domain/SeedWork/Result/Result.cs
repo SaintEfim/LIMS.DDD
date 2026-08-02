@@ -27,7 +27,7 @@ public class Result<TValue, TError>
 {
     public bool IsSuccess { get; }
     public bool IsFailure => !IsSuccess;
-    public TValue? Value { get; }
+    private TValue? Value { get; }
     public TError? Error { get; }
 
     private Result(
@@ -47,4 +47,9 @@ public class Result<TValue, TError>
     public static Result<TValue, TError> Failure(
         TError error) =>
         new(false, default, error);
+
+    public TValue GetValue()
+    {
+        return IsFailure ? throw new InvalidOperationException("Cannot get value from failed result.") : Value!;
+    }
 }

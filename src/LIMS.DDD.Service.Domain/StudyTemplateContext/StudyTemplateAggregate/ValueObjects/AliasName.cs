@@ -2,7 +2,7 @@
 
 namespace LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.ValueObjects;
 
-public readonly record struct AliasName
+public sealed record AliasName
 {
     private const int MaxAliasNameLength = 100;
 

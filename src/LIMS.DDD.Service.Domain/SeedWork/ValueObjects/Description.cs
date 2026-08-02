@@ -2,7 +2,7 @@
 
 namespace LIMS.DDD.Service.Domain.SeedWork.ValueObjects;
 
-public readonly record struct Description
+public sealed record Description
 {
     private const int MaxDescriptionLength = 1000;
 
@@ -19,9 +19,9 @@ public readonly record struct Description
 
         if (descriptionValue.Length > MaxDescriptionLength)
         {
-            throw new ArgumentException(
+            return Result<Description, Exception>.Failure(new ArgumentException(
                 $"Description length cannot exceed {MaxDescriptionLength} characters. " +
-                $"Current length: {descriptionValue.Length}.", nameof(value));
+                $"Current length: {descriptionValue.Length}.", nameof(value)));
         }
 
         var description = new Description(descriptionValue);

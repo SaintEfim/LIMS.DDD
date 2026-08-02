@@ -1,5 +1,5 @@
 ﻿using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.Ids;
-using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.OrderAggregate.ValueObject;
+using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.OrderAggregate.ValueObjects;
 using LIMS.DDD.Service.Domain.SeedWork.Result;
 using LIMS.DDD.Service.Domain.SeedWork.ValueObjects;
 
@@ -28,6 +28,7 @@ public class Order
     {
         var order = new Order
         {
+            Id = new OrderId(Guid.NewGuid()),
             Name = name,
             Description = description,
             Contractor = contractor
@@ -46,8 +47,8 @@ public class Order
                 new InvalidOperationException(
                     "Cannot modify details of an Active or Archived template. Create a new revision."));
 
-        if (name is not null) Name = name.Value;
-        if (description is not null) Description = description.Value;
+        if (name is not null) Name = name;
+        if (description is not null) Description = description;
         if (contractor is not null) Contractor = contractor;
 
         return Result<Order, Exception>.Success(this);

@@ -19,7 +19,7 @@ public class StudyTemplateConfiguration : IEntityTypeConfiguration<StudyTemplate
 
         builder.Property(x => x.Name)
             .HasConversion(n => n.Value, n => Name.Create(n)
-                .Value)
+                .GetValue())
             .HasMaxLength(100)
             .IsRequired();
 
@@ -30,12 +30,12 @@ public class StudyTemplateConfiguration : IEntityTypeConfiguration<StudyTemplate
 
         builder.Property(x => x.Description)
             .HasConversion(d => d.Value, d => Description.Create(d)
-                .Value)
+                .GetValue())
             .HasMaxLength(1000);
 
         builder.Property(x => x.Revision)
             .HasConversion(r => r.Value, r => Revision.Create(r)
-                .Value)
+                .GetValue())
             .IsRequired();
 
         builder.HasMany(x => x.InputParameters)

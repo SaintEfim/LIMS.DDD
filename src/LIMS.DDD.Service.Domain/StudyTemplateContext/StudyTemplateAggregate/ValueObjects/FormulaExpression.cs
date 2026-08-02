@@ -2,7 +2,7 @@
 
 namespace LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.ValueObjects;
 
-public readonly record struct FormulaExpression
+public sealed record FormulaExpression
 {
     private const int MaxLength = 2000;
 

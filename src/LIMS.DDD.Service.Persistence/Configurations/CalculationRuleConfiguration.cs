@@ -29,19 +29,19 @@ public class CalculationRuleConfiguration : IEntityTypeConfiguration<Calculation
 
         builder.Property(x => x.Name)
             .HasConversion(n => n.Value, n => Name.Create(n)
-                .Value)
+                .GetValue())
             .HasMaxLength(100)
             .IsRequired();
 
         builder.Property(x => x.FormulaExpression)
             .HasConversion(n => n.Value, n => FormulaExpression.Create(n)
-                .Value)
+                .GetValue())
             .HasMaxLength(2000)
             .IsRequired();
 
         builder.Property(x => x.Description)
             .HasConversion(d => d.Value, d => Description.Create(d)
-                .Value)
+                .GetValue())
             .HasMaxLength(1000);
 
         builder.OwnsMany(x => x.CalculationInputs, inputBuilder =>
@@ -50,7 +50,7 @@ public class CalculationRuleConfiguration : IEntityTypeConfiguration<Calculation
 
             inputBuilder.Property(x => x.VariableAlias)
                 .HasConversion(a => a.Value, a => AliasName.Create(a)
-                    .Value)
+                    .GetValue())
                 .HasMaxLength(100);
 
             inputBuilder.Property(x => x.ParameterId)

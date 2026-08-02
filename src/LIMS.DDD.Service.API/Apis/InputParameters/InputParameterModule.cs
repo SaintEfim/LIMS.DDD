@@ -66,7 +66,7 @@ public class InputParameterModule : ICarterModule
 
         if (result.IsFailure) return HandleFailure(result.Error!);
 
-        var parameterId = result.Value;
+        var parameterId = result.GetValue();
         return Results.Created($"/api/studyTemplates/{studyTemplateId}/parameters/{parameterId}",
             new { id = parameterId });
     }

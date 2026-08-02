@@ -3,10 +3,10 @@ using LIMS.DDD.Service.Domain.SeedWork.Result;
 
 namespace LIMS.DDD.Service.Domain.LaboratoryOperationsContext.OrderAggregate.State;
 
-public sealed class CompletedState : IState<Order>
+public sealed class OrderDraftState : IState<Order>
 {
-    public string Name => "Completed";
-    public bool CanEdit => false;
+    public string Name => "Draft";
+    public bool CanEdit => true;
 
     public Result<Exception> CanTransitionTo(
         IState<Order> newState,
@@ -14,8 +14,8 @@ public sealed class CompletedState : IState<Order>
     {
         return newState switch
         {
-            CompletedState => Result<Exception>.Success(),
-            _ => Result<Exception>.Failure(new InvalidOperationException("Completed templates cannot change status."))
+            OrderInProgressState or OrderCanceledState or OrderDraftState => Result<Exception>.Success(),
+            _ => Result<Exception>.Failure(new InvalidOperationException("Invalid transition from Draft"))
         };
     }
 }
