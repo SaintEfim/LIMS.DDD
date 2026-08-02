@@ -2,7 +2,7 @@
 using LIMS.DDD.Service.Domain.SeedWork;
 using LIMS.DDD.Service.Domain.SeedWork.ValueObjects;
 
-namespace LIMS.DDD.Service.Domain.LaboratoryOperationsContext.OrderAggregate.ValueObject;
+namespace LIMS.DDD.Service.Domain.LaboratoryOperationsContext.OrderAggregate.ValueObjects;
 
 public sealed record OrderStatus : StatusBase<IState<Order>, Order>
 {

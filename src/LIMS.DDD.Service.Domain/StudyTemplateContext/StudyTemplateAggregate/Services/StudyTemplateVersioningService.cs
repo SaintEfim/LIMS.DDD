@@ -20,7 +20,7 @@ public class StudyTemplateVersioningService
 
         newTemplate?.SetParentId(original.Id);
 
-        var copyResult = CopyChildren(original, newTemplate ?? throw new InvalidOperationException());
+        var copyResult = CopyChildren(original, newTemplate!);
         if (copyResult.IsFailure) return copyResult;
 
         var archiveResult = original.ChangeStatus(Status.Archived);
@@ -35,19 +35,22 @@ public class StudyTemplateVersioningService
     {
         foreach (var param in original.InputParameters)
         {
-            var newSpecification = new Specification(param.Specification.MinValue, param.Specification.MaxValue);
+            var newSpecification = Specification.Create(param.Specification.MinValue, param.Specification.MaxValue);
+            if (newSpecification.IsFailure) return Result<StudyTemplate, Exception>.Failure(newSpecification.Error!);
 
             var addResult = newTemplate.AddInputParameter(param.Name, param.Description, param.AliasName,
-                newSpecification);
+                newSpecification.Value!);
 
             if (addResult.IsFailure) return Result<StudyTemplate, Exception>.Failure(addResult.Error!);
         }
 
         foreach (var result in original.ResultDefinitions)
         {
-            var newSpecification = new Specification(result.Specification.MinValue, result.Specification.MaxValue);
+            var newSpecification = Specification.Create(result.Specification.MinValue, result.Specification.MaxValue);
+            if (newSpecification.IsFailure) return Result<StudyTemplate, Exception>.Failure(newSpecification.Error!);
 
-            var addResult = newTemplate.AddResultDefinition(result.ResultInstance, result.Unit, newSpecification);
+            var addResult = newTemplate.AddResultDefinition(result.ResultInstance, result.Unit,
+                newSpecification.Value!);
 
             if (addResult.IsFailure) return Result<StudyTemplate, Exception>.Failure(addResult.Error!);
         }

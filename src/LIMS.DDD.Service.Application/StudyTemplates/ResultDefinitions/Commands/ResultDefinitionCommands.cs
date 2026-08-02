@@ -15,9 +15,11 @@ public sealed class ResultDefinitionCommands(IStudyTemplateRepository repository
         var templateResult = await GetTemplateForChangeAsync(studyTemplateId, cancellationToken);
         if (templateResult.IsFailure) return Result<Guid, Exception>.Failure(templateResult.Error!);
 
-        var specification = new Specification(command.MinValue, command.MaxValue);
+        var newSpecification = Specification.Create(command.MinValue, command.MaxValue);
+        if (newSpecification.IsFailure) return Result<Guid, Exception>.Failure(newSpecification.Error!);
 
-        var addResult = templateResult.Value!.AddResultDefinition(command.ResultInstance, command.Unit, specification);
+        var addResult =
+            templateResult.Value!.AddResultDefinition(command.ResultInstance, command.Unit, newSpecification.Value!);
         if (addResult.IsFailure) return Result<Guid, Exception>.Failure(addResult.Error!);
 
         var saveResult = await SaveChangesAsync(cancellationToken);
@@ -49,12 +51,11 @@ public sealed class ResultDefinitionCommands(IStudyTemplateRepository repository
         var templateResult = await GetTemplateForChangeAsync(studyTemplateId, cancellationToken);
         if (templateResult.IsFailure) return Result<Exception>.Failure(templateResult.Error!);
 
-        Specification? specification = null;
-        if (command.MinValue is not null || command.MaxValue is not null)
-            specification = new Specification(command.MinValue, command.MaxValue);
+        var specification = Specification.Create(command.MinValue, command.MaxValue);
+        if (specification.IsFailure) return Result<Exception>.Failure(specification.Error!);
 
         var updateResult = templateResult.Value!.UpdateResultDefinition(new ResultDefinitionId(resultDefinitionId),
-            command.ResultInstance, command.Unit, specification);
+            command.ResultInstance, command.Unit, specification.Value);
         if (updateResult.IsFailure) return Result<Exception>.Failure(updateResult.Error!);
 
         return await SaveChangesAsync(cancellationToken);

@@ -1,5 +1,5 @@
 ﻿using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.Ids;
-using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.OrderAggregate.ValueObject;
+using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.OrderAggregate.ValueObjects;
 using LIMS.DDD.Service.Domain.SeedWork.Result;
 using LIMS.DDD.Service.Domain.SeedWork.ValueObjects;
 

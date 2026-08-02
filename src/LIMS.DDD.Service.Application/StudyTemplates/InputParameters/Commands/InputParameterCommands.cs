@@ -25,10 +25,11 @@ public sealed class InputParameterCommands(IStudyTemplateRepository repository)
         var aliasResult = AliasName.Create(command.AliasName);
         if (aliasResult.IsFailure) return Result<Guid, Exception>.Failure(aliasResult.Error!);
 
-        var specification = new Specification(command.MinValue, command.MaxValue);
+        var specification = Specification.Create(command.MinValue, command.MaxValue);
+        if (specification.IsFailure) return Result<Guid, Exception>.Failure(specification.Error!);
 
-        var addResult = templateResult.Value!.AddInputParameter(
-            nameResult.Value, descResult.Value, aliasResult.Value, specification);
+        var addResult = templateResult.Value!.AddInputParameter(nameResult.Value, descResult.Value, aliasResult.Value,
+            specification.Value!);
         if (addResult.IsFailure) return Result<Guid, Exception>.Failure(addResult.Error!);
 
         var saveResult = await SaveChangesAsync(cancellationToken);
@@ -85,28 +86,33 @@ public sealed class InputParameterCommands(IStudyTemplateRepository repository)
         }
 
         Specification? specification = null;
-        if (command.MinValue is not null || command.MaxValue is not null)
-            specification = new Specification(command.MinValue, command.MaxValue);
+        if (command.MaxValue is not null || command.MinValue is not null)
+        {
+            var specificationResult = Specification.Create(command.MinValue, command.MaxValue);
+            if (specificationResult.IsFailure) return Result<Exception>.Failure(specificationResult.Error!);
+            specification = specificationResult.Value;
+        }
 
-        var updateResult = templateResult.Value!.UpdateInputParameter(
-            new InputParameterId(parameterId), name, description, aliasName, specification);
+        var updateResult = templateResult.Value!.UpdateInputParameter(new InputParameterId(parameterId), name,
+            description, aliasName, specification);
         if (updateResult.IsFailure) return Result<Exception>.Failure(updateResult.Error!);
 
         return await SaveChangesAsync(cancellationToken);
     }
 
     private async Task<Result<StudyTemplate, Exception>> GetTemplateForChangeAsync(
-        Guid studyTemplateId, CancellationToken cancellationToken)
+        Guid studyTemplateId,
+        CancellationToken cancellationToken)
     {
-        var template = await repository.GetByIdForChangeAsync(
-            new StudyTemplateId(studyTemplateId), cancellationToken);
+        var template = await repository.GetByIdForChangeAsync(new StudyTemplateId(studyTemplateId), cancellationToken);
         return template is null
             ? Result<StudyTemplate, Exception>.Failure(
                 new KeyNotFoundException($"StudyTemplate with id {studyTemplateId} not found."))
             : Result<StudyTemplate, Exception>.Success(template);
     }
 
-    private async Task<Result<Exception>> SaveChangesAsync(CancellationToken cancellationToken)
+    private async Task<Result<Exception>> SaveChangesAsync(
+        CancellationToken cancellationToken)
     {
         try
         {
@@ -115,8 +121,7 @@ public sealed class InputParameterCommands(IStudyTemplateRepository repository)
         }
         catch (Exception ex)
         {
-            return Result<Exception>.Failure(
-                new Exception($"Failed to save changes: {ex.Message}", ex));
+            return Result<Exception>.Failure(new Exception($"Failed to save changes: {ex.Message}", ex));
         }
     }
 }
