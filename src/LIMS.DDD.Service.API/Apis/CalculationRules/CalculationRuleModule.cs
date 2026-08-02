@@ -81,7 +81,7 @@ public class CalculationRuleModule : ICarterModule
 
         if (result.IsFailure) return HandleFailure(result.Error!);
 
-        var ruleId = result.Value;
+        var ruleId = result.GetValue();
         return Results.Created($"/api/studyTemplates/{studyTemplateId}/calculation-rules/{ruleId}",
             new { id = ruleId });
     }

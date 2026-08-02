@@ -69,7 +69,7 @@ public class StudyTemplateModule : ICarterModule
 
         if (result.IsFailure) return HandleFailure(result.Error!);
 
-        var createdId = result.Value!.Id.Value;
+        var createdId = result.GetValue().Id.Value;
         return Results.Created($"/api/studyTemplates/{createdId}", new { id = createdId });
     }
 
@@ -103,7 +103,7 @@ public class StudyTemplateModule : ICarterModule
 
         if (result.IsFailure) return HandleFailure(result.Error!);
 
-        var newTemplateId = result.Value;
+        var newTemplateId = result.GetValue();
         return Results.Created($"/api/study-templates/{newTemplateId}", new { id = newTemplateId });
     }
 

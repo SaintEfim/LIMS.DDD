@@ -47,8 +47,8 @@ public class Order
                 new InvalidOperationException(
                     "Cannot modify details of an Active or Archived template. Create a new revision."));
 
-        if (name is not null) Name = name.Value;
-        if (description is not null) Description = description.Value;
+        if (name is not null) Name = name;
+        if (description is not null) Description = description;
         if (contractor is not null) Contractor = contractor;
 
         return Result<Order, Exception>.Success(this);

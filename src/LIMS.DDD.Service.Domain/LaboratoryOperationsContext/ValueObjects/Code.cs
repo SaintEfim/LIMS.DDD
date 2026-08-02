@@ -2,7 +2,7 @@ using LIMS.DDD.Service.Domain.SeedWork.Result;
 
 namespace LIMS.DDD.Service.Domain.LaboratoryOperationsContext.ValueObjects;
 
-public readonly record struct Code
+public sealed record Code
 {
     private const int MaxCodeLength = 100;
 

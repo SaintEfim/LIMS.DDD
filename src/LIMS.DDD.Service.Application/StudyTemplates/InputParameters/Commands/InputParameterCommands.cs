@@ -28,14 +28,16 @@ public sealed class InputParameterCommands(IStudyTemplateRepository repository)
         var specification = Specification.Create(command.MinValue, command.MaxValue);
         if (specification.IsFailure) return Result<Guid, Exception>.Failure(specification.Error!);
 
-        var addResult = templateResult.Value!.AddInputParameter(nameResult.Value, descResult.Value, aliasResult.Value,
-            specification.Value!);
+        var addResult = templateResult.GetValue()
+            .AddInputParameter(nameResult.GetValue(), descResult.GetValue(), aliasResult.GetValue(),
+                specification.GetValue());
         if (addResult.IsFailure) return Result<Guid, Exception>.Failure(addResult.Error!);
 
         var saveResult = await SaveChangesAsync(cancellationToken);
         return saveResult.IsFailure
             ? Result<Guid, Exception>.Failure(saveResult.Error!)
-            : Result<Guid, Exception>.Success(addResult.Value!.Id.Value);
+            : Result<Guid, Exception>.Success(addResult.GetValue()
+                .Id.Value);
     }
 
     public async Task<Result<Exception>> RemoveAsync(
@@ -46,7 +48,8 @@ public sealed class InputParameterCommands(IStudyTemplateRepository repository)
         var templateResult = await GetTemplateForChangeAsync(studyTemplateId, cancellationToken);
         if (templateResult.IsFailure) return Result<Exception>.Failure(templateResult.Error!);
 
-        var removeResult = templateResult.Value!.RemoveInputParameter(new InputParameterId(parameterId));
+        var removeResult = templateResult.GetValue()
+            .RemoveInputParameter(new InputParameterId(parameterId));
         if (removeResult.IsFailure) return Result<Exception>.Failure(removeResult.Error!);
 
         return await SaveChangesAsync(cancellationToken);
@@ -66,7 +69,7 @@ public sealed class InputParameterCommands(IStudyTemplateRepository repository)
         {
             var nameResult = Name.Create(command.Name);
             if (nameResult.IsFailure) return Result<Exception>.Failure(nameResult.Error!);
-            name = nameResult.Value;
+            name = nameResult.GetValue();
         }
 
         Description? description = null;
@@ -74,7 +77,7 @@ public sealed class InputParameterCommands(IStudyTemplateRepository repository)
         {
             var descResult = Description.Create(command.Description);
             if (descResult.IsFailure) return Result<Exception>.Failure(descResult.Error!);
-            description = descResult.Value;
+            description = descResult.GetValue();
         }
 
         AliasName? aliasName = null;
@@ -82,7 +85,7 @@ public sealed class InputParameterCommands(IStudyTemplateRepository repository)
         {
             var aliasResult = AliasName.Create(command.AliasName);
             if (aliasResult.IsFailure) return Result<Exception>.Failure(aliasResult.Error!);
-            aliasName = aliasResult.Value;
+            aliasName = aliasResult.GetValue();
         }
 
         Specification? specification = null;
@@ -90,11 +93,11 @@ public sealed class InputParameterCommands(IStudyTemplateRepository repository)
         {
             var specificationResult = Specification.Create(command.MinValue, command.MaxValue);
             if (specificationResult.IsFailure) return Result<Exception>.Failure(specificationResult.Error!);
-            specification = specificationResult.Value;
+            specification = specificationResult.GetValue();
         }
 
-        var updateResult = templateResult.Value!.UpdateInputParameter(new InputParameterId(parameterId), name,
-            description, aliasName, specification);
+        var updateResult = templateResult.GetValue()
+            .UpdateInputParameter(new InputParameterId(parameterId), name, description, aliasName, specification);
         if (updateResult.IsFailure) return Result<Exception>.Failure(updateResult.Error!);
 
         return await SaveChangesAsync(cancellationToken);

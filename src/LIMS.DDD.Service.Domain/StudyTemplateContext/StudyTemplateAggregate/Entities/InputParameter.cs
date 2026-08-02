@@ -36,9 +36,9 @@ public sealed class InputParameter
         AliasName? aliasName,
         Specification? specification)
     {
-        if (name is not null) Name = name.Value;
-        if (description is not null) Description = description.Value;
-        if (aliasName is not null) AliasName = aliasName.Value;
+        if (name is not null) Name = name;
+        if (description is not null) Description = description;
+        if (aliasName is not null) AliasName = aliasName;
         if (specification is not null) Specification = specification;
     }
 

@@ -16,11 +16,11 @@ public class StudyTemplateVersioningService
         var createResult = StudyTemplate.Create(original.Name, original.Description, newRevisionValue);
         if (createResult.IsFailure) return createResult;
 
-        var newTemplate = createResult.Value;
+        var newTemplate = createResult.GetValue();
 
-        newTemplate?.SetParentId(original.Id);
+        newTemplate.SetParentId(original.Id);
 
-        var copyResult = CopyChildren(original, newTemplate!);
+        var copyResult = CopyChildren(original, newTemplate);
         if (copyResult.IsFailure) return copyResult;
 
         var archiveResult = original.ChangeStatus(Status.Archived);
@@ -39,7 +39,7 @@ public class StudyTemplateVersioningService
             if (newSpecification.IsFailure) return Result<StudyTemplate, Exception>.Failure(newSpecification.Error!);
 
             var addResult = newTemplate.AddInputParameter(param.Name, param.Description, param.AliasName,
-                newSpecification.Value!);
+                newSpecification.GetValue());
 
             if (addResult.IsFailure) return Result<StudyTemplate, Exception>.Failure(addResult.Error!);
         }
@@ -50,7 +50,7 @@ public class StudyTemplateVersioningService
             if (newSpecification.IsFailure) return Result<StudyTemplate, Exception>.Failure(newSpecification.Error!);
 
             var addResult = newTemplate.AddResultDefinition(result.ResultInstance, result.Unit,
-                newSpecification.Value!);
+                newSpecification.GetValue());
 
             if (addResult.IsFailure) return Result<StudyTemplate, Exception>.Failure(addResult.Error!);
         }
@@ -68,7 +68,7 @@ public class StudyTemplateVersioningService
 
             if (ruleResult.IsFailure) return Result<StudyTemplate, Exception>.Failure(ruleResult.Error!);
 
-            var newRule = ruleResult.Value;
+            var newRule = ruleResult.GetValue();
 
             foreach (var input in rule.CalculationInputs)
             {
@@ -77,7 +77,7 @@ public class StudyTemplateVersioningService
 
                 if (newParam is null) continue;
 
-                var inputResult = newTemplate.AddCalculationInput(newRule!.Id, newParam.Id);
+                var inputResult = newTemplate.AddCalculationInput(newRule.Id, newParam.Id);
                 if (inputResult.IsFailure) return Result<StudyTemplate, Exception>.Failure(inputResult.Error!);
             }
         }

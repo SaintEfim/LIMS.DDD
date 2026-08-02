@@ -2,7 +2,7 @@
 
 namespace LIMS.DDD.Service.Domain.SeedWork.ValueObjects;
 
-public readonly record struct Description
+public sealed record Description
 {
     private const int MaxDescriptionLength = 1000;
 

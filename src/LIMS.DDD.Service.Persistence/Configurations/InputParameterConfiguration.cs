@@ -24,18 +24,18 @@ public class InputParameterConfiguration : IEntityTypeConfiguration<InputParamet
 
         builder.Property(x => x.Name)
             .HasConversion(n => n.Value, n => Name.Create(n)
-                .Value)
+                .GetValue())
             .HasMaxLength(100)
             .IsRequired();
 
         builder.Property(x => x.Description)
             .HasConversion(d => d.Value, d => Description.Create(d)
-                .Value)
+                .GetValue())
             .HasMaxLength(1000);
 
         builder.Property(x => x.AliasName)
             .HasConversion(a => a.Value, a => AliasName.Create(a)
-                .Value)
+                .GetValue())
             .HasMaxLength(100);
 
         builder.OwnsOne(x => x.Specification, vr =>

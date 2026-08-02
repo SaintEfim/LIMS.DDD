@@ -2,7 +2,7 @@
 
 namespace LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.ValueObjects;
 
-public readonly record struct Revision
+public sealed record Revision
 {
     private const int MaxRevisionLength = 100;
 

@@ -25,14 +25,14 @@ public sealed class CalculationRuleCommands(IStudyTemplateRepository repository)
         var formulaResult = FormulaExpression.Create(command.FormulaExpression);
         if (formulaResult.IsFailure) return Result<Guid, Exception>.Failure(formulaResult.Error!);
 
-        var addResult = templateResult.Value!.AddCalculationRule(nameResult.Value, formulaResult.Value,
-            descResult.Value, new ResultDefinitionId(command.ResultDefinitionId));
+        var addResult = templateResult.GetValue().AddCalculationRule(nameResult.GetValue(), formulaResult.GetValue(),
+            descResult.GetValue(), new ResultDefinitionId(command.ResultDefinitionId));
         if (addResult.IsFailure) return Result<Guid, Exception>.Failure(addResult.Error!);
 
         var saveResult = await SaveChangesAsync(cancellationToken);
         return saveResult.IsFailure
             ? Result<Guid, Exception>.Failure(saveResult.Error!)
-            : Result<Guid, Exception>.Success(addResult.Value!.Id.Value);
+            : Result<Guid, Exception>.Success(addResult.GetValue().Id.Value);
     }
 
     public async Task<Result<Exception>> RemoveAsync(
@@ -43,7 +43,7 @@ public sealed class CalculationRuleCommands(IStudyTemplateRepository repository)
         var templateResult = await GetTemplateForChangeAsync(studyTemplateId, cancellationToken);
         if (templateResult.IsFailure) return Result<Exception>.Failure(templateResult.Error!);
 
-        var removeResult = templateResult.Value!.RemoveCalculationRule(new CalculationRuleId(ruleId));
+        var removeResult = templateResult.GetValue().RemoveCalculationRule(new CalculationRuleId(ruleId));
         if (removeResult.IsFailure) return Result<Exception>.Failure(removeResult.Error!);
 
         return await SaveChangesAsync(cancellationToken);
@@ -61,7 +61,7 @@ public sealed class CalculationRuleCommands(IStudyTemplateRepository repository)
         var inputParameterId = new InputParameterId(command.InputParameterId);
         var calculationRuleId = new CalculationRuleId(ruleId);
 
-        var addResult = templateResult.Value!.AddCalculationInput(calculationRuleId, inputParameterId);
+        var addResult = templateResult.GetValue().AddCalculationInput(calculationRuleId, inputParameterId);
         if (addResult.IsFailure) return Result<Exception>.Failure(addResult.Error!);
 
         return await SaveChangesAsync(cancellationToken);
@@ -81,7 +81,7 @@ public sealed class CalculationRuleCommands(IStudyTemplateRepository repository)
 
         var calculationRuleId = new CalculationRuleId(ruleId);
 
-        var removeResult = templateResult.Value!.RemoveCalculationInput(calculationRuleId, variableAliasResult.Value);
+        var removeResult = templateResult.GetValue().RemoveCalculationInput(calculationRuleId, variableAliasResult.GetValue());
         if (removeResult.IsFailure) return Result<Exception>.Failure(removeResult.Error!);
 
         return await SaveChangesAsync(cancellationToken);
@@ -101,7 +101,7 @@ public sealed class CalculationRuleCommands(IStudyTemplateRepository repository)
         {
             var nameResult = Name.Create(command.Name);
             if (nameResult.IsFailure) return Result<Exception>.Failure(nameResult.Error!);
-            name = nameResult.Value;
+            name = nameResult.GetValue();
         }
 
         FormulaExpression? formula = null;
@@ -109,7 +109,7 @@ public sealed class CalculationRuleCommands(IStudyTemplateRepository repository)
         {
             var formulaResult = FormulaExpression.Create(command.FormulaExpression);
             if (formulaResult.IsFailure) return Result<Exception>.Failure(formulaResult.Error!);
-            formula = formulaResult.Value;
+            formula = formulaResult.GetValue();
         }
 
         Description? description = null;
@@ -117,14 +117,14 @@ public sealed class CalculationRuleCommands(IStudyTemplateRepository repository)
         {
             var descResult = Description.Create(command.Description);
             if (descResult.IsFailure) return Result<Exception>.Failure(descResult.Error!);
-            description = descResult.Value;
+            description = descResult.GetValue();
         }
 
         ResultDefinitionId? resultDefinitionId = command.ResultDefinitionId.HasValue
             ? new ResultDefinitionId(command.ResultDefinitionId.Value)
             : null;
 
-        var updateResult = templateResult.Value!.UpdateCalculationRule(new CalculationRuleId(ruleId), name, formula,
+        var updateResult = templateResult.GetValue().UpdateCalculationRule(new CalculationRuleId(ruleId), name, formula,
             description, resultDefinitionId);
         if (updateResult.IsFailure) return Result<Exception>.Failure(updateResult.Error!);
 

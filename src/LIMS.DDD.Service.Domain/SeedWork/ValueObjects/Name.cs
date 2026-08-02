@@ -2,7 +2,7 @@
 
 namespace LIMS.DDD.Service.Domain.SeedWork.ValueObjects;
 
-public readonly record struct Name
+public sealed record Name
 {
     private const int MaxNameLength = 100;
 

@@ -2,7 +2,7 @@ using LIMS.DDD.Service.Domain.SeedWork.Result;
 
 namespace LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.ValueObjects;
 
-public record Specification
+public sealed record Specification
 {
     public double? MinValue { get; init; }
 

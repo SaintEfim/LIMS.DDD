@@ -57,9 +57,9 @@ public class Sample
             return Result<Sample, Exception>.Failure(
                 new InvalidOperationException("Cannot modify sample details when it is InWork or Completed."));
 
-        if (name is not null) Name = name.Value;
+        if (name is not null) Name = name;
         if (gatherDate is not null) GatherDate = gatherDate;
-        if (code is not null) Code = code.Value;
+        if (code is not null) Code = code;
         if (volume is not null) Volume = volume;
 
         return Result<Sample, Exception>.Success(this);

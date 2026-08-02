@@ -18,14 +18,15 @@ public sealed class ResultDefinitionCommands(IStudyTemplateRepository repository
         var newSpecification = Specification.Create(command.MinValue, command.MaxValue);
         if (newSpecification.IsFailure) return Result<Guid, Exception>.Failure(newSpecification.Error!);
 
-        var addResult =
-            templateResult.Value!.AddResultDefinition(command.ResultInstance, command.Unit, newSpecification.Value!);
+        var addResult = templateResult.GetValue()
+            .AddResultDefinition(command.ResultInstance, command.Unit, newSpecification.GetValue());
         if (addResult.IsFailure) return Result<Guid, Exception>.Failure(addResult.Error!);
 
         var saveResult = await SaveChangesAsync(cancellationToken);
         return saveResult.IsFailure
             ? Result<Guid, Exception>.Failure(saveResult.Error!)
-            : Result<Guid, Exception>.Success(addResult.Value!.Id.Value);
+            : Result<Guid, Exception>.Success(addResult.GetValue()
+                .Id.Value);
     }
 
     public async Task<Result<Exception>> RemoveAsync(
@@ -36,7 +37,8 @@ public sealed class ResultDefinitionCommands(IStudyTemplateRepository repository
         var templateResult = await GetTemplateForChangeAsync(studyTemplateId, cancellationToken);
         if (templateResult.IsFailure) return Result<Exception>.Failure(templateResult.Error!);
 
-        var removeResult = templateResult.Value!.RemoveResultDefinition(new ResultDefinitionId(resultId));
+        var removeResult = templateResult.GetValue()
+            .RemoveResultDefinition(new ResultDefinitionId(resultId));
         if (removeResult.IsFailure) return Result<Exception>.Failure(removeResult.Error!);
 
         return await SaveChangesAsync(cancellationToken);
@@ -54,8 +56,9 @@ public sealed class ResultDefinitionCommands(IStudyTemplateRepository repository
         var specification = Specification.Create(command.MinValue, command.MaxValue);
         if (specification.IsFailure) return Result<Exception>.Failure(specification.Error!);
 
-        var updateResult = templateResult.Value!.UpdateResultDefinition(new ResultDefinitionId(resultDefinitionId),
-            command.ResultInstance, command.Unit, specification.Value);
+        var updateResult = templateResult.GetValue()
+            .UpdateResultDefinition(new ResultDefinitionId(resultDefinitionId), command.ResultInstance, command.Unit,
+                specification.GetValue());
         if (updateResult.IsFailure) return Result<Exception>.Failure(updateResult.Error!);
 
         return await SaveChangesAsync(cancellationToken);
