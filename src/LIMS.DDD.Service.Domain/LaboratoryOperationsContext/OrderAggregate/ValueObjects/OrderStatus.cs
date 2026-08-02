@@ -6,13 +6,17 @@ namespace LIMS.DDD.Service.Domain.LaboratoryOperationsContext.OrderAggregate.Val
 
 public sealed record OrderStatus : StatusBase<IState<Order>, Order>
 {
-    public static OrderStatus Draft { get; } = new(new DraftState());
-    public static OrderStatus Completed { get; } = new(new CompletedState());
+    public static OrderStatus Draft { get; } = new(new OrderDraftState());
+    public static OrderStatus InWork { get; } = new(new OrderInProgressState());
+    public static OrderStatus Completed { get; } = new(new OrderCompletedState());
+    public static OrderStatus Canceled { get; } = new(new OrderCanceledState());
 
     private static readonly Dictionary<string, OrderStatus> Registry = new(StringComparer.OrdinalIgnoreCase)
     {
         ["Draft"] = Draft,
-        ["Completed"] = Completed
+        ["InWork"] = InWork,
+        ["Completed"] = Completed,
+        ["Canceled"] = Canceled
     };
 
     private OrderStatus(

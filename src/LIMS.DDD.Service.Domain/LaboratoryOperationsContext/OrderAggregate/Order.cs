@@ -28,6 +28,7 @@ public class Order
     {
         var order = new Order
         {
+            Id = new OrderId(Guid.NewGuid()),
             Name = name,
             Description = description,
             Contractor = contractor
