@@ -68,6 +68,12 @@ public class StudyTemplateRepository : IStudyTemplateRepository
         _context.StudyTemplates.Add(studyTemplate);
     }
 
+    public void Update(
+        StudyTemplate studyTemplate)
+    {
+        _context.StudyTemplates.Update(studyTemplate);
+    }
+
     public void Remove(
         StudyTemplate studyTemplate)
     {

@@ -6,7 +6,9 @@ using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.ValueO
 
 namespace LIMS.DDD.Service.Application.StudyTemplates.Commands;
 
-public sealed class StudyTemplateCommands(IStudyTemplateRepository repository)
+public sealed class StudyTemplateCommands(
+    IStudyTemplateRepository repository,
+    StudyTemplateVersioningService domainService)
 {
     public async Task<Result<StudyTemplate, Exception>> CreateAsync(
         CreateStudyTemplateCommand command,
@@ -18,11 +20,11 @@ public sealed class StudyTemplateCommands(IStudyTemplateRepository repository)
         var descResult = Description.Create(command.Description);
         if (descResult.IsFailure) return Result<StudyTemplate, Exception>.Failure(descResult.Error!);
 
-            var revResult = Revision.Create(command.Revision);
-            if (revResult.IsFailure) return Result<StudyTemplate, Exception>.Failure(revResult.Error!);
+        var revResult = Revision.Create(command.Revision);
+        if (revResult.IsFailure) return Result<StudyTemplate, Exception>.Failure(revResult.Error!);
 
-            var duplicateResult = await CheckDuplicateAsync(nameResult.GetValue(), revResult.GetValue(), cancellationToken);
-            if (duplicateResult.IsFailure) return Result<StudyTemplate, Exception>.Failure(duplicateResult.Error!);
+        var duplicateResult = await CheckDuplicateAsync(nameResult.GetValue(), revResult.GetValue(), cancellationToken);
+        if (duplicateResult.IsFailure) return Result<StudyTemplate, Exception>.Failure(duplicateResult.Error!);
 
         var createResult = StudyTemplate.Create(nameResult.GetValue(), descResult.GetValue(), revResult.GetValue());
         if (createResult.IsFailure) return Result<StudyTemplate, Exception>.Failure(createResult.Error!);
@@ -106,18 +108,26 @@ public sealed class StudyTemplateCommands(IStudyTemplateRepository repository)
         var revisionResult = Revision.Create(command.NewRevision);
         if (revisionResult.IsFailure) return Result<Guid, Exception>.Failure(revisionResult.Error!);
 
-        var duplicateResult = await CheckDuplicateAsync(
-            originalResult.GetValue().Name, revisionResult.GetValue(), cancellationToken);
+        var duplicateResult = await CheckDuplicateAsync(originalResult.GetValue()
+            .Name, revisionResult.GetValue(), cancellationToken);
         if (duplicateResult.IsFailure) return Result<Guid, Exception>.Failure(duplicateResult.Error!);
 
-        var createResult =
-            StudyTemplateVersioningService.CreateNewRevisionAsync(originalResult.GetValue(), revisionResult.GetValue());
+        var createResult = domainService.CreateNewRevision(originalResult.GetValue(), revisionResult.GetValue());
         if (createResult.IsFailure) return Result<Guid, Exception>.Failure(createResult.Error!);
 
-        var saveResult = await SaveNewAsync(createResult.GetValue(), cancellationToken);
-        return saveResult.IsFailure
-            ? Result<Guid, Exception>.Failure(saveResult.Error!)
-            : Result<Guid, Exception>.Success(createResult.GetValue().Id.Value);
+        var creationResult = createResult.GetValue();
+
+        try
+        {
+            repository.Update(creationResult.Original);
+            repository.Add(creationResult.NewTemplate);
+            await repository.SaveChangesAsync(cancellationToken);
+            return Result<Guid, Exception>.Success(creationResult.NewTemplate.Id.Value);
+        }
+        catch (Exception ex)
+        {
+            return Result<Guid, Exception>.Failure(new Exception("Failed to save StudyTemplate.", ex));
+        }
     }
 
     private async Task<Result<StudyTemplate, Exception>> GetTemplateForChangeAsync(
