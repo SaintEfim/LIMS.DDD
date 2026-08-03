@@ -1,4 +1,4 @@
-﻿using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.SampleAggregate.State;
+﻿using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.SampleAggregate.States;
 using LIMS.DDD.Service.Domain.SeedWork;
 using LIMS.DDD.Service.Domain.SeedWork.ValueObjects;
 
@@ -7,13 +7,13 @@ namespace LIMS.DDD.Service.Domain.LaboratoryOperationsContext.SampleAggregate.Va
 public sealed record SampleStatus : StatusBase<IState<Sample>, Sample>
 {
     public static SampleStatus Registered { get; } = new(new SampleRegisteredState());
-    public static SampleStatus InWork { get; } = new(new SampleInWorkState());
+    public static SampleStatus InProgress { get; } = new(new SampleInProgressState());
     public static SampleStatus Completed { get; } = new(new SampleCompletedState());
 
     private static readonly Dictionary<string, SampleStatus> Registry = new(StringComparer.OrdinalIgnoreCase)
     {
         ["Registered"] = Registered,
-        ["InWork"] = InWork,
+        ["InProgress"] = InProgress,
         ["Completed"] = Completed
     };
 

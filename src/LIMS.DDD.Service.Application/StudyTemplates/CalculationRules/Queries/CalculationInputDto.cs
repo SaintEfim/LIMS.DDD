@@ -1,4 +1,5 @@
-﻿using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.ValueObjects;
+﻿using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.Entities.CalculationRules.ValueObjects;
+using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.ValueObjects;
 
 namespace LIMS.DDD.Service.Application.StudyTemplates.CalculationRules.Queries;
 

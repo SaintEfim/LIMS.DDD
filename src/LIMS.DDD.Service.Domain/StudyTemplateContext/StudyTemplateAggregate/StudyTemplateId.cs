@@ -1,0 +1,8 @@
+﻿using LIMS.DDD.Service.Domain.SeedWork;
+
+namespace LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate;
+
+public readonly record struct StudyTemplateId(Guid Value) : IValueObjectId
+{
+    public Guid Value { get; } = Value;
+}

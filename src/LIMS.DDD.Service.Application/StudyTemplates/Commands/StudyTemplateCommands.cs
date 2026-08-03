@@ -1,7 +1,6 @@
 ﻿using LIMS.DDD.Service.Domain.SeedWork.Result;
 using LIMS.DDD.Service.Domain.SeedWork.ValueObjects;
 using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate;
-using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.Ids;
 using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.Services;
 using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.ValueObjects;
 

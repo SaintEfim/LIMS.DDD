@@ -1,0 +1,45 @@
+﻿using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.StudyAggregate.States;
+using LIMS.DDD.Service.Domain.SeedWork;
+using LIMS.DDD.Service.Domain.SeedWork.ValueObjects;
+
+namespace LIMS.DDD.Service.Domain.LaboratoryOperationsContext.StudyAggregate.ValueObjects;
+
+public sealed record StudyStatus : StatusBase<IState<Study>, Study>
+{
+    public static StudyStatus InWork { get; } = new(new StudyInProgressState());
+
+    public static StudyStatus Completed { get; } = new(new StudyCompletedState());
+
+    public static StudyStatus Approved { get; } = new(new StudyApprovedState());
+
+    public static StudyStatus Canceled { get; } = new(new StudyCanceledState());
+
+    private static readonly Dictionary<string, StudyStatus> Registry = new(StringComparer.OrdinalIgnoreCase)
+    {
+        ["InWork"] = InWork,
+        ["Completed"] = Completed,
+        ["Approved"] = Approved,
+        ["Canceled"] = Canceled
+    };
+
+    public static bool TryParse(
+        string name,
+        out StudyStatus status)
+    {
+        return Registry.TryGetValue(name, out status!);
+    }
+
+    private StudyStatus(
+        IState<Study> state)
+        : base(state)
+    {
+    }
+
+    public static StudyStatus ConvertStatus(
+        string value)
+    {
+        return TryParse(value, out var status)
+            ? status
+            : throw new InvalidOperationException($"Unknown status '{value}'");
+    }
+}
