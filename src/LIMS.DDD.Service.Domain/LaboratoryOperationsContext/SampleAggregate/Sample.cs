@@ -48,22 +48,31 @@ public class Sample : IAggregateRoot
         return Result<Sample, Exception>.Success(sample);
     }
 
-    public Result<Sample, Exception> UpdatePartial(
+    public Result<Exception> UpdatePartial(
         Name? name,
         GatherDate? gatherDate,
         Code? code,
-        Volume? volume)
+        double? volumeValue,
+        string? volumeUnit)
     {
         if (!SampleStatus.CanEdit)
-            return Result<Sample, Exception>.Failure(
+            return Result<Exception>.Failure(
                 new InvalidOperationException("Cannot modify sample details when it is InWork or Completed."));
 
         if (name is not null) Name = name;
         if (gatherDate is not null) GatherDate = gatherDate;
         if (code is not null) Code = code;
-        if (volume is not null) Volume = volume;
 
-        return Result<Sample, Exception>.Success(this);
+        var value = volumeValue ?? Volume.Value;
+        var unit = volumeUnit ?? Volume.Unit;
+
+        var volumeResult = Volume.Create(value, unit);
+        if (volumeResult.IsFailure) return Result<Exception>.Failure(volumeResult.Error!);
+        var volume = volumeResult.GetValue();
+
+        Volume = volume;
+
+        return Result<Exception>.Success();
     }
 
     public Result<Exception> ChangeStatus(

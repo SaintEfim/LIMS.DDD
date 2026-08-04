@@ -40,13 +40,13 @@ public class Order : IAggregateRoot
         return Result<Order, Exception>.Success(order);
     }
 
-    public Result<Order, Exception> UpdatePartial(
+    public Result<Exception> UpdatePartial(
         Name? name,
         Description? description,
         string? contractor)
     {
         if (!OrderStatus.CanEdit)
-            return Result<Order, Exception>.Failure(
+            return Result<Exception>.Failure(
                 new InvalidOperationException(
                     "Cannot modify details of an Active or Archived template. Create a new revision."));
 
@@ -54,7 +54,7 @@ public class Order : IAggregateRoot
         if (description is not null) Description = description;
         if (contractor is not null) Contractor = contractor;
 
-        return Result<Order, Exception>.Success(this);
+        return Result<Exception>.Success();
     }
 
     public Result<Exception> ChangeStatus(

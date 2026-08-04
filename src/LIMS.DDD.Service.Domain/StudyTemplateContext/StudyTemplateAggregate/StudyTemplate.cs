@@ -62,19 +62,19 @@ public sealed class StudyTemplate : IAggregateRoot
         return Result<StudyTemplate, Exception>.Success(studyTemplate);
     }
 
-    public Result<StudyTemplate, Exception> UpdatePartial(
+    public Result<Exception> UpdatePartial(
         Name? name,
         Description? description)
     {
         if (!Status.CanEdit)
-            return Result<StudyTemplate, Exception>.Failure(
+            return Result<Exception>.Failure(
                 new InvalidOperationException(
                     "Cannot modify details of an Active or Archived template. Create a new revision."));
 
         if (name is not null) Name = name;
         if (description is not null) Description = description;
 
-        return Result<StudyTemplate, Exception>.Success(this);
+        return Result<Exception>.Success();
     }
 
     public Result<InputParameter, Exception> AddInputParameter(
@@ -273,7 +273,8 @@ public sealed class StudyTemplate : IAggregateRoot
         ResultDefinitionId resultDefinitionId,
         string? resultInstance,
         string? unit,
-        Specification? specification)
+        double? minValue,
+        double? maxValue)
     {
         if (!Status.CanEdit)
             return Result<Exception>.Failure(
@@ -282,6 +283,13 @@ public sealed class StudyTemplate : IAggregateRoot
         var resultDef = _resultDefinitions.FirstOrDefault(r => r.Id == resultDefinitionId);
         if (resultDef is null)
             return Result<Exception>.Failure(new InvalidOperationException("Result definition not found."));
+
+        var min = minValue ?? resultDef.Specification.MinValue;
+        var max = maxValue ?? resultDef.Specification.MaxValue;
+
+        var specificationResult = Specification.Create(min, max);
+        if (specificationResult.IsFailure) return Result<Exception>.Failure(specificationResult.Error!);
+        var specification = specificationResult.GetValue();
 
         resultDef.Update(resultInstance, unit, specification);
         return Result<Exception>.Success();
