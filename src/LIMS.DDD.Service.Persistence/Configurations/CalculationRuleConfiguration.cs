@@ -19,8 +19,6 @@ public class CalculationRuleConfiguration : IEntityTypeConfiguration<Calculation
     {
         builder.ToTable("CalculationRules");
 
-        builder.HasKey(x => x.Id);
-
         builder.Property(x => x.Id)
             .HasConversion(id => id.Value, id => new CalculationRuleId(id));
 

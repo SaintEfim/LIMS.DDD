@@ -1,11 +1,12 @@
 ﻿using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.OrderAggregate.ValueObjects;
 using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.ValueObjects;
+using LIMS.DDD.Service.Domain.SeedWork;
 using LIMS.DDD.Service.Domain.SeedWork.Result;
 using LIMS.DDD.Service.Domain.SeedWork.ValueObjects;
 
 namespace LIMS.DDD.Service.Domain.LaboratoryOperationsContext.OrderAggregate;
 
-public class Order
+public class Order : IAggregateRoot
 {
     public OrderId Id { get; private set; }
 

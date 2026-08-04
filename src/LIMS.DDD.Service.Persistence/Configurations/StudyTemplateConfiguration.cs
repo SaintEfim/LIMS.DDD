@@ -11,7 +11,7 @@ public class StudyTemplateConfiguration : IEntityTypeConfiguration<StudyTemplate
     public void Configure(
         EntityTypeBuilder<StudyTemplate> builder)
     {
-        builder.HasKey(x => x.Id);
+        builder.ToTable("StudyTemplates");
 
         builder.Property(x => x.Id)
             .HasConversion(id => id.Value, id => new StudyTemplateId(id));

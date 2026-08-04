@@ -12,8 +12,6 @@ public class ResultDefinitionConfiguration : IEntityTypeConfiguration<ResultDefi
     {
         builder.ToTable("ResultDefinitions");
 
-        builder.HasKey(x => x.Id);
-
          builder.Property(x => x.Id)
             .HasConversion(id => id.Value, id => new ResultDefinitionId(id));
 
