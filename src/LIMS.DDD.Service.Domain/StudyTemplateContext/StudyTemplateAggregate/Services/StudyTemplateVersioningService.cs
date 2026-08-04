@@ -5,7 +5,6 @@ using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.ValueO
 
 namespace LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.Services;
 
-// Специальный record для возврата обоих агрегатов в Application Service
 public record RevisionCreationResult(StudyTemplate Original, StudyTemplate NewTemplate);
 
 public class StudyTemplateVersioningService
