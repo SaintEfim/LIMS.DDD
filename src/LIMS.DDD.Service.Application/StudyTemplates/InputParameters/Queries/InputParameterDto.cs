@@ -1,4 +1,5 @@
 ﻿using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.Entities;
+using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.Entities.InputParameters;
 
 namespace LIMS.DDD.Service.Application.StudyTemplates.InputParameters.Queries;
 

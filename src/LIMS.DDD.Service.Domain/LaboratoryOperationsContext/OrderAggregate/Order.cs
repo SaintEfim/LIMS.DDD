@@ -1,5 +1,5 @@
-﻿using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.Ids;
-using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.OrderAggregate.ValueObjects;
+﻿using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.OrderAggregate.ValueObjects;
+using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.ValueObjects;
 using LIMS.DDD.Service.Domain.SeedWork.Result;
 using LIMS.DDD.Service.Domain.SeedWork.ValueObjects;
 
@@ -12,6 +12,8 @@ public class Order
     public Name Name { get; private set; }
 
     public Description Description { get; private set; }
+
+    public Code Code { get; private set; }
 
     public string Contractor { get; private set; } = string.Empty;
 

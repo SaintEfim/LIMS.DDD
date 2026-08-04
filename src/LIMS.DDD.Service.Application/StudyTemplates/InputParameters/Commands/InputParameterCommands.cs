@@ -1,7 +1,8 @@
 ﻿using LIMS.DDD.Service.Domain.SeedWork.Result;
 using LIMS.DDD.Service.Domain.SeedWork.ValueObjects;
 using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate;
-using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.Ids;
+using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.Entities.InputParameters;
+using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.Entities.InputParameters.ValueObjects;
 using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.ValueObjects;
 
 namespace LIMS.DDD.Service.Application.StudyTemplates.InputParameters.Commands;
@@ -88,16 +89,9 @@ public sealed class InputParameterCommands(IStudyTemplateRepository repository)
             aliasName = aliasResult.GetValue();
         }
 
-        Specification? specification = null;
-        if (command.MaxValue is not null || command.MinValue is not null)
-        {
-            var specificationResult = Specification.Create(command.MinValue, command.MaxValue);
-            if (specificationResult.IsFailure) return Result<Exception>.Failure(specificationResult.Error!);
-            specification = specificationResult.GetValue();
-        }
-
         var updateResult = templateResult.GetValue()
-            .UpdateInputParameter(new InputParameterId(parameterId), name, description, aliasName, specification);
+            .UpdateInputParameter(new InputParameterId(parameterId), name, description, aliasName, command.MinValue,
+                command.MaxValue);
         if (updateResult.IsFailure) return Result<Exception>.Failure(updateResult.Error!);
 
         return await SaveChangesAsync(cancellationToken);

@@ -1,6 +1,5 @@
 ﻿using LIMS.DDD.Service.Domain.SeedWork.ValueObjects;
 using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate;
-using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.Ids;
 using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 
@@ -67,6 +66,12 @@ public class StudyTemplateRepository : IStudyTemplateRepository
         StudyTemplate studyTemplate)
     {
         _context.StudyTemplates.Add(studyTemplate);
+    }
+
+    public void Update(
+        StudyTemplate studyTemplate)
+    {
+        _context.StudyTemplates.Update(studyTemplate);
     }
 
     public void Remove(
