@@ -20,6 +20,9 @@ public class Order : IAggregateRoot
 
     public OrderStatus OrderStatus { get; private set; } = OrderStatus.Draft;
 
+    // В классе Order
+    public bool CanAcceptNewSamples => OrderStatus == OrderStatus.Draft || OrderStatus == OrderStatus.InProgress;
+
     private Order()
     {
     }
