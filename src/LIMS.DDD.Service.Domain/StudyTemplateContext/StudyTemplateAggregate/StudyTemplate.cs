@@ -240,7 +240,8 @@ public sealed class StudyTemplate : IAggregateRoot
         Name? name,
         Description? description,
         AliasName? aliasName,
-        Specification? specification)
+        double? minValue,
+        double? maxValue)
     {
         if (!Status.CanEdit)
             return Result<Exception>.Failure(
@@ -256,6 +257,13 @@ public sealed class StudyTemplate : IAggregateRoot
                 return Result<Exception>.Failure(
                     new InvalidOperationException("Alias name must be unique within the template."));
         }
+
+        var min = minValue ?? parameter.Specification.MinValue;
+        var max = maxValue ?? parameter.Specification.MaxValue;
+
+        var specificationResult = Specification.Create(min, max);
+        if (specificationResult.IsFailure) return Result<Exception>.Failure(specificationResult.Error!);
+        var specification = specificationResult.GetValue();
 
         parameter.Update(name, description, aliasName, specification);
         return Result<Exception>.Success();

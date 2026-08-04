@@ -89,16 +89,9 @@ public sealed class InputParameterCommands(IStudyTemplateRepository repository)
             aliasName = aliasResult.GetValue();
         }
 
-        Specification? specification = null;
-        if (command.MaxValue is not null || command.MinValue is not null)
-        {
-            var specificationResult = Specification.Create(command.MinValue, command.MaxValue);
-            if (specificationResult.IsFailure) return Result<Exception>.Failure(specificationResult.Error!);
-            specification = specificationResult.GetValue();
-        }
-
         var updateResult = templateResult.GetValue()
-            .UpdateInputParameter(new InputParameterId(parameterId), name, description, aliasName, specification);
+            .UpdateInputParameter(new InputParameterId(parameterId), name, description, aliasName, command.MinValue,
+                command.MaxValue);
         if (updateResult.IsFailure) return Result<Exception>.Failure(updateResult.Error!);
 
         return await SaveChangesAsync(cancellationToken);

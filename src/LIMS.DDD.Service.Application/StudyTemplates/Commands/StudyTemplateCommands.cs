@@ -117,17 +117,10 @@ public sealed class StudyTemplateCommands(
 
         var creationResult = createResult.GetValue();
 
-        try
-        {
-            repository.Update(creationResult.Original);
-            repository.Add(creationResult.NewTemplate);
-            await repository.SaveChangesAsync(cancellationToken);
-            return Result<Guid, Exception>.Success(creationResult.NewTemplate.Id.Value);
-        }
-        catch (Exception ex)
-        {
-            return Result<Guid, Exception>.Failure(new Exception("Failed to save StudyTemplate.", ex));
-        }
+        var saveResult = await SaveNewAsync(creationResult.Original, cancellationToken);
+        return saveResult.IsFailure
+            ? Result<Guid, Exception>.Failure(saveResult.Error!)
+            : Result<Guid, Exception>.Success(creationResult.NewTemplate.Id.Value);
     }
 
     private async Task<Result<StudyTemplate, Exception>> GetTemplateForChangeAsync(
