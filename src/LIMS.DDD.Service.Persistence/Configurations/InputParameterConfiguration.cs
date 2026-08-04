@@ -16,8 +16,6 @@ public class InputParameterConfiguration : IEntityTypeConfiguration<InputParamet
     {
         builder.ToTable("InputParameters");
 
-        builder.HasKey(x => x.Id);
-
         builder.Property(x => x.Id)
             .HasConversion(id => id.Value, id => new InputParameterId(id));
 

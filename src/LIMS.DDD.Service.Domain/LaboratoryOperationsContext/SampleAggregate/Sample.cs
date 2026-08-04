@@ -1,12 +1,13 @@
 ﻿using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.OrderAggregate;
 using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.SampleAggregate.ValueObjects;
 using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.ValueObjects;
+using LIMS.DDD.Service.Domain.SeedWork;
 using LIMS.DDD.Service.Domain.SeedWork.Result;
 using LIMS.DDD.Service.Domain.SeedWork.ValueObjects;
 
 namespace LIMS.DDD.Service.Domain.LaboratoryOperationsContext.SampleAggregate;
 
-public class Sample
+public class Sample : IAggregateRoot
 {
     public SampleId Id { get; private set; }
 
@@ -65,7 +66,8 @@ public class Sample
         return Result<Sample, Exception>.Success(this);
     }
 
-    public Result<Exception> ChangeStatus(SampleStatus newSampleStatus)
+    public Result<Exception> ChangeStatus(
+        SampleStatus newSampleStatus)
     {
         var result = SampleStatus.CanTransitionTo(newSampleStatus, this);
 

@@ -1,0 +1,54 @@
+﻿using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.OrderAggregate;
+using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.SampleAggregate;
+using Microsoft.EntityFrameworkCore;
+
+namespace LIMS.DDD.Service.Persistence.Repositories;
+
+public class SampleRepository : ISampleRepository
+{
+    private readonly ApplicationDbContext _context;
+
+    public SampleRepository(
+        ApplicationDbContext context)
+    {
+        _context = context;
+    }
+
+    public async Task<Sample?> GetByIdAsync(
+        SampleId id,
+        CancellationToken cancellationToken = default)
+    {
+        return await _context.Samples
+            .AsNoTracking()
+            .SingleOrDefaultAsync(s => s.Id == id, cancellationToken);
+    }
+
+    public async Task<Sample?> GetByIdForChangeAsync(
+        SampleId id,
+        CancellationToken cancellationToken = default)
+    {
+        return await _context.Samples.SingleOrDefaultAsync(s => s.Id == id, cancellationToken);
+    }
+
+    public async Task<ICollection<Sample>> GetByOrderIdAsync(
+        OrderId orderId,
+        CancellationToken cancellationToken = default)
+    {
+        return await _context.Samples
+            .AsNoTracking()
+            .Where(s => s.OrderId == orderId)
+            .ToListAsync(cancellationToken);
+    }
+
+    public void Add(
+        Sample sample)
+    {
+        _context.Samples.Add(sample);
+    }
+
+    public async Task<int> SaveChangesAsync(
+        CancellationToken cancellationToken = default)
+    {
+        return await _context.SaveChangesAsync(cancellationToken);
+    }
+}
