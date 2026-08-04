@@ -1,8 +1,9 @@
-﻿using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.Entities.ResultDefinitions;
+﻿using LIMS.DDD.Service.Domain.SeedWork;
+using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.Entities.ResultDefinitions;
 
 namespace LIMS.DDD.Service.Domain.LaboratoryOperationsContext.StudyAggregate.Entities;
 
-public sealed class TestResult
+public sealed class TestResult : SoftDeletableModel
 {
     private TestResult()
     {
@@ -18,7 +19,7 @@ public sealed class TestResult
 
     public bool IsOutOfSpec { get; private set; }
 
-    public static TestResult Create(
+    internal static TestResult Create(
         StudyId studyId,
         ResultDefinitionId resultDefinitionId,
         double? value,
@@ -34,11 +35,17 @@ public sealed class TestResult
         };
     }
 
-    public void Update(
+    internal void Update(
         double? value,
         bool isOutOfSpec)
     {
         if (value is not null) Value = value;
         IsOutOfSpec = isOutOfSpec;
+    }
+
+    internal void MarkAsDeleted()
+    {
+        IsDeleted = true;
+        DeletedAt = DateTimeOffset.UtcNow;
     }
 }

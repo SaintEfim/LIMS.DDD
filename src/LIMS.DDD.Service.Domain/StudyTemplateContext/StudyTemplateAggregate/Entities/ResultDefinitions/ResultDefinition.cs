@@ -1,8 +1,9 @@
-﻿using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.ValueObjects;
+﻿using LIMS.DDD.Service.Domain.SeedWork;
+using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.ValueObjects;
 
 namespace LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.Entities.ResultDefinitions;
 
-public sealed class ResultDefinition
+public sealed class ResultDefinition : SoftDeletableModel
 {
     private ResultDefinition()
     {
@@ -34,6 +35,12 @@ public sealed class ResultDefinition
         if (resultInstance is not null) ResultInstance = resultInstance;
         if (unit is not null) Unit = unit;
         if (specification is not null) Specification = specification;
+    }
+
+    internal void MarkAsDeleted()
+    {
+        IsDeleted = true;
+        DeletedAt = DateTimeOffset.UtcNow;
     }
 
     public string ResultInstance { get; private set; } = string.Empty;

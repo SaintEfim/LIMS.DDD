@@ -1,12 +1,10 @@
 ﻿using LIMS.DDD.Service.Domain.SeedWork.ValueObjects;
 using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate;
-using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.Entities;
 using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.Entities.CalculationRules;
 using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.Entities.CalculationRules.ValueObjects;
 using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.Entities.InputParameters;
 using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.Entities.InputParameters.ValueObjects;
 using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.Entities.ResultDefinitions;
-using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -19,6 +17,7 @@ public class CalculationRuleConfiguration : IEntityTypeConfiguration<Calculation
     {
         builder.ToTable("CalculationRules");
 
+        builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
             .HasConversion(id => id.Value, id => new CalculationRuleId(id));
 
@@ -37,7 +36,7 @@ public class CalculationRuleConfiguration : IEntityTypeConfiguration<Calculation
             .IsRequired();
 
         builder.Property(x => x.FormulaExpression)
-            .HasConversion(n => n.Value, n => FormulaExpression.Create(n)
+            .HasConversion(f => f.Value, f => FormulaExpression.Create(f)
                 .GetValue())
             .HasMaxLength(2000)
             .IsRequired();
@@ -54,18 +53,21 @@ public class CalculationRuleConfiguration : IEntityTypeConfiguration<Calculation
             inputBuilder.Property(x => x.VariableAlias)
                 .HasConversion(a => a.Value, a => AliasName.Create(a)
                     .GetValue())
-                .HasMaxLength(100);
+                .HasMaxLength(100)
+                .IsRequired();
 
             inputBuilder.Property(x => x.ParameterId)
                 .HasConversion(id => id.Value, id => new InputParameterId(id))
                 .IsRequired();
         });
 
-        builder.HasIndex(x => new
-            {
-                x.StudyTemplateId,
-                x.Name
-            })
-            .IsUnique();
+        builder.Property(x => x.IsDeleted)
+            .HasDefaultValue(false);
+        builder.Property(x => x.DeletedAt)
+            .IsRequired(false);
+
+        builder.HasQueryFilter(x => !x.IsDeleted);
+
+        builder.HasIndex(x => x.StudyTemplateId);
     }
 }

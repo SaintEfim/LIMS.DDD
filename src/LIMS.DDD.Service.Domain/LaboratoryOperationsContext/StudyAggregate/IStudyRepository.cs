@@ -1,5 +1,6 @@
 ﻿using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.SampleAggregate;
 using LIMS.DDD.Service.Domain.SeedWork;
+using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate;
 
 namespace LIMS.DDD.Service.Domain.LaboratoryOperationsContext.StudyAggregate;
 
@@ -18,4 +19,8 @@ public interface IStudyRepository : IRepository<Study>
 
     Task<int> SaveChangesAsync(
         CancellationToken cancellationToken = default);
+
+    Task<ICollection<Study>> GetByTemplateIdAsync(
+        StudyTemplateId templateId,
+        CancellationToken cancellationToken);
 }

@@ -14,7 +14,14 @@ public class SampleConfiguration : IEntityTypeConfiguration<Sample>
         EntityTypeBuilder<Sample> builder)
     {
         builder.ToTable("Samples");
-        builder.HasKey(x => x.Id);
+
+        builder.Property(x => x.IsDeleted)
+            .HasDefaultValue(false);
+
+        builder.Property(x => x.DeletedAt)
+            .IsRequired(false);
+
+        builder.HasQueryFilter(x => !x.IsDeleted);
 
         builder.Property(x => x.Id)
             .HasConversion(id => id.Value, value => new SampleId(value));
@@ -65,6 +72,7 @@ public class SampleConfiguration : IEntityTypeConfiguration<Sample>
             .IsRequired();
 
         builder.HasIndex(x => x.Code)
-            .IsUnique();
+            .IsUnique()
+            .HasFilter("[IsDeleted] = 0");
     }
 }

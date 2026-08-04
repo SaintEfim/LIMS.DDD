@@ -10,7 +10,9 @@ using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.ValueO
 
 namespace LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate;
 
-public sealed class StudyTemplate : IAggregateRoot
+public sealed class StudyTemplate
+    : SoftDeletableModel,
+        IAggregateRoot
 {
     private StudyTemplate()
     {
@@ -125,15 +127,13 @@ public sealed class StudyTemplate : IAggregateRoot
     {
         if (!Status.CanEdit)
             return Result<Exception>.Failure(
-                new InvalidOperationException("Cannot add calculation rule to an Active template."));
+                new InvalidOperationException("Cannot remove calculation rule from an Active or Archived template."));
 
-        var result = _calculationRules.SingleOrDefault(r => r.Id == ruleId);
-        if (result == null)
-        {
+        var rule = _calculationRules.SingleOrDefault(r => r.Id == ruleId);
+        if (rule == null)
             return Result<Exception>.Failure(new InvalidOperationException("Calculation rule not found."));
-        }
 
-        _calculationRules.Remove(result);
+        rule.MarkAsDeleted();
         return Result<Exception>.Success();
     }
 
@@ -180,7 +180,7 @@ public sealed class StudyTemplate : IAggregateRoot
         var parameter = _inputParameters.SingleOrDefault(p => p.Id == observationId);
         if (parameter == null) return Result<Exception>.Failure(new InvalidOperationException("Parameter not found."));
 
-        _inputParameters.Remove(parameter);
+        parameter.MarkAsDeleted();
         return Result<Exception>.Success();
     }
 
@@ -219,19 +219,25 @@ public sealed class StudyTemplate : IAggregateRoot
     }
 
     public Result<Exception> RemoveResultDefinition(
-        ResultDefinitionId determinationId)
+        ResultDefinitionId resultDefinitionId)
     {
         if (!Status.CanEdit)
             return Result<Exception>.Failure(
-                new InvalidOperationException("Cannot add determination to an Active template."));
+                new InvalidOperationException(
+                    "Cannot remove result definition from an Active or Archived template.")); // 🔥 Исправлено
 
-        var result = _resultDefinitions.SingleOrDefault(r => r.Id == determinationId);
-        if (result == null)
-        {
+        var resultDef = _resultDefinitions.SingleOrDefault(r => r.Id == resultDefinitionId);
+        if (resultDef == null)
             return Result<Exception>.Failure(new InvalidOperationException("Determination result not found."));
+        var isUsedInCalculations = _calculationRules.Any(rule => rule.ResultDefinitionId == resultDefinitionId);
+
+        if (isUsedInCalculations)
+        {
+            return Result<Exception>.Failure(new InvalidOperationException(
+                "Cannot remove result definition because it is targeted by calculation rules. Remove or reassign the calculation rules first."));
         }
 
-        _resultDefinitions.Remove(result);
+        resultDef.MarkAsDeleted();
         return Result<Exception>.Success();
     }
 
@@ -310,21 +316,34 @@ public sealed class StudyTemplate : IAggregateRoot
         if (rule is null)
             return Result<Exception>.Failure(new InvalidOperationException("Calculation rule not found."));
 
-        if (name is not null && rule.Name != name)
-        {
-            if (_calculationRules.Any(r => r.Name == name && r.Id != ruleId))
-                return Result<Exception>.Failure(
-                    new InvalidOperationException("Calculation rule name must be unique within the template."));
-        }
+        if (name is not null && rule.Name != name && _calculationRules.Any(r => r.Name == name && r.Id != ruleId))
+            return Result<Exception>.Failure(
+                new InvalidOperationException("Calculation rule name must be unique within the template."));
 
-        if (resultDefinitionId is not null && rule.ResultDefinitionId != resultDefinitionId)
-        {
-            if (_resultDefinitions.All(r => r.Id != resultDefinitionId))
-                return Result<Exception>.Failure(
-                    new InvalidOperationException("Result definition not found in template."));
-        }
+        if (resultDefinitionId is not null && rule.ResultDefinitionId != resultDefinitionId &&
+            _resultDefinitions.All(r => r.Id != resultDefinitionId))
+            return Result<Exception>.Failure(new InvalidOperationException("Result definition not found in template."));
 
         rule.Update(name, formulaExpression, description, resultDefinitionId);
+        return Result<Exception>.Success();
+    }
+
+    internal Result<Exception> Delete()
+    {
+        if (IsDeleted) return Result<Exception>.Failure(new InvalidOperationException("Template is already deleted."));
+        if (Status != Status.Draft)
+        {
+            return Result<Exception>.Failure(new InvalidOperationException(
+                $"Cannot delete template in '{Status.Name}' status. Only 'Draft' templates can be deleted. Use 'Archive' for Active templates."));
+        }
+
+        IsDeleted = true;
+        DeletedAt = DateTimeOffset.UtcNow;
+
+        foreach (var param in _inputParameters) param.MarkAsDeleted();
+        foreach (var res in _resultDefinitions) res.MarkAsDeleted();
+        foreach (var rule in _calculationRules) rule.MarkAsDeleted();
+
         return Result<Exception>.Success();
     }
 }
