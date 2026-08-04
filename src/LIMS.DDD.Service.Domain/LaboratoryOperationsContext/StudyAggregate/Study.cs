@@ -3,6 +3,7 @@ using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.StudyAggregate.Entitie
 using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.StudyAggregate.ValueObjects;
 using LIMS.DDD.Service.Domain.SeedWork;
 using LIMS.DDD.Service.Domain.SeedWork.Result;
+using LIMS.DDD.Service.Domain.SeedWork.ValueObjects;
 using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate;
 
 namespace LIMS.DDD.Service.Domain.LaboratoryOperationsContext.StudyAggregate;
@@ -21,12 +22,12 @@ public sealed class Study : IAggregateRoot
 
     public StudyStatus Status { get; private set; } = StudyStatus.InWork;
 
-    private readonly List<MeasuredValue> _measuredValues = [];
+    public Description Description { get; private set; }
 
+    private readonly List<MeasuredValue> _measuredValues = [];
     public IReadOnlyList<MeasuredValue> MeasuredValues => _measuredValues.AsReadOnly();
 
     private readonly List<TestResult> _testResults = [];
-
     public IReadOnlyList<TestResult> TestResults => _testResults.AsReadOnly();
 
     public static Result<Study, Exception> Create(
@@ -47,6 +48,30 @@ public sealed class Study : IAggregateRoot
         study._testResults.AddRange(initialTestResults);
 
         return Result<Study, Exception>.Success(study);
+    }
+
+    public Result<Exception> UpdateNotes(
+        Description? description)
+    {
+        if (!Status.CanEdit)
+            return Result<Exception>.Failure(
+                new InvalidOperationException("Cannot update study notes when study is not InWork."));
+
+        if (description is not null) Description = description;
+        return Result<Exception>.Success();
+    }
+
+    public Result<Exception> ReassignSample(
+        SampleId newSampleId)
+    {
+        if (!Status.CanEdit)
+            return Result<Exception>.Failure(
+                new InvalidOperationException("Cannot reassign sample when study is not InWork."));
+
+        if (newSampleId == SampleId) return Result<Exception>.Success();
+
+        SampleId = newSampleId;
+        return Result<Exception>.Success();
     }
 
     public Result<Exception> UpdateMeasuredValue(
