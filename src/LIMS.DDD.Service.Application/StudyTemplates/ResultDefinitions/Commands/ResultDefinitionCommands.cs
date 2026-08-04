@@ -53,12 +53,9 @@ public sealed class ResultDefinitionCommands(IStudyTemplateRepository repository
         var templateResult = await GetTemplateForChangeAsync(studyTemplateId, cancellationToken);
         if (templateResult.IsFailure) return Result<Exception>.Failure(templateResult.Error!);
 
-        var specification = Specification.Create(command.MinValue, command.MaxValue);
-        if (specification.IsFailure) return Result<Exception>.Failure(specification.Error!);
-
         var updateResult = templateResult.GetValue()
             .UpdateResultDefinition(new ResultDefinitionId(resultDefinitionId), command.ResultInstance, command.Unit,
-                specification.GetValue());
+               command.MinValue, command.MaxValue);
         if (updateResult.IsFailure) return Result<Exception>.Failure(updateResult.Error!);
 
         return await SaveChangesAsync(cancellationToken);
