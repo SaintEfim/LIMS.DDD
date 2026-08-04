@@ -1,7 +1,7 @@
 ﻿using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate;
 using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.Entities.InputParameters;
 
-namespace LIMS.DDD.Service.Application.StudyTemplates.InputParameters.Queries;
+namespace LIMS.DDD.Service.Application.StudyTemplates.InputParameters;
 
 public sealed class InputParameterQueries(IStudyTemplateRepository repository)
 {

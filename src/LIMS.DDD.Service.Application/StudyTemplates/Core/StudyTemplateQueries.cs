@@ -1,6 +1,6 @@
 ﻿using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate;
 
-namespace LIMS.DDD.Service.Application.StudyTemplates.Queries;
+namespace LIMS.DDD.Service.Application.StudyTemplates.Core;
 
 public sealed class StudyTemplateQueries(IStudyTemplateRepository repository)
 {

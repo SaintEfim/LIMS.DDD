@@ -1,9 +1,9 @@
 ﻿using LIMS.DDD.Service.Application.StudyTemplates.CalculationRules.Queries;
-using LIMS.DDD.Service.Application.StudyTemplates.InputParameters.Queries;
-using LIMS.DDD.Service.Application.StudyTemplates.ResultDefinitions.Queries;
+using LIMS.DDD.Service.Application.StudyTemplates.InputParameters;
+using LIMS.DDD.Service.Application.StudyTemplates.ResultDefinitions;
 using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate;
 
-namespace LIMS.DDD.Service.Application.StudyTemplates.Queries;
+namespace LIMS.DDD.Service.Application.StudyTemplates.Core;
 
 public sealed record StudyTemplateDto(
     Guid? ParentId,

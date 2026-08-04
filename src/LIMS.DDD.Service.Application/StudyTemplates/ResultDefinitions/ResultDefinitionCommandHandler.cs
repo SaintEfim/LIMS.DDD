@@ -1,9 +1,10 @@
-﻿using LIMS.DDD.Service.Domain.SeedWork.Result;
+﻿using LIMS.DDD.Service.Application.StudyTemplates.ResultDefinitions.Commands;
+using LIMS.DDD.Service.Domain.SeedWork.Result;
 using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate;
 using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.Entities.ResultDefinitions;
 using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.ValueObjects;
 
-namespace LIMS.DDD.Service.Application.StudyTemplates.ResultDefinitions.Commands;
+namespace LIMS.DDD.Service.Application.StudyTemplates.ResultDefinitions;
 
 public sealed class ResultDefinitionCommands(IStudyTemplateRepository repository)
 {

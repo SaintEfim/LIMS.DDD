@@ -1,7 +1,7 @@
 ﻿using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate;
 using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.Entities.ResultDefinitions;
 
-namespace LIMS.DDD.Service.Application.StudyTemplates.ResultDefinitions.Queries;
+namespace LIMS.DDD.Service.Application.StudyTemplates.ResultDefinitions;
 
 public sealed class ResultDefinitionQueries(IStudyTemplateRepository repository)
 {

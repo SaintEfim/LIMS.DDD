@@ -1,6 +1,6 @@
 ﻿using Carter;
+using LIMS.DDD.Service.Application.StudyTemplates.ResultDefinitions;
 using LIMS.DDD.Service.Application.StudyTemplates.ResultDefinitions.Commands;
-using LIMS.DDD.Service.Application.StudyTemplates.ResultDefinitions.Queries;
 
 namespace LIMS.DDD.Service.API.Apis.ResultDefinitions;
 

@@ -1,5 +1,5 @@
-﻿using LIMS.DDD.Service.Application.StudyTemplates.ResultDefinitions.Commands;
-using LIMS.DDD.Service.Application.StudyTemplates.ResultDefinitions.Queries;
+﻿using LIMS.DDD.Service.Application.StudyTemplates.ResultDefinitions;
+using LIMS.DDD.Service.Application.StudyTemplates.ResultDefinitions.Commands;
 
 namespace LIMS.DDD.Service.API.Apis.ResultDefinitions;
 
