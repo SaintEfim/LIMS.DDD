@@ -15,6 +15,14 @@ public class StudyConfiguration : IEntityTypeConfiguration<Study>
     {
         builder.ToTable("Studies");
 
+        builder.Property(x => x.IsDeleted)
+            .HasDefaultValue(false);
+
+        builder.Property(x => x.DeletedAt)
+            .IsRequired(false);
+
+        builder.HasQueryFilter(x => !x.IsDeleted);
+
         builder.Property(x => x.Id)
             .HasConversion(id => id.Value, value => new StudyId(value));
 
@@ -48,5 +56,13 @@ public class StudyConfiguration : IEntityTypeConfiguration<Study>
             .WithOne()
             .HasForeignKey(x => x.StudyId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasIndex(x => new
+            {
+                x.SampleId,
+                x.TemplateId
+            })
+            .IsUnique()
+            .HasFilter("[IsDeleted] = 0");
     }
 }

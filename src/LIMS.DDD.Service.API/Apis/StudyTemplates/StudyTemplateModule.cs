@@ -41,6 +41,12 @@ public class StudyTemplateModule : ICarterModule
             .Produces(StatusCodes.Status404NotFound)
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status500InternalServerError);
+
+        group.MapDelete("/{id:guid}", Delete)
+            .Produces(StatusCodes.Status204NoContent)
+            .Produces(StatusCodes.Status404NotFound)
+            .Produces(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status500InternalServerError);
     }
 
     private static async Task<IResult> GetAl(
@@ -69,7 +75,8 @@ public class StudyTemplateModule : ICarterModule
 
         if (result.IsFailure) return HandleFailure(result.Error!);
 
-        var createdId = result.GetValue().Id.Value;
+        var createdId = result.GetValue()
+            .Id.Value;
         return Results.Created($"/api/studyTemplates/{createdId}", new { id = createdId });
     }
 
@@ -105,6 +112,16 @@ public class StudyTemplateModule : ICarterModule
 
         var newTemplateId = result.GetValue();
         return Results.Created($"/api/study-templates/{newTemplateId}", new { id = newTemplateId });
+    }
+
+    private static async Task<IResult> Delete(
+        Guid id,
+        [AsParameters] StudyTemplateServices services,
+        CancellationToken ct)
+    {
+        var result = await services.Commands.DeleteAsync(id, ct);
+
+        return result.IsFailure ? HandleFailure(result.Error!) : Results.NoContent();
     }
 
     private static IResult HandleFailure(

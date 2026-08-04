@@ -7,7 +7,9 @@ using LIMS.DDD.Service.Domain.SeedWork.ValueObjects;
 
 namespace LIMS.DDD.Service.Domain.LaboratoryOperationsContext.SampleAggregate;
 
-public class Sample : IAggregateRoot
+public class Sample
+    : SoftDeletableModel,
+        IAggregateRoot
 {
     public SampleId Id { get; private set; }
 
@@ -27,7 +29,7 @@ public class Sample : IAggregateRoot
     {
     }
 
-    public static Result<Sample, Exception> Create(
+    internal static Result<Sample, Exception> Create(
         OrderId orderId,
         Name name,
         GatherDate gatherDate,
@@ -46,6 +48,17 @@ public class Sample : IAggregateRoot
         };
 
         return Result<Sample, Exception>.Success(sample);
+    }
+
+    internal Result<Exception> Delete()
+    {
+        if (IsDeleted)
+            return Result<Exception>.Failure(new InvalidOperationException("Sample is already deleted."));
+
+        IsDeleted = true;
+        DeletedAt = DateTimeOffset.UtcNow;
+
+        return Result<Exception>.Success();
     }
 
     public Result<Exception> UpdatePartial(

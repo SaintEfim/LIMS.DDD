@@ -1,4 +1,5 @@
-﻿using LIMS.DDD.Service.Domain.SeedWork.Result;
+﻿using LIMS.DDD.Service.Domain.SeedWork;
+using LIMS.DDD.Service.Domain.SeedWork.Result;
 using LIMS.DDD.Service.Domain.SeedWork.ValueObjects;
 using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.Entities.CalculationRules.ValueObjects;
 using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.Entities.InputParameters;
@@ -8,7 +9,7 @@ using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.ValueO
 
 namespace LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.Entities.CalculationRules;
 
-public sealed class CalculationRule
+public sealed class CalculationRule : SoftDeletableModel
 {
     private CalculationRule()
     {
@@ -42,6 +43,12 @@ public sealed class CalculationRule
         if (formulaExpression is not null) FormulaExpression = formulaExpression;
         if (description is not null) Description = description;
         if (resultDefinitionId is not null) ResultDefinitionId = resultDefinitionId.Value;
+    }
+
+    internal void MarkAsDeleted()
+    {
+        IsDeleted = true;
+        DeletedAt = DateTimeOffset.UtcNow;
     }
 
     public CalculationRuleId Id { get; private set; }

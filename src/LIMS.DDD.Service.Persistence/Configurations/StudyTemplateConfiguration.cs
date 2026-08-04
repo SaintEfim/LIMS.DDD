@@ -22,11 +22,6 @@ public class StudyTemplateConfiguration : IEntityTypeConfiguration<StudyTemplate
             .HasMaxLength(100)
             .IsRequired();
 
-        builder.Property(x => x.Status)
-            .HasConversion(status => status.Name, value => Status.ConvertStatus(value))
-            .HasMaxLength(50)
-            .IsRequired();
-
         builder.Property(x => x.Description)
             .HasConversion(d => d.Value, d => Description.Create(d)
                 .GetValue())
@@ -35,7 +30,20 @@ public class StudyTemplateConfiguration : IEntityTypeConfiguration<StudyTemplate
         builder.Property(x => x.Revision)
             .HasConversion(r => r.Value, r => Revision.Create(r)
                 .GetValue())
+            .HasMaxLength(50)
             .IsRequired();
+
+        builder.Property(x => x.Status)
+            .HasConversion(status => status.Name, value => Status.ConvertStatus(value))
+            .HasMaxLength(50)
+            .IsRequired();
+
+        builder.Property(x => x.IsDeleted)
+            .HasDefaultValue(false);
+        builder.Property(x => x.DeletedAt)
+            .IsRequired(false);
+
+        builder.HasQueryFilter(x => !x.IsDeleted);
 
         builder.HasMany(x => x.InputParameters)
             .WithOne()

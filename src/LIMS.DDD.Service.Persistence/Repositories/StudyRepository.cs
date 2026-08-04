@@ -1,5 +1,6 @@
 ﻿using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.SampleAggregate;
 using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.StudyAggregate;
+using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate;
 using Microsoft.EntityFrameworkCore;
 
 namespace LIMS.DDD.Service.Persistence.Repositories;
@@ -53,5 +54,16 @@ public class StudyRepository : IStudyRepository
         CancellationToken cancellationToken = default)
     {
         return await _context.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task<ICollection<Study>> GetByTemplateIdAsync(
+        StudyTemplateId templateId,
+        CancellationToken cancellationToken)
+    {
+        return await _context.Studies
+            .AsNoTracking()
+            .AsSplitQuery()
+            .Where(x => x.TemplateId == templateId)
+            .ToListAsync(cancellationToken);
     }
 }

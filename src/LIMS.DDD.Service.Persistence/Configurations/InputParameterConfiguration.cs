@@ -1,9 +1,7 @@
 using LIMS.DDD.Service.Domain.SeedWork.ValueObjects;
 using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate;
-using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.Entities;
 using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.Entities.InputParameters;
 using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.Entities.InputParameters.ValueObjects;
-using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -20,7 +18,8 @@ public class InputParameterConfiguration : IEntityTypeConfiguration<InputParamet
             .HasConversion(id => id.Value, id => new InputParameterId(id));
 
         builder.Property(x => x.StudyTemplateId)
-            .HasConversion(id => id.Value, id => new StudyTemplateId(id));
+            .HasConversion(id => id.Value, id => new StudyTemplateId(id))
+            .IsRequired();
 
         builder.Property(x => x.Name)
             .HasConversion(n => n.Value, n => Name.Create(n)
@@ -36,19 +35,28 @@ public class InputParameterConfiguration : IEntityTypeConfiguration<InputParamet
         builder.Property(x => x.AliasName)
             .HasConversion(a => a.Value, a => AliasName.Create(a)
                 .GetValue())
-            .HasMaxLength(100);
+            .HasMaxLength(100)
+            .IsRequired();
 
-        builder.OwnsOne(x => x.Specification, vr =>
+        builder.OwnsOne(x => x.Specification, spec =>
         {
-            vr.Property(p => p.MaxValue);
-            vr.Property(p => p.MinValue);
+            spec.Property(p => p.MinValue)
+                .HasColumnName("SpecMinValue");
+            spec.Property(p => p.MaxValue)
+                .HasColumnName("SpecMaxValue");
         });
 
+        builder.Property(x => x.IsDeleted)
+            .HasDefaultValue(false);
+        builder.Property(x => x.DeletedAt)
+            .IsRequired(false);
+
+        builder.HasQueryFilter(x => !x.IsDeleted);
+
         builder.HasIndex(x => new
-            {
-                x.StudyTemplateId,
-                x.AliasName
-            })
-            .IsUnique();
+        {
+            x.StudyTemplateId,
+            x.AliasName
+        });
     }
 }

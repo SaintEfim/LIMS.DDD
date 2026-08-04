@@ -1,10 +1,11 @@
-﻿using LIMS.DDD.Service.Domain.SeedWork.ValueObjects;
+﻿using LIMS.DDD.Service.Domain.SeedWork;
+using LIMS.DDD.Service.Domain.SeedWork.ValueObjects;
 using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.Entities.InputParameters.ValueObjects;
 using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.ValueObjects;
 
 namespace LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.Entities.InputParameters;
 
-public sealed class InputParameter
+public sealed class InputParameter : SoftDeletableModel
 {
     private InputParameter()
     {
@@ -40,6 +41,12 @@ public sealed class InputParameter
         if (description is not null) Description = description;
         if (aliasName is not null) AliasName = aliasName;
         if (specification is not null) Specification = specification;
+    }
+
+    internal void MarkAsDeleted()
+    {
+        IsDeleted = true;
+        DeletedAt = DateTimeOffset.UtcNow;
     }
 
     public InputParameterId Id { get; private set; }

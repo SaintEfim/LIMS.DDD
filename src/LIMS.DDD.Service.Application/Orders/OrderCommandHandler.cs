@@ -78,6 +78,23 @@ public sealed class OrderCommandHandler(IOrderRepository repository)
         return Result<Exception>.Success();
     }
 
+    public async Task<Result<Exception>> DeleteAsync(
+        Guid id,
+        CancellationToken cancellationToken = default)
+    {
+        var orderResult = await GetOrderForChangeAsync(id, cancellationToken);
+        if (orderResult.IsFailure) return Result<Exception>.Failure(orderResult.Error!);
+
+        var order = orderResult.GetValue();
+
+        var deleteResult = order.Delete();
+        if (deleteResult.IsFailure) return Result<Exception>.Failure(deleteResult.Error!);
+
+        await repository.SaveChangesAsync(cancellationToken);
+
+        return Result<Exception>.Success();
+    }
+
     private async Task<Result<Order, Exception>> GetOrderForChangeAsync(
         Guid id,
         CancellationToken ct)

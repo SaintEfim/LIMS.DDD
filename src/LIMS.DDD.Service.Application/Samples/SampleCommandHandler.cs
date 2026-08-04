@@ -3,6 +3,7 @@ using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.OrderAggregate;
 using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.SampleAggregate;
 using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.SampleAggregate.Services;
 using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.SampleAggregate.ValueObjects;
+using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.StudyAggregate;
 using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.ValueObjects;
 using LIMS.DDD.Service.Domain.SeedWork.Result;
 using LIMS.DDD.Service.Domain.SeedWork.ValueObjects;
@@ -12,7 +13,9 @@ namespace LIMS.DDD.Service.Application.Samples;
 public sealed class SampleCommandHandler(
     ISampleRepository repository,
     IOrderRepository orderRepository,
-    SampleCreationDomainService domainService)
+    IStudyRepository studyRepository,
+    SampleCreationDomainService creationDomainService,
+    SampleDeletionDomainService deletionDomainService)
 {
     public async Task<Result<Sample, Exception>> CreateAsync(
         CreateSampleCommand command,
@@ -35,7 +38,7 @@ public sealed class SampleCommandHandler(
         var volumeResult = Volume.Create(command.VolumeValue, command.VolumeUnit);
         if (volumeResult.IsFailure) return Result<Sample, Exception>.Failure(volumeResult.Error!);
 
-        var sampleResult = domainService.CreateSample(order, nameResult.GetValue(), gatherDateResult.GetValue(),
+        var sampleResult = creationDomainService.CreateSample(order, nameResult.GetValue(), gatherDateResult.GetValue(),
             codeResult.GetValue(), volumeResult.GetValue());
 
         if (sampleResult.IsFailure) return Result<Sample, Exception>.Failure(sampleResult.Error!);
@@ -96,6 +99,30 @@ public sealed class SampleCommandHandler(
         if (changeResult.IsFailure) return Result<Sample, Exception>.Failure(changeResult.Error!);
 
         return await SaveChangesAsync(template, cancellationToken);
+    }
+
+    public async Task<Result<Exception>> DeleteAsync(
+        Guid id,
+        CancellationToken cancellationToken = default)
+    {
+        var sampleResult = await GetSampleForChangeAsync(id, cancellationToken);
+        if (sampleResult.IsFailure) return Result<Exception>.Failure(sampleResult.Error!);
+        var sample = sampleResult.GetValue();
+
+        var order = await orderRepository.GetByIdAsync(sample.OrderId, cancellationToken);
+        if (order is null)
+            return Result<Exception>.Failure(
+                new KeyNotFoundException($"Parent Order with id {sample.OrderId} not found."));
+
+        var studies = (await studyRepository.GetBySampleIdAsync(sample.Id, cancellationToken)).ToList()
+            .AsReadOnly();
+
+        var deleteResult = deletionDomainService.Delete(sample, order, studies);
+        if (deleteResult.IsFailure) return Result<Exception>.Failure(deleteResult.Error!);
+
+        await repository.SaveChangesAsync(cancellationToken);
+
+        return Result<Exception>.Success();
     }
 
     private async Task<Result<Sample, Exception>> SaveChangesAsync(

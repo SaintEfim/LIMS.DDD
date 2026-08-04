@@ -12,6 +12,14 @@ public class MeasuredValueConfiguration : IEntityTypeConfiguration<MeasuredValue
     {
         builder.ToTable("MeasuredValues");
 
+        builder.Property(x => x.IsDeleted)
+            .HasDefaultValue(false);
+
+        builder.Property(x => x.DeletedAt)
+            .IsRequired(false);
+
+        builder.HasQueryFilter(x => !x.IsDeleted);
+
         builder.Property(x => x.Id)
             .HasConversion(id => id.Value, value => new MeasuredValueId(value));
 

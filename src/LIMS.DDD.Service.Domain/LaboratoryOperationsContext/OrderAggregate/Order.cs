@@ -6,7 +6,9 @@ using LIMS.DDD.Service.Domain.SeedWork.ValueObjects;
 
 namespace LIMS.DDD.Service.Domain.LaboratoryOperationsContext.OrderAggregate;
 
-public class Order : IAggregateRoot
+public class Order
+    : SoftDeletableModel,
+        IAggregateRoot
 {
     public OrderId Id { get; private set; }
 
@@ -41,6 +43,22 @@ public class Order : IAggregateRoot
         };
 
         return Result<Order, Exception>.Success(order);
+    }
+
+    public Result<Exception> Delete()
+    {
+        if (OrderStatus != OrderStatus.Draft)
+            return Result<Exception>.Failure(new InvalidOperationException(
+                $"Cannot delete order in '{OrderStatus.Name}' status. " +
+                "Only orders in 'Draft' status can be deleted. Use 'Cancel' status for others."));
+
+        if (IsDeleted)
+            return Result<Exception>.Failure(new InvalidOperationException("Sample is already deleted."));
+
+        IsDeleted = true;
+        DeletedAt = DateTimeOffset.UtcNow;
+
+        return Result<Exception>.Success();
     }
 
     public Result<Exception> UpdatePartial(

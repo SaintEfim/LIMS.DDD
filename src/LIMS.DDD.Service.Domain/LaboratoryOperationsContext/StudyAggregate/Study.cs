@@ -8,7 +8,9 @@ using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate;
 
 namespace LIMS.DDD.Service.Domain.LaboratoryOperationsContext.StudyAggregate;
 
-public sealed class Study : IAggregateRoot
+public sealed class Study
+    : SoftDeletableModel,
+        IAggregateRoot
 {
     private Study()
     {
@@ -118,6 +120,31 @@ public sealed class Study : IAggregateRoot
         if (result.IsFailure) return result;
 
         Status = newStatus;
+        return Result<Exception>.Success();
+    }
+
+    public Result<Exception> Delete()
+    {
+        if (IsDeleted) return Result<Exception>.Failure(new InvalidOperationException("Study is already deleted."));
+
+        if (Status == StudyStatus.Completed || Status == StudyStatus.Approved)
+            return Result<Exception>.Failure(
+                new InvalidOperationException(
+                    "Cannot delete a Completed or Approved study. Use 'Cancel' status instead."));
+
+        IsDeleted = true;
+        DeletedAt = DateTimeOffset.UtcNow;
+
+        foreach (var measuredValue in _measuredValues)
+        {
+            measuredValue.MarkAsDeleted();
+        }
+
+        foreach (var testResult in _testResults)
+        {
+            testResult.MarkAsDeleted();
+        }
+
         return Result<Exception>.Success();
     }
 }

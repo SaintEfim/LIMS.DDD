@@ -8,9 +8,18 @@ namespace LIMS.DDD.Service.Persistence.Configurations;
 
 public class TestResultConfiguration : IEntityTypeConfiguration<TestResult>
 {
-    public void Configure(EntityTypeBuilder<TestResult> builder)
+    public void Configure(
+        EntityTypeBuilder<TestResult> builder)
     {
         builder.ToTable("TestResults");
+
+        builder.Property(x => x.IsDeleted)
+            .HasDefaultValue(false);
+
+        builder.Property(x => x.DeletedAt)
+            .IsRequired(false);
+
+        builder.HasQueryFilter(x => !x.IsDeleted);
 
         builder.Property(x => x.Id)
             .HasConversion(id => id.Value, value => new TestResultId(value));
