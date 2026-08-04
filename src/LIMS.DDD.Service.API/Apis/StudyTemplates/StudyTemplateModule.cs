@@ -1,6 +1,6 @@
 ﻿using Carter;
-using LIMS.DDD.Service.Application.StudyTemplates.Commands;
-using LIMS.DDD.Service.Application.StudyTemplates.Queries;
+using LIMS.DDD.Service.Application.StudyTemplates.Core;
+using LIMS.DDD.Service.Application.StudyTemplates.Core.Commands;
 
 namespace LIMS.DDD.Service.API.Apis.StudyTemplates;
 

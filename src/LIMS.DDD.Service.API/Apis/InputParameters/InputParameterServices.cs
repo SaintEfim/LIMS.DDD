@@ -1,13 +1,13 @@
-﻿using LIMS.DDD.Service.Application.StudyTemplates.InputParameters.Commands;
-using LIMS.DDD.Service.Application.StudyTemplates.InputParameters.Queries;
+﻿using LIMS.DDD.Service.Application.StudyTemplates.InputParameters;
+using LIMS.DDD.Service.Application.StudyTemplates.InputParameters.Commands;
 
 namespace LIMS.DDD.Service.API.Apis.InputParameters;
 
 public class InputParameterServices(
-    InputParameterCommands commands,
+    InputParameterCommandHandler commands,
     InputParameterQueries queries)
 {
-    public InputParameterCommands Commands { get; } = commands;
+    public InputParameterCommandHandler Commands { get; } = commands;
 
     public InputParameterQueries Queries { get; } = queries;
 }

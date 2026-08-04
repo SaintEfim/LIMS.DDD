@@ -1,11 +1,11 @@
-﻿using LIMS.DDD.Service.Application.StudyTemplates.Commands;
-using LIMS.DDD.Service.Application.StudyTemplates.Queries;
+﻿using LIMS.DDD.Service.Application.StudyTemplates;
+using LIMS.DDD.Service.Application.StudyTemplates.Core;
 
 namespace LIMS.DDD.Service.API.Apis.StudyTemplates;
 
-public class StudyTemplateServices(StudyTemplateCommands commands, StudyTemplateQueries queries)
+public class StudyTemplateServices(StudyTemplateCommandHandler commands, StudyTemplateQueries queries)
 {
-    public StudyTemplateCommands Commands { get; } = commands;
+    public StudyTemplateCommandHandler Commands { get; } = commands;
 
     public StudyTemplateQueries Queries { get; } =  queries;
 }

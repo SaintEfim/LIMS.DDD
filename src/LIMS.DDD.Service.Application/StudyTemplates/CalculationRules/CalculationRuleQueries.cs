@@ -1,7 +1,8 @@
-﻿using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate;
+﻿using LIMS.DDD.Service.Application.StudyTemplates.CalculationRules.Queries;
+using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate;
 using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.Entities.CalculationRules;
 
-namespace LIMS.DDD.Service.Application.StudyTemplates.CalculationRules.Queries;
+namespace LIMS.DDD.Service.Application.StudyTemplates.CalculationRules;
 
 public sealed class CalculationRuleQueries(IStudyTemplateRepository repository)
 {

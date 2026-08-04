@@ -1,12 +1,13 @@
-﻿using LIMS.DDD.Service.Domain.SeedWork.Result;
+﻿using LIMS.DDD.Service.Application.StudyTemplates.Core.Commands;
+using LIMS.DDD.Service.Domain.SeedWork.Result;
 using LIMS.DDD.Service.Domain.SeedWork.ValueObjects;
 using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate;
 using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.Services;
 using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.ValueObjects;
 
-namespace LIMS.DDD.Service.Application.StudyTemplates.Commands;
+namespace LIMS.DDD.Service.Application.StudyTemplates.Core;
 
-public sealed class StudyTemplateCommands(
+public sealed class StudyTemplateCommandHandler(
     IStudyTemplateRepository repository,
     StudyTemplateVersioningService domainService)
 {

@@ -1,6 +1,6 @@
 ﻿using Carter;
+using LIMS.DDD.Service.Application.StudyTemplates.InputParameters;
 using LIMS.DDD.Service.Application.StudyTemplates.InputParameters.Commands;
-using LIMS.DDD.Service.Application.StudyTemplates.InputParameters.Queries;
 
 namespace LIMS.DDD.Service.API.Apis.InputParameters;
 
