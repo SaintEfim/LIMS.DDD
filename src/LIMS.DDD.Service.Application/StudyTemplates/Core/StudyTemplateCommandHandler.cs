@@ -91,7 +91,7 @@ public sealed class StudyTemplateCommandHandler(
                 new InvalidOperationException($"Unknown status '{statusCommand}'."));
         }
 
-        var changeResult = template.ChangeStatus(newStatus);
+        var changeResult = template.ChangeStatus(newStatus!);
 
         if (changeResult.IsFailure) return Result<StudyTemplate, Exception>.Failure(changeResult.Error!);
 
