@@ -15,7 +15,7 @@ public sealed class SampleCreationDomainService
         Code code,
         Volume volume)
     {
-        if (!order.CanAcceptNewSamples)
+        if (!order.CanAcceptNewEntity)
         {
             return Result<Sample, Exception>.Failure(new InvalidOperationException(
                 $"Cannot add samples to an order with status '{order.OrderStatus.Name}'. " +

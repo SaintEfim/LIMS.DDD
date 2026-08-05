@@ -22,7 +22,7 @@ public class Order
 
     public OrderStatus OrderStatus { get; private set; } = OrderStatus.Draft;
 
-    public bool CanAcceptNewSamples => OrderStatus == OrderStatus.Draft || OrderStatus == OrderStatus.InProgress;
+    public bool CanAcceptNewEntity => OrderStatus == OrderStatus.Draft || OrderStatus == OrderStatus.InProgress;
 
     public bool CanDeleteAssociatedEntities => OrderStatus == OrderStatus.Draft;
 
