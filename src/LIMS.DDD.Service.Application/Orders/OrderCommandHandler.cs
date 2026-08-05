@@ -1,6 +1,7 @@
 using LIMS.DDD.Service.Application.Orders.Commands;
 using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.OrderAggregate;
 using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.OrderAggregate.ValueObjects;
+using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.ValueObjects;
 using LIMS.DDD.Service.Domain.SeedWork.Result;
 using LIMS.DDD.Service.Domain.SeedWork.ValueObjects;
 
@@ -18,7 +19,11 @@ public sealed class OrderCommandHandler(IOrderRepository repository)
         var descResult = Description.Create(command.Description);
         if (descResult.IsFailure) return Result<Order, Exception>.Failure(descResult.Error!);
 
-        var createResult = Order.Create(nameResult.GetValue(), descResult.GetValue(), command.Contractor);
+        var codeResult = Code.Create(command.Code);
+        if (codeResult.IsFailure) return Result<Order, Exception>.Failure(codeResult.Error!);
+
+        var createResult = Order.Create(nameResult.GetValue(), descResult.GetValue(), command.Contractor,
+            codeResult.GetValue());
         if (createResult.IsFailure) return Result<Order, Exception>.Failure(createResult.Error!);
 
         try
@@ -51,8 +56,12 @@ public sealed class OrderCommandHandler(IOrderRepository repository)
             ? Description.Create(command.Description)
                 .GetValue()
             : null;
+        var code = command.Code is not null
+            ? Code.Create(command.Code)
+                .GetValue()
+            : null;
 
-        var updateResult = order.UpdatePartial(name, desc, command.Contractor);
+        var updateResult = order.UpdatePartial(name, desc, command.Contractor, code);
         if (updateResult.IsFailure) return Result<Exception>.Failure(updateResult.Error!);
 
         await repository.SaveChangesAsync(cancellationToken);
