@@ -1,5 +1,6 @@
 ﻿namespace LIMS.DDD.Service.Domain.LaboratoryOperationsContext.StudyAggregate.ValueObjects;
 
+// TODO добавить модель для чтения, это модель для создания. использовать VO в snapshot
 public sealed record StudyTemplateSnapshot(
     Guid TemplateId,
     string Name,
