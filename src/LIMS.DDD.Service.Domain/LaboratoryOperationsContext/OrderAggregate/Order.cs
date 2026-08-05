@@ -22,8 +22,9 @@ public class Order
 
     public OrderStatus OrderStatus { get; private set; } = OrderStatus.Draft;
 
-    // В классе Order
-    public bool CanAcceptNewSamples => OrderStatus == OrderStatus.Draft || OrderStatus == OrderStatus.InProgress;
+    public bool CanAcceptNewEntity => OrderStatus == OrderStatus.Draft || OrderStatus == OrderStatus.InProgress;
+
+    public bool CanDeleteAssociatedEntities => OrderStatus == OrderStatus.Draft;
 
     private Order()
     {
@@ -52,8 +53,7 @@ public class Order
                 $"Cannot delete order in '{OrderStatus.Name}' status. " +
                 "Only orders in 'Draft' status can be deleted. Use 'Cancel' status for others."));
 
-        if (IsDeleted)
-            return Result<Exception>.Failure(new InvalidOperationException("Sample is already deleted."));
+        if (IsDeleted) return Result<Exception>.Failure(new InvalidOperationException("Sample is already deleted."));
 
         IsDeleted = true;
         DeletedAt = DateTimeOffset.UtcNow;
