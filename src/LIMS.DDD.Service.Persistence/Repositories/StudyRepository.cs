@@ -55,15 +55,4 @@ public class StudyRepository : IStudyRepository
     {
         return await _context.SaveChangesAsync(cancellationToken);
     }
-
-    public async Task<ICollection<Study>> GetByTemplateIdAsync(
-        StudyTemplateId templateId,
-        CancellationToken cancellationToken)
-    {
-        return await _context.Studies
-            .AsNoTracking()
-            .AsSplitQuery()
-            .Where(x => x.TemplateId == templateId)
-            .ToListAsync(cancellationToken);
-    }
 }

@@ -20,9 +20,9 @@ public sealed class Study
 
     public SampleId SampleId { get; private set; }
 
-    public StudyTemplateId TemplateId { get; private set; }
-
     public StudyStatus Status { get; private set; } = StudyStatus.InWork;
+
+    public StudyTemplateSnapshot StudyTemplateSnapshot { get; private set; } = null!;
 
     public Description Description { get; private set; }
 
@@ -32,17 +32,18 @@ public sealed class Study
     private readonly List<TestResult> _testResults = [];
     public IReadOnlyList<TestResult> TestResults => _testResults.AsReadOnly();
 
-    public static Result<Study, Exception> Create(
+    internal static Result<Study, Exception> Create(
+        StudyId studyId,
         SampleId sampleId,
-        StudyTemplateId templateId,
+        StudyTemplateSnapshot templateSnapshot,
         IReadOnlyList<MeasuredValue> initialMeasuredValues,
         IReadOnlyList<TestResult> initialTestResults)
     {
         var study = new Study
         {
-            Id = new StudyId(Guid.NewGuid()),
+            Id = studyId,
             SampleId = sampleId,
-            TemplateId = templateId,
+            StudyTemplateSnapshot = templateSnapshot,
             Status = StudyStatus.InWork
         };
 

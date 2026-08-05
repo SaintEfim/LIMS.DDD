@@ -32,7 +32,7 @@ public class SampleConfiguration : IEntityTypeConfiguration<Sample>
         builder.HasOne<Order>()
             .WithMany()
             .HasForeignKey(x => x.OrderId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.Restrict);
 
         builder.Property(x => x.Name)
             .HasConversion(n => n.Value, n => Name.Create(n)

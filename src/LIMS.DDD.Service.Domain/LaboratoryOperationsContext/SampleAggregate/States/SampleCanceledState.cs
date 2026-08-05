@@ -1,11 +1,12 @@
-﻿using LIMS.DDD.Service.Domain.SeedWork;
+using LIMS.DDD.Service.Domain.SeedWork;
 using LIMS.DDD.Service.Domain.SeedWork.Result;
 
 namespace LIMS.DDD.Service.Domain.LaboratoryOperationsContext.SampleAggregate.States;
 
-public sealed class SampleInProgressState : IState<Sample>
+public sealed class SampleCanceledState : IState<Sample>
 {
-    public string Name => "InProgress";
+    public string Name => "Canceled";
+
     public bool CanEdit => false;
 
     public Result<Exception> CanTransitionTo(
@@ -14,9 +15,9 @@ public sealed class SampleInProgressState : IState<Sample>
     {
         return newState switch
         {
-            SampleCompletedState => Result<Exception>.Success(),
             SampleCanceledState => Result<Exception>.Success(),
-            _ => Result<Exception>.Failure(new InvalidOperationException("Invalid transition from InWork"))
+            _ => Result<Exception>.Failure(
+                new InvalidOperationException("Cannot transition from Canceled state. A canceled sample is final."))
         };
     }
 }

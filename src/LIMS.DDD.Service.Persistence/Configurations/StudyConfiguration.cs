@@ -34,9 +34,6 @@ public class StudyConfiguration : IEntityTypeConfiguration<Study>
             .HasForeignKey(x => x.SampleId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        builder.Property(x => x.TemplateId)
-            .HasConversion(id => id.Value, value => new StudyTemplateId(value));
-
         builder.Property(x => x.Description)
             .HasConversion(d => d.Value, d => Description.Create(d)
                 .GetValue())
@@ -46,6 +43,17 @@ public class StudyConfiguration : IEntityTypeConfiguration<Study>
             .HasConversion(status => status.Name, statusName => StudyStatus.ConvertStatus(statusName))
             .HasMaxLength(50)
             .IsRequired();
+
+        builder.OwnsOne(x => x.StudyTemplateSnapshot, snap =>
+        {
+            snap.Property(p => p.TemplateId)
+                .HasColumnName("TemplateId");
+
+            snap.Property(p => p.Name)
+                .HasConversion(n => n, n => n)
+                .HasMaxLength(100)
+                .HasColumnName("TemplateName");
+        });
 
         builder.HasMany(x => x.MeasuredValues)
             .WithOne()
@@ -57,11 +65,7 @@ public class StudyConfiguration : IEntityTypeConfiguration<Study>
             .HasForeignKey(x => x.StudyId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasIndex(x => new
-            {
-                x.SampleId,
-                x.TemplateId
-            })
+        builder.HasIndex("SampleId", "TemplateId")
             .IsUnique()
             .HasFilter("[IsDeleted] = 0");
     }
