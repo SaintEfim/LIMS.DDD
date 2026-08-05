@@ -33,14 +33,16 @@ public class Order
     public static Result<Order, Exception> Create(
         Name name,
         Description description,
-        string contractor)
+        string contractor,
+        Code code)
     {
         var order = new Order
         {
             Id = new OrderId(Guid.NewGuid()),
             Name = name,
             Description = description,
-            Contractor = contractor
+            Contractor = contractor,
+            Code = code
         };
 
         return Result<Order, Exception>.Success(order);
@@ -64,7 +66,8 @@ public class Order
     public Result<Exception> UpdatePartial(
         Name? name,
         Description? description,
-        string? contractor)
+        string? contractor,
+        Code? code)
     {
         if (!OrderStatus.CanEdit)
             return Result<Exception>.Failure(
@@ -74,6 +77,7 @@ public class Order
         if (name is not null) Name = name;
         if (description is not null) Description = description;
         if (contractor is not null) Contractor = contractor;
+        if (code is not null) Code = code;
 
         return Result<Exception>.Success();
     }

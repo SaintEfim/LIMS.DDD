@@ -32,7 +32,7 @@ public sealed class SampleCommandHandler(
         var gatherDateResult = GatherDate.Create(command.GatherDateBegin, command.GatherDateEnd);
         if (gatherDateResult.IsFailure) return Result<Sample, Exception>.Failure(gatherDateResult.Error!);
 
-        var codeResult = command.Code is not null ? Code.Create(command.Code) : Result<Code, Exception>.Success(null!);
+        var codeResult = Code.Create(command.Code);
         if (codeResult.IsFailure) return Result<Sample, Exception>.Failure(codeResult.Error!);
 
         var volumeResult = Volume.Create(command.VolumeValue, command.VolumeUnit);
