@@ -12,7 +12,7 @@ public sealed class StudyCreationDomainService
     public Result<Study, Exception> Create(
         Sample sample,
         Order order,
-        StudyTemplateSnapshot templateSnapshot)
+        StudyTemplateCreateSnapshot templateSnapshot)
     {
         if (!order.CanAcceptNewEntity)
         {
@@ -31,13 +31,13 @@ public sealed class StudyCreationDomainService
         var studyId = new StudyId(Guid.NewGuid());
 
         var measuredValues = templateSnapshot.Parameters
-            .Select(p => MeasuredValue.Create(studyId, p, null))
+            .Select(p => MeasuredValue.Create(studyId, p))
             .ToList();
 
         var testResults = templateSnapshot.Results
-            .Select(r => TestResult.Create(studyId, r, null, false))
+            .Select(r => TestResult.Create(studyId, r))
             .ToList();
 
-        return Study.Create(studyId, sample.Id, templateSnapshot, measuredValues, testResults);
+        return Study.Create(studyId, sample.Id, templateSnapshot.ToStudySnapshot(), measuredValues, testResults);
     }
 }

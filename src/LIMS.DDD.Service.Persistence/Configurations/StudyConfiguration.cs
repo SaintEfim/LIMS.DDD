@@ -2,7 +2,6 @@
 using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.StudyAggregate;
 using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.StudyAggregate.ValueObjects;
 using LIMS.DDD.Service.Domain.SeedWork.ValueObjects;
-using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -17,10 +16,8 @@ public class StudyConfiguration : IEntityTypeConfiguration<Study>
 
         builder.Property(x => x.IsDeleted)
             .HasDefaultValue(false);
-
         builder.Property(x => x.DeletedAt)
             .IsRequired(false);
-
         builder.HasQueryFilter(x => !x.IsDeleted);
 
         builder.Property(x => x.Id)
@@ -50,7 +47,8 @@ public class StudyConfiguration : IEntityTypeConfiguration<Study>
                 .HasColumnName("TemplateId");
 
             snap.Property(p => p.Name)
-                .HasConversion(n => n, n => n)
+                .HasConversion(n => n.Value, n => Name.Create(n)
+                    .GetValue())
                 .HasMaxLength(100)
                 .HasColumnName("TemplateName");
         });

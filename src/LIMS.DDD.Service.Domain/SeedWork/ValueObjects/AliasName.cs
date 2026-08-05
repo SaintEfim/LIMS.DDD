@@ -1,6 +1,6 @@
 ﻿using LIMS.DDD.Service.Domain.SeedWork.Result;
 
-namespace LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.Entities.InputParameters.ValueObjects;
+namespace LIMS.DDD.Service.Domain.SeedWork.ValueObjects;
 
 public sealed record AliasName
 {

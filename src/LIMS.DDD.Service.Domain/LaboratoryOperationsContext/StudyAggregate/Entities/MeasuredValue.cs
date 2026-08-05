@@ -21,15 +21,13 @@ public sealed class MeasuredValue : SoftDeletableModel
 
     internal static MeasuredValue Create(
         StudyId studyId,
-        ParameterSnapshot snapshot,
-        double? value)
+        ParameterSnapshot snapshot)
     {
         return new MeasuredValue
         {
             Id = new MeasuredValueId(Guid.NewGuid()),
             StudyId = studyId,
-            ParameterSnapshot = snapshot,
-            Value = value,
+            ParameterSnapshot = snapshot
         };
     }
 

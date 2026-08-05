@@ -21,17 +21,13 @@ public sealed class TestResult : SoftDeletableModel
 
     internal static TestResult Create(
         StudyId studyId,
-        ResultSnapshot snapshot,
-        double? value,
-        bool isOutOfSpec)
+        ResultSnapshot snapshot)
     {
         return new TestResult
         {
             Id = new TestResultId(Guid.NewGuid()),
             StudyId = studyId,
-            ResultSnapshot = snapshot,
-            Value = value,
-            IsOutOfSpec = isOutOfSpec
+            ResultSnapshot = snapshot
         };
     }
 
