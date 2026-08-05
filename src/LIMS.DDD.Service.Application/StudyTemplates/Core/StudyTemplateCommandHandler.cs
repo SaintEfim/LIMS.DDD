@@ -1,5 +1,4 @@
 ﻿using LIMS.DDD.Service.Application.StudyTemplates.Core.Commands;
-using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.StudyAggregate;
 using LIMS.DDD.Service.Domain.SeedWork.Result;
 using LIMS.DDD.Service.Domain.SeedWork.ValueObjects;
 using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate;
@@ -10,8 +9,6 @@ namespace LIMS.DDD.Service.Application.StudyTemplates.Core;
 
 public sealed class StudyTemplateCommandHandler(
     IStudyTemplateRepository repository,
-    IStudyRepository studyRepository,
-    StudyTemplateDeletionDomainService deletionDomainService,
     StudyTemplateVersioningService domainService)
 {
     public async Task<Result<StudyTemplate, Exception>> CreateAsync(
@@ -110,10 +107,7 @@ public sealed class StudyTemplateCommandHandler(
 
         var template = templateResult.GetValue();
 
-        var studies = (await studyRepository.GetByTemplateIdAsync(template.Id, cancellationToken)).ToList()
-            .AsReadOnly();
-
-        var deleteResult = deletionDomainService.Delete(template, studies);
+        var deleteResult = template.Delete();
         if (deleteResult.IsFailure) return Result<Exception>.Failure(deleteResult.Error!);
 
         await repository.SaveChangesAsync(cancellationToken);

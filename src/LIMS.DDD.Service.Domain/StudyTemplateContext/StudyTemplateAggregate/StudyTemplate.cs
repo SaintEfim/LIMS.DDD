@@ -328,7 +328,7 @@ public sealed class StudyTemplate
         return Result<Exception>.Success();
     }
 
-    internal Result<Exception> Delete()
+    public Result<Exception> Delete()
     {
         if (IsDeleted) return Result<Exception>.Failure(new InvalidOperationException("Template is already deleted."));
         if (Status != Status.Draft)
