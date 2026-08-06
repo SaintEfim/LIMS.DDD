@@ -58,7 +58,7 @@ public sealed class InputParameterCommandHandler(IStudyTemplateRepository reposi
                 .Id.Value);
     }
 
-    public async Task<Result<UnitEmpty, Exception>> RemoveAsync(
+    public async Task<Result<None, Exception>> RemoveAsync(
         Guid studyTemplateId,
         Guid parameterId,
         CancellationToken cancellationToken = default)
@@ -66,20 +66,20 @@ public sealed class InputParameterCommandHandler(IStudyTemplateRepository reposi
         var templateResult = await GetTemplateForChangeAsync(studyTemplateId, cancellationToken);
         if (templateResult.IsFailure)
         {
-            return templateResult.CastFailure<UnitEmpty>();
+            return templateResult.CastFailure<None>();
         }
 
         var removeResult = templateResult.GetValue()
             .RemoveInputParameter(new InputParameterId(parameterId));
         if (removeResult.IsFailure)
         {
-            return removeResult.CastFailure<UnitEmpty>();
+            return removeResult.CastFailure<None>();
         }
 
         return await SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<Result<UnitEmpty, Exception>> UpdateAsync(
+    public async Task<Result<None, Exception>> UpdateAsync(
         Guid studyTemplateId,
         Guid parameterId,
         UpdateInputParameterCommand command,
@@ -88,7 +88,7 @@ public sealed class InputParameterCommandHandler(IStudyTemplateRepository reposi
         var templateResult = await GetTemplateForChangeAsync(studyTemplateId, cancellationToken);
         if (templateResult.IsFailure)
         {
-            return templateResult.CastFailure<UnitEmpty>();
+            return templateResult.CastFailure<None>();
         }
 
         Name? name = null;
@@ -97,7 +97,7 @@ public sealed class InputParameterCommandHandler(IStudyTemplateRepository reposi
             var nameResult = Name.Create(command.Name);
             if (nameResult.IsFailure)
             {
-                return nameResult.CastFailure<UnitEmpty>();
+                return nameResult.CastFailure<None>();
             }
 
             name = nameResult.GetValue();
@@ -109,7 +109,7 @@ public sealed class InputParameterCommandHandler(IStudyTemplateRepository reposi
             var descResult = Description.Create(command.Description);
             if (descResult.IsFailure)
             {
-                return descResult.CastFailure<UnitEmpty>();
+                return descResult.CastFailure<None>();
             }
 
             description = descResult.GetValue();
@@ -121,7 +121,7 @@ public sealed class InputParameterCommandHandler(IStudyTemplateRepository reposi
             var aliasResult = AliasName.Create(command.AliasName);
             if (aliasResult.IsFailure)
             {
-                return aliasResult.CastFailure<UnitEmpty>();
+                return aliasResult.CastFailure<None>();
             }
 
             aliasName = aliasResult.GetValue();
@@ -132,7 +132,7 @@ public sealed class InputParameterCommandHandler(IStudyTemplateRepository reposi
                 command.MaxValue);
         if (updateResult.IsFailure)
         {
-            return updateResult.CastFailure<UnitEmpty>();
+            return updateResult.CastFailure<None>();
         }
 
         return await SaveChangesAsync(cancellationToken);
@@ -149,17 +149,17 @@ public sealed class InputParameterCommandHandler(IStudyTemplateRepository reposi
             : Result<StudyTemplate, Exception>.Success(template);
     }
 
-    private async Task<Result<UnitEmpty, Exception>> SaveChangesAsync(
+    private async Task<Result<None, Exception>> SaveChangesAsync(
         CancellationToken cancellationToken)
     {
         try
         {
             await repository.SaveChangesAsync(cancellationToken);
-            return Result<UnitEmpty, Exception>.Success(new UnitEmpty());
+            return Result<None, Exception>.Success();
         }
         catch (Exception ex)
         {
-            return Result<UnitEmpty, Exception>.Failure(new Exception($"Failed to save changes: {ex.Message}", ex));
+            return Result<None, Exception>.Failure(new Exception($"Failed to save changes: {ex.Message}", ex));
         }
     }
 }

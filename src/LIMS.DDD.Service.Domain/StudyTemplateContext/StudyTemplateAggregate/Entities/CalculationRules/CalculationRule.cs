@@ -80,33 +80,33 @@ public sealed class CalculationRule : SoftDeletableModel
         DeletedAt = DateTimeOffset.UtcNow;
     }
 
-    internal Result<UnitEmpty, Exception> AddInput(
+    internal Result<None, Exception> AddInput(
         AliasName variableAlias,
         InputParameterId inputParameterId)
     {
         if (_calculationInputs.Any(i => i.VariableAlias == variableAlias))
         {
-            return Result<UnitEmpty, Exception>.Failure(
+            return Result<None, Exception>.Failure(
                 new InvalidOperationException("Variable alias must be unique within the calculation rule."));
         }
 
         _calculationInputs.Add(new CalculationInput(variableAlias, inputParameterId));
 
-        return Result<UnitEmpty, Exception>.Success(new UnitEmpty());
+        return Result<None, Exception>.Success();
     }
 
-    internal Result<UnitEmpty, Exception> RemoveInput(
+    internal Result<None, Exception> RemoveInput(
         AliasName variableAlias)
     {
         var inputToRemove = _calculationInputs.FirstOrDefault(i => i.VariableAlias == variableAlias);
 
         if (inputToRemove == null)
         {
-            return Result<UnitEmpty, Exception>.Failure(
+            return Result<None, Exception>.Failure(
                 new InvalidOperationException("Variable alias must be unique within the calculation rule."));
         }
 
         _calculationInputs.Remove(inputToRemove);
-        return Result<UnitEmpty, Exception>.Success(new UnitEmpty());
+        return Result<None, Exception>.Success();
     }
 }

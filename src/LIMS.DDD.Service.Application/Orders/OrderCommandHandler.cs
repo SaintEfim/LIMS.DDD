@@ -41,7 +41,7 @@ public sealed class OrderCommandHandler(IOrderRepository repository)
         return await SaveNewAsync(createResult.GetValue(), cancellationToken);
     }
 
-    public async Task<Result<UnitEmpty, Exception>> UpdateAsync(
+    public async Task<Result<None, Exception>> UpdateAsync(
         Guid id,
         UpdateOrderCommand command,
         CancellationToken cancellationToken = default)
@@ -49,7 +49,7 @@ public sealed class OrderCommandHandler(IOrderRepository repository)
         var orderResult = await GetOrderForChangeAsync(id, cancellationToken);
         if (orderResult.IsFailure)
         {
-            return orderResult.CastFailure<UnitEmpty>();
+            return orderResult.CastFailure<None>();
         }
 
         var order = orderResult.GetValue();
@@ -70,14 +70,14 @@ public sealed class OrderCommandHandler(IOrderRepository repository)
         var updateResult = order.UpdatePartial(name, desc, command.Contractor, code);
         if (updateResult.IsFailure)
         {
-            return updateResult.CastFailure<UnitEmpty>();
+            return updateResult.CastFailure<None>();
         }
 
         await repository.SaveChangesAsync(cancellationToken);
-        return Result<UnitEmpty, Exception>.Success(new UnitEmpty());
+        return Result<None, Exception>.Success();
     }
 
-    public async Task<Result<UnitEmpty, Exception>> ChangeStatusAsync(
+    public async Task<Result<None, Exception>> ChangeStatusAsync(
         Guid id,
         ChangeOrderStatusCommand command,
         CancellationToken cancellationToken = default)
@@ -85,12 +85,12 @@ public sealed class OrderCommandHandler(IOrderRepository repository)
         var orderResult = await GetOrderForChangeAsync(id, cancellationToken);
         if (orderResult.IsFailure)
         {
-            return orderResult.CastFailure<UnitEmpty>();
+            return orderResult.CastFailure<None>();
         }
 
         if (!OrderStatus.TryParse(command.Status, out var newStatus))
         {
-            return Result<UnitEmpty, Exception>.Failure(
+            return Result<None, Exception>.Failure(
                 new InvalidOperationException($"Unknown status '{command.Status}'."));
         }
 
@@ -98,21 +98,21 @@ public sealed class OrderCommandHandler(IOrderRepository repository)
             .ChangeStatus(newStatus);
         if (changeResult.IsFailure)
         {
-            return changeResult.CastFailure<UnitEmpty>();
+            return changeResult.CastFailure<None>();
         }
 
         await repository.SaveChangesAsync(cancellationToken);
-        return Result<UnitEmpty, Exception>.Success(new UnitEmpty());
+        return Result<None, Exception>.Success();
     }
 
-    public async Task<Result<UnitEmpty, Exception>> DeleteAsync(
+    public async Task<Result<None, Exception>> DeleteAsync(
         Guid id,
         CancellationToken cancellationToken = default)
     {
         var orderResult = await GetOrderForChangeAsync(id, cancellationToken);
         if (orderResult.IsFailure)
         {
-            return orderResult.CastFailure<UnitEmpty>();
+            return orderResult.CastFailure<None>();
         }
 
         var order = orderResult.GetValue();
@@ -120,12 +120,12 @@ public sealed class OrderCommandHandler(IOrderRepository repository)
         var deleteResult = order.Delete();
         if (deleteResult.IsFailure)
         {
-            return deleteResult.CastFailure<UnitEmpty>();
+            return deleteResult.CastFailure<None>();
         }
 
         await repository.SaveChangesAsync(cancellationToken);
 
-        return Result<UnitEmpty, Exception>.Success(new UnitEmpty());
+        return Result<None, Exception>.Success();
     }
 
     private async Task<Result<Order, Exception>> SaveNewAsync(

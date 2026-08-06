@@ -39,7 +39,7 @@ public sealed class ResultDefinitionCommands(IStudyTemplateRepository repository
                 .Id.Value);
     }
 
-    public async Task<Result<UnitEmpty, Exception>> RemoveAsync(
+    public async Task<Result<None, Exception>> RemoveAsync(
         Guid studyTemplateId,
         Guid resultId,
         CancellationToken cancellationToken = default)
@@ -47,20 +47,20 @@ public sealed class ResultDefinitionCommands(IStudyTemplateRepository repository
         var templateResult = await GetTemplateForChangeAsync(studyTemplateId, cancellationToken);
         if (templateResult.IsFailure)
         {
-            return templateResult.CastFailure<UnitEmpty>();
+            return templateResult.CastFailure<None>();
         }
 
         var removeResult = templateResult.GetValue()
             .RemoveResultDefinition(new ResultDefinitionId(resultId));
         if (removeResult.IsFailure)
         {
-            return removeResult.CastFailure<UnitEmpty>();
+            return removeResult.CastFailure<None>();
         }
 
         return await SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<Result<UnitEmpty, Exception>> UpdateAsync(
+    public async Task<Result<None, Exception>> UpdateAsync(
         Guid studyTemplateId,
         Guid resultDefinitionId,
         UpdateResultDefinitionCommand command,
@@ -69,7 +69,7 @@ public sealed class ResultDefinitionCommands(IStudyTemplateRepository repository
         var templateResult = await GetTemplateForChangeAsync(studyTemplateId, cancellationToken);
         if (templateResult.IsFailure)
         {
-            return templateResult.CastFailure<UnitEmpty>();
+            return templateResult.CastFailure<None>();
         }
 
         var updateResult = templateResult.GetValue()
@@ -77,7 +77,7 @@ public sealed class ResultDefinitionCommands(IStudyTemplateRepository repository
                 command.MinValue, command.MaxValue);
         if (updateResult.IsFailure)
         {
-            return updateResult.CastFailure<UnitEmpty>();
+            return updateResult.CastFailure<None>();
         }
 
         return await SaveChangesAsync(cancellationToken);
@@ -94,17 +94,17 @@ public sealed class ResultDefinitionCommands(IStudyTemplateRepository repository
             : Result<StudyTemplate, Exception>.Success(template);
     }
 
-    private async Task<Result<UnitEmpty, Exception>> SaveChangesAsync(
+    private async Task<Result<None, Exception>> SaveChangesAsync(
         CancellationToken cancellationToken)
     {
         try
         {
             await repository.SaveChangesAsync(cancellationToken);
-            return Result<UnitEmpty, Exception>.Success(new UnitEmpty());
+            return Result<None, Exception>.Success();
         }
         catch (Exception ex)
         {
-            return Result<UnitEmpty, Exception>.Failure(new Exception($"Failed to save changes: {ex.Message}", ex));
+            return Result<None, Exception>.Failure(new Exception($"Failed to save changes: {ex.Message}", ex));
         }
     }
 }

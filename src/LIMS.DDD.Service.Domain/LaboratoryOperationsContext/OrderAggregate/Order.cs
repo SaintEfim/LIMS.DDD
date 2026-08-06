@@ -48,27 +48,27 @@ public class Order
         return Result<Order, Exception>.Success(order);
     }
 
-    public Result<UnitEmpty, Exception> Delete()
+    public Result<None, Exception> Delete()
     {
         if (OrderStatus != OrderStatus.Draft)
         {
-            return Result<UnitEmpty, Exception>.Failure(new InvalidOperationException(
+            return Result<None, Exception>.Failure(new InvalidOperationException(
                 $"Cannot delete order in '{OrderStatus.Name}' status. " +
                 "Only orders in 'Draft' status can be deleted. Use 'Cancel' status for others."));
         }
 
         if (IsDeleted)
         {
-            return Result<UnitEmpty, Exception>.Failure(new InvalidOperationException("Sample is already deleted."));
+            return Result<None, Exception>.Failure(new InvalidOperationException("Sample is already deleted."));
         }
 
         IsDeleted = true;
         DeletedAt = DateTimeOffset.UtcNow;
 
-        return Result<UnitEmpty, Exception>.Success(new UnitEmpty());
+        return Result<None, Exception>.Success();
     }
 
-    public Result<UnitEmpty, Exception> UpdatePartial(
+    public Result<None, Exception> UpdatePartial(
         Name? name,
         Description? description,
         string? contractor,
@@ -76,7 +76,7 @@ public class Order
     {
         if (!OrderStatus.CanEdit)
         {
-            return Result<UnitEmpty, Exception>.Failure(
+            return Result<None, Exception>.Failure(
                 new InvalidOperationException(
                     "Cannot modify details of an Active or Archived template. Create a new revision."));
         }
@@ -101,21 +101,21 @@ public class Order
             Code = code;
         }
 
-        return Result<UnitEmpty, Exception>.Success(new UnitEmpty());
+        return Result<None, Exception>.Success();
     }
 
-    public Result<UnitEmpty, Exception> ChangeStatus(
+    public Result<None, Exception> ChangeStatus(
         OrderStatus newOrderStatus)
     {
         var result = OrderStatus.CanTransitionTo(newOrderStatus, this);
 
         if (result.IsFailure)
         {
-            return result.CastFailure<UnitEmpty>();
+            return result.CastFailure<None>();
         }
 
         OrderStatus = newOrderStatus;
 
-        return Result<UnitEmpty, Exception>.Success(new UnitEmpty());
+        return Result<None, Exception>.Success();
     }
 }

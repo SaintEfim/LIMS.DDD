@@ -8,7 +8,7 @@ public interface IState<T>
 
     bool CanEdit { get; }
 
-    Result<UnitEmpty, Exception> CanTransitionTo(
+    Result<None, Exception> CanTransitionTo(
         IState<T> newState,
         T template);
 }

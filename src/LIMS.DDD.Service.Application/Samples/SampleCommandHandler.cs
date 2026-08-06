@@ -63,7 +63,7 @@ public sealed class SampleCommandHandler(
         return await SaveNewAsync(sampleResult.GetValue(), cancellationToken);
     }
 
-    public async Task<Result<UnitEmpty, Exception>> UpdateAsync(
+    public async Task<Result<None, Exception>> UpdateAsync(
         Guid id,
         UpdateSampleCommand command,
         CancellationToken cancellationToken = default)
@@ -71,7 +71,7 @@ public sealed class SampleCommandHandler(
         var sampleResult = await GetSampleForChangeAsync(id, cancellationToken);
         if (sampleResult.IsFailure)
         {
-            return sampleResult.CastFailure<UnitEmpty>();
+            return sampleResult.CastFailure<None>();
         }
 
         var sample = sampleResult.GetValue();
@@ -93,11 +93,11 @@ public sealed class SampleCommandHandler(
         var updateResult = sample.UpdatePartial(name, gatherDate, code, command.VolumeValue, command.VolumeUnit);
         if (updateResult.IsFailure)
         {
-            return updateResult.CastFailure<UnitEmpty>();
+            return updateResult.CastFailure<None>();
         }
 
         await repository.SaveChangesAsync(cancellationToken);
-        return Result<UnitEmpty, Exception>.Success(new UnitEmpty());
+        return Result<None, Exception>.Success();
     }
 
     public async Task<Result<Sample, Exception>> ChangeStatusAsync(
@@ -130,14 +130,14 @@ public sealed class SampleCommandHandler(
         return await SaveChangesAsync(template, cancellationToken);
     }
 
-    public async Task<Result<UnitEmpty, Exception>> DeleteAsync(
+    public async Task<Result<None, Exception>> DeleteAsync(
         Guid id,
         CancellationToken cancellationToken = default)
     {
         var sampleResult = await GetSampleForChangeAsync(id, cancellationToken);
         if (sampleResult.IsFailure)
         {
-            return sampleResult.CastFailure<UnitEmpty>();
+            return sampleResult.CastFailure<None>();
         }
 
         var sample = sampleResult.GetValue();
@@ -145,7 +145,7 @@ public sealed class SampleCommandHandler(
         var order = await orderRepository.GetByIdAsync(sample.OrderId, cancellationToken);
         if (order is null)
         {
-            return Result<UnitEmpty, Exception>.Failure(
+            return Result<None, Exception>.Failure(
                 new KeyNotFoundException($"Parent Order with id {sample.OrderId} not found."));
         }
 
@@ -155,12 +155,12 @@ public sealed class SampleCommandHandler(
         var deleteResult = deletionDomainService.Delete(sample, order, studies);
         if (deleteResult.IsFailure)
         {
-            return deleteResult.CastFailure<UnitEmpty>();
+            return deleteResult.CastFailure<None>();
         }
 
         await repository.SaveChangesAsync(cancellationToken);
 
-        return Result<UnitEmpty, Exception>.Success(new UnitEmpty());
+        return Result<None, Exception>.Success();
     }
 
     private async Task<Result<Sample, Exception>> SaveNewAsync(

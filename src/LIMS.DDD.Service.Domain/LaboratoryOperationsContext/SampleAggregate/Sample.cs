@@ -50,20 +50,20 @@ public class Sample
         return Result<Sample, Exception>.Success(sample);
     }
 
-    internal Result<UnitEmpty, Exception> Delete()
+    internal Result<None, Exception> Delete()
     {
         if (IsDeleted)
         {
-            return Result<UnitEmpty, Exception>.Failure(new InvalidOperationException("Sample is already deleted."));
+            return Result<None, Exception>.Failure(new InvalidOperationException("Sample is already deleted."));
         }
 
         IsDeleted = true;
         DeletedAt = DateTimeOffset.UtcNow;
 
-        return Result<UnitEmpty, Exception>.Success(new UnitEmpty());
+        return Result<None, Exception>.Success();
     }
 
-    public Result<UnitEmpty, Exception> UpdatePartial(
+    public Result<None, Exception> UpdatePartial(
         Name? name,
         GatherDate? gatherDate,
         Code? code,
@@ -72,7 +72,7 @@ public class Sample
     {
         if (!SampleStatus.CanEdit)
         {
-            return Result<UnitEmpty, Exception>.Failure(
+            return Result<None, Exception>.Failure(
                 new InvalidOperationException("Cannot modify sample details when it is InWork or Completed."));
         }
 
@@ -97,28 +97,28 @@ public class Sample
         var volumeResult = Volume.Create(value, unit);
         if (volumeResult.IsFailure)
         {
-            return volumeResult.CastFailure<UnitEmpty>();
+            return volumeResult.CastFailure<None>();
         }
 
         var volume = volumeResult.GetValue();
 
         Volume = volume;
 
-        return Result<UnitEmpty, Exception>.Success(new UnitEmpty());
+        return Result<None, Exception>.Success();
     }
 
-    public Result<UnitEmpty, Exception> ChangeStatus(
+    public Result<None, Exception> ChangeStatus(
         SampleStatus newSampleStatus)
     {
         var result = SampleStatus.CanTransitionTo(newSampleStatus, this);
 
         if (result.IsFailure)
         {
-            return result.CastFailure<UnitEmpty>();
+            return result.CastFailure<None>();
         }
 
         SampleStatus = newSampleStatus;
 
-        return Result<UnitEmpty, Exception>.Success(new UnitEmpty());
+        return Result<None, Exception>.Success();
     }
 }

@@ -8,11 +8,11 @@ public sealed class SampleCompletedState : IState<Sample>
     public string Name => "Completed";
     public bool CanEdit => false;
 
-    public Result<UnitEmpty, Exception> CanTransitionTo(
+    public Result<None, Exception> CanTransitionTo(
         IState<Sample> newState,
         Sample sample)
     {
-        return Result<UnitEmpty, Exception>.Failure(
+        return Result<None, Exception>.Failure(
             new InvalidOperationException("Completed samples cannot change status."));
     }
 }

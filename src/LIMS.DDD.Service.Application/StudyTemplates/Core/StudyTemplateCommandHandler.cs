@@ -121,14 +121,14 @@ public sealed class StudyTemplateCommandHandler(
         return await SaveChangesAsync(template, cancellationToken);
     }
 
-    public async Task<Result<UnitEmpty, Exception>> DeleteAsync(
+    public async Task<Result<None, Exception>> DeleteAsync(
         Guid id,
         CancellationToken cancellationToken = default)
     {
         var templateResult = await GetTemplateForChangeAsync(id, cancellationToken);
         if (templateResult.IsFailure)
         {
-            return templateResult.CastFailure<UnitEmpty>();
+            return templateResult.CastFailure<None>();
         }
 
         var template = templateResult.GetValue();
@@ -136,12 +136,12 @@ public sealed class StudyTemplateCommandHandler(
         var deleteResult = template.Delete();
         if (deleteResult.IsFailure)
         {
-            return deleteResult.CastFailure<UnitEmpty>();
+            return deleteResult.CastFailure<None>();
         }
 
         await repository.SaveChangesAsync(cancellationToken);
 
-        return Result<UnitEmpty, Exception>.Success(new UnitEmpty());
+        return Result<None, Exception>.Success();
     }
 
     public async Task<Result<Guid, Exception>> CreateRevisionAsync(

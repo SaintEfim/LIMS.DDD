@@ -1,6 +1,6 @@
 ﻿namespace LIMS.DDD.Service.Domain.SeedWork.Result;
 
-public readonly record struct UnitEmpty;
+public readonly record struct None;
 
 public class Result<TValue, TError>
     where TError : Exception
@@ -19,6 +19,11 @@ public class Result<TValue, TError>
     public bool IsFailure => !IsSuccess;
     private TValue? Value { get; }
     private TError? Error { get; }
+
+    public static Result<None, TError> Success()
+    {
+        return Result<None, TError>.Success(new None());
+    }
 
     public static Result<TValue, TError> Success(
         TValue? value)

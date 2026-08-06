@@ -8,15 +8,15 @@ public sealed class StudyCompletedState : IState<Study>
     public string Name => "Completed";
     public bool CanEdit => false;
 
-    public Result<UnitEmpty, Exception> CanTransitionTo(
+    public Result<None, Exception> CanTransitionTo(
         IState<Study> newState,
         Study study)
     {
         return newState switch
         {
-            StudyCompletedState or StudyApprovedState or StudyInProgressState => Result<UnitEmpty, Exception>.Success(
-                new UnitEmpty()),
-            _ => Result<UnitEmpty, Exception>.Failure(
+            StudyCompletedState or StudyApprovedState or StudyInProgressState => Result<None, Exception>.Success(
+                new None()),
+            _ => Result<None, Exception>.Failure(
                 new InvalidOperationException("Invalid transition from Completed"))
         };
     }

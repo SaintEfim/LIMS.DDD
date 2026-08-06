@@ -19,7 +19,7 @@ public abstract record StatusBase<TState, TEntity>
     public string Name => _state.Name;
     public bool CanEdit => _state.CanEdit;
 
-    public Result<UnitEmpty, Exception> CanTransitionTo(
+    public Result<None, Exception> CanTransitionTo(
         StatusBase<TState, TEntity> newStatus,
         TEntity entity)
     {

@@ -8,14 +8,14 @@ public sealed class StudyInProgressState : IState<Study>
     public string Name => "InProgress";
     public bool CanEdit => true;
 
-    public Result<UnitEmpty, Exception> CanTransitionTo(
+    public Result<None, Exception> CanTransitionTo(
         IState<Study> newState,
         Study study)
     {
         return newState switch
         {
-            StudyInProgressState or StudyCompletedState => Result<UnitEmpty, Exception>.Success(new UnitEmpty()),
-            _ => Result<UnitEmpty, Exception>.Failure(new InvalidOperationException("Invalid transition from InWork"))
+            StudyInProgressState or StudyCompletedState => Result<None, Exception>.Success(new None()),
+            _ => Result<None, Exception>.Failure(new InvalidOperationException("Invalid transition from InWork"))
         };
     }
 }

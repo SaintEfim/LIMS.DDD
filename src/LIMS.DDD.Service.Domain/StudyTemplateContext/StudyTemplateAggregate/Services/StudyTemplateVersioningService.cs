@@ -44,7 +44,7 @@ public class StudyTemplateVersioningService
             : Result<StudyTemplate, Exception>.Success(newTemplate);
     }
 
-    private static Result<UnitEmpty, Exception> CopyChildren(
+    private static Result<None, Exception> CopyChildren(
         StudyTemplate original,
         StudyTemplate newTemplate)
     {
@@ -56,7 +56,7 @@ public class StudyTemplateVersioningService
             var specResult = Specification.Create(param.Specification.MinValue, param.Specification.MaxValue);
             if (specResult.IsFailure)
             {
-                return specResult.CastFailure<UnitEmpty>();
+                return specResult.CastFailure<None>();
             }
 
             var addResult = newTemplate.AddInputParameter(
@@ -64,7 +64,7 @@ public class StudyTemplateVersioningService
 
             if (addResult.IsFailure)
             {
-                return addResult.CastFailure<UnitEmpty>();
+                return addResult.CastFailure<None>();
             }
 
             paramIdMap[param.Id] = addResult.GetValue()
@@ -76,14 +76,14 @@ public class StudyTemplateVersioningService
             var specResult = Specification.Create(result.Specification.MinValue, result.Specification.MaxValue);
             if (specResult.IsFailure)
             {
-                return specResult.CastFailure<UnitEmpty>();
+                return specResult.CastFailure<None>();
             }
 
             var addResult = newTemplate.AddResultDefinition(result.ResultInstance, result.Unit, specResult.GetValue());
 
             if (addResult.IsFailure)
             {
-                return addResult.CastFailure<UnitEmpty>();
+                return addResult.CastFailure<None>();
             }
 
             resultDefIdMap[result.Id] = addResult.GetValue()
@@ -102,7 +102,7 @@ public class StudyTemplateVersioningService
 
             if (ruleResult.IsFailure)
             {
-                return ruleResult.CastFailure<UnitEmpty>();
+                return ruleResult.CastFailure<None>();
             }
 
             var newRule = ruleResult.GetValue();
@@ -117,11 +117,11 @@ public class StudyTemplateVersioningService
                 var inputResult = newTemplate.AddCalculationInput(newRule.Id, newParamId);
                 if (inputResult.IsFailure)
                 {
-                    return inputResult.CastFailure<UnitEmpty>();
+                    return inputResult.CastFailure<None>();
                 }
             }
         }
 
-        return Result<UnitEmpty, Exception>.Success(new UnitEmpty());
+        return Result<None, Exception>.Success();
     }
 }

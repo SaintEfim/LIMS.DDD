@@ -63,13 +63,13 @@ public sealed class StudyTemplate
         return Result<StudyTemplate, Exception>.Success(studyTemplate);
     }
 
-    public Result<UnitEmpty, Exception> UpdatePartial(
+    public Result<None, Exception> UpdatePartial(
         Name? name,
         Description? description)
     {
         if (!Status.CanEdit)
         {
-            return Result<UnitEmpty, Exception>.Failure(
+            return Result<None, Exception>.Failure(
                 new InvalidOperationException(
                     "Cannot modify details of an Active or Archived template. Create a new revision."));
         }
@@ -84,7 +84,7 @@ public sealed class StudyTemplate
             Description = description;
         }
 
-        return Result<UnitEmpty, Exception>.Success(new UnitEmpty());
+        return Result<None, Exception>.Success();
     }
 
     public Result<InputParameter, Exception> AddInputParameter(
@@ -140,97 +140,97 @@ public sealed class StudyTemplate
         return Result<CalculationRule, Exception>.Success(rule);
     }
 
-    public Result<UnitEmpty, Exception> RemoveCalculationRule(
+    public Result<None, Exception> RemoveCalculationRule(
         CalculationRuleId ruleId)
     {
         if (!Status.CanEdit)
         {
-            return Result<UnitEmpty, Exception>.Failure(
+            return Result<None, Exception>.Failure(
                 new InvalidOperationException("Cannot remove calculation rule from an Active or Archived template."));
         }
 
         var rule = _calculationRules.SingleOrDefault(r => r.Id == ruleId);
         if (rule == null)
         {
-            return Result<UnitEmpty, Exception>.Failure(new InvalidOperationException("Calculation rule not found."));
+            return Result<None, Exception>.Failure(new InvalidOperationException("Calculation rule not found."));
         }
 
         rule.MarkAsDeleted();
-        return Result<UnitEmpty, Exception>.Success(new UnitEmpty());
+        return Result<None, Exception>.Success();
     }
 
-    public Result<UnitEmpty, Exception> AddCalculationInput(
+    public Result<None, Exception> AddCalculationInput(
         CalculationRuleId ruleId,
         InputParameterId inputParameterId)
     {
         if (!Status.CanEdit)
         {
-            return Result<UnitEmpty, Exception>.Failure(
+            return Result<None, Exception>.Failure(
                 new InvalidOperationException("Cannot modify calculation rules in an Active template."));
         }
 
         var rule = _calculationRules.SingleOrDefault(r => r.Id == ruleId);
         if (rule == null)
         {
-            return Result<UnitEmpty, Exception>.Failure(new InvalidOperationException("Calculation rule not found."));
+            return Result<None, Exception>.Failure(new InvalidOperationException("Calculation rule not found."));
         }
 
         var parameter = _inputParameters.SingleOrDefault(p => p.Id == inputParameterId);
 
         return parameter is null
-            ? Result<UnitEmpty, Exception>.Failure(
+            ? Result<None, Exception>.Failure(
                 new InvalidOperationException("InputParameter not found in template."))
             : rule.AddInput(parameter.AliasName, inputParameterId);
     }
 
-    public Result<UnitEmpty, Exception> RemoveCalculationInput(
+    public Result<None, Exception> RemoveCalculationInput(
         CalculationRuleId ruleId,
         AliasName variableAlias)
     {
         if (!Status.CanEdit)
         {
-            return Result<UnitEmpty, Exception>.Failure(
+            return Result<None, Exception>.Failure(
                 new InvalidOperationException("Cannot modify calculation rules in an Active template."));
         }
 
         var rule = _calculationRules.SingleOrDefault(r => r.Id == ruleId);
         return rule == null
-            ? Result<UnitEmpty, Exception>.Failure(new InvalidOperationException("Calculation rule not found."))
+            ? Result<None, Exception>.Failure(new InvalidOperationException("Calculation rule not found."))
             : rule.RemoveInput(variableAlias);
     }
 
-    public Result<UnitEmpty, Exception> RemoveInputParameter(
+    public Result<None, Exception> RemoveInputParameter(
         InputParameterId observationId)
     {
         if (!Status.CanEdit)
         {
-            return Result<UnitEmpty, Exception>.Failure(
+            return Result<None, Exception>.Failure(
                 new InvalidOperationException("Cannot remove observation from an Active template."));
         }
 
         var parameter = _inputParameters.SingleOrDefault(p => p.Id == observationId);
         if (parameter == null)
         {
-            return Result<UnitEmpty, Exception>.Failure(new InvalidOperationException("Parameter not found."));
+            return Result<None, Exception>.Failure(new InvalidOperationException("Parameter not found."));
         }
 
         parameter.MarkAsDeleted();
-        return Result<UnitEmpty, Exception>.Success(new UnitEmpty());
+        return Result<None, Exception>.Success();
     }
 
-    public Result<UnitEmpty, Exception> ChangeStatus(
+    public Result<None, Exception> ChangeStatus(
         Status newStatus)
     {
         var result = Status.CanTransitionTo(newStatus, this);
 
         if (result.IsFailure)
         {
-            return result.CastFailure<UnitEmpty>();
+            return result.CastFailure<None>();
         }
 
         Status = newStatus;
 
-        return Result<UnitEmpty, Exception>.Success(new UnitEmpty());
+        return Result<None, Exception>.Success();
     }
 
     public Result<ResultDefinition, Exception> AddResultDefinition(
@@ -257,19 +257,19 @@ public sealed class StudyTemplate
         return Result<ResultDefinition, Exception>.Success(result);
     }
 
-    public Result<UnitEmpty, Exception> RemoveResultDefinition(
+    public Result<None, Exception> RemoveResultDefinition(
         ResultDefinitionId resultDefinitionId)
     {
         if (!Status.CanEdit)
         {
-            return Result<UnitEmpty, Exception>.Failure(
+            return Result<None, Exception>.Failure(
                 new InvalidOperationException("Cannot remove result definition from an Active or Archived template."));
         }
 
         var resultDef = _resultDefinitions.SingleOrDefault(r => r.Id == resultDefinitionId);
         if (resultDef == null)
         {
-            return Result<UnitEmpty, Exception>.Failure(
+            return Result<None, Exception>.Failure(
                 new InvalidOperationException("Determination result not found."));
         }
 
@@ -277,15 +277,15 @@ public sealed class StudyTemplate
 
         if (isUsedInCalculations)
         {
-            return Result<UnitEmpty, Exception>.Failure(new InvalidOperationException(
+            return Result<None, Exception>.Failure(new InvalidOperationException(
                 "Cannot remove result definition because it is targeted by calculation rules. Remove or reassign the calculation rules first."));
         }
 
         resultDef.MarkAsDeleted();
-        return Result<UnitEmpty, Exception>.Success(new UnitEmpty());
+        return Result<None, Exception>.Success();
     }
 
-    public Result<UnitEmpty, Exception> UpdateInputParameter(
+    public Result<None, Exception> UpdateInputParameter(
         InputParameterId parameterId,
         Name? name,
         Description? description,
@@ -295,21 +295,21 @@ public sealed class StudyTemplate
     {
         if (!Status.CanEdit)
         {
-            return Result<UnitEmpty, Exception>.Failure(
+            return Result<None, Exception>.Failure(
                 new InvalidOperationException("Cannot modify input parameters in an Active or Archived template."));
         }
 
         var parameter = _inputParameters.FirstOrDefault(p => p.Id == parameterId);
         if (parameter is null)
         {
-            return Result<UnitEmpty, Exception>.Failure(new InvalidOperationException("Input parameter not found."));
+            return Result<None, Exception>.Failure(new InvalidOperationException("Input parameter not found."));
         }
 
         if (aliasName is not null && parameter.AliasName != aliasName)
         {
             if (_inputParameters.Any(p => p.AliasName == aliasName && p.Id != parameterId))
             {
-                return Result<UnitEmpty, Exception>.Failure(
+                return Result<None, Exception>.Failure(
                     new InvalidOperationException("Alias name must be unique within the template."));
             }
         }
@@ -320,16 +320,16 @@ public sealed class StudyTemplate
         var specificationResult = Specification.Create(min, max);
         if (specificationResult.IsFailure)
         {
-            return specificationResult.CastFailure<UnitEmpty>();
+            return specificationResult.CastFailure<None>();
         }
 
         var specification = specificationResult.GetValue();
 
         parameter.Update(name, description, aliasName, specification);
-        return Result<UnitEmpty, Exception>.Success(new UnitEmpty());
+        return Result<None, Exception>.Success();
     }
 
-    public Result<UnitEmpty, Exception> UpdateResultDefinition(
+    public Result<None, Exception> UpdateResultDefinition(
         ResultDefinitionId resultDefinitionId,
         string? resultInstance,
         string? unit,
@@ -338,14 +338,14 @@ public sealed class StudyTemplate
     {
         if (!Status.CanEdit)
         {
-            return Result<UnitEmpty, Exception>.Failure(
+            return Result<None, Exception>.Failure(
                 new InvalidOperationException("Cannot modify result definitions in an Active or Archived template."));
         }
 
         var resultDef = _resultDefinitions.FirstOrDefault(r => r.Id == resultDefinitionId);
         if (resultDef is null)
         {
-            return Result<UnitEmpty, Exception>.Failure(new InvalidOperationException("Result definition not found."));
+            return Result<None, Exception>.Failure(new InvalidOperationException("Result definition not found."));
         }
 
         var min = minValue ?? resultDef.Specification.MinValue;
@@ -354,16 +354,16 @@ public sealed class StudyTemplate
         var specificationResult = Specification.Create(min, max);
         if (specificationResult.IsFailure)
         {
-            return specificationResult.CastFailure<UnitEmpty>();
+            return specificationResult.CastFailure<None>();
         }
 
         var specification = specificationResult.GetValue();
 
         resultDef.Update(resultInstance, unit, specification);
-        return Result<UnitEmpty, Exception>.Success(new UnitEmpty());
+        return Result<None, Exception>.Success();
     }
 
-    public Result<UnitEmpty, Exception> UpdateCalculationRule(
+    public Result<None, Exception> UpdateCalculationRule(
         CalculationRuleId ruleId,
         Name? name,
         FormulaExpression? formulaExpression,
@@ -372,43 +372,43 @@ public sealed class StudyTemplate
     {
         if (!Status.CanEdit)
         {
-            return Result<UnitEmpty, Exception>.Failure(
+            return Result<None, Exception>.Failure(
                 new InvalidOperationException("Cannot modify calculation rules in an Active or Archived template."));
         }
 
         var rule = _calculationRules.FirstOrDefault(r => r.Id == ruleId);
         if (rule is null)
         {
-            return Result<UnitEmpty, Exception>.Failure(new InvalidOperationException("Calculation rule not found."));
+            return Result<None, Exception>.Failure(new InvalidOperationException("Calculation rule not found."));
         }
 
         if (name is not null && rule.Name != name && _calculationRules.Any(r => r.Name == name && r.Id != ruleId))
         {
-            return Result<UnitEmpty, Exception>.Failure(
+            return Result<None, Exception>.Failure(
                 new InvalidOperationException("Calculation rule name must be unique within the template."));
         }
 
         if (resultDefinitionId is not null && rule.ResultDefinitionId != resultDefinitionId &&
             _resultDefinitions.All(r => r.Id != resultDefinitionId))
         {
-            return Result<UnitEmpty, Exception>.Failure(
+            return Result<None, Exception>.Failure(
                 new InvalidOperationException("Result definition not found in template."));
         }
 
         rule.Update(name, formulaExpression, description, resultDefinitionId);
-        return Result<UnitEmpty, Exception>.Success(new UnitEmpty());
+        return Result<None, Exception>.Success();
     }
 
-    public Result<UnitEmpty, Exception> Delete()
+    public Result<None, Exception> Delete()
     {
         if (IsDeleted)
         {
-            return Result<UnitEmpty, Exception>.Failure(new InvalidOperationException("Template is already deleted."));
+            return Result<None, Exception>.Failure(new InvalidOperationException("Template is already deleted."));
         }
 
         if (Status != Status.Draft)
         {
-            return Result<UnitEmpty, Exception>.Failure(new InvalidOperationException(
+            return Result<None, Exception>.Failure(new InvalidOperationException(
                 $"Cannot delete template in '{Status.Name}' status. Only 'Draft' templates can be deleted. Use 'Archive' for Active templates."));
         }
 
@@ -430,6 +430,6 @@ public sealed class StudyTemplate
             rule.MarkAsDeleted();
         }
 
-        return Result<UnitEmpty, Exception>.Success(new UnitEmpty());
+        return Result<None, Exception>.Success();
     }
 }
