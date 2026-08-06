@@ -64,7 +64,7 @@ namespace LIMS.DDD.Service.Persistence.Migrations
 
                     b.HasIndex("Code")
                         .IsUnique()
-                        .HasFilter("[IsDeleted] = 0");
+                        .HasFilter("\"IsDeleted\" = false");
 
                     b.ToTable("Orders", (string)null);
                 });
@@ -104,7 +104,7 @@ namespace LIMS.DDD.Service.Persistence.Migrations
 
                     b.HasIndex("Code")
                         .IsUnique()
-                        .HasFilter("[IsDeleted] = 0");
+                        .HasFilter("\"IsDeleted\" = false");
 
                     b.HasIndex("OrderId");
 
@@ -123,9 +123,6 @@ namespace LIMS.DDD.Service.Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("boolean")
                         .HasDefaultValue(false);
-
-                    b.Property<Guid>("ParameterId")
-                        .HasColumnType("uuid");
 
                     b.Property<Guid>("StudyId")
                         .HasColumnType("uuid");
@@ -155,9 +152,6 @@ namespace LIMS.DDD.Service.Persistence.Migrations
 
                     b.Property<bool>("IsOutOfSpec")
                         .HasColumnType("boolean");
-
-                    b.Property<Guid>("ResultDefinitionId")
-                        .HasColumnType("uuid");
 
                     b.Property<Guid>("StudyId")
                         .HasColumnType("uuid");
@@ -190,6 +184,11 @@ namespace LIMS.DDD.Service.Persistence.Migrations
                         .HasColumnType("boolean")
                         .HasDefaultValue(false);
 
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
                     b.Property<Guid>("SampleId")
                         .HasColumnType("uuid");
 
@@ -203,9 +202,11 @@ namespace LIMS.DDD.Service.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("SampleId", "TemplateId")
+                    b.HasIndex("SampleId");
+
+                    b.HasIndex("Name", "SampleId")
                         .IsUnique()
-                        .HasFilter("[IsDeleted] = 0");
+                        .HasFilter("\"IsDeleted\" = false");
 
                     b.ToTable("Studies", (string)null);
                 });
@@ -284,7 +285,8 @@ namespace LIMS.DDD.Service.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("StudyTemplateId", "AliasName");
+                    b.HasIndex("StudyTemplateId", "AliasName")
+                        .HasFilter("\"IsDeleted\" = false");
 
                     b.ToTable("InputParameters", (string)null);
                 });
@@ -318,7 +320,8 @@ namespace LIMS.DDD.Service.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("StudyTemplateId", "ResultInstance", "Unit")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("\"IsDeleted\" = false");
 
                     b.ToTable("ResultDefinitions", (string)null);
                 });
@@ -362,7 +365,8 @@ namespace LIMS.DDD.Service.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("Name", "Revision")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("\"IsDeleted\" = false");
 
                     b.ToTable("StudyTemplates", (string)null);
                 });
@@ -381,11 +385,11 @@ namespace LIMS.DDD.Service.Persistence.Migrations
                                 .HasColumnType("uuid");
 
                             b1.Property<DateTimeOffset?>("Begin")
-                                .HasColumnType("datetimeoffset")
+                                .HasColumnType("timestamp with time zone")
                                 .HasColumnName("GatherDateBegin");
 
                             b1.Property<DateTimeOffset?>("End")
-                                .HasColumnType("datetimeoffset")
+                                .HasColumnType("timestamp with time zone")
                                 .HasColumnName("GatherDateEnd");
 
                             b1.HasKey("SampleId");
@@ -432,6 +436,46 @@ namespace LIMS.DDD.Service.Persistence.Migrations
                         .HasForeignKey("StudyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.OwnsOne("LIMS.DDD.Service.Domain.LaboratoryOperationsContext.StudyAggregate.ValueObjects.ParameterSnapshot", "ParameterSnapshot", b1 =>
+                        {
+                            b1.Property<Guid>("MeasuredValueId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<string>("AliasName")
+                                .IsRequired()
+                                .HasMaxLength(100)
+                                .HasColumnType("character varying(100)")
+                                .HasColumnName("ParamAliasName");
+
+                            b1.Property<Guid>("InputParameterId")
+                                .HasColumnType("uuid")
+                                .HasColumnName("ParameterId");
+
+                            b1.Property<double?>("MaxValue")
+                                .HasColumnType("decimal(18,6)")
+                                .HasColumnName("ParamSpecMax");
+
+                            b1.Property<double?>("MinValue")
+                                .HasColumnType("decimal(18,6)")
+                                .HasColumnName("ParamSpecMin");
+
+                            b1.Property<string>("Name")
+                                .IsRequired()
+                                .HasMaxLength(100)
+                                .HasColumnType("character varying(100)")
+                                .HasColumnName("ParamName");
+
+                            b1.HasKey("MeasuredValueId");
+
+                            b1.ToTable("MeasuredValues");
+
+                            b1.WithOwner()
+                                .HasForeignKey("MeasuredValueId");
+                        });
+
+                    b.Navigation("ParameterSnapshot")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("LIMS.DDD.Service.Domain.LaboratoryOperationsContext.StudyAggregate.Entities.TestResult", b =>
@@ -440,6 +484,46 @@ namespace LIMS.DDD.Service.Persistence.Migrations
                         .WithMany("TestResults")
                         .HasForeignKey("StudyId")
                         .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.OwnsOne("LIMS.DDD.Service.Domain.LaboratoryOperationsContext.StudyAggregate.ValueObjects.ResultSnapshot", "ResultSnapshot", b1 =>
+                        {
+                            b1.Property<Guid>("TestResultId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<double?>("MaxValue")
+                                .HasColumnType("decimal(18,6)")
+                                .HasColumnName("ResSpecMax");
+
+                            b1.Property<double?>("MinValue")
+                                .HasColumnType("decimal(18,6)")
+                                .HasColumnName("ResSpecMin");
+
+                            b1.Property<Guid>("ResultDefinitionId")
+                                .HasColumnType("uuid")
+                                .HasColumnName("ResultDefinitionId");
+
+                            b1.Property<string>("ResultInstance")
+                                .IsRequired()
+                                .HasMaxLength(100)
+                                .HasColumnType("character varying(100)")
+                                .HasColumnName("ResInstance");
+
+                            b1.Property<string>("Unit")
+                                .IsRequired()
+                                .HasMaxLength(50)
+                                .HasColumnType("character varying(50)")
+                                .HasColumnName("ResUnit");
+
+                            b1.HasKey("TestResultId");
+
+                            b1.ToTable("TestResults");
+
+                            b1.WithOwner()
+                                .HasForeignKey("TestResultId");
+                        });
+
+                    b.Navigation("ResultSnapshot")
                         .IsRequired();
                 });
 
@@ -496,7 +580,7 @@ namespace LIMS.DDD.Service.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.OwnsOne("LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.ValueObjects.Specification", "Specification", b1 =>
+                    b.OwnsOne("LIMS.DDD.Service.Domain.SeedWork.ValueObjects.Specification", "Specification", b1 =>
                         {
                             b1.Property<Guid>("InputParameterId")
                                 .HasColumnType("uuid");
@@ -529,7 +613,7 @@ namespace LIMS.DDD.Service.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.OwnsOne("LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.ValueObjects.Specification", "Specification", b1 =>
+                    b.OwnsOne("LIMS.DDD.Service.Domain.SeedWork.ValueObjects.Specification", "Specification", b1 =>
                         {
                             b1.Property<Guid>("ResultDefinitionId")
                                 .HasColumnType("uuid");
