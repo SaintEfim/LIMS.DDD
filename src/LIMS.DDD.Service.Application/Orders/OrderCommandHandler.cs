@@ -14,28 +14,43 @@ public sealed class OrderCommandHandler(IOrderRepository repository)
         CancellationToken cancellationToken = default)
     {
         var nameResult = Name.Create(command.Name);
-        if (nameResult.IsFailure) return Result<Order, Exception>.Failure(nameResult.Error!);
+        if (nameResult.IsFailure)
+        {
+            return nameResult.CastFailure<Order>();
+        }
 
         var descResult = Description.Create(command.Description);
-        if (descResult.IsFailure) return Result<Order, Exception>.Failure(descResult.Error!);
+        if (descResult.IsFailure)
+        {
+            return descResult.CastFailure<Order>();
+        }
 
         var codeResult = Code.Create(command.Code);
-        if (codeResult.IsFailure) return Result<Order, Exception>.Failure(codeResult.Error!);
+        if (codeResult.IsFailure)
+        {
+            return codeResult.CastFailure<Order>();
+        }
 
         var createResult = Order.Create(nameResult.GetValue(), descResult.GetValue(), command.Contractor,
             codeResult.GetValue());
-        if (createResult.IsFailure) return Result<Order, Exception>.Failure(createResult.Error!);
+        if (createResult.IsFailure)
+        {
+            return createResult.CastFailure<Order>();
+        }
 
         return await SaveNewAsync(createResult.GetValue(), cancellationToken);
     }
 
-    public async Task<Result<Exception>> UpdateAsync(
+    public async Task<Result<UnitEmpty, Exception>> UpdateAsync(
         Guid id,
         UpdateOrderCommand command,
         CancellationToken cancellationToken = default)
     {
         var orderResult = await GetOrderForChangeAsync(id, cancellationToken);
-        if (orderResult.IsFailure) return Result<Exception>.Failure(orderResult.Error!);
+        if (orderResult.IsFailure)
+        {
+            return orderResult.CastFailure<UnitEmpty>();
+        }
 
         var order = orderResult.GetValue();
 
@@ -53,46 +68,64 @@ public sealed class OrderCommandHandler(IOrderRepository repository)
             : null;
 
         var updateResult = order.UpdatePartial(name, desc, command.Contractor, code);
-        if (updateResult.IsFailure) return Result<Exception>.Failure(updateResult.Error!);
+        if (updateResult.IsFailure)
+        {
+            return updateResult.CastFailure<UnitEmpty>();
+        }
 
         await repository.SaveChangesAsync(cancellationToken);
-        return Result<Exception>.Success();
+        return Result<UnitEmpty, Exception>.Success(new UnitEmpty());
     }
 
-    public async Task<Result<Exception>> ChangeStatusAsync(
+    public async Task<Result<UnitEmpty, Exception>> ChangeStatusAsync(
         Guid id,
         ChangeOrderStatusCommand command,
         CancellationToken cancellationToken = default)
     {
         var orderResult = await GetOrderForChangeAsync(id, cancellationToken);
-        if (orderResult.IsFailure) return Result<Exception>.Failure(orderResult.Error!);
+        if (orderResult.IsFailure)
+        {
+            return orderResult.CastFailure<UnitEmpty>();
+        }
 
         if (!OrderStatus.TryParse(command.Status, out var newStatus))
-            return Result<Exception>.Failure(new InvalidOperationException($"Unknown status '{command.Status}'."));
+        {
+            return Result<UnitEmpty, Exception>.Failure(
+                new InvalidOperationException($"Unknown status '{command.Status}'."));
+        }
 
         var changeResult = orderResult.GetValue()
             .ChangeStatus(newStatus);
-        if (changeResult.IsFailure) return Result<Exception>.Failure(changeResult.Error!);
+        if (changeResult.IsFailure)
+        {
+            return changeResult.CastFailure<UnitEmpty>();
+        }
 
         await repository.SaveChangesAsync(cancellationToken);
-        return Result<Exception>.Success();
+        return Result<UnitEmpty, Exception>.Success(new UnitEmpty());
     }
 
-    public async Task<Result<Exception>> DeleteAsync(
+    public async Task<Result<UnitEmpty, Exception>> DeleteAsync(
         Guid id,
         CancellationToken cancellationToken = default)
     {
         var orderResult = await GetOrderForChangeAsync(id, cancellationToken);
-        if (orderResult.IsFailure) return Result<Exception>.Failure(orderResult.Error!);
+        if (orderResult.IsFailure)
+        {
+            return orderResult.CastFailure<UnitEmpty>();
+        }
 
         var order = orderResult.GetValue();
 
         var deleteResult = order.Delete();
-        if (deleteResult.IsFailure) return Result<Exception>.Failure(deleteResult.Error!);
+        if (deleteResult.IsFailure)
+        {
+            return deleteResult.CastFailure<UnitEmpty>();
+        }
 
         await repository.SaveChangesAsync(cancellationToken);
 
-        return Result<Exception>.Success();
+        return Result<UnitEmpty, Exception>.Success(new UnitEmpty());
     }
 
     private async Task<Result<Order, Exception>> SaveNewAsync(

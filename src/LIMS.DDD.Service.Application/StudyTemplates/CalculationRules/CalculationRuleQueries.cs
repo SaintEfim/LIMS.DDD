@@ -24,7 +24,10 @@ public sealed class CalculationRuleQueries(IStudyTemplateRepository repository)
     {
         var studyTemplate = await repository.GetByIdAsync(new StudyTemplateId(studyTemplateId), cancellationToken);
 
-        if (studyTemplate is null) return [];
+        if (studyTemplate is null)
+        {
+            return [];
+        }
 
         return studyTemplate.CalculationRules
             .Select(CalculationRuleDto.FromDomain)

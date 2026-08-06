@@ -31,12 +31,15 @@ public sealed class TestResult : SoftDeletableModel
         };
     }
 
-
     internal void Update(
         double? value,
         bool isOutOfSpec)
     {
-        if (value is not null) Value = value;
+        if (value is not null)
+        {
+            Value = value;
+        }
+
         IsOutOfSpec = isOutOfSpec;
     }
 

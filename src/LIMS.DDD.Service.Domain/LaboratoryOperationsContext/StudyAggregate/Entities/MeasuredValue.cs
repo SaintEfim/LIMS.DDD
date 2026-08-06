@@ -1,11 +1,9 @@
 ﻿using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.StudyAggregate.ValueObjects;
 using LIMS.DDD.Service.Domain.SeedWork;
-using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.Entities.InputParameters;
 
 namespace LIMS.DDD.Service.Domain.LaboratoryOperationsContext.StudyAggregate.Entities;
 
 public sealed class MeasuredValue : SoftDeletableModel
-
 {
     private MeasuredValue()
     {
@@ -34,7 +32,10 @@ public sealed class MeasuredValue : SoftDeletableModel
     internal void Update(
         double? value)
     {
-        if (value is not null) Value = value;
+        if (value is not null)
+        {
+            Value = value;
+        }
     }
 
     internal void MarkAsDeleted()

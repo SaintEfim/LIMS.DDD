@@ -6,14 +6,6 @@ namespace LIMS.DDD.Service.Domain.LaboratoryOperationsContext.SampleAggregate.Va
 
 public sealed record SampleStatus : StatusBase<IState<Sample>, Sample>
 {
-    public static SampleStatus Registered { get; } = new(new SampleRegisteredState());
-
-    public static SampleStatus InProgress { get; } = new(new SampleInProgressState());
-
-    public static SampleStatus Completed { get; } = new(new SampleCompletedState());
-
-    public static SampleStatus Canceled { get; } = new(new SampleCanceledState());
-
     private static readonly Dictionary<string, SampleStatus> Registry = new(StringComparer.OrdinalIgnoreCase)
     {
         ["Registered"] = Registered,
@@ -27,6 +19,14 @@ public sealed record SampleStatus : StatusBase<IState<Sample>, Sample>
         : base(state)
     {
     }
+
+    public static SampleStatus Registered { get; } = new(new SampleRegisteredState());
+
+    public static SampleStatus InProgress { get; } = new(new SampleInProgressState());
+
+    public static SampleStatus Completed { get; } = new(new SampleCompletedState());
+
+    public static SampleStatus Canceled { get; } = new(new SampleCanceledState());
 
     public static bool TryParse(
         string? name,

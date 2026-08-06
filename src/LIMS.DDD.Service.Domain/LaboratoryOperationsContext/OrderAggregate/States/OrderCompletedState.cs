@@ -8,14 +8,15 @@ public sealed class OrderCompletedState : IState<Order>
     public string Name => "Completed";
     public bool CanEdit => false;
 
-    public Result<Exception> CanTransitionTo(
+    public Result<UnitEmpty, Exception> CanTransitionTo(
         IState<Order> newState,
         Order template)
     {
         return newState switch
         {
-            OrderCompletedState => Result<Exception>.Success(),
-            _ => Result<Exception>.Failure(new InvalidOperationException("Completed orders cannot change status."))
+            OrderCompletedState => Result<UnitEmpty, Exception>.Success(new UnitEmpty()),
+            _ => Result<UnitEmpty, Exception>.Failure(
+                new InvalidOperationException("Completed orders cannot change status."))
         };
     }
 }

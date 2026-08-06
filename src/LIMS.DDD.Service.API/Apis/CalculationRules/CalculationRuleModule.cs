@@ -79,7 +79,10 @@ public class CalculationRuleModule : ICarterModule
     {
         var result = await services.Commands.CreateAsync(studyTemplateId, command, ct);
 
-        if (result.IsFailure) return HandleFailure(result.Error!);
+        if (result.IsFailure)
+        {
+            return HandleFailure(result.GetError());
+        }
 
         var ruleId = result.GetValue();
         return Results.Created($"/api/studyTemplates/{studyTemplateId}/calculation-rules/{ruleId}",
@@ -93,7 +96,7 @@ public class CalculationRuleModule : ICarterModule
         CancellationToken ct)
     {
         var result = await services.Commands.RemoveAsync(studyTemplateId, ruleId, ct);
-        return result.IsFailure ? HandleFailure(result.Error!) : Results.NoContent();
+        return result.IsFailure ? HandleFailure(result.GetError()) : Results.NoContent();
     }
 
     private static async Task<IResult> CreateInput(
@@ -104,7 +107,7 @@ public class CalculationRuleModule : ICarterModule
         CancellationToken ct)
     {
         var result = await services.Commands.CreateInputAsync(studyTemplateId, ruleId, command, ct);
-        return result.IsFailure ? HandleFailure(result.Error!) : Results.Created();
+        return result.IsFailure ? HandleFailure(result.GetError()) : Results.Created();
     }
 
     private static async Task<IResult> RemoveInput(
@@ -116,7 +119,7 @@ public class CalculationRuleModule : ICarterModule
     {
         var command = new RemoveCalculationInputCommand(variableAlias);
         var result = await services.Commands.RemoveInputAsync(studyTemplateId, ruleId, command, ct);
-        return result.IsFailure ? HandleFailure(result.Error!) : Results.NoContent();
+        return result.IsFailure ? HandleFailure(result.GetError()) : Results.NoContent();
     }
 
     private static async Task<IResult> Update(
@@ -127,16 +130,18 @@ public class CalculationRuleModule : ICarterModule
         CancellationToken ct)
     {
         var result = await services.Commands.UpdateAsync(studyTemplateId, ruleId, command, ct);
-        return result.IsFailure ? HandleFailure(result.Error!) : Results.NoContent();
+        return result.IsFailure ? HandleFailure(result.GetError()) : Results.NoContent();
     }
 
     private static IResult HandleFailure(
-        Exception error) =>
-        error switch
+        Exception error)
+    {
+        return error switch
         {
             KeyNotFoundException => Results.NotFound(new { error.Message }),
             InvalidOperationException => Results.BadRequest(new { error.Message }),
-            _ => Results.Problem(detail: error.Message, statusCode: StatusCodes.Status500InternalServerError,
+            _ => Results.Problem(error.Message, statusCode: StatusCodes.Status500InternalServerError,
                 title: "An unexpected error occurred")
         };
+    }
 }

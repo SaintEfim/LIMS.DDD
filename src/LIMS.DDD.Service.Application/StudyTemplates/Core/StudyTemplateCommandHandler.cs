@@ -16,16 +16,28 @@ public sealed class StudyTemplateCommandHandler(
         CancellationToken cancellationToken = default)
     {
         var nameResult = Name.Create(command.Name);
-        if (nameResult.IsFailure) return Result<StudyTemplate, Exception>.Failure(nameResult.Error!);
+        if (nameResult.IsFailure)
+        {
+            return nameResult.CastFailure<StudyTemplate>();
+        }
 
         var descResult = Description.Create(command.Description);
-        if (descResult.IsFailure) return Result<StudyTemplate, Exception>.Failure(descResult.Error!);
+        if (descResult.IsFailure)
+        {
+            return descResult.CastFailure<StudyTemplate>();
+        }
 
         var revResult = Revision.Create(command.Revision);
-        if (revResult.IsFailure) return Result<StudyTemplate, Exception>.Failure(revResult.Error!);
+        if (revResult.IsFailure)
+        {
+            return revResult.CastFailure<StudyTemplate>();
+        }
 
         var createResult = StudyTemplate.Create(nameResult.GetValue(), descResult.GetValue(), revResult.GetValue());
-        if (createResult.IsFailure) return Result<StudyTemplate, Exception>.Failure(createResult.Error!);
+        if (createResult.IsFailure)
+        {
+            return createResult.CastFailure<StudyTemplate>();
+        }
 
         return await SaveNewAsync(createResult.GetValue(), cancellationToken);
     }
@@ -36,7 +48,10 @@ public sealed class StudyTemplateCommandHandler(
         CancellationToken cancellationToken = default)
     {
         var templateResult = await GetTemplateForChangeAsync(id, cancellationToken);
-        if (templateResult.IsFailure) return templateResult;
+        if (templateResult.IsFailure)
+        {
+            return templateResult;
+        }
 
         var template = templateResult.GetValue();
 
@@ -44,7 +59,11 @@ public sealed class StudyTemplateCommandHandler(
         if (command.Name is not null)
         {
             var nameResult = Name.Create(command.Name);
-            if (nameResult.IsFailure) return Result<StudyTemplate, Exception>.Failure(nameResult.Error!);
+            if (nameResult.IsFailure)
+            {
+                return nameResult.CastFailure<StudyTemplate>();
+            }
+
             name = nameResult.GetValue();
         }
 
@@ -52,7 +71,11 @@ public sealed class StudyTemplateCommandHandler(
         if (command.Description is not null)
         {
             var descResult = Description.Create(command.Description);
-            if (descResult.IsFailure) return Result<StudyTemplate, Exception>.Failure(descResult.Error!);
+            if (descResult.IsFailure)
+            {
+                return descResult.CastFailure<StudyTemplate>();
+            }
+
             description = descResult.GetValue();
         }
 
@@ -60,7 +83,10 @@ public sealed class StudyTemplateCommandHandler(
         var effectiveDescription = description ?? template.Description;
 
         var updateResult = template.UpdatePartial(effectiveName, effectiveDescription);
-        if (updateResult.IsFailure) return Result<StudyTemplate, Exception>.Failure(updateResult.Error!);
+        if (updateResult.IsFailure)
+        {
+            return updateResult.CastFailure<StudyTemplate>();
+        }
 
         return await SaveChangesAsync(template, cancellationToken);
     }
@@ -72,7 +98,10 @@ public sealed class StudyTemplateCommandHandler(
     {
         var templateResult = await GetTemplateForChangeAsync(id, cancellationToken);
 
-        if (templateResult.IsFailure) return Result<StudyTemplate, Exception>.Failure(templateResult.Error!);
+        if (templateResult.IsFailure)
+        {
+            return templateResult.CastFailure<StudyTemplate>();
+        }
 
         var template = templateResult.GetValue();
 
@@ -84,26 +113,35 @@ public sealed class StudyTemplateCommandHandler(
 
         var changeResult = template.ChangeStatus(newStatus!);
 
-        if (changeResult.IsFailure) return Result<StudyTemplate, Exception>.Failure(changeResult.Error!);
+        if (changeResult.IsFailure)
+        {
+            return changeResult.CastFailure<StudyTemplate>();
+        }
 
         return await SaveChangesAsync(template, cancellationToken);
     }
 
-    public async Task<Result<Exception>> DeleteAsync(
+    public async Task<Result<UnitEmpty, Exception>> DeleteAsync(
         Guid id,
         CancellationToken cancellationToken = default)
     {
         var templateResult = await GetTemplateForChangeAsync(id, cancellationToken);
-        if (templateResult.IsFailure) return Result<Exception>.Failure(templateResult.Error!);
+        if (templateResult.IsFailure)
+        {
+            return templateResult.CastFailure<UnitEmpty>();
+        }
 
         var template = templateResult.GetValue();
 
         var deleteResult = template.Delete();
-        if (deleteResult.IsFailure) return Result<Exception>.Failure(deleteResult.Error!);
+        if (deleteResult.IsFailure)
+        {
+            return deleteResult.CastFailure<UnitEmpty>();
+        }
 
         await repository.SaveChangesAsync(cancellationToken);
 
-        return Result<Exception>.Success();
+        return Result<UnitEmpty, Exception>.Success(new UnitEmpty());
     }
 
     public async Task<Result<Guid, Exception>> CreateRevisionAsync(
@@ -112,19 +150,28 @@ public sealed class StudyTemplateCommandHandler(
         CancellationToken cancellationToken = default)
     {
         var originalResult = await GetTemplateForChangeAsync(originalId, cancellationToken);
-        if (originalResult.IsFailure) return Result<Guid, Exception>.Failure(originalResult.Error!);
+        if (originalResult.IsFailure)
+        {
+            return originalResult.CastFailure<Guid>();
+        }
 
         var revisionResult = Revision.Create(command.NewRevision);
-        if (revisionResult.IsFailure) return Result<Guid, Exception>.Failure(revisionResult.Error!);
+        if (revisionResult.IsFailure)
+        {
+            return revisionResult.CastFailure<Guid>();
+        }
 
         var createResult = domainService.CreateNewRevision(originalResult.GetValue(), revisionResult.GetValue());
-        if (createResult.IsFailure) return Result<Guid, Exception>.Failure(createResult.Error!);
+        if (createResult.IsFailure)
+        {
+            return createResult.CastFailure<Guid>();
+        }
 
         var creationResult = createResult.GetValue();
 
         var saveResult = await SaveNewAsync(creationResult, cancellationToken);
         return saveResult.IsFailure
-            ? Result<Guid, Exception>.Failure(saveResult.Error!)
+            ? saveResult.CastFailure<Guid>()
             : Result<Guid, Exception>.Success(creationResult.Id.Value);
     }
 

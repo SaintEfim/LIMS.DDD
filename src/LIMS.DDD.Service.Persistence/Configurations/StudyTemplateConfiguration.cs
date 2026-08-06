@@ -70,6 +70,7 @@ public class StudyTemplateConfiguration : IEntityTypeConfiguration<StudyTemplate
                 x.Name,
                 x.Revision
             })
-            .IsUnique().HasFilter("\"IsDeleted\" = false");
+            .IsUnique()
+            .HasFilter("\"IsDeleted\" = false");
     }
 }

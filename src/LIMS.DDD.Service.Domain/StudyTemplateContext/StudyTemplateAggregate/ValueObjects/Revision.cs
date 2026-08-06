@@ -7,8 +7,10 @@ public sealed record Revision
     private const int MaxRevisionLength = 100;
 
     private Revision(
-        string value) =>
+        string value)
+    {
         Value = value;
+    }
 
     public string Value { get; }
 

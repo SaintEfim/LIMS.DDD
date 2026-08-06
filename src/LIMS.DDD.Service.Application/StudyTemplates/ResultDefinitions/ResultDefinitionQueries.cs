@@ -12,8 +12,7 @@ public sealed class ResultDefinitionQueries(IStudyTemplateRepository repository)
     {
         var studyTemplate = await repository.GetByIdAsync(new StudyTemplateId(studyTemplateId), cancellationToken);
 
-        var result =
-            studyTemplate?.ResultDefinitions.SingleOrDefault(r => r.Id == new ResultDefinitionId(resultId));
+        var result = studyTemplate?.ResultDefinitions.SingleOrDefault(r => r.Id == new ResultDefinitionId(resultId));
 
         return result != null ? ResultDefinitionDto.FromDomain(result) : null;
     }
@@ -24,7 +23,10 @@ public sealed class ResultDefinitionQueries(IStudyTemplateRepository repository)
     {
         var studyTemplate = await repository.GetByIdAsync(new StudyTemplateId(studyTemplateId), cancellationToken);
 
-        if (studyTemplate is null) return [];
+        if (studyTemplate is null)
+        {
+            return [];
+        }
 
         return studyTemplate.ResultDefinitions
             .Select(ResultDefinitionDto.FromDomain)

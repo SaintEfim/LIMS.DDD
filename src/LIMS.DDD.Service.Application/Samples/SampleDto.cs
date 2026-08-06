@@ -13,17 +13,11 @@ public sealed record SampleDto(
     string? VolumeUnit,
     string Status)
 {
-    public static SampleDto FromDomain(Sample sample)
+    public static SampleDto FromDomain(
+        Sample sample)
     {
-        return new SampleDto(
-            Id: sample.Id.Value,
-            OrderId: sample.OrderId.Value,
-            Name: sample.Name.Value,
-            GatherDateBegin: sample.GatherDate.Begin,
-            GatherDateEnd: sample.GatherDate.End,
-            Code: sample.Code?.Value,
-            VolumeValue: sample.Volume.Value,
-            VolumeUnit: sample.Volume.Unit,
-            Status: sample.SampleStatus.Name);
+        return new SampleDto(sample.Id.Value, sample.OrderId.Value, sample.Name.Value, sample.GatherDate.Begin,
+            sample.GatherDate.End, sample.Code?.Value, sample.Volume.Value, sample.Volume.Unit,
+            sample.SampleStatus.Name);
     }
 }

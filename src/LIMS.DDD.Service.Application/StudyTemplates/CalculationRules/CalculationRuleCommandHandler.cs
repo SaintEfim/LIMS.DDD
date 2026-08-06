@@ -17,93 +17,141 @@ public sealed class CalculationRuleCommandHandler(IStudyTemplateRepository repos
         CancellationToken cancellationToken = default)
     {
         var templateResult = await GetTemplateForChangeAsync(studyTemplateId, cancellationToken);
-        if (templateResult.IsFailure) return Result<Guid, Exception>.Failure(templateResult.Error!);
+        if (templateResult.IsFailure)
+        {
+            return templateResult.CastFailure<Guid>();
+        }
 
         var nameResult = Name.Create(command.Name);
-        if (nameResult.IsFailure) return Result<Guid, Exception>.Failure(nameResult.Error!);
+        if (nameResult.IsFailure)
+        {
+            return nameResult.CastFailure<Guid>();
+        }
 
         var descResult = Description.Create(command.Description);
-        if (descResult.IsFailure) return Result<Guid, Exception>.Failure(descResult.Error!);
+        if (descResult.IsFailure)
+        {
+            return descResult.CastFailure<Guid>();
+        }
 
         var formulaResult = FormulaExpression.Create(command.FormulaExpression);
-        if (formulaResult.IsFailure) return Result<Guid, Exception>.Failure(formulaResult.Error!);
+        if (formulaResult.IsFailure)
+        {
+            return formulaResult.CastFailure<Guid>();
+        }
 
-        var addResult = templateResult.GetValue().AddCalculationRule(nameResult.GetValue(), formulaResult.GetValue(),
-            descResult.GetValue(), new ResultDefinitionId(command.ResultDefinitionId));
-        if (addResult.IsFailure) return Result<Guid, Exception>.Failure(addResult.Error!);
+        var addResult = templateResult.GetValue()
+            .AddCalculationRule(nameResult.GetValue(), formulaResult.GetValue(), descResult.GetValue(),
+                new ResultDefinitionId(command.ResultDefinitionId));
+        if (addResult.IsFailure)
+        {
+            return addResult.CastFailure<Guid>();
+        }
 
         var saveResult = await SaveChangesAsync(cancellationToken);
         return saveResult.IsFailure
-            ? Result<Guid, Exception>.Failure(saveResult.Error!)
-            : Result<Guid, Exception>.Success(addResult.GetValue().Id.Value);
+            ? saveResult.CastFailure<Guid>()
+            : Result<Guid, Exception>.Success(addResult.GetValue()
+                .Id.Value);
     }
 
-    public async Task<Result<Exception>> RemoveAsync(
+    public async Task<Result<UnitEmpty, Exception>> RemoveAsync(
         Guid studyTemplateId,
         Guid ruleId,
         CancellationToken cancellationToken = default)
     {
         var templateResult = await GetTemplateForChangeAsync(studyTemplateId, cancellationToken);
-        if (templateResult.IsFailure) return Result<Exception>.Failure(templateResult.Error!);
+        if (templateResult.IsFailure)
+        {
+            return templateResult.CastFailure<UnitEmpty>();
+        }
 
-        var removeResult = templateResult.GetValue().RemoveCalculationRule(new CalculationRuleId(ruleId));
-        if (removeResult.IsFailure) return Result<Exception>.Failure(removeResult.Error!);
+        var removeResult = templateResult.GetValue()
+            .RemoveCalculationRule(new CalculationRuleId(ruleId));
+        if (removeResult.IsFailure)
+        {
+            return removeResult.CastFailure<UnitEmpty>();
+        }
 
         return await SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<Result<Exception>> CreateInputAsync(
+    public async Task<Result<UnitEmpty, Exception>> CreateInputAsync(
         Guid studyTemplateId,
         Guid ruleId,
         AddCalculationInputCommand command,
         CancellationToken cancellationToken = default)
     {
         var templateResult = await GetTemplateForChangeAsync(studyTemplateId, cancellationToken);
-        if (templateResult.IsFailure) return Result<Exception>.Failure(templateResult.Error!);
+        if (templateResult.IsFailure)
+        {
+            return templateResult.CastFailure<UnitEmpty>();
+        }
 
         var inputParameterId = new InputParameterId(command.InputParameterId);
         var calculationRuleId = new CalculationRuleId(ruleId);
 
-        var addResult = templateResult.GetValue().AddCalculationInput(calculationRuleId, inputParameterId);
-        if (addResult.IsFailure) return Result<Exception>.Failure(addResult.Error!);
+        var addResult = templateResult.GetValue()
+            .AddCalculationInput(calculationRuleId, inputParameterId);
+        if (addResult.IsFailure)
+        {
+            return addResult.CastFailure<UnitEmpty>();
+        }
 
         return await SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<Result<Exception>> RemoveInputAsync(
+    public async Task<Result<UnitEmpty, Exception>> RemoveInputAsync(
         Guid studyTemplateId,
         Guid ruleId,
         RemoveCalculationInputCommand command,
         CancellationToken cancellationToken = default)
     {
         var templateResult = await GetTemplateForChangeAsync(studyTemplateId, cancellationToken);
-        if (templateResult.IsFailure) return Result<Exception>.Failure(templateResult.Error!);
+        if (templateResult.IsFailure)
+        {
+            return templateResult.CastFailure<UnitEmpty>();
+        }
 
         var variableAliasResult = AliasName.Create(command.VariableAlias);
-        if (variableAliasResult.IsFailure) return Result<Exception>.Failure(variableAliasResult.Error!);
+        if (variableAliasResult.IsFailure)
+        {
+            return variableAliasResult.CastFailure<UnitEmpty>();
+        }
 
         var calculationRuleId = new CalculationRuleId(ruleId);
 
-        var removeResult = templateResult.GetValue().RemoveCalculationInput(calculationRuleId, variableAliasResult.GetValue());
-        if (removeResult.IsFailure) return Result<Exception>.Failure(removeResult.Error!);
+        var removeResult = templateResult.GetValue()
+            .RemoveCalculationInput(calculationRuleId, variableAliasResult.GetValue());
+        if (removeResult.IsFailure)
+        {
+            return removeResult.CastFailure<UnitEmpty>();
+        }
 
         return await SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<Result<Exception>> UpdateAsync(
+    public async Task<Result<UnitEmpty, Exception>> UpdateAsync(
         Guid studyTemplateId,
         Guid ruleId,
         UpdateCalculationRuleCommand command,
         CancellationToken cancellationToken = default)
     {
         var templateResult = await GetTemplateForChangeAsync(studyTemplateId, cancellationToken);
-        if (templateResult.IsFailure) return Result<Exception>.Failure(templateResult.Error!);
+        if (templateResult.IsFailure)
+        {
+            return templateResult.CastFailure<UnitEmpty>();
+        }
 
         Name? name = null;
         if (command.Name is not null)
         {
             var nameResult = Name.Create(command.Name);
-            if (nameResult.IsFailure) return Result<Exception>.Failure(nameResult.Error!);
+            if (nameResult.IsFailure)
+            {
+                return nameResult.CastFailure<UnitEmpty>();
+            }
+
             name = nameResult.GetValue();
         }
 
@@ -111,7 +159,11 @@ public sealed class CalculationRuleCommandHandler(IStudyTemplateRepository repos
         if (command.FormulaExpression is not null)
         {
             var formulaResult = FormulaExpression.Create(command.FormulaExpression);
-            if (formulaResult.IsFailure) return Result<Exception>.Failure(formulaResult.Error!);
+            if (formulaResult.IsFailure)
+            {
+                return formulaResult.CastFailure<UnitEmpty>();
+            }
+
             formula = formulaResult.GetValue();
         }
 
@@ -119,7 +171,11 @@ public sealed class CalculationRuleCommandHandler(IStudyTemplateRepository repos
         if (command.Description is not null)
         {
             var descResult = Description.Create(command.Description);
-            if (descResult.IsFailure) return Result<Exception>.Failure(descResult.Error!);
+            if (descResult.IsFailure)
+            {
+                return descResult.CastFailure<UnitEmpty>();
+            }
+
             description = descResult.GetValue();
         }
 
@@ -127,9 +183,12 @@ public sealed class CalculationRuleCommandHandler(IStudyTemplateRepository repos
             ? new ResultDefinitionId(command.ResultDefinitionId.Value)
             : null;
 
-        var updateResult = templateResult.GetValue().UpdateCalculationRule(new CalculationRuleId(ruleId), name, formula,
-            description, resultDefinitionId);
-        if (updateResult.IsFailure) return Result<Exception>.Failure(updateResult.Error!);
+        var updateResult = templateResult.GetValue()
+            .UpdateCalculationRule(new CalculationRuleId(ruleId), name, formula, description, resultDefinitionId);
+        if (updateResult.IsFailure)
+        {
+            return updateResult.CastFailure<UnitEmpty>();
+        }
 
         return await SaveChangesAsync(cancellationToken);
     }
@@ -145,17 +204,17 @@ public sealed class CalculationRuleCommandHandler(IStudyTemplateRepository repos
             : Result<StudyTemplate, Exception>.Success(template);
     }
 
-    private async Task<Result<Exception>> SaveChangesAsync(
+    private async Task<Result<UnitEmpty, Exception>> SaveChangesAsync(
         CancellationToken cancellationToken)
     {
         try
         {
             await repository.SaveChangesAsync(cancellationToken);
-            return Result<Exception>.Success();
+            return Result<UnitEmpty, Exception>.Success(new UnitEmpty());
         }
         catch (Exception ex)
         {
-            return Result<Exception>.Failure(new Exception($"Failed to save changes: {ex.Message}", ex));
+            return Result<UnitEmpty, Exception>.Failure(new Exception($"Failed to save changes: {ex.Message}", ex));
         }
     }
 }

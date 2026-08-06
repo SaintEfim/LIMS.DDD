@@ -8,15 +8,15 @@ public sealed class SampleInProgressState : IState<Sample>
     public string Name => "InProgress";
     public bool CanEdit => false;
 
-    public Result<Exception> CanTransitionTo(
+    public Result<UnitEmpty, Exception> CanTransitionTo(
         IState<Sample> newState,
         Sample sample)
     {
         return newState switch
         {
-            SampleCompletedState => Result<Exception>.Success(),
-            SampleCanceledState => Result<Exception>.Success(),
-            _ => Result<Exception>.Failure(new InvalidOperationException("Invalid transition from InWork"))
+            SampleCompletedState => Result<UnitEmpty, Exception>.Success(new UnitEmpty()),
+            SampleCanceledState => Result<UnitEmpty, Exception>.Success(new UnitEmpty()),
+            _ => Result<UnitEmpty, Exception>.Failure(new InvalidOperationException("Invalid transition from InWork"))
         };
     }
 }

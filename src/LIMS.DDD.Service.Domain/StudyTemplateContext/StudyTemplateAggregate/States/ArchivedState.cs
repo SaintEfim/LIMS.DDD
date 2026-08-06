@@ -8,12 +8,15 @@ public sealed class ArchivedState : IState<StudyTemplate>
     public string Name => "Archived";
     public bool CanEdit => false;
 
-    public Result<Exception> CanTransitionTo(IState<StudyTemplate> newState, StudyTemplate template)
+    public Result<UnitEmpty, Exception> CanTransitionTo(
+        IState<StudyTemplate> newState,
+        StudyTemplate template)
     {
         return newState switch
         {
-            ArchivedState => Result<Exception>.Success(),
-            _ => Result<Exception>.Failure(new InvalidOperationException("Archived templates cannot change status."))
+            ArchivedState => Result<UnitEmpty, Exception>.Success(new UnitEmpty()),
+            _ => Result<UnitEmpty, Exception>.Failure(
+                new InvalidOperationException("Archived templates cannot change status."))
         };
     }
 }

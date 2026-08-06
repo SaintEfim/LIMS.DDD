@@ -1,6 +1,5 @@
 ﻿using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.SampleAggregate;
 using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.StudyAggregate;
-using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate;
 using Microsoft.EntityFrameworkCore;
 
 namespace LIMS.DDD.Service.Persistence.Repositories;
@@ -13,13 +12,6 @@ public class StudyRepository : IStudyRepository
         ApplicationDbContext context)
     {
         _context = context;
-    }
-
-    private static IQueryable<Study> StudyBaseQuery(
-        IQueryable<Study> query)
-    {
-        return query.Include(s => s.MeasuredValues)
-            .Include(s => s.TestResults);
     }
 
     public async Task<Study?> GetByIdForChangeAsync(
@@ -54,5 +46,12 @@ public class StudyRepository : IStudyRepository
         CancellationToken cancellationToken = default)
     {
         return await _context.SaveChangesAsync(cancellationToken);
+    }
+
+    private static IQueryable<Study> StudyBaseQuery(
+        IQueryable<Study> query)
+    {
+        return query.Include(s => s.MeasuredValues)
+            .Include(s => s.TestResults);
     }
 }

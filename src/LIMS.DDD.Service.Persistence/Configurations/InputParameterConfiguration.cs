@@ -53,9 +53,10 @@ public class InputParameterConfiguration : IEntityTypeConfiguration<InputParamet
         builder.HasQueryFilter(x => !x.IsDeleted);
 
         builder.HasIndex(x => new
-        {
-            x.StudyTemplateId,
-            x.AliasName
-        }).HasFilter("\"IsDeleted\" = false");
+            {
+                x.StudyTemplateId,
+                x.AliasName
+            })
+            .HasFilter("\"IsDeleted\" = false");
     }
 }

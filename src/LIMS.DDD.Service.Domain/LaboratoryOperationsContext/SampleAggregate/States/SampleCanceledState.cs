@@ -9,14 +9,14 @@ public sealed class SampleCanceledState : IState<Sample>
 
     public bool CanEdit => false;
 
-    public Result<Exception> CanTransitionTo(
+    public Result<UnitEmpty, Exception> CanTransitionTo(
         IState<Sample> newState,
         Sample sample)
     {
         return newState switch
         {
-            SampleCanceledState => Result<Exception>.Success(),
-            _ => Result<Exception>.Failure(
+            SampleCanceledState => Result<UnitEmpty, Exception>.Success(new UnitEmpty()),
+            _ => Result<UnitEmpty, Exception>.Failure(
                 new InvalidOperationException("Cannot transition from Canceled state. A canceled sample is final."))
         };
     }

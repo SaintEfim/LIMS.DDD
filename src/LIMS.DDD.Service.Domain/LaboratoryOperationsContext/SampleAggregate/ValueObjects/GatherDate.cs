@@ -4,9 +4,6 @@ namespace LIMS.DDD.Service.Domain.LaboratoryOperationsContext.SampleAggregate.Va
 
 public sealed record GatherDate
 {
-    public DateTimeOffset? Begin { get; init; }
-    public DateTimeOffset? End { get; init; }
-
     private GatherDate(
         DateTimeOffset? begin,
         DateTimeOffset? end)
@@ -14,6 +11,9 @@ public sealed record GatherDate
         Begin = begin;
         End = end;
     }
+
+    public DateTimeOffset? Begin { get; init; }
+    public DateTimeOffset? End { get; init; }
 
     public static Result<GatherDate, Exception> Create(
         DateTimeOffset? begin,
@@ -25,8 +25,10 @@ public sealed record GatherDate
         }
 
         if (begin.Value > end.Value)
+        {
             return Result<GatherDate, Exception>.Failure(
                 new ArgumentException("Gather begin date cannot be later than gather end date."));
+        }
 
         return Result<GatherDate, Exception>.Success(new GatherDate(begin, end));
     }

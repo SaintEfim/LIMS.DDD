@@ -23,36 +23,56 @@ public sealed class SampleCommandHandler(
     {
         var order = await orderRepository.GetByIdAsync(new OrderId(command.OrderId), cancellationToken);
         if (order is null)
+        {
             return Result<Sample, Exception>.Failure(
                 new KeyNotFoundException($"Order with id {command.OrderId} not found."));
+        }
 
         var nameResult = Name.Create(command.Name);
-        if (nameResult.IsFailure) return Result<Sample, Exception>.Failure(nameResult.Error!);
+        if (nameResult.IsFailure)
+        {
+            return nameResult.CastFailure<Sample>();
+        }
 
         var gatherDateResult = GatherDate.Create(command.GatherDateBegin, command.GatherDateEnd);
-        if (gatherDateResult.IsFailure) return Result<Sample, Exception>.Failure(gatherDateResult.Error!);
+        if (gatherDateResult.IsFailure)
+        {
+            return gatherDateResult.CastFailure<Sample>();
+        }
 
         var codeResult = Code.Create(command.Code);
-        if (codeResult.IsFailure) return Result<Sample, Exception>.Failure(codeResult.Error!);
+        if (codeResult.IsFailure)
+        {
+            return codeResult.CastFailure<Sample>();
+        }
 
         var volumeResult = Volume.Create(command.VolumeValue, command.VolumeUnit);
-        if (volumeResult.IsFailure) return Result<Sample, Exception>.Failure(volumeResult.Error!);
+        if (volumeResult.IsFailure)
+        {
+            return volumeResult.CastFailure<Sample>();
+        }
 
         var sampleResult = creationDomainService.CreateSample(order, nameResult.GetValue(), gatherDateResult.GetValue(),
             codeResult.GetValue(), volumeResult.GetValue());
 
-        if (sampleResult.IsFailure) return Result<Sample, Exception>.Failure(sampleResult.Error!);
+        if (sampleResult.IsFailure)
+        {
+            return sampleResult.CastFailure<Sample>();
+        }
 
         return await SaveNewAsync(sampleResult.GetValue(), cancellationToken);
     }
 
-    public async Task<Result<Exception>> UpdateAsync(
+    public async Task<Result<UnitEmpty, Exception>> UpdateAsync(
         Guid id,
         UpdateSampleCommand command,
         CancellationToken cancellationToken = default)
     {
         var sampleResult = await GetSampleForChangeAsync(id, cancellationToken);
-        if (sampleResult.IsFailure) return Result<Exception>.Failure(sampleResult.Error!);
+        if (sampleResult.IsFailure)
+        {
+            return sampleResult.CastFailure<UnitEmpty>();
+        }
 
         var sample = sampleResult.GetValue();
 
@@ -60,7 +80,7 @@ public sealed class SampleCommandHandler(
             ? Name.Create(command.Name)
                 .GetValue()
             : null;
-        var gatherDate = (command.GatherDateBegin is not null || command.GatherDateEnd is not null)
+        var gatherDate = command.GatherDateBegin is not null || command.GatherDateEnd is not null
             ? GatherDate.Create(command.GatherDateBegin ?? sample.GatherDate.Begin,
                     command.GatherDateEnd ?? sample.GatherDate.End)
                 .GetValue()
@@ -71,10 +91,13 @@ public sealed class SampleCommandHandler(
             : null;
 
         var updateResult = sample.UpdatePartial(name, gatherDate, code, command.VolumeValue, command.VolumeUnit);
-        if (updateResult.IsFailure) return Result<Exception>.Failure(updateResult.Error!);
+        if (updateResult.IsFailure)
+        {
+            return updateResult.CastFailure<UnitEmpty>();
+        }
 
         await repository.SaveChangesAsync(cancellationToken);
-        return Result<Exception>.Success();
+        return Result<UnitEmpty, Exception>.Success(new UnitEmpty());
     }
 
     public async Task<Result<Sample, Exception>> ChangeStatusAsync(
@@ -84,7 +107,10 @@ public sealed class SampleCommandHandler(
     {
         var templateResult = await GetSampleForChangeAsync(id, cancellationToken);
 
-        if (templateResult.IsFailure) return Result<Sample, Exception>.Failure(templateResult.Error!);
+        if (templateResult.IsFailure)
+        {
+            return templateResult.CastFailure<Sample>();
+        }
 
         var template = templateResult.GetValue();
 
@@ -96,33 +122,45 @@ public sealed class SampleCommandHandler(
 
         var changeResult = template.ChangeStatus(newStatus!);
 
-        if (changeResult.IsFailure) return Result<Sample, Exception>.Failure(changeResult.Error!);
+        if (changeResult.IsFailure)
+        {
+            return changeResult.CastFailure<Sample>();
+        }
 
         return await SaveChangesAsync(template, cancellationToken);
     }
 
-    public async Task<Result<Exception>> DeleteAsync(
+    public async Task<Result<UnitEmpty, Exception>> DeleteAsync(
         Guid id,
         CancellationToken cancellationToken = default)
     {
         var sampleResult = await GetSampleForChangeAsync(id, cancellationToken);
-        if (sampleResult.IsFailure) return Result<Exception>.Failure(sampleResult.Error!);
+        if (sampleResult.IsFailure)
+        {
+            return sampleResult.CastFailure<UnitEmpty>();
+        }
+
         var sample = sampleResult.GetValue();
 
         var order = await orderRepository.GetByIdAsync(sample.OrderId, cancellationToken);
         if (order is null)
-            return Result<Exception>.Failure(
+        {
+            return Result<UnitEmpty, Exception>.Failure(
                 new KeyNotFoundException($"Parent Order with id {sample.OrderId} not found."));
+        }
 
         var studies = (await studyRepository.GetBySampleIdAsync(sample.Id, cancellationToken)).ToList()
             .AsReadOnly();
 
         var deleteResult = deletionDomainService.Delete(sample, order, studies);
-        if (deleteResult.IsFailure) return Result<Exception>.Failure(deleteResult.Error!);
+        if (deleteResult.IsFailure)
+        {
+            return deleteResult.CastFailure<UnitEmpty>();
+        }
 
         await repository.SaveChangesAsync(cancellationToken);
 
-        return Result<Exception>.Success();
+        return Result<UnitEmpty, Exception>.Success(new UnitEmpty());
     }
 
     private async Task<Result<Sample, Exception>> SaveNewAsync(

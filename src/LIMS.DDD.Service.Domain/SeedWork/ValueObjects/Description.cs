@@ -6,11 +6,13 @@ public sealed record Description
 {
     private const int MaxDescriptionLength = 1000;
 
-    public string? Value { get; }
-
     private Description(
-        string? value) =>
+        string? value)
+    {
         Value = value;
+    }
+
+    public string? Value { get; }
 
     public static Result<Description, Exception> Create(
         string? value)

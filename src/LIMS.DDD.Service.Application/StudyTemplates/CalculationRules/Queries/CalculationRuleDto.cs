@@ -1,5 +1,4 @@
-﻿using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.Entities;
-using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.Entities.CalculationRules;
+﻿using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.Entities.CalculationRules;
 
 namespace LIMS.DDD.Service.Application.StudyTemplates.CalculationRules.Queries;
 
@@ -14,9 +13,8 @@ public sealed record CalculationRuleDto(
     public static CalculationRuleDto FromDomain(
         CalculationRule rule)
     {
-        return new CalculationRuleDto(Id: rule.Id.Value, Name: rule.Name.Value,
-            FormulaExpression: rule.FormulaExpression.Value, Description: rule.Description.Value,
-            ResultDefinitionId: rule.ResultDefinitionId.Value, Inputs: rule.CalculationInputs
+        return new CalculationRuleDto(rule.Id.Value, rule.Name.Value, rule.FormulaExpression.Value,
+            rule.Description.Value, rule.ResultDefinitionId.Value, rule.CalculationInputs
                 .Select(CalculationInputDto.FromDomain)
                 .ToList());
     }

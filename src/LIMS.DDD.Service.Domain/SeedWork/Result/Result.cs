@@ -1,35 +1,10 @@
 ﻿namespace LIMS.DDD.Service.Domain.SeedWork.Result;
 
-public class Result<TError>
-    where TError : Exception
-{
-    public bool IsSuccess { get; }
-    public bool IsFailure => !IsSuccess;
-    public TError? Error { get; }
-
-    private Result(
-        bool isSuccess,
-        TError? error)
-    {
-        IsSuccess = isSuccess;
-        Error = error;
-    }
-
-    public static Result<TError> Success() => new(true, null);
-
-    public static Result<TError> Failure(
-        TError error) =>
-        new(false, error);
-}
+public readonly record struct UnitEmpty;
 
 public class Result<TValue, TError>
     where TError : Exception
 {
-    public bool IsSuccess { get; }
-    public bool IsFailure => !IsSuccess;
-    private TValue? Value { get; }
-    public TError? Error { get; }
-
     private Result(
         bool isSuccess,
         TValue? value,
@@ -40,16 +15,35 @@ public class Result<TValue, TError>
         Error = error;
     }
 
+    public bool IsSuccess { get; }
+    public bool IsFailure => !IsSuccess;
+    private TValue? Value { get; }
+    private TError? Error { get; }
+
     public static Result<TValue, TError> Success(
-        TValue? value) =>
-        new(true, value, null);
+        TValue? value)
+    {
+        return new Result<TValue, TError>(true, value, null);
+    }
 
     public static Result<TValue, TError> Failure(
-        TError error) =>
-        new(false, default, error);
+        TError error)
+    {
+        return new Result<TValue, TError>(false, default, error);
+    }
 
     public TValue GetValue()
     {
         return IsFailure ? throw new InvalidOperationException("Cannot get value from failed result.") : Value!;
+    }
+
+    public TError GetError()
+    {
+        return IsFailure ? throw new InvalidOperationException("Cannot get error from failed result.") : Error!;
+    }
+
+    public Result<TNew, TError> CastFailure<TNew>()
+    {
+        return Result<TNew, TError>.Failure(GetError());
     }
 }

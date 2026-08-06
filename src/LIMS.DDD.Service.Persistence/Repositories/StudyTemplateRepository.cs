@@ -1,6 +1,4 @@
-﻿using LIMS.DDD.Service.Domain.SeedWork.ValueObjects;
-using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate;
-using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.ValueObjects;
+﻿using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate;
 using Microsoft.EntityFrameworkCore;
 
 namespace LIMS.DDD.Service.Persistence.Repositories;
@@ -13,14 +11,6 @@ public class StudyTemplateRepository : IStudyTemplateRepository
         ApplicationDbContext context)
     {
         _context = context;
-    }
-
-    private static IQueryable<StudyTemplate> StudyTemplateBaseQuery(
-        IQueryable<StudyTemplate> query)
-    {
-        return query.Include(t => t.InputParameters)
-            .Include(t => t.ResultDefinitions)
-            .Include(t => t.CalculationRules);
     }
 
     public async Task<StudyTemplate?> GetByIdAsync(
@@ -68,15 +58,23 @@ public class StudyTemplateRepository : IStudyTemplateRepository
         _context.StudyTemplates.Add(studyTemplate);
     }
 
-    public void Remove(
-        StudyTemplate studyTemplate)
-    {
-        _context.StudyTemplates.Remove(studyTemplate);
-    }
-
     public async Task<int> SaveChangesAsync(
         CancellationToken cancellationToken = default)
     {
         return await _context.SaveChangesAsync(cancellationToken);
+    }
+
+    private static IQueryable<StudyTemplate> StudyTemplateBaseQuery(
+        IQueryable<StudyTemplate> query)
+    {
+        return query.Include(t => t.InputParameters)
+            .Include(t => t.ResultDefinitions)
+            .Include(t => t.CalculationRules);
+    }
+
+    public void Remove(
+        StudyTemplate studyTemplate)
+    {
+        _context.StudyTemplates.Remove(studyTemplate);
     }
 }

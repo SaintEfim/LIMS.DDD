@@ -8,15 +8,16 @@ public sealed class SampleRegisteredState : IState<Sample>
     public string Name => "Registered";
     public bool CanEdit => true;
 
-    public Result<Exception> CanTransitionTo(
+    public Result<UnitEmpty, Exception> CanTransitionTo(
         IState<Sample> newState,
         Sample sample)
     {
         return newState switch
         {
-            SampleInProgressState or SampleRegisteredState => Result<Exception>.Success(),
-            SampleCanceledState => Result<Exception>.Success(),
-            _ => Result<Exception>.Failure(new InvalidOperationException("Invalid transition from Registered"))
+            SampleInProgressState or SampleRegisteredState => Result<UnitEmpty, Exception>.Success(new UnitEmpty()),
+            SampleCanceledState => Result<UnitEmpty, Exception>.Success(new UnitEmpty()),
+            _ => Result<UnitEmpty, Exception>.Failure(
+                new InvalidOperationException("Invalid transition from Registered"))
         };
     }
 }

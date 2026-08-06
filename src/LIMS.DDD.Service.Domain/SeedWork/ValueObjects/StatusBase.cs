@@ -3,7 +3,7 @@
 namespace LIMS.DDD.Service.Domain.SeedWork.ValueObjects;
 
 /// <summary>
-/// Базовый класс для статусов, реализующих State Pattern
+///     Базовый класс для статусов, реализующих State Pattern
 /// </summary>
 public abstract record StatusBase<TState, TEntity>
     where TState : class, IState<TEntity>
@@ -19,7 +19,7 @@ public abstract record StatusBase<TState, TEntity>
     public string Name => _state.Name;
     public bool CanEdit => _state.CanEdit;
 
-    public Result<Exception> CanTransitionTo(
+    public Result<UnitEmpty, Exception> CanTransitionTo(
         StatusBase<TState, TEntity> newStatus,
         TEntity entity)
     {

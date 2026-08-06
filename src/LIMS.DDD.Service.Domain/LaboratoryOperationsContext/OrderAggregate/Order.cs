@@ -10,6 +10,10 @@ public class Order
     : SoftDeletableModel,
         IAggregateRoot
 {
+    private Order()
+    {
+    }
+
     public OrderId Id { get; private set; }
 
     public Name Name { get; private set; }
@@ -25,10 +29,6 @@ public class Order
     public bool CanAcceptNewEntity => OrderStatus == OrderStatus.Draft || OrderStatus == OrderStatus.InProgress;
 
     public bool CanDeleteAssociatedEntities => OrderStatus == OrderStatus.Draft;
-
-    private Order()
-    {
-    }
 
     public static Result<Order, Exception> Create(
         Name name,
@@ -48,49 +48,74 @@ public class Order
         return Result<Order, Exception>.Success(order);
     }
 
-    public Result<Exception> Delete()
+    public Result<UnitEmpty, Exception> Delete()
     {
         if (OrderStatus != OrderStatus.Draft)
-            return Result<Exception>.Failure(new InvalidOperationException(
+        {
+            return Result<UnitEmpty, Exception>.Failure(new InvalidOperationException(
                 $"Cannot delete order in '{OrderStatus.Name}' status. " +
                 "Only orders in 'Draft' status can be deleted. Use 'Cancel' status for others."));
+        }
 
-        if (IsDeleted) return Result<Exception>.Failure(new InvalidOperationException("Sample is already deleted."));
+        if (IsDeleted)
+        {
+            return Result<UnitEmpty, Exception>.Failure(new InvalidOperationException("Sample is already deleted."));
+        }
 
         IsDeleted = true;
         DeletedAt = DateTimeOffset.UtcNow;
 
-        return Result<Exception>.Success();
+        return Result<UnitEmpty, Exception>.Success(new UnitEmpty());
     }
 
-    public Result<Exception> UpdatePartial(
+    public Result<UnitEmpty, Exception> UpdatePartial(
         Name? name,
         Description? description,
         string? contractor,
         Code? code)
     {
         if (!OrderStatus.CanEdit)
-            return Result<Exception>.Failure(
+        {
+            return Result<UnitEmpty, Exception>.Failure(
                 new InvalidOperationException(
                     "Cannot modify details of an Active or Archived template. Create a new revision."));
+        }
 
-        if (name is not null) Name = name;
-        if (description is not null) Description = description;
-        if (contractor is not null) Contractor = contractor;
-        if (code is not null) Code = code;
+        if (name is not null)
+        {
+            Name = name;
+        }
 
-        return Result<Exception>.Success();
+        if (description is not null)
+        {
+            Description = description;
+        }
+
+        if (contractor is not null)
+        {
+            Contractor = contractor;
+        }
+
+        if (code is not null)
+        {
+            Code = code;
+        }
+
+        return Result<UnitEmpty, Exception>.Success(new UnitEmpty());
     }
 
-    public Result<Exception> ChangeStatus(
+    public Result<UnitEmpty, Exception> ChangeStatus(
         OrderStatus newOrderStatus)
     {
         var result = OrderStatus.CanTransitionTo(newOrderStatus, this);
 
-        if (result.IsFailure) return result;
+        if (result.IsFailure)
+        {
+            return result.CastFailure<UnitEmpty>();
+        }
 
         OrderStatus = newOrderStatus;
 
-        return Result<Exception>.Success();
+        return Result<UnitEmpty, Exception>.Success(new UnitEmpty());
     }
 }

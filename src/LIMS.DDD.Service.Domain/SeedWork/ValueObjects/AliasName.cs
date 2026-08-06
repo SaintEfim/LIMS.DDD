@@ -6,11 +6,13 @@ public sealed record AliasName
 {
     private const int MaxAliasNameLength = 100;
 
-    public string Value { get; }
-
     private AliasName(
-        string value) =>
+        string value)
+    {
         Value = value;
+    }
+
+    public string Value { get; }
 
     public static Result<AliasName, Exception> Create(
         string value)

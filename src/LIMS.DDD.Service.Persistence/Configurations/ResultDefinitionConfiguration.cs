@@ -49,6 +49,7 @@ public class ResultDefinitionConfiguration : IEntityTypeConfiguration<ResultDefi
                 x.ResultInstance,
                 x.Unit
             })
-            .IsUnique().HasFilter("\"IsDeleted\" = false");
+            .IsUnique()
+            .HasFilter("\"IsDeleted\" = false");
     }
 }

@@ -9,10 +9,11 @@ public sealed class StudyCanceledState : IState<Study>
 
     public bool CanEdit => false;
 
-    public Result<Exception> CanTransitionTo(
+    public Result<UnitEmpty, Exception> CanTransitionTo(
         IState<Study> newState,
         Study study)
     {
-        return Result<Exception>.Failure(new InvalidOperationException("Canceled studies cannot change status."));
+        return Result<UnitEmpty, Exception>.Failure(
+            new InvalidOperationException("Canceled studies cannot change status."));
     }
 }

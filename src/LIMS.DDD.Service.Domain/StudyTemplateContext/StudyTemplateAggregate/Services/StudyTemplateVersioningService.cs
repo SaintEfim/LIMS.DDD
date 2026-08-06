@@ -13,17 +13,25 @@ public class StudyTemplateVersioningService
         Revision newRevisionValue)
     {
         if (original.Status != Status.Active && original.Status != Status.Archived)
+        {
             return Result<StudyTemplate, Exception>.Failure(
                 new InvalidOperationException("Can only create revisions from Active or Archived templates."));
+        }
 
         var createResult = StudyTemplate.Create(original.Name, original.Description, newRevisionValue);
-        if (createResult.IsFailure) return Result<StudyTemplate, Exception>.Failure(createResult.Error!);
+        if (createResult.IsFailure)
+        {
+            return createResult.CastFailure<StudyTemplate>();
+        }
 
         var newTemplate = createResult.GetValue();
         newTemplate.SetParentId(original.Id);
 
         var copyResult = CopyChildren(original, newTemplate);
-        if (copyResult.IsFailure) return Result<StudyTemplate, Exception>.Failure(copyResult.Error!);
+        if (copyResult.IsFailure)
+        {
+            return copyResult.CastFailure<StudyTemplate>();
+        }
 
         if (original.Status != Status.Active)
         {
@@ -32,11 +40,11 @@ public class StudyTemplateVersioningService
 
         var archiveResult = original.ChangeStatus(Status.Archived);
         return archiveResult.IsFailure
-            ? Result<StudyTemplate, Exception>.Failure(archiveResult.Error!)
+            ? archiveResult.CastFailure<StudyTemplate>()
             : Result<StudyTemplate, Exception>.Success(newTemplate);
     }
 
-    private static Result<Exception> CopyChildren(
+    private static Result<UnitEmpty, Exception> CopyChildren(
         StudyTemplate original,
         StudyTemplate newTemplate)
     {
@@ -46,59 +54,74 @@ public class StudyTemplateVersioningService
         foreach (var param in original.InputParameters)
         {
             var specResult = Specification.Create(param.Specification.MinValue, param.Specification.MaxValue);
-            if (specResult.IsFailure) return Result<Exception>.Failure(specResult.Error!);
+            if (specResult.IsFailure)
+            {
+                return specResult.CastFailure<UnitEmpty>();
+            }
 
             var addResult = newTemplate.AddInputParameter(
-                param.Name,
-                param.Description,
-                param.AliasName,
-                specResult.GetValue());
+                param.Name, param.Description, param.AliasName, specResult.GetValue());
 
-            if (addResult.IsFailure) return Result<Exception>.Failure(addResult.Error!);
+            if (addResult.IsFailure)
+            {
+                return addResult.CastFailure<UnitEmpty>();
+            }
 
-            paramIdMap[param.Id] = addResult.GetValue().Id;
+            paramIdMap[param.Id] = addResult.GetValue()
+                .Id;
         }
 
         foreach (var result in original.ResultDefinitions)
         {
             var specResult = Specification.Create(result.Specification.MinValue, result.Specification.MaxValue);
-            if (specResult.IsFailure) return Result<Exception>.Failure(specResult.Error!);
+            if (specResult.IsFailure)
+            {
+                return specResult.CastFailure<UnitEmpty>();
+            }
 
-            var addResult = newTemplate.AddResultDefinition(
-                result.ResultInstance,
-                result.Unit,
-                specResult.GetValue());
+            var addResult = newTemplate.AddResultDefinition(result.ResultInstance, result.Unit, specResult.GetValue());
 
-            if (addResult.IsFailure) return Result<Exception>.Failure(addResult.Error!);
+            if (addResult.IsFailure)
+            {
+                return addResult.CastFailure<UnitEmpty>();
+            }
 
-            resultDefIdMap[result.Id] = addResult.GetValue().Id;
+            resultDefIdMap[result.Id] = addResult.GetValue()
+                .Id;
         }
 
         foreach (var rule in original.CalculationRules)
         {
             if (!resultDefIdMap.TryGetValue(rule.ResultDefinitionId, out var newResultDefId))
+            {
                 continue;
+            }
 
             var ruleResult = newTemplate.AddCalculationRule(
-                rule.Name,
-                rule.FormulaExpression,
-                rule.Description,
-                newResultDefId);
+                rule.Name, rule.FormulaExpression, rule.Description, newResultDefId);
 
-            if (ruleResult.IsFailure) return Result<Exception>.Failure(ruleResult.Error!);
+            if (ruleResult.IsFailure)
+            {
+                return ruleResult.CastFailure<UnitEmpty>();
+            }
 
             var newRule = ruleResult.GetValue();
 
             foreach (var input in rule.CalculationInputs)
             {
                 if (!paramIdMap.TryGetValue(input.ParameterId, out var newParamId))
+                {
                     continue;
+                }
 
                 var inputResult = newTemplate.AddCalculationInput(newRule.Id, newParamId);
-                if (inputResult.IsFailure) return Result<Exception>.Failure(inputResult.Error!);
+                if (inputResult.IsFailure)
+                {
+                    return inputResult.CastFailure<UnitEmpty>();
+                }
             }
         }
 
-        return Result<Exception>.Success();
+        return Result<UnitEmpty, Exception>.Success(new UnitEmpty());
     }
 }
