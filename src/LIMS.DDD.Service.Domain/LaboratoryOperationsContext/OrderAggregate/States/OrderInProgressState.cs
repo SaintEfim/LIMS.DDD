@@ -8,13 +8,15 @@ public sealed class OrderInProgressState : IState<Order>
     public string Name => "InProgress";
     public bool CanEdit => false;
 
-    public Result<Exception> CanTransitionTo(IState<Order> newState, Order template)
+    public Result<None, Exception> CanTransitionTo(
+        IState<Order> newState,
+        Order template)
     {
         return newState switch
         {
-            OrderCompletedState => Result<Exception>.Success(),
-            OrderCanceledState => Result<Exception>.Success(),
-            _ => Result<Exception>.Failure(new InvalidOperationException("Invalid transition from InWork"))
+            OrderCompletedState => Result<None, Exception>.Success(new None()),
+            OrderCanceledState => Result<None, Exception>.Success(new None()),
+            _ => Result<None, Exception>.Failure(new InvalidOperationException("Invalid transition from InWork"))
         };
     }
 }

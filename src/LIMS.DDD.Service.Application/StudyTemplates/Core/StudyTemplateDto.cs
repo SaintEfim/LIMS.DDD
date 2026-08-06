@@ -19,11 +19,10 @@ public sealed record StudyTemplateDto(
     public static StudyTemplateDto FromDomain(
         StudyTemplate template)
     {
-        return new StudyTemplateDto(ParentId: template.ParentId?.Value, Id: template.Id.Value, Name: template.Name.Value,
-            Description: template.Description.Value, Revision: template.Revision.Value,
-            Status: template.Status.Name,
-            ResultDefinitions: template.ResultDefinitions.Select(ResultDefinitionDto.FromDomain),
-            InputParameters: template.InputParameters.Select(InputParameterDto.FromDomain),
-            CalculationRules: template.CalculationRules.Select(CalculationRuleDto.FromDomain));
+        return new StudyTemplateDto(template.ParentId?.Value, template.Id.Value, template.Name.Value,
+            template.Description.Value, template.Revision.Value, template.Status.Name,
+            template.ResultDefinitions.Select(ResultDefinitionDto.FromDomain),
+            template.InputParameters.Select(InputParameterDto.FromDomain),
+            template.CalculationRules.Select(CalculationRuleDto.FromDomain));
     }
 }

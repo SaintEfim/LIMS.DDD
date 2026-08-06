@@ -13,8 +13,8 @@ public sealed record InputParameterDto(
     public static InputParameterDto FromDomain(
         InputParameter inputParameter)
     {
-        return new InputParameterDto(Id: inputParameter.Id.Value, Name: inputParameter.Name.Value,
-            Description: inputParameter.Description.Value, AliasName: inputParameter.AliasName.Value,
-            MinValue: inputParameter.Specification.MinValue, MaxValue: inputParameter.Specification.MaxValue);
+        return new InputParameterDto(inputParameter.Id.Value, inputParameter.Name.Value,
+            inputParameter.Description.Value, inputParameter.AliasName.Value, inputParameter.Specification.MinValue,
+            inputParameter.Specification.MaxValue);
     }
 }

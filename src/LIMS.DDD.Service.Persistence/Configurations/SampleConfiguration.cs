@@ -32,7 +32,7 @@ public class SampleConfiguration : IEntityTypeConfiguration<Sample>
         builder.HasOne<Order>()
             .WithMany()
             .HasForeignKey(x => x.OrderId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.Restrict);
 
         builder.Property(x => x.Name)
             .HasConversion(n => n.Value, n => Name.Create(n)
@@ -48,12 +48,10 @@ public class SampleConfiguration : IEntityTypeConfiguration<Sample>
         builder.OwnsOne(x => x.GatherDate, gd =>
         {
             gd.Property(p => p.Begin)
-                .HasColumnName("GatherDateBegin")
-                .HasColumnType("datetimeoffset");
+                .HasColumnName("GatherDateBegin");
 
             gd.Property(p => p.End)
-                .HasColumnName("GatherDateEnd")
-                .HasColumnType("datetimeoffset");
+                .HasColumnName("GatherDateEnd");
         });
 
         builder.OwnsOne(x => x.Volume, v =>
@@ -73,6 +71,6 @@ public class SampleConfiguration : IEntityTypeConfiguration<Sample>
 
         builder.HasIndex(x => x.Code)
             .IsUnique()
-            .HasFilter("[IsDeleted] = 0");
+            .HasFilter("\"IsDeleted\" = false");
     }
 }

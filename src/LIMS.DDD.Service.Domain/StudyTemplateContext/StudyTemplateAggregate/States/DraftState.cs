@@ -8,27 +8,39 @@ public sealed class DraftState : IState<StudyTemplate>
     public string Name => "Draft";
     public bool CanEdit => true;
 
-    public Result<Exception> CanTransitionTo(IState<StudyTemplate> newState, StudyTemplate template)
+    public Result<None, Exception> CanTransitionTo(
+        IState<StudyTemplate> newState,
+        StudyTemplate template)
     {
         return newState switch
         {
             ActiveState => ValidateForActivation(template),
-            DraftState or ArchivedState => Result<Exception>.Success(),
-            _ => Result<Exception>.Failure(new InvalidOperationException("Invalid transition from Draft"))
+            DraftState or ArchivedState => Result<None, Exception>.Success(new None()),
+            _ => Result<None, Exception>.Failure(new InvalidOperationException("Invalid transition from Draft"))
         };
     }
 
-    private static Result<Exception> ValidateForActivation(StudyTemplate template)
+    private static Result<None, Exception> ValidateForActivation(
+        StudyTemplate template)
     {
         if (template.InputParameters.Count == 0)
-            return Result<Exception>.Failure(new InvalidOperationException("Cannot activate without input parameters."));
+        {
+            return Result<None, Exception>.Failure(
+                new InvalidOperationException("Cannot activate without input parameters."));
+        }
 
         if (template.ResultDefinitions.Count == 0)
-            return Result<Exception>.Failure(new InvalidOperationException("Cannot activate without result definitions."));
+        {
+            return Result<None, Exception>.Failure(
+                new InvalidOperationException("Cannot activate without result definitions."));
+        }
 
         if (template.CalculationRules.Count == 0)
-            return Result<Exception>.Failure(new InvalidOperationException("Cannot activate without calculation rules."));
+        {
+            return Result<None, Exception>.Failure(
+                new InvalidOperationException("Cannot activate without calculation rules."));
+        }
 
-        return Result<Exception>.Success();
+        return Result<None, Exception>.Success();
     }
 }

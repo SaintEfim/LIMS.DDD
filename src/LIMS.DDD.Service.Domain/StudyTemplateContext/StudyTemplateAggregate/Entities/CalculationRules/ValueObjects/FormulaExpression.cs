@@ -7,8 +7,10 @@ public sealed record FormulaExpression
     private const int MaxLength = 2000;
 
     private FormulaExpression(
-        string value) =>
+        string value)
+    {
         Value = value;
+    }
 
     public string Value { get; }
 

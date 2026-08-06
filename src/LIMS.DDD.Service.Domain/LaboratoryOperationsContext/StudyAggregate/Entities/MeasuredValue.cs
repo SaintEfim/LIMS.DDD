@@ -1,40 +1,41 @@
-﻿using LIMS.DDD.Service.Domain.SeedWork;
-using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.Entities.InputParameters;
+﻿using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.StudyAggregate.ValueObjects;
+using LIMS.DDD.Service.Domain.SeedWork;
 
 namespace LIMS.DDD.Service.Domain.LaboratoryOperationsContext.StudyAggregate.Entities;
 
 public sealed class MeasuredValue : SoftDeletableModel
-
 {
     private MeasuredValue()
     {
     }
 
     public MeasuredValueId Id { get; private set; }
+
     public StudyId StudyId { get; private set; }
 
-    public InputParameterId ParameterId { get; private set; }
+    public ParameterSnapshot ParameterSnapshot { get; private set; } = null!;
+
     public double? Value { get; private set; }
 
     internal static MeasuredValue Create(
         StudyId studyId,
-        InputParameterId parameterId,
-        double? value,
-        string? unit)
+        ParameterSnapshot snapshot)
     {
         return new MeasuredValue
         {
             Id = new MeasuredValueId(Guid.NewGuid()),
             StudyId = studyId,
-            ParameterId = parameterId,
-            Value = value,
+            ParameterSnapshot = snapshot
         };
     }
 
     internal void Update(
         double? value)
     {
-        if (value is not null) Value = value;
+        if (value is not null)
+        {
+            Value = value;
+        }
     }
 
     internal void MarkAsDeleted()

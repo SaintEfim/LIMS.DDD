@@ -73,7 +73,10 @@ public class StudyTemplateModule : ICarterModule
     {
         var result = await services.Commands.CreateAsync(createCommand, ct);
 
-        if (result.IsFailure) return HandleFailure(result.Error!);
+        if (result.IsFailure)
+        {
+            return HandleFailure(result.GetError());
+        }
 
         var createdId = result.GetValue()
             .Id.Value;
@@ -87,7 +90,7 @@ public class StudyTemplateModule : ICarterModule
         CancellationToken ct)
     {
         var result = await services.Commands.UpdateAsync(id, updateCommand, ct);
-        return result.IsFailure ? HandleFailure(result.Error!) : Results.NoContent();
+        return result.IsFailure ? HandleFailure(result.GetError()) : Results.NoContent();
     }
 
     private static async Task<IResult> ChangeStatus(
@@ -97,7 +100,7 @@ public class StudyTemplateModule : ICarterModule
         CancellationToken ct)
     {
         var result = await services.Commands.ChangeStatusAsync(id, newStatus, ct);
-        return result.IsFailure ? HandleFailure(result.Error!) : Results.Ok();
+        return result.IsFailure ? HandleFailure(result.GetError()) : Results.Ok();
     }
 
     private static async Task<IResult> CreateRevision(
@@ -108,7 +111,10 @@ public class StudyTemplateModule : ICarterModule
     {
         var result = await services.Commands.CreateRevisionAsync(id, command, ct);
 
-        if (result.IsFailure) return HandleFailure(result.Error!);
+        if (result.IsFailure)
+        {
+            return HandleFailure(result.GetError());
+        }
 
         var newTemplateId = result.GetValue();
         return Results.Created($"/api/study-templates/{newTemplateId}", new { id = newTemplateId });
@@ -121,16 +127,18 @@ public class StudyTemplateModule : ICarterModule
     {
         var result = await services.Commands.DeleteAsync(id, ct);
 
-        return result.IsFailure ? HandleFailure(result.Error!) : Results.NoContent();
+        return result.IsFailure ? HandleFailure(result.GetError()) : Results.NoContent();
     }
 
     private static IResult HandleFailure(
-        Exception error) =>
-        error switch
+        Exception error)
+    {
+        return error switch
         {
             KeyNotFoundException => Results.NotFound(new { error.Message }),
             ArgumentException or InvalidOperationException => Results.BadRequest(new { error.Message }),
-            _ => Results.Problem(detail: error.Message, statusCode: StatusCodes.Status500InternalServerError,
+            _ => Results.Problem(error.Message, statusCode: StatusCodes.Status500InternalServerError,
                 title: "An unexpected error occurred")
         };
+    }
 }

@@ -6,14 +6,6 @@ namespace LIMS.DDD.Service.Domain.LaboratoryOperationsContext.StudyAggregate.Val
 
 public sealed record StudyStatus : StatusBase<IState<Study>, Study>
 {
-    public static StudyStatus InWork { get; } = new(new StudyInProgressState());
-
-    public static StudyStatus Completed { get; } = new(new StudyCompletedState());
-
-    public static StudyStatus Approved { get; } = new(new StudyApprovedState());
-
-    public static StudyStatus Canceled { get; } = new(new StudyCanceledState());
-
     private static readonly Dictionary<string, StudyStatus> Registry = new(StringComparer.OrdinalIgnoreCase)
     {
         ["InWork"] = InWork,
@@ -22,17 +14,25 @@ public sealed record StudyStatus : StatusBase<IState<Study>, Study>
         ["Canceled"] = Canceled
     };
 
+    private StudyStatus(
+        IState<Study> state)
+        : base(state)
+    {
+    }
+
+    public static StudyStatus InWork { get; } = new(new StudyInProgressState());
+
+    public static StudyStatus Completed { get; } = new(new StudyCompletedState());
+
+    public static StudyStatus Approved { get; } = new(new StudyApprovedState());
+
+    public static StudyStatus Canceled { get; } = new(new StudyCanceledState());
+
     public static bool TryParse(
         string name,
         out StudyStatus status)
     {
         return Registry.TryGetValue(name, out status!);
-    }
-
-    private StudyStatus(
-        IState<Study> state)
-        : base(state)
-    {
     }
 
     public static StudyStatus ConvertStatus(

@@ -1,13 +1,9 @@
 using LIMS.DDD.Service.Domain.SeedWork.Result;
 
-namespace LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.ValueObjects;
+namespace LIMS.DDD.Service.Domain.SeedWork.ValueObjects;
 
 public sealed record Specification
 {
-    public double? MinValue { get; init; }
-
-    public double? MaxValue { get; init; }
-
     private Specification(
         double? minValue,
         double? maxValue)
@@ -15,6 +11,10 @@ public sealed record Specification
         MinValue = minValue;
         MaxValue = maxValue;
     }
+
+    public double? MinValue { get; init; }
+
+    public double? MaxValue { get; init; }
 
     public static Result<Specification, Exception> Create(
         double? minValue,
@@ -33,7 +33,11 @@ public sealed record Specification
     public bool Contains(
         double value)
     {
-        if (value < MinValue) return false;
+        if (value < MinValue)
+        {
+            return false;
+        }
+
         return !(value > MaxValue);
     }
 }

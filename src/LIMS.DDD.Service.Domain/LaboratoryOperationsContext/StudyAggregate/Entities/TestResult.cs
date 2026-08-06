@@ -1,5 +1,5 @@
-﻿using LIMS.DDD.Service.Domain.SeedWork;
-using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.Entities.ResultDefinitions;
+﻿using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.StudyAggregate.ValueObjects;
+using LIMS.DDD.Service.Domain.SeedWork;
 
 namespace LIMS.DDD.Service.Domain.LaboratoryOperationsContext.StudyAggregate.Entities;
 
@@ -13,7 +13,7 @@ public sealed class TestResult : SoftDeletableModel
 
     public StudyId StudyId { get; private set; }
 
-    public ResultDefinitionId ResultDefinitionId { get; private set; }
+    public ResultSnapshot ResultSnapshot { get; private set; } = null!;
 
     public double? Value { get; private set; }
 
@@ -21,17 +21,13 @@ public sealed class TestResult : SoftDeletableModel
 
     internal static TestResult Create(
         StudyId studyId,
-        ResultDefinitionId resultDefinitionId,
-        double? value,
-        bool isOutOfSpec)
+        ResultSnapshot snapshot)
     {
         return new TestResult
         {
             Id = new TestResultId(Guid.NewGuid()),
             StudyId = studyId,
-            ResultDefinitionId = resultDefinitionId,
-            Value = value,
-            IsOutOfSpec = isOutOfSpec
+            ResultSnapshot = snapshot
         };
     }
 
@@ -39,7 +35,11 @@ public sealed class TestResult : SoftDeletableModel
         double? value,
         bool isOutOfSpec)
     {
-        if (value is not null) Value = value;
+        if (value is not null)
+        {
+            Value = value;
+        }
+
         IsOutOfSpec = isOutOfSpec;
     }
 

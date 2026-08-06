@@ -2,7 +2,6 @@
 using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.StudyAggregate;
 using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.StudyAggregate.ValueObjects;
 using LIMS.DDD.Service.Domain.SeedWork.ValueObjects;
-using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -17,25 +16,29 @@ public class StudyConfiguration : IEntityTypeConfiguration<Study>
 
         builder.Property(x => x.IsDeleted)
             .HasDefaultValue(false);
-
         builder.Property(x => x.DeletedAt)
             .IsRequired(false);
-
         builder.HasQueryFilter(x => !x.IsDeleted);
 
         builder.Property(x => x.Id)
             .HasConversion(id => id.Value, value => new StudyId(value));
 
+        builder.Property(x => x.TemplateId)
+            .HasConversion(id => id.Value, value => new TemplateId(value));
+
         builder.Property(x => x.SampleId)
             .HasConversion(id => id.Value, value => new SampleId(value));
+
+        builder.Property(x => x.Name)
+            .HasConversion(n => n.Value, n => Name.Create(n)
+                .GetValue())
+            .HasMaxLength(200)
+            .IsRequired();
 
         builder.HasOne<Sample>()
             .WithMany()
             .HasForeignKey(x => x.SampleId)
             .OnDelete(DeleteBehavior.Restrict);
-
-        builder.Property(x => x.TemplateId)
-            .HasConversion(id => id.Value, value => new StudyTemplateId(value));
 
         builder.Property(x => x.Description)
             .HasConversion(d => d.Value, d => Description.Create(d)
@@ -59,10 +62,11 @@ public class StudyConfiguration : IEntityTypeConfiguration<Study>
 
         builder.HasIndex(x => new
             {
-                x.SampleId,
-                x.TemplateId
+                x.Name,
+                x.SampleId
             })
             .IsUnique()
-            .HasFilter("[IsDeleted] = 0");
+            .HasFilter("\"IsDeleted\" = false");
+        ;
     }
 }

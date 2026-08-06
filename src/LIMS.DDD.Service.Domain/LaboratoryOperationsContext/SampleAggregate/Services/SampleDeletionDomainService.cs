@@ -7,28 +7,28 @@ namespace LIMS.DDD.Service.Domain.LaboratoryOperationsContext.SampleAggregate.Se
 
 public sealed class SampleDeletionDomainService
 {
-    public Result<Exception> Delete(
+    public Result<None, Exception> Delete(
         Sample sample,
         Order order,
         IReadOnlyCollection<Study> studies)
     {
         if (!order.CanDeleteAssociatedEntities)
         {
-            return Result<Exception>.Failure(new InvalidOperationException(
+            return Result<None, Exception>.Failure(new InvalidOperationException(
                 $"Cannot delete sample from an order with status '{order.OrderStatus.Name}'. " +
                 "Order must be in Draft or InProgress status."));
         }
 
         if (studies.Count > 0)
         {
-            return Result<Exception>.Failure(new InvalidOperationException(
+            return Result<None, Exception>.Failure(new InvalidOperationException(
                 $"Cannot delete sample because it has {studies.Count} associated study(ies). " +
                 "Please cancel or delete the studies first."));
         }
 
         if (sample.SampleStatus != SampleStatus.Registered)
         {
-            return Result<Exception>.Failure(new InvalidOperationException(
+            return Result<None, Exception>.Failure(new InvalidOperationException(
                 $"Cannot delete sample in '{sample.SampleStatus.Name}' status. Only 'Registered' samples can be deleted."));
         }
 

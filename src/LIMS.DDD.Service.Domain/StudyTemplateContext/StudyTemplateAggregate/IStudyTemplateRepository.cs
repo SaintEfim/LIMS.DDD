@@ -1,6 +1,4 @@
 ﻿using LIMS.DDD.Service.Domain.SeedWork;
-using LIMS.DDD.Service.Domain.SeedWork.ValueObjects;
-using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.ValueObjects;
 
 namespace LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate;
 
@@ -21,10 +19,5 @@ public interface IStudyTemplateRepository : IRepository<StudyTemplate>
         StudyTemplate studyTemplate);
 
     Task<int> SaveChangesAsync(
-        CancellationToken cancellationToken = default);
-
-    Task<bool> ExistsByNameAndRevisionAsync(
-        Name name,
-        Revision revision,
         CancellationToken cancellationToken = default);
 }

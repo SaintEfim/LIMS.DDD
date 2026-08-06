@@ -1,5 +1,5 @@
 ﻿using LIMS.DDD.Service.Domain.SeedWork;
-using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.ValueObjects;
+using LIMS.DDD.Service.Domain.SeedWork.ValueObjects;
 
 namespace LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.Entities.ResultDefinitions;
 
@@ -8,6 +8,16 @@ public sealed class ResultDefinition : SoftDeletableModel
     private ResultDefinition()
     {
     }
+
+    public string ResultInstance { get; private set; } = string.Empty;
+
+    public ResultDefinitionId Id { get; private set; }
+
+    public StudyTemplateId StudyTemplateId { get; private set; }
+
+    public string Unit { get; private set; } = string.Empty;
+
+    public Specification Specification { get; private set; } = null!;
 
     internal static ResultDefinition Create(
         StudyTemplateId studyTemplateId,
@@ -32,9 +42,20 @@ public sealed class ResultDefinition : SoftDeletableModel
         string? unit,
         Specification? specification)
     {
-        if (resultInstance is not null) ResultInstance = resultInstance;
-        if (unit is not null) Unit = unit;
-        if (specification is not null) Specification = specification;
+        if (resultInstance is not null)
+        {
+            ResultInstance = resultInstance;
+        }
+
+        if (unit is not null)
+        {
+            Unit = unit;
+        }
+
+        if (specification is not null)
+        {
+            Specification = specification;
+        }
     }
 
     internal void MarkAsDeleted()
@@ -42,14 +63,4 @@ public sealed class ResultDefinition : SoftDeletableModel
         IsDeleted = true;
         DeletedAt = DateTimeOffset.UtcNow;
     }
-
-    public string ResultInstance { get; private set; } = string.Empty;
-
-    public ResultDefinitionId Id { get; private set; }
-
-    public StudyTemplateId StudyTemplateId { get; private set; }
-
-    public string Unit { get; private set; } = string.Empty;
-
-    public Specification Specification { get; private set; } = null!;
 }

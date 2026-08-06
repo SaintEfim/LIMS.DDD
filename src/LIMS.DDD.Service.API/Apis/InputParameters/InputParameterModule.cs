@@ -64,7 +64,10 @@ public class InputParameterModule : ICarterModule
     {
         var result = await services.Commands.CreateAsync(studyTemplateId, command, ct);
 
-        if (result.IsFailure) return HandleFailure(result.Error!);
+        if (result.IsFailure)
+        {
+            return HandleFailure(result.GetError());
+        }
 
         var parameterId = result.GetValue();
         return Results.Created($"/api/studyTemplates/{studyTemplateId}/parameters/{parameterId}",
@@ -79,7 +82,7 @@ public class InputParameterModule : ICarterModule
     {
         var result = await services.Commands.RemoveAsync(studyTemplateId, parameterId, ct);
 
-        return result.IsFailure ? HandleFailure(result.Error!) : Results.NoContent();
+        return result.IsFailure ? HandleFailure(result.GetError()) : Results.NoContent();
     }
 
     private static async Task<IResult> Update(
@@ -89,18 +92,19 @@ public class InputParameterModule : ICarterModule
         [AsParameters] InputParameterServices services,
         CancellationToken ct)
     {
-        var result = await services.Commands.UpdateAsync(
-            studyTemplateId, parameterId, command, ct);
-        return result.IsFailure ? HandleFailure(result.Error!) : Results.NoContent();
+        var result = await services.Commands.UpdateAsync(studyTemplateId, parameterId, command, ct);
+        return result.IsFailure ? HandleFailure(result.GetError()) : Results.NoContent();
     }
 
     private static IResult HandleFailure(
-        Exception error) =>
-        error switch
+        Exception error)
+    {
+        return error switch
         {
             KeyNotFoundException => Results.NotFound(new { error.Message }),
             InvalidOperationException => Results.BadRequest(new { error.Message }),
-            _ => Results.Problem(detail: error.Message, statusCode: StatusCodes.Status500InternalServerError,
+            _ => Results.Problem(error.Message, statusCode: StatusCodes.Status500InternalServerError,
                 title: "An unexpected error occurred")
         };
+    }
 }
