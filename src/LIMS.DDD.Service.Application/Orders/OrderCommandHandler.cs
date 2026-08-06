@@ -120,7 +120,7 @@ public sealed class OrderCommandHandler(IOrderRepository repository)
         var deleteResult = order.Delete();
         if (deleteResult.IsFailure)
         {
-            return deleteResult.CastFailure<None>();
+            return deleteResult;
         }
 
         await repository.SaveChangesAsync(cancellationToken);

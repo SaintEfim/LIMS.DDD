@@ -155,7 +155,7 @@ public sealed class SampleCommandHandler(
         var deleteResult = deletionDomainService.Delete(sample, order, studies);
         if (deleteResult.IsFailure)
         {
-            return deleteResult.CastFailure<None>();
+            return deleteResult;
         }
 
         await repository.SaveChangesAsync(cancellationToken);
