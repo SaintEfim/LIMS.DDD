@@ -79,13 +79,4 @@ public class StudyTemplateRepository : IStudyTemplateRepository
     {
         return await _context.SaveChangesAsync(cancellationToken);
     }
-
-    public async Task<bool> ExistsByNameAndRevisionAsync(
-        Name name,
-        Revision revision,
-        CancellationToken cancellationToken = default)
-    {
-        return await _context.StudyTemplates.AnyAsync(x => x.Name == name && x.Revision == revision,
-            cancellationToken: cancellationToken);
-    }
 }

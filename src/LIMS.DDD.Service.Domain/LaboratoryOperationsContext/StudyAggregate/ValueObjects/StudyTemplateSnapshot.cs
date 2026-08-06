@@ -1,20 +1,18 @@
-﻿using LIMS.DDD.Service.Domain.SeedWork.ValueObjects;
+﻿using LIMS.DDD.Service.Domain.SeedWork;
+using LIMS.DDD.Service.Domain.SeedWork.ValueObjects;
 
 namespace LIMS.DDD.Service.Domain.LaboratoryOperationsContext.StudyAggregate.ValueObjects;
 
-public sealed record StudyTemplateCreateSnapshot(
-    Guid TemplateId,
-    Name Name,
-    IReadOnlyList<ParameterSnapshot> Parameters,
-    IReadOnlyList<ResultSnapshot> Results)
+public readonly record struct TemplateId(Guid Value) : IValueObjectId
 {
-    public StudyTemplateSnapshot ToStudySnapshot()
-    {
-        return new StudyTemplateSnapshot(TemplateId, Name);
-    }
+    public Guid Value { get; } = Value;
 }
 
-public sealed record StudyTemplateSnapshot(Guid TemplateId, Name Name);
+public sealed record StudyTemplateCreateSnapshot(
+    TemplateId TemplateId,
+    Name Name,
+    IReadOnlyList<ParameterSnapshot> Parameters,
+    IReadOnlyList<ResultSnapshot> Results);
 
 public sealed record ParameterSnapshot(
     Guid InputParameterId,

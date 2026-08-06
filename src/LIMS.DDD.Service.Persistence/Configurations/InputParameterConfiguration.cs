@@ -56,6 +56,6 @@ public class InputParameterConfiguration : IEntityTypeConfiguration<InputParamet
         {
             x.StudyTemplateId,
             x.AliasName
-        });
+        }).HasFilter("\"IsDeleted\" = false");
     }
 }

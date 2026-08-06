@@ -6,36 +6,34 @@ using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.ValueO
 
 namespace LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.Services;
 
-public record RevisionCreationResult(StudyTemplate Original, StudyTemplate NewTemplate);
-
 public class StudyTemplateVersioningService
 {
-    public Result<RevisionCreationResult, Exception> CreateNewRevision(
+    public Result<StudyTemplate, Exception> CreateNewRevision(
         StudyTemplate original,
         Revision newRevisionValue)
     {
         if (original.Status != Status.Active && original.Status != Status.Archived)
-            return Result<RevisionCreationResult, Exception>.Failure(
+            return Result<StudyTemplate, Exception>.Failure(
                 new InvalidOperationException("Can only create revisions from Active or Archived templates."));
 
         var createResult = StudyTemplate.Create(original.Name, original.Description, newRevisionValue);
-        if (createResult.IsFailure) return Result<RevisionCreationResult, Exception>.Failure(createResult.Error!);
+        if (createResult.IsFailure) return Result<StudyTemplate, Exception>.Failure(createResult.Error!);
 
         var newTemplate = createResult.GetValue();
         newTemplate.SetParentId(original.Id);
 
         var copyResult = CopyChildren(original, newTemplate);
-        if (copyResult.IsFailure) return Result<RevisionCreationResult, Exception>.Failure(copyResult.Error!);
+        if (copyResult.IsFailure) return Result<StudyTemplate, Exception>.Failure(copyResult.Error!);
 
         if (original.Status != Status.Active)
         {
-            return Result<RevisionCreationResult, Exception>.Success(new RevisionCreationResult(original, newTemplate));
+            return Result<StudyTemplate, Exception>.Success(newTemplate);
         }
 
         var archiveResult = original.ChangeStatus(Status.Archived);
         return archiveResult.IsFailure
-            ? Result<RevisionCreationResult, Exception>.Failure(archiveResult.Error!)
-            : Result<RevisionCreationResult, Exception>.Success(new RevisionCreationResult(original, newTemplate));
+            ? Result<StudyTemplate, Exception>.Failure(archiveResult.Error!)
+            : Result<StudyTemplate, Exception>.Success(newTemplate);
     }
 
     private static Result<Exception> CopyChildren(

@@ -26,16 +26,7 @@ public sealed class OrderCommandHandler(IOrderRepository repository)
             codeResult.GetValue());
         if (createResult.IsFailure) return Result<Order, Exception>.Failure(createResult.Error!);
 
-        try
-        {
-            repository.Add(createResult.GetValue());
-            await repository.SaveChangesAsync(cancellationToken);
-            return Result<Order, Exception>.Success(createResult.GetValue());
-        }
-        catch (Exception ex)
-        {
-            return Result<Order, Exception>.Failure(new Exception("Failed to save Order.", ex));
-        }
+        return await SaveNewAsync(createResult.GetValue(), cancellationToken);
     }
 
     public async Task<Result<Exception>> UpdateAsync(
@@ -102,6 +93,22 @@ public sealed class OrderCommandHandler(IOrderRepository repository)
         await repository.SaveChangesAsync(cancellationToken);
 
         return Result<Exception>.Success();
+    }
+
+    private async Task<Result<Order, Exception>> SaveNewAsync(
+        Order order,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            repository.Add(order);
+            await repository.SaveChangesAsync(cancellationToken);
+            return Result<Order, Exception>.Success(order);
+        }
+        catch (Exception ex)
+        {
+            return Result<Order, Exception>.Failure(new Exception($"Failed to save Order: {ex.Message}", ex));
+        }
     }
 
     private async Task<Result<Order, Exception>> GetOrderForChangeAsync(

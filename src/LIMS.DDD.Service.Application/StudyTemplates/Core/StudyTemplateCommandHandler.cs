@@ -24,9 +24,6 @@ public sealed class StudyTemplateCommandHandler(
         var revResult = Revision.Create(command.Revision);
         if (revResult.IsFailure) return Result<StudyTemplate, Exception>.Failure(revResult.Error!);
 
-        var duplicateResult = await CheckDuplicateAsync(nameResult.GetValue(), revResult.GetValue(), cancellationToken);
-        if (duplicateResult.IsFailure) return Result<StudyTemplate, Exception>.Failure(duplicateResult.Error!);
-
         var createResult = StudyTemplate.Create(nameResult.GetValue(), descResult.GetValue(), revResult.GetValue());
         if (createResult.IsFailure) return Result<StudyTemplate, Exception>.Failure(createResult.Error!);
 
@@ -57,12 +54,6 @@ public sealed class StudyTemplateCommandHandler(
             var descResult = Description.Create(command.Description);
             if (descResult.IsFailure) return Result<StudyTemplate, Exception>.Failure(descResult.Error!);
             description = descResult.GetValue();
-        }
-
-        if (name is not null && name != template.Name)
-        {
-            var duplicateResult = await CheckDuplicateAsync(name, template.Revision, cancellationToken);
-            if (duplicateResult.IsFailure) return Result<StudyTemplate, Exception>.Failure(duplicateResult.Error!);
         }
 
         var effectiveName = name ?? template.Name;
@@ -126,19 +117,15 @@ public sealed class StudyTemplateCommandHandler(
         var revisionResult = Revision.Create(command.NewRevision);
         if (revisionResult.IsFailure) return Result<Guid, Exception>.Failure(revisionResult.Error!);
 
-        var duplicateResult = await CheckDuplicateAsync(originalResult.GetValue()
-            .Name, revisionResult.GetValue(), cancellationToken);
-        if (duplicateResult.IsFailure) return Result<Guid, Exception>.Failure(duplicateResult.Error!);
-
         var createResult = domainService.CreateNewRevision(originalResult.GetValue(), revisionResult.GetValue());
         if (createResult.IsFailure) return Result<Guid, Exception>.Failure(createResult.Error!);
 
         var creationResult = createResult.GetValue();
 
-        var saveResult = await SaveNewAsync(creationResult.Original, cancellationToken);
+        var saveResult = await SaveNewAsync(creationResult, cancellationToken);
         return saveResult.IsFailure
             ? Result<Guid, Exception>.Failure(saveResult.Error!)
-            : Result<Guid, Exception>.Success(creationResult.NewTemplate.Id.Value);
+            : Result<Guid, Exception>.Success(creationResult.Id.Value);
     }
 
     private async Task<Result<StudyTemplate, Exception>> GetTemplateForChangeAsync(
@@ -150,18 +137,6 @@ public sealed class StudyTemplateCommandHandler(
             ? Result<StudyTemplate, Exception>.Failure(
                 new KeyNotFoundException($"StudyTemplate with id {id} not found."))
             : Result<StudyTemplate, Exception>.Success(template);
-    }
-
-    private async Task<Result<bool, Exception>> CheckDuplicateAsync(
-        Name name,
-        Revision revision,
-        CancellationToken cancellationToken)
-    {
-        var exists = await repository.ExistsByNameAndRevisionAsync(name, revision, cancellationToken);
-        return exists
-            ? Result<bool, Exception>.Failure(new InvalidOperationException(
-                $"StudyTemplate with name '{name.Value}' and revision '{revision.Value}' already exists."))
-            : Result<bool, Exception>.Success(false);
     }
 
     private async Task<Result<StudyTemplate, Exception>> SaveNewAsync(
@@ -176,7 +151,8 @@ public sealed class StudyTemplateCommandHandler(
         }
         catch (Exception ex)
         {
-            return Result<StudyTemplate, Exception>.Failure(new Exception("Failed to save StudyTemplate.", ex));
+            return Result<StudyTemplate, Exception>.Failure(new Exception($"Failed to save StudyTemplate: {ex.Message}",
+                ex));
         }
     }
 

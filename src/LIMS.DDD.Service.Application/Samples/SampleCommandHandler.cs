@@ -43,7 +43,7 @@ public sealed class SampleCommandHandler(
 
         if (sampleResult.IsFailure) return Result<Sample, Exception>.Failure(sampleResult.Error!);
 
-        return await SaveChangesAsync(sampleResult.GetValue(), cancellationToken);
+        return await SaveNewAsync(sampleResult.GetValue(), cancellationToken);
     }
 
     public async Task<Result<Exception>> UpdateAsync(
@@ -123,6 +123,22 @@ public sealed class SampleCommandHandler(
         await repository.SaveChangesAsync(cancellationToken);
 
         return Result<Exception>.Success();
+    }
+
+    private async Task<Result<Sample, Exception>> SaveNewAsync(
+        Sample sample,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            repository.Add(sample);
+            await repository.SaveChangesAsync(cancellationToken);
+            return Result<Sample, Exception>.Success(sample);
+        }
+        catch (Exception ex)
+        {
+            return Result<Sample, Exception>.Failure(new Exception($"Failed to save Sample: {ex.Message}", ex));
+        }
     }
 
     private async Task<Result<Sample, Exception>> SaveChangesAsync(

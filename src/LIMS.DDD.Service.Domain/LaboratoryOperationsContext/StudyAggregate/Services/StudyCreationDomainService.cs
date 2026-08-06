@@ -38,6 +38,7 @@ public sealed class StudyCreationDomainService
             .Select(r => TestResult.Create(studyId, r))
             .ToList();
 
-        return Study.Create(studyId, sample.Id, templateSnapshot.ToStudySnapshot(), measuredValues, testResults);
+        return Study.Create(studyId, sample.Id, templateSnapshot.Name, templateSnapshot.TemplateId, measuredValues,
+            testResults);
     }
 }

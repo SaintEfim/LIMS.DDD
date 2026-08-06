@@ -22,9 +22,4 @@ public interface IStudyTemplateRepository : IRepository<StudyTemplate>
 
     Task<int> SaveChangesAsync(
         CancellationToken cancellationToken = default);
-
-    Task<bool> ExistsByNameAndRevisionAsync(
-        Name name,
-        Revision revision,
-        CancellationToken cancellationToken = default);
 }

@@ -23,8 +23,17 @@ public class StudyConfiguration : IEntityTypeConfiguration<Study>
         builder.Property(x => x.Id)
             .HasConversion(id => id.Value, value => new StudyId(value));
 
+        builder.Property(x => x.TemplateId)
+            .HasConversion(id => id.Value, value => new TemplateId(value));
+
         builder.Property(x => x.SampleId)
             .HasConversion(id => id.Value, value => new SampleId(value));
+
+        builder.Property(x => x.Name)
+            .HasConversion(n => n.Value, n => Name.Create(n)
+                .GetValue())
+            .HasMaxLength(200)
+            .IsRequired();
 
         builder.HasOne<Sample>()
             .WithMany()
@@ -41,18 +50,6 @@ public class StudyConfiguration : IEntityTypeConfiguration<Study>
             .HasMaxLength(50)
             .IsRequired();
 
-        builder.OwnsOne(x => x.StudyTemplateSnapshot, snap =>
-        {
-            snap.Property(p => p.TemplateId)
-                .HasColumnName("TemplateId");
-
-            snap.Property(p => p.Name)
-                .HasConversion(n => n.Value, n => Name.Create(n)
-                    .GetValue())
-                .HasMaxLength(100)
-                .HasColumnName("TemplateName");
-        });
-
         builder.HasMany(x => x.MeasuredValues)
             .WithOne()
             .HasForeignKey(x => x.StudyId)
@@ -63,8 +60,13 @@ public class StudyConfiguration : IEntityTypeConfiguration<Study>
             .HasForeignKey(x => x.StudyId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasIndex("SampleId", "TemplateId")
+        builder.HasIndex(x => new
+            {
+                x.Name,
+                x.SampleId
+            })
             .IsUnique()
-            .HasFilter("[IsDeleted] = 0");
+            .HasFilter("\"IsDeleted\" = false");
+        ;
     }
 }

@@ -21,7 +21,9 @@ public sealed class Study
 
     public StudyStatus Status { get; private set; } = StudyStatus.InWork;
 
-    public StudyTemplateSnapshot StudyTemplateSnapshot { get; private set; } = null!;
+    public Name Name { get; private set; }
+
+    public TemplateId TemplateId { get; private set; }
 
     public Description Description { get; private set; }
 
@@ -34,7 +36,8 @@ public sealed class Study
     internal static Result<Study, Exception> Create(
         StudyId studyId,
         SampleId sampleId,
-        StudyTemplateSnapshot templateSnapshot,
+        Name templateName,
+        TemplateId templateId,
         IReadOnlyList<MeasuredValue> initialMeasuredValues,
         IReadOnlyList<TestResult> initialTestResults)
     {
@@ -42,7 +45,8 @@ public sealed class Study
         {
             Id = studyId,
             SampleId = sampleId,
-            StudyTemplateSnapshot = templateSnapshot,
+            Name = templateName,
+            TemplateId = templateId,
             Status = StudyStatus.InWork
         };
 
