@@ -9,6 +9,10 @@ public interface IStudyRepository : IRepository<Study>
         StudyId id,
         CancellationToken cancellationToken = default);
 
+    Task<Study?> GetByIdAsync(
+        StudyId id,
+        CancellationToken cancellationToken = default);
+
     Task<ICollection<Study>> GetBySampleIdAsync(
         SampleId sampleId,
         CancellationToken cancellationToken = default);

@@ -23,6 +23,17 @@ public class StudyRepository : IStudyRepository
             .SingleOrDefaultAsync(s => s.Id == id, cancellationToken);
     }
 
+    public async Task<Study?> GetByIdAsync(
+        StudyId id,
+        CancellationToken cancellationToken = default)
+    {
+        var query = _context.Studies
+            .AsSplitQuery()
+            .AsNoTracking();
+        return await StudyBaseQuery(query)
+            .SingleOrDefaultAsync(s => s.Id == id, cancellationToken);
+    }
+
     public async Task<ICollection<Study>> GetBySampleIdAsync(
         SampleId sampleId,
         CancellationToken cancellationToken = default)

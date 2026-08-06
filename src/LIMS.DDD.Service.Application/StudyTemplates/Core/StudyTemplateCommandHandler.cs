@@ -136,7 +136,7 @@ public sealed class StudyTemplateCommandHandler(
         var deleteResult = template.Delete();
         if (deleteResult.IsFailure)
         {
-            return deleteResult.CastFailure<None>();
+            return deleteResult;
         }
 
         await repository.SaveChangesAsync(cancellationToken);
