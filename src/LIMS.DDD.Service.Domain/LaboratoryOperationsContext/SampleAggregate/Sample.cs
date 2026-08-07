@@ -29,6 +29,9 @@ public class Sample
 
     public SampleStatus SampleStatus { get; private set; } = SampleStatus.Registered;
 
+    public bool CanAcceptNewEntity =>
+        SampleStatus == SampleStatus.Registered || SampleStatus == SampleStatus.InProgress;
+
     internal static Result<Sample, Exception> Create(
         OrderId orderId,
         Name name,

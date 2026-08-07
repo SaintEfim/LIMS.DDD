@@ -44,14 +44,14 @@ public sealed class StudyCommandsHandler(
                 new KeyNotFoundException($"StudyTemplate with id {command.TemplateId} not found."));
         }
 
-        var snapshot = new StudyTemplateCreateSnapshot(new TemplateId(template.Id.Value), template.Name, template
-            .InputParameters
-            .Select(p => new ParameterSnapshot(p.Id.Value, p.Name, p.AliasName, p.Specification.MinValue,
-                p.Specification.MaxValue))
-            .ToList(), template.ResultDefinitions
-            .Select(r => new ResultSnapshot(r.Id.Value, r.ResultInstance, r.Unit, r.Specification.MinValue,
-                r.Specification.MaxValue))
-            .ToList());
+        var snapshot = new StudyTemplateCreateSnapshot(new TemplateId(template.Id.Value), template.Name,
+            template.CanCreateStudy, template.InputParameters
+                .Select(p => new ParameterSnapshot(p.Id.Value, p.Name, p.AliasName, p.Specification.MinValue,
+                    p.Specification.MaxValue))
+                .ToList(), template.ResultDefinitions
+                .Select(r => new ResultSnapshot(r.Id.Value, r.ResultInstance, r.Unit, r.Specification.MinValue,
+                    r.Specification.MaxValue))
+                .ToList());
 
         var createResult = domainService.Create(sample, order, snapshot);
         if (createResult.IsFailure)

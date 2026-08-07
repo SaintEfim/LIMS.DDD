@@ -1,6 +1,5 @@
 ﻿using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.OrderAggregate;
 using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.SampleAggregate;
-using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.SampleAggregate.ValueObjects;
 using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.StudyAggregate.Entities;
 using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.StudyAggregate.ValueObjects;
 using LIMS.DDD.Service.Domain.SeedWork.Result;
@@ -14,6 +13,12 @@ public sealed class StudyCreationDomainService
         Order order,
         StudyTemplateCreateSnapshot templateSnapshot)
     {
+        if (!templateSnapshot.CanCreateStudy)
+        {
+            return Result<Study, Exception>.Failure(
+                new InvalidOperationException("Cannot create study from the selected study template."));
+        }
+
         if (!order.CanAcceptNewEntity)
         {
             return Result<Study, Exception>.Failure(
@@ -21,7 +26,7 @@ public sealed class StudyCreationDomainService
                     $"Cannot create study for an order in '{order.OrderStatus.Name}' status."));
         }
 
-        if (sample.SampleStatus == SampleStatus.Canceled || sample.SampleStatus == SampleStatus.Completed)
+        if (!sample.CanAcceptNewEntity)
         {
             return Result<Study, Exception>.Failure(
                 new InvalidOperationException(

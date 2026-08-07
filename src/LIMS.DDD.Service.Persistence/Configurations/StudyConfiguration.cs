@@ -59,14 +59,5 @@ public class StudyConfiguration : IEntityTypeConfiguration<Study>
             .WithOne()
             .HasForeignKey(x => x.StudyId)
             .OnDelete(DeleteBehavior.Cascade);
-
-        builder.HasIndex(x => new
-            {
-                x.Name,
-                x.SampleId
-            })
-            .IsUnique()
-            .HasFilter("\"IsDeleted\" = false");
-        ;
     }
 }
