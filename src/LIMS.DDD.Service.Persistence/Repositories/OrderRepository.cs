@@ -22,6 +22,17 @@ public class OrderRepository : IOrderRepository
             .SingleOrDefaultAsync(o => o.Id == id, cancellationToken);
     }
 
+    public async Task<ICollection<Order>> GetAllAsync(
+        CancellationToken cancellationToken = default)
+    {
+        var orderQuery = await _context.Orders
+            .AsSplitQuery()
+            .AsNoTracking()
+            .ToListAsync(cancellationToken);
+
+        return orderQuery;
+    }
+
     public async Task<Order?> GetByIdForChangeAsync(
         OrderId id,
         CancellationToken cancellationToken = default)

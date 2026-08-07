@@ -1,0 +1,66 @@
+﻿using Carter;
+using LIMS.DDD.Service.Application.Studies.MeasuredValues;
+
+namespace LIMS.DDD.Service.API.Apis.MeasuredValues;
+
+public class MeasuredValueModule : ICarterModule
+{
+    public void AddRoutes(
+        IEndpointRouteBuilder app)
+    {
+        var group = app.MapGroup("/api/studies/{studyId:guid}/measured-values")
+            .WithTags("MeasuredValues");
+
+        group.MapGet("/", GetAll)
+            .Produces<ICollection<MeasuredValueDto>>();
+
+        group.MapGet("/{measuredValueId:guid}", GetById)
+            .Produces<MeasuredValueDto>()
+            .Produces(StatusCodes.Status404NotFound);
+
+        group.MapPatch("/{measuredValueId:guid}", Update)
+            .Produces(StatusCodes.Status204NoContent)
+            .Produces(StatusCodes.Status404NotFound)
+            .Produces(StatusCodes.Status400BadRequest);
+    }
+
+    private static async Task<IResult> GetAll(
+        Guid studyId,
+        [AsParameters] MeasuredValueServices services,
+        CancellationToken ct)
+    {
+        var values = await services.Queries.GetAllByStudyIdAsync(studyId, ct);
+        return Results.Ok(values);
+    }
+
+    private static async Task<IResult> GetById(
+        Guid studyId,
+        Guid measuredValueId,
+        [AsParameters] MeasuredValueServices services,
+        CancellationToken ct)
+    {
+        var dto = await services.Queries.GetByIdAsync(studyId, measuredValueId, ct);
+        return dto is not null ? Results.Ok(dto) : Results.NotFound();
+    }
+
+    private static async Task<IResult> Update(
+        Guid studyId,
+        Guid measuredValueId,
+        UpdateMeasuredValueCommand command,
+        [AsParameters] MeasuredValueServices services,
+        CancellationToken ct)
+    {
+        var result = await services.Commands.UpdateAsync(studyId, measuredValueId, command, ct);
+        return result.IsFailure ? HandleFailure(result.GetError()) : Results.NoContent();
+    }
+
+    private static IResult HandleFailure(
+        Exception error) =>
+        error switch
+        {
+            KeyNotFoundException => Results.NotFound(new { error.Message }),
+            ArgumentException or InvalidOperationException => Results.BadRequest(new { error.Message }),
+            _ => Results.Problem(error.Message, statusCode: StatusCodes.Status500InternalServerError,
+                title: "An unexpected error occurred")
+        };
+}

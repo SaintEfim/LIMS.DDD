@@ -2,9 +2,9 @@
 
 namespace LIMS.DDD.Service.API.Apis.ResultDefinitions;
 
-public class ResultDefinitionServices(ResultDefinitionCommands commands, ResultDefinitionQueries queries)
+public class ResultDefinitionServices(ResultDefinitionCommandsHandler commands, ResultDefinitionQueries queries)
 {
-    public ResultDefinitionCommands Commands { get; } = commands;
+    public ResultDefinitionCommandsHandler Commands { get; } = commands;
 
     public ResultDefinitionQueries Queries { get; } = queries;
 }

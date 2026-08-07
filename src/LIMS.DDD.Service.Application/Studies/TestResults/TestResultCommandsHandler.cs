@@ -2,14 +2,14 @@
 using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.StudyAggregate.Entities;
 using LIMS.DDD.Service.Domain.SeedWork.Result;
 
-namespace LIMS.DDD.Service.Application.Studies.MeasuredValues;
+namespace LIMS.DDD.Service.Application.Studies.TestResults;
 
-public sealed class MeasuredValueCommandHandler(IStudyRepository studyRepository)
+public sealed class TestResultCommandsHandler(IStudyRepository studyRepository)
 {
     public async Task<Result<None, Exception>> UpdateAsync(
         Guid studyId,
-        Guid measuredValueId,
-        UpdateMeasuredValueCommand command,
+        Guid testResultId,
+        UpdateTestResultCommand command,
         CancellationToken cancellationToken = default)
     {
         var studyResult = await GetStudyForChangeAsync(studyId, cancellationToken);
@@ -19,7 +19,7 @@ public sealed class MeasuredValueCommandHandler(IStudyRepository studyRepository
         }
 
         var updateResult = studyResult.GetValue()
-            .UpdateMeasuredValue(new MeasuredValueId(measuredValueId), command.Value);
+            .UpdateTestResult(new TestResultId(testResultId), command.Value, command.IsOutOfSpec);
 
         if (updateResult.IsFailure)
         {

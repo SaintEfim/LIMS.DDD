@@ -13,6 +13,9 @@ public interface ISampleRepository : IRepository<Sample>
         SampleId id,
         CancellationToken cancellationToken = default);
 
+    Task<ICollection<Sample>> GetAllAsync(
+        CancellationToken cancellationToken = default);
+
     Task<ICollection<Sample>> GetByOrderIdAsync(
         OrderId orderId,
         CancellationToken cancellationToken = default);

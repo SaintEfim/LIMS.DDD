@@ -7,7 +7,7 @@ using LIMS.DDD.Service.Domain.SeedWork.ValueObjects;
 
 namespace LIMS.DDD.Service.Application.Orders;
 
-public sealed class OrderCommandHandler(IOrderRepository repository)
+public sealed class OrderCommandsHandler(IOrderRepository repository)
 {
     public async Task<Result<Order, Exception>> CreateAsync(
         CreateOrderCommand command,

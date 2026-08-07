@@ -2,9 +2,9 @@
 
 namespace LIMS.DDD.Service.API.Apis.StudyTemplates;
 
-public class StudyTemplateServices(StudyTemplateCommandHandler commands, StudyTemplateQueries queries)
+public class StudyTemplateServices(StudyTemplateCommandsHandler commands, StudyTemplateQueries queries)
 {
-    public StudyTemplateCommandHandler Commands { get; } = commands;
+    public StudyTemplateCommandsHandler Commands { get; } = commands;
 
     public StudyTemplateQueries Queries { get; } = queries;
 }

@@ -10,7 +10,7 @@ using LIMS.DDD.Service.Domain.SeedWork.ValueObjects;
 
 namespace LIMS.DDD.Service.Application.Samples;
 
-public sealed class SampleCommandHandler(
+public sealed class SampleCommandsHandler(
     ISampleRepository repository,
     IOrderRepository orderRepository,
     IStudyRepository studyRepository,
@@ -18,14 +18,15 @@ public sealed class SampleCommandHandler(
     SampleDeletionDomainService deletionDomainService)
 {
     public async Task<Result<Sample, Exception>> CreateAsync(
+        OrderId orderId,
         CreateSampleCommand command,
         CancellationToken cancellationToken = default)
     {
-        var order = await orderRepository.GetByIdAsync(new OrderId(command.OrderId), cancellationToken);
+        var order = await orderRepository.GetByIdAsync(orderId, cancellationToken);
         if (order is null)
         {
             return Result<Sample, Exception>.Failure(
-                new KeyNotFoundException($"Order with id {command.OrderId} not found."));
+                new KeyNotFoundException($"Order with id {orderId.Value} not found."));
         }
 
         var nameResult = Name.Create(command.Name);

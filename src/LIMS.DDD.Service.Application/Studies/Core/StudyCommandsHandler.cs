@@ -10,7 +10,7 @@ using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate;
 
 namespace LIMS.DDD.Service.Application.Studies.Core;
 
-public sealed class StudyCommandHandler(
+public sealed class StudyCommandsHandler(
     IStudyRepository studyRepository,
     ISampleRepository sampleRepository,
     IOrderRepository orderRepository,
@@ -18,14 +18,15 @@ public sealed class StudyCommandHandler(
     StudyCreationDomainService domainService)
 {
     public async Task<Result<Study, Exception>> CreateAsync(
+        SampleId sampleId,
         CreateStudyCommand command,
         CancellationToken cancellationToken = default)
     {
-        var sample = await sampleRepository.GetByIdAsync(new SampleId(command.SampleId), cancellationToken);
+        var sample = await sampleRepository.GetByIdAsync(sampleId, cancellationToken);
         if (sample is null)
         {
             return Result<Study, Exception>.Failure(
-                new KeyNotFoundException($"Sample with id {command.SampleId} not found."));
+                new KeyNotFoundException($"Sample with id {sampleId.Value} not found."));
         }
 
         var order = await orderRepository.GetByIdAsync(sample.OrderId, cancellationToken);
