@@ -10,20 +10,12 @@ public sealed class StudyCreationDomainService
 {
     public Result<Study, Exception> Create(
         Sample sample,
-        Order order,
         StudyTemplateCreateSnapshot templateSnapshot)
     {
         if (!templateSnapshot.CanCreateStudy)
         {
             return Result<Study, Exception>.Failure(
                 new InvalidOperationException("Cannot create study from the selected study template."));
-        }
-
-        if (!order.CanAcceptNewEntity)
-        {
-            return Result<Study, Exception>.Failure(
-                new InvalidOperationException(
-                    $"Cannot create study for an order in '{order.OrderStatus.Name}' status."));
         }
 
         if (!sample.CanAcceptNewEntity)

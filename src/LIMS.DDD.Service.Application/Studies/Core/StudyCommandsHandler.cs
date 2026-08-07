@@ -53,7 +53,7 @@ public sealed class StudyCommandsHandler(
                     r.Specification.MaxValue))
                 .ToList());
 
-        var createResult = domainService.Create(sample, order, snapshot);
+        var createResult = domainService.Create(sample, snapshot);
         if (createResult.IsFailure)
         {
             return createResult;
