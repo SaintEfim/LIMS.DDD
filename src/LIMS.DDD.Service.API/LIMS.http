@@ -9,9 +9,9 @@ POST {{baseUrl}}/api/study-templates
 Content-Type: application/json
 
 {
-  "name": "Определение влажности зерна {{$random.book.title}}",
+  "name": "Определение влажности зерна",
   "description": "Методика определения массовой доли влаги в зерне воздушно-тепловым способом",
-  "revision": "v1.0-{{$random.book.title}}"
+  "revision": "v1.0"
 }
 
 > {%
@@ -32,7 +32,7 @@ Content-Type: application/json
 
 {
   "aliasName": "X",
-  "name": "Масса бюксы с зерном до высушивания {{$random.book.title}}",
+  "name": "Масса бюксы с зерном до высушивания",
   "description": "Масса бюксы с навеской зерна до высушивания",
   "unit": "г",
   "minValue": 10.0,
@@ -54,7 +54,7 @@ Content-Type: application/json
 
 {
   "aliasName": "Y",
-  "name": "Масса бюксы с зерном после высушивания {{$random.book.title}}",
+  "name": "Масса бюксы с зерном после высушивания",
   "description": "Масса бюксы после высушивания при 130°C",
   "unit": "г",
   "minValue": 8.0,
@@ -76,7 +76,7 @@ Content-Type: application/json
 
 {
   "aliasName": "Z",
-  "name": "Масса пустой бюксы {{$random.book.title}}",
+  "name": "Масса пустой бюксы",
   "description": "Масса чистой сухой бюксы",
   "unit": "г",
   "minValue": 5.0,
@@ -99,7 +99,7 @@ POST {{baseUrl}}/api/study-templates/{{moistureTemplateId}}/result-definitions
 Content-Type: application/json
 
 {
-  "resultInstance": "Вода {{$random.book.title}}",
+  "resultInstance": "Вода",
   "unit": "%",
   "minValue": 5.0,
   "maxValue": 20.0
@@ -119,7 +119,7 @@ POST {{baseUrl}}/api/study-templates/{{moistureTemplateId}}/result-definitions
 Content-Type: application/json
 
 {
-  "resultInstance": "Сухое вещество {{$random.book.title}}",
+  "resultInstance": "Сухое вещество",
   "unit": "%",
   "minValue": 80.0,
   "maxValue": 95.0
@@ -141,7 +141,7 @@ POST {{baseUrl}}/api/study-templates/{{moistureTemplateId}}/calculation-rules
 Content-Type: application/json
 
 {
-  "name": "Расчет влажности {{$random.book.title}}",
+  "name": "Расчет влажности",
   "formulaExpression": "((m1 - m2) / (m1 - m0)) * 100",
   "description": "Формула расчета массовой доли влаги",
   "resultDefinitionId": "{{moistureResultId}}"
@@ -198,7 +198,7 @@ POST {{baseUrl}}/api/study-templates/{{moistureTemplateId}}/change-status?newSta
   client.test("Approve moisture template", function () {
     client.assert(response.status === 200, "Status change failed: " + response.status);
   });
-  client.log("✅ Moisture Template approved (Active)");
+  client.log("Moisture Template approved (Active)");
 %}
 
 ### ============================================
@@ -211,7 +211,7 @@ POST {{baseUrl}}/api/study-templates/{{moistureTemplateId}}/create-revision
 Content-Type: application/json
 
 {
-  "newRevision": "v1.1-{{$random.book.title}}"
+  "newRevision": "v1.1"
 }
 
 > {%
@@ -220,7 +220,7 @@ Content-Type: application/json
   });
 
   client.global.set("moistureTemplateV2Id", response.body.id);
-  client.log("✅ Moisture Template V2 ID: " + response.body.id);
+  client.log("Moisture Template V2 ID: " + response.body.id);
 %}
 
 ### ============================================
@@ -245,5 +245,201 @@ POST {{baseUrl}}/api/study-templates/{{moistureTemplateV2Id}}/change-status?newS
   client.test("Approve moisture template V2", function () {
     client.assert(response.status === 200, "Status change for V2 failed: " + response.status);
   });
-  client.log("✅ Moisture Template V2 approved (Active)");
+  client.log("Moisture Template V2 approved (Active)");
+%}
+
+### ============================================
+### 1. СОЗДАНИЕ ЗАДАНИЯ (ORDER)
+### ============================================
+
+# @name createOrder
+POST {{baseUrl}}/api/orders
+Content-Type: application/json
+
+{
+  "name": "Партия зерна №4512",
+  "description": "Входной контроль качества зерна от поставщика ООО 'Агро'",
+  "code": "A-100",
+  "contractor": "ООО 'Агро Поставки'"
+}
+
+> {%
+  client.test("Create order", function () {
+    client.assert(response.status === 201, "Order creation failed: " + response.status);
+  });
+  client.global.set("orderId", response.body.id);
+  client.log("Order ID: " + response.body.id);
+%}
+
+### ============================================
+### 2. РЕГИСТРАЦИЯ ПРОБЫ (SAMPLE) В РАМКАХ ЗАДАНИЯ
+### ============================================
+
+# @name createSample
+POST {{baseUrl}}/api/orders/{{orderId}}/samples
+Content-Type: application/json
+
+{
+  "name": "Проба зерна из вагона №12345",
+  "gatherDateBegin": "2023-10-25T08:00:00Z",
+  "gatherDateEnd": "2023-10-25T08:15:00Z",
+  "code": "SAMPLE-001",
+  "volumeValue": 1000.0,
+  "volumeUnit": "г"
+}
+
+> {%
+  client.test("Create sample", function () {
+    client.assert(response.status === 201, "Sample creation failed: " + response.status);
+  });
+  client.global.set("sampleId", response.body.id);
+  client.log("Sample ID: " + response.body.id);
+%}
+
+### ============================================
+### 3. СОЗДАНИЕ ИССЛЕДОВАНИЯ (STUDY) ПО МЕТОДИКЕ
+### Система автоматически создаст MeasuredValues и TestResults на основе Snapshot шаблона
+### ============================================
+
+# @name createStudy
+POST {{baseUrl}}/api/samples/{{sampleId}}/studies
+Content-Type: application/json
+
+{
+  "templateId": "{{moistureTemplateV2Id}}"
+}
+
+> {%
+  client.test("Create study", function () {
+    client.assert(response.status === 201, "Study creation failed: " + response.status);
+  });
+  client.global.set("studyId", response.body.id);
+  client.log("Study ID: " + response.body.id);
+%}
+
+### ============================================
+### 4. ПОЛУЧЕНИЕ ИССЛЕДОВАНИЯ ДЛЯ ИЗВЛЕЧЕНИЯ ID ДОЧЕРНИХ СУЩНОСТЕЙ
+### Нам нужно найти ID конкретных MeasuredValue и TestResult по их AliasName/ResultInstance
+### ============================================
+
+# @name getStudyDetails
+GET {{baseUrl}}/api/samples/{{sampleId}}/studies/{{studyId}}
+
+> {%
+  client.test("Get study details", function () {
+    client.assert(response.status === 200, "Failed to get study details");
+
+    const study = response.body;
+
+    // Ищем сырые данные по AliasName
+    const massBefore = study.measuredValues.find(mv => mv.parameterAlias === "X");
+    const massAfter = study.measuredValues.find(mv => mv.parameterAlias === "Y");
+    const emptyMass = study.measuredValues.find(mv => mv.parameterAlias === "Z");
+
+    // Ищем результаты
+    const moistureResult = study.testResults.find(tr => tr.resultInstance.includes("Вода"));
+    const dryMatterResult = study.testResults.find(tr => tr.resultInstance.includes("Сухое вещество"));
+
+    if (massBefore) client.global.set("massBeforeMvId", massBefore.id);
+    if (massAfter) client.global.set("massAfterMvId", massAfter.id);
+    if (emptyMass) client.global.set("emptyMassMvId", emptyMass.id);
+
+    if (moistureResult) client.global.set("moistureResultTrId", moistureResult.id);
+    if (dryMatterResult) client.global.set("dryMatterResultTrId", dryMatterResult.id);
+
+    client.log("Extracted MeasuredValue and TestResult IDs for updates");
+  });
+%}
+
+### ============================================
+### 5. ВВОД СЫРЫХ ДАННЫХ АНАЛИТИКОМ (MEASURED VALUES)
+### ============================================
+
+# @name updateMassBefore
+PATCH {{baseUrl}}/api/studies/{{studyId}}/measured-values/{{massBeforeMvId}}
+Content-Type: application/json
+
+{
+  "value": 35.5
+}
+
+###
+
+# @name updateMassAfter
+PATCH {{baseUrl}}/api/studies/{{studyId}}/measured-values/{{massAfterMvId}}
+Content-Type: application/json
+
+{
+  "value": 32.1
+}
+
+###
+
+# @name updateEmptyMass
+PATCH {{baseUrl}}/api/studies/{{studyId}}/measured-values/{{emptyMassMvId}}
+Content-Type: application/json
+
+{
+  "value": 15.0
+}
+
+### ============================================
+### 6. ВВОД/ОБНОВЛЕНИЕ РЕЗУЛЬТАТОВ (TEST RESULTS)
+### В реальной системе это может делать движок расчетов, но здесь мы эмулируем результат
+### ============================================
+
+# @name updateMoistureResult
+PATCH {{baseUrl}}/api/studies/{{studyId}}/test-results/{{moistureResultTrId}}
+Content-Type: application/json
+
+{
+  "value": 14.2,
+  "isOutOfSpec": false
+}
+
+###
+
+# @name updateDryMatterResult
+PATCH {{baseUrl}}/api/studies/{{studyId}}/test-results/{{dryMatterResultTrId}}
+Content-Type: application/json
+
+{
+  "value": 85.8,
+  "isOutOfSpec": false
+}
+
+### ============================================
+### 7. ЗАВЕРШЕНИЕ ИССЛЕДОВАНИЯ (CHANGE STATUS)
+### Переводим исследование из InWork в Completed
+### ============================================
+
+# @name completeStudy
+POST {{baseUrl}}/api/samples/{{sampleId}}/studies/{{studyId}}/change-status
+Content-Type: application/json
+
+{
+  "status": "Completed"
+}
+
+> {%
+  client.test("Complete study", function () {
+    client.assert(response.status === 204, "Study status change failed: " + response.status);
+  });
+  client.log("Study completed successfully");
+%}
+
+### ============================================
+### 8. ФИНАЛЬНАЯ ПРОВЕРКА: ПОЛУЧЕНИЕ ГОТОВОГО ИССЛЕДОВАНИЯ
+### Убеждаемся, что все данные сохранились и статус изменен
+### ============================================
+
+GET {{baseUrl}}/api/samples/{{sampleId}}/studies/{{studyId}}
+
+> {%
+  client.test("Verify final study state", function () {
+    client.assert(response.status === 200, "Failed to get final study");
+    client.assert(response.body.status === "Completed", "Study status is not Completed");
+    client.assert(response.body.testResults[0].value !== null, "Test results should have values");
+    client.log("Full LIMS workflow completed successfully");
+  });
 %}
