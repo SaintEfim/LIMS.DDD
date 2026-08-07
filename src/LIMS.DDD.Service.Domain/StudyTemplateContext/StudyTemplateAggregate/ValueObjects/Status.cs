@@ -6,14 +6,6 @@ namespace LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.Va
 
 public sealed record Status : StatusBase<IState<StudyTemplate>, StudyTemplate>
 {
-    private static readonly Dictionary<string, Status> Registry =
-        new(StringComparer.OrdinalIgnoreCase)
-        {
-            ["Draft"] = Draft,
-            ["Active"] = Active,
-            ["Archived"] = Archived
-        };
-
     private Status(
         IState<StudyTemplate> state)
         : base(state)
@@ -23,6 +15,14 @@ public sealed record Status : StatusBase<IState<StudyTemplate>, StudyTemplate>
     public static Status Draft { get; } = new(new DraftState());
     public static Status Active { get; } = new(new ActiveState());
     public static Status Archived { get; } = new(new ArchivedState());
+
+    private static readonly Dictionary<string, Status> Registry =
+        new(StringComparer.OrdinalIgnoreCase)
+        {
+            ["Draft"] = Draft,
+            ["Active"] = Active,
+            ["Archived"] = Archived
+        };
 
     public static bool TryParse(
         string name,

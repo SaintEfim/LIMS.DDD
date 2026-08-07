@@ -3,6 +3,8 @@ using LIMS.DDD.Service.API.Apis.InputParameters;
 using LIMS.DDD.Service.API.Apis.ResultDefinitions;
 using LIMS.DDD.Service.API.Apis.StudyTemplates;
 using LIMS.DDD.Service.Application;
+using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.SampleAggregate.Services;
+using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.StudyAggregate.Services;
 using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.Services;
 using LIMS.DDD.Service.Persistence;
 
@@ -18,6 +20,9 @@ public static class DependencyInjection
         services.AddApplication();
 
         services.AddScoped<StudyTemplateVersioningService>();
+        services.AddScoped<SampleCreationDomainService>();
+        services.AddScoped<SampleDeletionDomainService>();
+        services.AddScoped<StudyCreationDomainService>();
 
         services.AddScoped<InputParameterServices>();
         services.AddScoped<ResultDefinitionServices>();

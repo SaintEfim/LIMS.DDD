@@ -2,9 +2,9 @@
 
 namespace LIMS.DDD.Service.API.Apis.InputParameters;
 
-public class InputParameterServices(InputParameterCommandHandler commands, InputParameterQueries queries)
+public class InputParameterServices(InputParameterCommandsHandler commands, InputParameterQueries queries)
 {
-    public InputParameterCommandHandler Commands { get; } = commands;
+    public InputParameterCommandsHandler Commands { get; } = commands;
 
     public InputParameterQueries Queries { get; } = queries;
 }

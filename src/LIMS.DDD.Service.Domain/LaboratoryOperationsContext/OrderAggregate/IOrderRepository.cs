@@ -8,6 +8,9 @@ public interface IOrderRepository : IRepository<Order>
         OrderId id,
         CancellationToken cancellationToken = default);
 
+    Task<ICollection<Order>> GetAllAsync(
+        CancellationToken cancellationToken = default);
+
     Task<Order?> GetByIdForChangeAsync(
         OrderId id,
         CancellationToken cancellationToken = default);

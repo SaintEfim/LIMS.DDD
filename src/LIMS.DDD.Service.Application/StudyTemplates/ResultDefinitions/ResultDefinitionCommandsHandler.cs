@@ -1,16 +1,16 @@
-﻿using LIMS.DDD.Service.Application.StudyTemplates.InputParameters.Commands;
+﻿using LIMS.DDD.Service.Application.StudyTemplates.ResultDefinitions.Commands;
 using LIMS.DDD.Service.Domain.SeedWork.Result;
 using LIMS.DDD.Service.Domain.SeedWork.ValueObjects;
 using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate;
-using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.Entities.InputParameters;
+using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.Entities.ResultDefinitions;
 
-namespace LIMS.DDD.Service.Application.StudyTemplates.InputParameters;
+namespace LIMS.DDD.Service.Application.StudyTemplates.ResultDefinitions;
 
-public sealed class InputParameterCommandHandler(IStudyTemplateRepository repository)
+public sealed class ResultDefinitionCommandsHandler(IStudyTemplateRepository repository)
 {
     public async Task<Result<Guid, Exception>> CreateAsync(
         Guid studyTemplateId,
-        CreateInputParameterCommand command,
+        CreateResultDefinitionCommand command,
         CancellationToken cancellationToken = default)
     {
         var templateResult = await GetTemplateForChangeAsync(studyTemplateId, cancellationToken);
@@ -19,33 +19,14 @@ public sealed class InputParameterCommandHandler(IStudyTemplateRepository reposi
             return templateResult.CastFailure<Guid>();
         }
 
-        var nameResult = Name.Create(command.Name);
-        if (nameResult.IsFailure)
+        var newSpecification = Specification.Create(command.MinValue, command.MaxValue);
+        if (newSpecification.IsFailure)
         {
-            return nameResult.CastFailure<Guid>();
-        }
-
-        var descResult = Description.Create(command.Description);
-        if (descResult.IsFailure)
-        {
-            return descResult.CastFailure<Guid>();
-        }
-
-        var aliasResult = AliasName.Create(command.AliasName);
-        if (aliasResult.IsFailure)
-        {
-            return aliasResult.CastFailure<Guid>();
-        }
-
-        var specification = Specification.Create(command.MinValue, command.MaxValue);
-        if (specification.IsFailure)
-        {
-            return specification.CastFailure<Guid>();
+            return newSpecification.CastFailure<Guid>();
         }
 
         var addResult = templateResult.GetValue()
-            .AddInputParameter(nameResult.GetValue(), descResult.GetValue(), aliasResult.GetValue(),
-                specification.GetValue());
+            .AddResultDefinition(command.ResultInstance, command.Unit, newSpecification.GetValue());
         if (addResult.IsFailure)
         {
             return addResult.CastFailure<Guid>();
@@ -60,7 +41,7 @@ public sealed class InputParameterCommandHandler(IStudyTemplateRepository reposi
 
     public async Task<Result<None, Exception>> RemoveAsync(
         Guid studyTemplateId,
-        Guid parameterId,
+        Guid resultId,
         CancellationToken cancellationToken = default)
     {
         var templateResult = await GetTemplateForChangeAsync(studyTemplateId, cancellationToken);
@@ -70,7 +51,7 @@ public sealed class InputParameterCommandHandler(IStudyTemplateRepository reposi
         }
 
         var removeResult = templateResult.GetValue()
-            .RemoveInputParameter(new InputParameterId(parameterId));
+            .RemoveResultDefinition(new ResultDefinitionId(resultId));
         if (removeResult.IsFailure)
         {
             return removeResult.CastFailure<None>();
@@ -81,8 +62,8 @@ public sealed class InputParameterCommandHandler(IStudyTemplateRepository reposi
 
     public async Task<Result<None, Exception>> UpdateAsync(
         Guid studyTemplateId,
-        Guid parameterId,
-        UpdateInputParameterCommand command,
+        Guid resultDefinitionId,
+        UpdateResultDefinitionCommand command,
         CancellationToken cancellationToken = default)
     {
         var templateResult = await GetTemplateForChangeAsync(studyTemplateId, cancellationToken);
@@ -91,45 +72,9 @@ public sealed class InputParameterCommandHandler(IStudyTemplateRepository reposi
             return templateResult.CastFailure<None>();
         }
 
-        Name? name = null;
-        if (command.Name is not null)
-        {
-            var nameResult = Name.Create(command.Name);
-            if (nameResult.IsFailure)
-            {
-                return nameResult.CastFailure<None>();
-            }
-
-            name = nameResult.GetValue();
-        }
-
-        Description? description = null;
-        if (command.Description is not null)
-        {
-            var descResult = Description.Create(command.Description);
-            if (descResult.IsFailure)
-            {
-                return descResult.CastFailure<None>();
-            }
-
-            description = descResult.GetValue();
-        }
-
-        AliasName? aliasName = null;
-        if (command.AliasName is not null)
-        {
-            var aliasResult = AliasName.Create(command.AliasName);
-            if (aliasResult.IsFailure)
-            {
-                return aliasResult.CastFailure<None>();
-            }
-
-            aliasName = aliasResult.GetValue();
-        }
-
         var updateResult = templateResult.GetValue()
-            .UpdateInputParameter(new InputParameterId(parameterId), name, description, aliasName, command.MinValue,
-                command.MaxValue);
+            .UpdateResultDefinition(new ResultDefinitionId(resultDefinitionId), command.ResultInstance, command.Unit,
+                command.MinValue, command.MaxValue);
         if (updateResult.IsFailure)
         {
             return updateResult.CastFailure<None>();

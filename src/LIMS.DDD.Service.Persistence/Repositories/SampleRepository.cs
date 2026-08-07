@@ -30,6 +30,17 @@ public class SampleRepository : ISampleRepository
         return await _context.Samples.SingleOrDefaultAsync(s => s.Id == id, cancellationToken);
     }
 
+    public async Task<ICollection<Sample>> GetAllAsync(
+        CancellationToken cancellationToken = default)
+    {
+        var sampleQuery = await _context.Samples
+            .AsSplitQuery()
+            .AsNoTracking()
+            .ToListAsync(cancellationToken);
+
+        return sampleQuery;
+    }
+
     public async Task<ICollection<Sample>> GetByOrderIdAsync(
         OrderId orderId,
         CancellationToken cancellationToken = default)

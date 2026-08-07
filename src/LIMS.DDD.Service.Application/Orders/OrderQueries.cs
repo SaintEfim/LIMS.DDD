@@ -11,4 +11,13 @@ public sealed class OrderQueries(IOrderRepository repository)
         var order = await repository.GetByIdAsync(new OrderId(id), cancellationToken);
         return order is null ? null : OrderDto.FromDomain(order);
     }
+
+    public async Task<ICollection<OrderDto>> GetAllAsync(
+        CancellationToken cancellationToken = default)
+    {
+        var studyTemplates = await repository.GetAllAsync(cancellationToken);
+
+        return studyTemplates.Select(OrderDto.FromDomain)
+            .ToList();
+    }
 }

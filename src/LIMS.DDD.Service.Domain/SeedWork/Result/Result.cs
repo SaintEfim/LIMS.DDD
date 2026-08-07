@@ -44,7 +44,7 @@ public class Result<TValue, TError>
 
     public TError GetError()
     {
-        return IsFailure ? throw new InvalidOperationException("Cannot get error from failed result.") : Error!;
+        return IsFailure ? Error! : throw new InvalidOperationException("Cannot get error from failed result.");
     }
 
     public Result<TNew, TError> CastFailure<TNew>()

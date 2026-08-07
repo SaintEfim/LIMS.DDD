@@ -11,6 +11,7 @@ public readonly record struct TemplateId(Guid Value) : IValueObjectId
 public sealed record StudyTemplateCreateSnapshot(
     TemplateId TemplateId,
     Name Name,
+    bool CanCreateStudy,
     IReadOnlyList<ParameterSnapshot> Parameters,
     IReadOnlyList<ResultSnapshot> Results);
 

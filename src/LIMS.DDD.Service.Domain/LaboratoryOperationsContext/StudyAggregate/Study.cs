@@ -23,13 +23,14 @@ public sealed class Study
 
     public SampleId SampleId { get; private set; }
 
-    public StudyStatus Status { get; private set; } = StudyStatus.InWork;
+    public StudyStatus Status { get; private set; } = StudyStatus.InProgress;
 
     public Name Name { get; private set; }
 
     public TemplateId TemplateId { get; private set; }
 
     public Description Description { get; private set; }
+
     public IReadOnlyList<MeasuredValue> MeasuredValues => _measuredValues.AsReadOnly();
     public IReadOnlyList<TestResult> TestResults => _testResults.AsReadOnly();
 
@@ -47,7 +48,8 @@ public sealed class Study
             SampleId = sampleId,
             Name = templateName,
             TemplateId = templateId,
-            Status = StudyStatus.InWork
+            Description = Description.Create(null)
+                .GetValue()
         };
 
         study._measuredValues.AddRange(initialMeasuredValues);

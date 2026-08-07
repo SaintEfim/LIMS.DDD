@@ -2,8 +2,8 @@
 
 namespace LIMS.DDD.Service.API.Apis.CalculationRules;
 
-public class CalculationRuleServices(CalculationRuleCommandHandler commands, CalculationRuleQueries queries)
+public class CalculationRuleServices(CalculationRuleCommandsHandler commands, CalculationRuleQueries queries)
 {
-    public CalculationRuleCommandHandler Commands { get; } = commands;
+    public CalculationRuleCommandsHandler Commands { get; } = commands;
     public CalculationRuleQueries Queries { get; } = queries;
 }

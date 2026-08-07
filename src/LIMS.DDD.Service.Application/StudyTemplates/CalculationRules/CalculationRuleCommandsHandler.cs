@@ -9,7 +9,7 @@ using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.Entiti
 
 namespace LIMS.DDD.Service.Application.StudyTemplates.CalculationRules;
 
-public sealed class CalculationRuleCommandHandler(IStudyTemplateRepository repository)
+public sealed class CalculationRuleCommandsHandler(IStudyTemplateRepository repository)
 {
     public async Task<Result<Guid, Exception>> CreateAsync(
         Guid studyTemplateId,

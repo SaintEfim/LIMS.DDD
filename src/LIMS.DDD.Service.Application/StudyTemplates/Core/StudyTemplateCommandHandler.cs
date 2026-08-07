@@ -7,7 +7,7 @@ using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.ValueO
 
 namespace LIMS.DDD.Service.Application.StudyTemplates.Core;
 
-public sealed class StudyTemplateCommandHandler(
+public sealed class StudyTemplateCommandsHandler(
     IStudyTemplateRepository repository,
     StudyTemplateVersioningService domainService)
 {
@@ -111,7 +111,7 @@ public sealed class StudyTemplateCommandHandler(
                 new InvalidOperationException($"Unknown status '{statusCommand}'."));
         }
 
-        var changeResult = template.ChangeStatus(newStatus!);
+        var changeResult = template.ChangeStatus(newStatus);
 
         if (changeResult.IsFailure)
         {

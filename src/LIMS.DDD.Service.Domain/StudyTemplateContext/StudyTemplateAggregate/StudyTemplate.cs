@@ -41,6 +41,10 @@ public sealed class StudyTemplate
 
     public IReadOnlyList<CalculationRule> CalculationRules => _calculationRules.AsReadOnly();
 
+    public bool CanCreateStudy =>
+        Status == Status.Active ||
+        Status == Status.Archived;
+
     internal void SetParentId(
         StudyTemplateId parentId)
     {
