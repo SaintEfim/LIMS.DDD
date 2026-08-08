@@ -27,11 +27,11 @@ public sealed class StudyTemplate
 
     public StudyTemplateId Id { get; private set; }
 
-    public Name Name { get; private set; }
+    public Name Name { get; private set; } = null!;
 
-    public Description Description { get; private set; }
+    public Description Description { get; private set; } = null!;
 
-    public Revision Revision { get; private set; }
+    public Revision Revision { get; private set; } = null!;
 
     public Status Status { get; private set; } = Status.Draft;
 
@@ -41,7 +41,7 @@ public sealed class StudyTemplate
 
     public IReadOnlyList<CalculationRule> CalculationRules => _calculationRules.AsReadOnly();
 
-    public bool CanCreateStudy => Status == Status.Active || Status == Status.Archived;
+    public bool CanCreateStudy => Status == Status.Active;
 
     internal void SetParentId(
         StudyTemplateId parentId)

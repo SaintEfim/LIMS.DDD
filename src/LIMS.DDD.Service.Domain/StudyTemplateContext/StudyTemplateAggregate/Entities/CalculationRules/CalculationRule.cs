@@ -11,7 +11,7 @@ public sealed class CalculationRule : SoftDeletableModel
 {
     private readonly HashSet<CalculationInput> _calculationInputs = [];
 
-    public ResultDefinitionId ResultDefinitionId;
+    public ResultDefinitionId ResultDefinitionId { get; private set; }
 
     private CalculationRule()
     {
@@ -23,11 +23,11 @@ public sealed class CalculationRule : SoftDeletableModel
 
     public IReadOnlyCollection<CalculationInput> CalculationInputs => _calculationInputs.AsReadOnly();
 
-    public Name Name { get; private set; }
+    public Name Name { get; private set; } = null!;
 
-    public FormulaExpression FormulaExpression { get; private set; }
+    public FormulaExpression FormulaExpression { get; private set; } = null!;
 
-    public Description Description { get; private set; }
+    public Description Description { get; private set; } = null!;
 
     internal static CalculationRule Create(
         StudyTemplateId studyTemplateId,

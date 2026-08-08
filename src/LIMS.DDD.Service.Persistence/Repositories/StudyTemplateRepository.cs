@@ -58,12 +58,6 @@ public class StudyTemplateRepository : IStudyTemplateRepository
         _context.StudyTemplates.Add(studyTemplate);
     }
 
-    public async Task<int> SaveChangesAsync(
-        CancellationToken cancellationToken = default)
-    {
-        return await _context.SaveChangesAsync(cancellationToken);
-    }
-
     private static IQueryable<StudyTemplate> StudyTemplateBaseQuery(
         IQueryable<StudyTemplate> query)
     {

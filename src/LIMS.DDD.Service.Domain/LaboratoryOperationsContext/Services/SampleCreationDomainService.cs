@@ -20,7 +20,7 @@ public sealed class SampleCreationDomainService
         {
             return Result<Sample, Exception>.Failure(new InvalidOperationException(
                 $"Cannot add samples to an order with status '{order.OrderStatus.Name}'. " +
-                "Order must be in Draft or InWork status."));
+                "Order must be in Draft or InProgress status."));
         }
 
         var sampleResult = Sample.Create(order.Id, name, gatherDate, code, volume);

@@ -25,11 +25,11 @@ public sealed class Study
 
     public StudyStatus Status { get; private set; } = StudyStatus.InProgress;
 
-    public Name Name { get; private set; }
+    public Name Name { get; private set; } = null!;
 
     public TemplateId TemplateId { get; private set; }
 
-    public Description Description { get; private set; }
+    public Description Description { get; private set; } = null!;
 
     public IReadOnlyList<MeasuredValue> MeasuredValues => _measuredValues.AsReadOnly();
     public IReadOnlyList<TestResult> TestResults => _testResults.AsReadOnly();
