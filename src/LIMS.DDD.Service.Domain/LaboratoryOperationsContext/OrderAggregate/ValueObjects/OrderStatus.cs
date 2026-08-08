@@ -30,16 +30,16 @@ public sealed record OrderStatus : StatusBase<IState<Order>, Order>
 
     public static bool TryParse(
         string name,
-        out OrderStatus status)
+        out OrderStatus? status)
     {
-        return Registry.TryGetValue(name, out status!);
+        return Registry.TryGetValue(name, out status);
     }
 
     public static OrderStatus ConvertStatus(
         string value)
     {
         return TryParse(value, out var status)
-            ? status
+            ? status!
             : throw new InvalidOperationException($"Unknown status '{value}'");
     }
 }

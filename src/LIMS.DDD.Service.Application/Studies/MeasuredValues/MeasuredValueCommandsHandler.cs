@@ -1,10 +1,11 @@
 ﻿using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.StudyAggregate;
 using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.StudyAggregate.Entities;
+using LIMS.DDD.Service.Domain.SeedWork;
 using LIMS.DDD.Service.Domain.SeedWork.Result;
 
 namespace LIMS.DDD.Service.Application.Studies.MeasuredValues;
 
-public sealed class MeasuredValueCommandsHandler(IStudyRepository studyRepository)
+public sealed class MeasuredValueCommandsHandler(IUnitOfWork unitOfWork, IStudyRepository studyRepository)
 {
     public async Task<Result<None, Exception>> UpdateAsync(
         Guid studyId,
@@ -44,7 +45,7 @@ public sealed class MeasuredValueCommandsHandler(IStudyRepository studyRepositor
     {
         try
         {
-            await studyRepository.SaveChangesAsync(cancellationToken);
+            await unitOfWork.SaveChangesAsync(cancellationToken);
             return Result<None, Exception>.Success();
         }
         catch (Exception ex)

@@ -17,7 +17,4 @@ public interface IOrderRepository : IRepository<Order>
 
     void Add(
         Order order);
-
-    Task<int> SaveChangesAsync(
-        CancellationToken cancellationToken = default);
 }

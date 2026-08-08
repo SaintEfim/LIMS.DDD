@@ -1,10 +1,11 @@
 ﻿using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.OrderAggregate;
+using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.SampleAggregate;
 using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.SampleAggregate.ValueObjects;
 using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.ValueObjects;
 using LIMS.DDD.Service.Domain.SeedWork.Result;
 using LIMS.DDD.Service.Domain.SeedWork.ValueObjects;
 
-namespace LIMS.DDD.Service.Domain.LaboratoryOperationsContext.SampleAggregate.Services;
+namespace LIMS.DDD.Service.Domain.LaboratoryOperationsContext.Services;
 
 public sealed class SampleCreationDomainService
 {

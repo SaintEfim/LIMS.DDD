@@ -7,7 +7,7 @@ public sealed record OrderDto(Guid Id, string Name, string? Description, string?
     public static OrderDto FromDomain(
         Order order)
     {
-        return new OrderDto(order.Id.Value, order.Name.Value, order.Description?.Value, order.Code?.Value,
+        return new OrderDto(order.Id.Value, order.Name.Value, order.Description.Value, order.Code.Value,
             order.Contractor, order.OrderStatus.Name);
     }
 }

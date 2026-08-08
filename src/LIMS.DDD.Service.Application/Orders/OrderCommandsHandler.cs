@@ -1,13 +1,20 @@
 using LIMS.DDD.Service.Application.Orders.Commands;
 using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.OrderAggregate;
 using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.OrderAggregate.ValueObjects;
+using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.SampleAggregate;
+using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.Services;
 using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.ValueObjects;
+using LIMS.DDD.Service.Domain.SeedWork;
 using LIMS.DDD.Service.Domain.SeedWork.Result;
 using LIMS.DDD.Service.Domain.SeedWork.ValueObjects;
 
 namespace LIMS.DDD.Service.Application.Orders;
 
-public sealed class OrderCommandsHandler(IOrderRepository repository)
+public sealed class OrderCommandsHandler(
+    IUnitOfWork unitOfWork,
+    IOrderRepository repository,
+    ISampleRepository sampleRepository,
+    OrderStatusChangeDomainService statusChangeDomainService)
 {
     public async Task<Result<Order, Exception>> CreateAsync(
         CreateOrderCommand command,
@@ -73,8 +80,7 @@ public sealed class OrderCommandsHandler(IOrderRepository repository)
             return updateResult.CastFailure<None>();
         }
 
-        await repository.SaveChangesAsync(cancellationToken);
-        return Result<None, Exception>.Success();
+        return await SaveChangesAsync(cancellationToken);
     }
 
     public async Task<Result<None, Exception>> ChangeStatusAsync(
@@ -88,21 +94,24 @@ public sealed class OrderCommandsHandler(IOrderRepository repository)
             return orderResult.CastFailure<None>();
         }
 
-        if (!OrderStatus.TryParse(command.Status, out var newStatus))
+        var order = orderResult.GetValue();
+
+        if (!OrderStatus.TryParse(command.Status, out var newStatus) || newStatus is null)
         {
             return Result<None, Exception>.Failure(
                 new InvalidOperationException($"Unknown status '{command.Status}'."));
         }
 
-        var changeResult = orderResult.GetValue()
-            .ChangeStatus(newStatus);
+        var samples = (await sampleRepository.GetByOrderIdAsync(order.Id, cancellationToken)).ToList()
+            .AsReadOnly();
+
+        var changeResult = statusChangeDomainService.ValidateAndChangeStatus(order, newStatus, samples);
         if (changeResult.IsFailure)
         {
             return changeResult.CastFailure<None>();
         }
 
-        await repository.SaveChangesAsync(cancellationToken);
-        return Result<None, Exception>.Success();
+        return await SaveChangesAsync(cancellationToken);
     }
 
     public async Task<Result<None, Exception>> DeleteAsync(
@@ -123,9 +132,7 @@ public sealed class OrderCommandsHandler(IOrderRepository repository)
             return deleteResult;
         }
 
-        await repository.SaveChangesAsync(cancellationToken);
-
-        return Result<None, Exception>.Success();
+        return await SaveChangesAsync(cancellationToken);
     }
 
     private async Task<Result<Order, Exception>> SaveNewAsync(
@@ -135,12 +142,26 @@ public sealed class OrderCommandsHandler(IOrderRepository repository)
         try
         {
             repository.Add(order);
-            await repository.SaveChangesAsync(cancellationToken);
+            await unitOfWork.SaveChangesAsync(cancellationToken);
             return Result<Order, Exception>.Success(order);
         }
         catch (Exception ex)
         {
             return Result<Order, Exception>.Failure(new Exception($"Failed to save Order: {ex.Message}", ex));
+        }
+    }
+
+    private async Task<Result<None, Exception>> SaveChangesAsync(
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            await unitOfWork.SaveChangesAsync(cancellationToken);
+            return Result<None, Exception>.Success();
+        }
+        catch (Exception ex)
+        {
+            return Result<None, Exception>.Failure(new Exception($"Failed to save Sample: {ex.Message}", ex));
         }
     }
 

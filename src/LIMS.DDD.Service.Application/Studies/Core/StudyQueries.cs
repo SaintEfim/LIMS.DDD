@@ -18,6 +18,7 @@ public sealed class StudyQueries(IStudyRepository repository)
         CancellationToken cancellationToken = default)
     {
         var studies = await repository.GetBySampleIdAsync(new SampleId(sampleId), cancellationToken);
-        return studies.Select(StudyDto.FromDomain).ToList();
+        return studies.Select(StudyDto.FromDomain)
+            .ToList();
     }
 }

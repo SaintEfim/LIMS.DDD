@@ -22,7 +22,4 @@ public interface ISampleRepository : IRepository<Sample>
 
     void Add(
         Sample sample);
-
-    Task<int> SaveChangesAsync(
-        CancellationToken cancellationToken = default);
 }
