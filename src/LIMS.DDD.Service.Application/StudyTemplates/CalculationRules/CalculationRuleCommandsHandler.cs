@@ -1,4 +1,5 @@
 ﻿using LIMS.DDD.Service.Application.StudyTemplates.CalculationRules.Commands;
+using LIMS.DDD.Service.Domain.SeedWork;
 using LIMS.DDD.Service.Domain.SeedWork.Result;
 using LIMS.DDD.Service.Domain.SeedWork.ValueObjects;
 using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate;
@@ -9,7 +10,9 @@ using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.Entiti
 
 namespace LIMS.DDD.Service.Application.StudyTemplates.CalculationRules;
 
-public sealed class CalculationRuleCommandsHandler(IStudyTemplateRepository repository)
+public sealed class CalculationRuleCommandsHandler(
+    IStudyTemplateRepository repository,
+    IUnitOfWork unitOfWork)
 {
     public async Task<Result<Guid, Exception>> CreateAsync(
         Guid studyTemplateId,
@@ -209,7 +212,7 @@ public sealed class CalculationRuleCommandsHandler(IStudyTemplateRepository repo
     {
         try
         {
-            await repository.SaveChangesAsync(cancellationToken);
+            await unitOfWork.SaveChangesAsync(cancellationToken);
             return Result<None, Exception>.Success();
         }
         catch (Exception ex)

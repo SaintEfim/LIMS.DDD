@@ -1,4 +1,5 @@
 ﻿using LIMS.DDD.Service.Application.StudyTemplates.Core.Commands;
+using LIMS.DDD.Service.Domain.SeedWork;
 using LIMS.DDD.Service.Domain.SeedWork.Result;
 using LIMS.DDD.Service.Domain.SeedWork.ValueObjects;
 using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate;
@@ -9,6 +10,7 @@ namespace LIMS.DDD.Service.Application.StudyTemplates.Core;
 
 public sealed class StudyTemplateCommandsHandler(
     IStudyTemplateRepository repository,
+    IUnitOfWork unitOfWork,
     StudyTemplateVersioningService domainService)
 {
     public async Task<Result<StudyTemplate, Exception>> CreateAsync(
@@ -139,7 +141,7 @@ public sealed class StudyTemplateCommandsHandler(
             return deleteResult;
         }
 
-        await repository.SaveChangesAsync(cancellationToken);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
 
         return Result<None, Exception>.Success();
     }
@@ -193,7 +195,7 @@ public sealed class StudyTemplateCommandsHandler(
         try
         {
             repository.Add(template);
-            await repository.SaveChangesAsync(cancellationToken);
+            await unitOfWork.SaveChangesAsync(cancellationToken);
             return Result<StudyTemplate, Exception>.Success(template);
         }
         catch (Exception ex)
@@ -209,7 +211,7 @@ public sealed class StudyTemplateCommandsHandler(
     {
         try
         {
-            await repository.SaveChangesAsync(cancellationToken);
+            await unitOfWork.SaveChangesAsync(cancellationToken);
             return Result<StudyTemplate, Exception>.Success(template);
         }
         catch (Exception ex)

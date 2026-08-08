@@ -16,11 +16,11 @@ public class Order
 
     public OrderId Id { get; private set; }
 
-    public Name Name { get; private set; }
+    public Name Name { get; private set; } = null!;
 
-    public Description Description { get; private set; }
+    public Description Description { get; private set; } = null!;
 
-    public Code Code { get; private set; }
+    public Code Code { get; private set; } = null!;
 
     public string Contractor { get; private set; } = string.Empty;
 
@@ -59,7 +59,7 @@ public class Order
 
         if (IsDeleted)
         {
-            return Result<None, Exception>.Failure(new InvalidOperationException("Sample is already deleted."));
+            return Result<None, Exception>.Failure(new InvalidOperationException("Order is already deleted."));
         }
 
         IsDeleted = true;
@@ -78,7 +78,7 @@ public class Order
         {
             return Result<None, Exception>.Failure(
                 new InvalidOperationException(
-                    "Cannot modify details of an Active or Archived template. Create a new revision."));
+                    "Cannot modify order details when the order is not editable."));
         }
 
         if (name is not null)

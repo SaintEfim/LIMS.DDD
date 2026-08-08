@@ -13,11 +13,11 @@ public sealed class InputParameter : SoftDeletableModel
 
     public StudyTemplateId StudyTemplateId { get; private set; }
 
-    public Name Name { get; private set; }
+    public Name Name { get; private set; } = null!;
 
-    public Description Description { get; private set; }
+    public Description Description { get; private set; } = null!;
 
-    public AliasName AliasName { get; private set; }
+    public AliasName AliasName { get; private set; } = null!;
 
     public Specification Specification { get; private set; } = null!;
 

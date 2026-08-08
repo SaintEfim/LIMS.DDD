@@ -19,13 +19,13 @@ public class Sample
 
     public OrderId OrderId { get; private set; }
 
-    public Name Name { get; private set; }
+    public Name Name { get; private set; } = null!;
 
-    public GatherDate GatherDate { get; private set; }
+    public GatherDate GatherDate { get; private set; } = null!;
 
-    public Code Code { get; private set; }
+    public Code Code { get; private set; } = null!;
 
-    public Volume Volume { get; private set; }
+    public Volume Volume { get; private set; } = null!;
 
     public SampleStatus SampleStatus { get; private set; } = SampleStatus.Registered;
 

@@ -158,9 +158,7 @@ public sealed class StudyCommandsHandler(
             return changeResult;
         }
 
-        await unitOfWork.SaveChangesAsync(cancellationToken);
-
-        return Result<None, Exception>.Success();
+        return await SaveChangesAsync(cancellationToken);
     }
 
     public async Task<Result<None, Exception>> DeleteAsync(

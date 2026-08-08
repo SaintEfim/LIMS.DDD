@@ -16,7 +16,7 @@ public sealed class SampleDeletionDomainService
         {
             return Result<None, Exception>.Failure(new InvalidOperationException(
                 $"Cannot delete sample from an order with status '{order.OrderStatus.Name}'. " +
-                "Order must be in Draft or InProgress status."));
+                "Order must be in Draft status."));
         }
 
         if (hasAssociatedStudies)

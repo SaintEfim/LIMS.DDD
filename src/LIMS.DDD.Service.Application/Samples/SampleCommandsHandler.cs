@@ -80,19 +80,43 @@ public sealed class SampleCommandsHandler(
 
         var sample = sampleResult.GetValue();
 
-        var name = command.Name is not null
-            ? Name.Create(command.Name)
-                .GetValue()
-            : null;
-        var gatherDate = command.GatherDateBegin is not null || command.GatherDateEnd is not null
-            ? GatherDate.Create(command.GatherDateBegin ?? sample.GatherDate.Begin,
-                    command.GatherDateEnd ?? sample.GatherDate.End)
-                .GetValue()
-            : null;
-        var code = command.Code is not null
-            ? Code.Create(command.Code)
-                .GetValue()
-            : null;
+        Name? name = null;
+        if (command.Name is not null)
+        {
+            var nameResult = Name.Create(command.Name);
+            if (nameResult.IsFailure)
+            {
+                return nameResult.CastFailure<None>();
+            }
+
+            name = nameResult.GetValue();
+        }
+
+        GatherDate? gatherDate = null;
+        if (command.GatherDateBegin is not null || command.GatherDateEnd is not null)
+        {
+            var gatherDateResult = GatherDate.Create(
+                command.GatherDateBegin ?? sample.GatherDate.Begin,
+                command.GatherDateEnd ?? sample.GatherDate.End);
+            if (gatherDateResult.IsFailure)
+            {
+                return gatherDateResult.CastFailure<None>();
+            }
+
+            gatherDate = gatherDateResult.GetValue();
+        }
+
+        Code? code = null;
+        if (command.Code is not null)
+        {
+            var codeResult = Code.Create(command.Code);
+            if (codeResult.IsFailure)
+            {
+                return codeResult.CastFailure<None>();
+            }
+
+            code = codeResult.GetValue();
+        }
 
         var updateResult = sample.UpdatePartial(name, gatherDate, code, command.VolumeValue, command.VolumeUnit);
         if (updateResult.IsFailure)

@@ -1,4 +1,5 @@
 ﻿using LIMS.DDD.Service.Application.StudyTemplates.InputParameters.Commands;
+using LIMS.DDD.Service.Domain.SeedWork;
 using LIMS.DDD.Service.Domain.SeedWork.Result;
 using LIMS.DDD.Service.Domain.SeedWork.ValueObjects;
 using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate;
@@ -6,7 +7,9 @@ using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.Entiti
 
 namespace LIMS.DDD.Service.Application.StudyTemplates.InputParameters;
 
-public sealed class InputParameterCommandsHandler(IStudyTemplateRepository repository)
+public sealed class InputParameterCommandsHandler(
+    IStudyTemplateRepository repository,
+    IUnitOfWork unitOfWork)
 {
     public async Task<Result<Guid, Exception>> CreateAsync(
         Guid studyTemplateId,
@@ -154,7 +157,7 @@ public sealed class InputParameterCommandsHandler(IStudyTemplateRepository repos
     {
         try
         {
-            await repository.SaveChangesAsync(cancellationToken);
+            await unitOfWork.SaveChangesAsync(cancellationToken);
             return Result<None, Exception>.Success();
         }
         catch (Exception ex)

@@ -17,7 +17,4 @@ public interface IStudyTemplateRepository : IRepository<StudyTemplate>
 
     void Add(
         StudyTemplate studyTemplate);
-
-    Task<int> SaveChangesAsync(
-        CancellationToken cancellationToken = default);
 }

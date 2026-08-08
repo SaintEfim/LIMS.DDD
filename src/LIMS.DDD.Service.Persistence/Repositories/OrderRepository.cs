@@ -46,9 +46,4 @@ public class OrderRepository : IOrderRepository
         _context.Orders.Add(order);
     }
 
-    public async Task<int> SaveChangesAsync(
-        CancellationToken cancellationToken = default)
-    {
-        return await _context.SaveChangesAsync(cancellationToken);
-    }
 }

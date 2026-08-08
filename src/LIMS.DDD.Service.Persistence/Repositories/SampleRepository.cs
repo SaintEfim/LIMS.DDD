@@ -57,9 +57,4 @@ public class SampleRepository : ISampleRepository
         _context.Samples.Add(sample);
     }
 
-    public async Task<int> SaveChangesAsync(
-        CancellationToken cancellationToken = default)
-    {
-        return await _context.SaveChangesAsync(cancellationToken);
-    }
 }

@@ -61,20 +61,43 @@ public sealed class OrderCommandsHandler(
 
         var order = orderResult.GetValue();
 
-        var name = command.Name is not null
-            ? Name.Create(command.Name)
-                .GetValue()
-            : null;
-        var desc = command.Description is not null
-            ? Description.Create(command.Description)
-                .GetValue()
-            : null;
-        var code = command.Code is not null
-            ? Code.Create(command.Code)
-                .GetValue()
-            : null;
+        Name? name = null;
+        if (command.Name is not null)
+        {
+            var nameResult = Name.Create(command.Name);
+            if (nameResult.IsFailure)
+            {
+                return nameResult.CastFailure<None>();
+            }
 
-        var updateResult = order.UpdatePartial(name, desc, command.Contractor, code);
+            name = nameResult.GetValue();
+        }
+
+        Description? description = null;
+        if (command.Description is not null)
+        {
+            var descriptionResult = Description.Create(command.Description);
+            if (descriptionResult.IsFailure)
+            {
+                return descriptionResult.CastFailure<None>();
+            }
+
+            description = descriptionResult.GetValue();
+        }
+
+        Code? code = null;
+        if (command.Code is not null)
+        {
+            var codeResult = Code.Create(command.Code);
+            if (codeResult.IsFailure)
+            {
+                return codeResult.CastFailure<None>();
+            }
+
+            code = codeResult.GetValue();
+        }
+
+        var updateResult = order.UpdatePartial(name, description, command.Contractor, code);
         if (updateResult.IsFailure)
         {
             return updateResult.CastFailure<None>();
@@ -161,7 +184,7 @@ public sealed class OrderCommandsHandler(
         }
         catch (Exception ex)
         {
-            return Result<None, Exception>.Failure(new Exception($"Failed to save Sample: {ex.Message}", ex));
+            return Result<None, Exception>.Failure(new Exception($"Failed to save Order: {ex.Message}", ex));
         }
     }
 
