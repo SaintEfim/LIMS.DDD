@@ -1,5 +1,7 @@
 ﻿using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.StudyAggregate.Entities;
 
+namespace LIMS.DDD.Service.Application.Studies.MeasuredValues;
+
 public sealed record MeasuredValueDto(
     Guid Id,
     Guid StudyId,

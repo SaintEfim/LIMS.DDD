@@ -9,9 +9,9 @@ POST {{baseUrl}}/api/study-templates
 Content-Type: application/json
 
 {
-  "name": "Определение влажности зерна",
+  "name": "Определение влажности зерна {{$random.uuid}}",
   "description": "Методика определения массовой доли влаги в зерне воздушно-тепловым способом",
-  "revision": "v1.0"
+  "revision": "v1.0-{{$random.uuid}}"
 }
 
 > {%
@@ -211,7 +211,7 @@ POST {{baseUrl}}/api/study-templates/{{moistureTemplateId}}/create-revision
 Content-Type: application/json
 
 {
-  "newRevision": "v1.1"
+  "newRevision": "v1.1-{{$random.uuid}}"
 }
 
 > {%
@@ -257,9 +257,9 @@ POST {{baseUrl}}/api/orders
 Content-Type: application/json
 
 {
-  "name": "Партия зерна №4512",
+  "name": "Партия зерна №4512 {{$random.uuid}}",
   "description": "Входной контроль качества зерна от поставщика ООО 'Агро'",
-  "code": "A-100",
+  "code": "A-{{$random.uuid}}",
   "contractor": "ООО 'Агро Поставки'"
 }
 
@@ -280,10 +280,10 @@ POST {{baseUrl}}/api/orders/{{orderId}}/samples
 Content-Type: application/json
 
 {
-  "name": "Проба зерна из вагона №12345",
+  "name": "Проба зерна из вагона №12345 {{$random.uuid}}",
   "gatherDateBegin": "2023-10-25T08:00:00Z",
   "gatherDateEnd": "2023-10-25T08:15:00Z",
-  "code": "SAMPLE-001",
+  "code": "SAMPLE-{{$random.uuid}}",
   "volumeValue": 1000.0,
   "volumeUnit": "г"
 }
