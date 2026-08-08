@@ -22,6 +22,21 @@ public class TestResultModule : ICarterModule
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status404NotFound)
             .Produces(StatusCodes.Status400BadRequest);
+
+        group.MapPost("/{testResultId:guid}", Execute)
+            .Produces(StatusCodes.Status204NoContent)
+            .Produces(StatusCodes.Status404NotFound)
+            .Produces(StatusCodes.Status400BadRequest);
+    }
+
+    private static async Task<IResult> Execute(
+        Guid studyId,
+        Guid testResultId,
+        [AsParameters] TestResultServices services,
+        CancellationToken ct)
+    {
+        var result = await services.Commands.ExecuteTest(studyId, testResultId, ct);
+        return result.IsFailure ? HandleFailure(result.GetError()) : Results.NoContent();
     }
 
     private static async Task<IResult> GetAll(

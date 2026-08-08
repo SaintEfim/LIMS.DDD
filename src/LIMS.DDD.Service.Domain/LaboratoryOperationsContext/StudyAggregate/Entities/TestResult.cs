@@ -1,5 +1,6 @@
 ﻿using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.StudyAggregate.ValueObjects;
 using LIMS.DDD.Service.Domain.SeedWork;
+using LIMS.DDD.Service.Domain.SeedWork.Result;
 
 namespace LIMS.DDD.Service.Domain.LaboratoryOperationsContext.StudyAggregate.Entities;
 
@@ -31,16 +32,16 @@ public sealed class TestResult : SoftDeletableModel
         };
     }
 
-    internal void Update(
-        double? value,
+    internal void UpdateIsOutOfSpec(
         bool isOutOfSpec)
     {
-        if (value is not null)
-        {
-            Value = value;
-        }
-
         IsOutOfSpec = isOutOfSpec;
+    }
+
+    public void SetValue(
+        double value)
+    {
+        Value = value;
     }
 
     internal void MarkAsDeleted()

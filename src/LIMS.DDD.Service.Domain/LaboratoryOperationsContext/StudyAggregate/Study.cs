@@ -118,7 +118,6 @@ public sealed class Study
 
     public Result<None, Exception> UpdateTestResult(
         TestResultId testResultId,
-        double? value,
         bool isOutOfSpec)
     {
         if (!Status.CanEdit)
@@ -135,7 +134,7 @@ public sealed class Study
                 new InvalidOperationException("Test result not found in this study."));
         }
 
-        testResult.Update(value, isOutOfSpec);
+        testResult.UpdateIsOutOfSpec(isOutOfSpec);
 
         return Result<None, Exception>.Success();
     }
