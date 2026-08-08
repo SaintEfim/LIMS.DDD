@@ -407,34 +407,34 @@ Content-Type: application/json
 ### 7. ЗАВЕРШЕНИЕ ИССЛЕДОВАНИЯ (CHANGE STATUS)
 ### Переводим исследование из InWork в Completed
 ### ============================================
-#
-## @name completeStudy
-#POST {{baseUrl}}/api/samples/{{sampleId}}/studies/{{studyId}}/change-status
-#Content-Type: application/json
-#
-#{
-#  "status": "Completed"
-#}
-#
-#> {%
-#  client.test("Complete study", function () {
-#    client.assert(response.status === 204, "Study status change failed: " + response.status);
-#  });
-#  client.log("Study completed successfully");
-#%}
-#
-#### ============================================
-#### 8. ФИНАЛЬНАЯ ПРОВЕРКА: ПОЛУЧЕНИЕ ГОТОВОГО ИССЛЕДОВАНИЯ
-#### Убеждаемся, что все данные сохранились и статус изменен
-#### ============================================
-#
-#GET {{baseUrl}}/api/samples/{{sampleId}}/studies/{{studyId}}
-#
-#> {%
-#  client.test("Verify final study state", function () {
-#    client.assert(response.status === 200, "Failed to get final study");
-#    client.assert(response.body.status === "Completed", "Study status is not Completed");
-#    client.assert(response.body.testResults[0].value !== null, "Test results should have values");
-#    client.log("Full LIMS workflow completed successfully");
-#  });
-#%}
+
+# @name completeStudy
+POST {{baseUrl}}/api/samples/{{sampleId}}/studies/{{studyId}}/change-status
+Content-Type: application/json
+
+{
+  "status": "Completed"
+}
+
+> {%
+  client.test("Complete study", function () {
+    client.assert(response.status === 204, "Study status change failed: " + response.status);
+  });
+  client.log("Study completed successfully");
+%}
+
+### ============================================
+### 8. ФИНАЛЬНАЯ ПРОВЕРКА: ПОЛУЧЕНИЕ ГОТОВОГО ИССЛЕДОВАНИЯ
+### Убеждаемся, что все данные сохранились и статус изменен
+### ============================================
+
+GET {{baseUrl}}/api/samples/{{sampleId}}/studies/{{studyId}}
+
+> {%
+  client.test("Verify final study state", function () {
+    client.assert(response.status === 200, "Failed to get final study");
+    client.assert(response.body.status === "Completed", "Study status is not Completed");
+    client.assert(response.body.testResults[0].value !== null, "Test results should have values");
+    client.log("Full LIMS workflow completed successfully");
+  });
+%}
