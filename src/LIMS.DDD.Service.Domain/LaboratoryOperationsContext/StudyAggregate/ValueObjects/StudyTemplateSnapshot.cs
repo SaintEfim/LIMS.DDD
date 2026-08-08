@@ -15,16 +15,56 @@ public sealed record StudyTemplateCreateSnapshot(
     IReadOnlyList<ParameterSnapshot> Parameters,
     IReadOnlyList<ResultSnapshot> Results);
 
-public sealed record ParameterSnapshot(
-    Guid InputParameterId,
-    Name Name,
-    AliasName AliasName,
-    double? MinValue,
-    double? MaxValue);
+public sealed record ParameterSnapshot
+{
+    private ParameterSnapshot()
+    {
+    }
 
-public sealed record ResultSnapshot(
-    Guid ResultDefinitionId,
-    string ResultInstance,
-    string Unit,
-    double? MinValue,
-    double? MaxValue);
+    public ParameterSnapshot(
+        Guid inputParameterId,
+        Name name,
+        AliasName aliasName,
+        Specification specification)
+    {
+        InputParameterId = inputParameterId;
+        Name = name;
+        AliasName = aliasName;
+        Specification = specification;
+    }
+
+    public Guid InputParameterId { get; private set; }
+
+    public Name Name { get; private set; }
+
+    public AliasName AliasName { get; private set; }
+
+    public Specification Specification { get; private set; }
+}
+
+public sealed record ResultSnapshot
+{
+    private ResultSnapshot()
+    {
+    }
+
+    public ResultSnapshot(
+        Guid resultDefinitionId,
+        string resultInstance,
+        string unit,
+        Specification specification)
+    {
+        ResultDefinitionId = resultDefinitionId;
+        ResultInstance = resultInstance;
+        Unit = unit;
+        Specification = specification;
+    }
+
+    public Guid ResultDefinitionId { get; private set; }
+
+    public string ResultInstance { get; private set; }
+
+    public string Unit { get; private set; }
+
+    public Specification Specification { get; private set; }
+}

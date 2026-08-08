@@ -1,10 +1,14 @@
-﻿using LIMS.DDD.Service.Domain.SeedWork.Result;
+﻿using System.Text.RegularExpressions;
+using LIMS.DDD.Service.Domain.SeedWork.Result;
 
 namespace LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.Entities.CalculationRules.ValueObjects;
 
-public sealed record FormulaExpression
+public sealed partial record FormulaExpression
 {
     private const int MaxLength = 2000;
+
+    [GeneratedRegex(@"\b[a-zA-Z_][a-zA-Z0-9_]*\b")]
+    private static partial Regex Formula();
 
     private FormulaExpression(
         string value)
@@ -39,5 +43,15 @@ public sealed record FormulaExpression
 
         var formula = new FormulaExpression(value.Trim());
         return Result<FormulaExpression, Exception>.Success(formula);
+    }
+
+    public IReadOnlyCollection<string> ExtractVariables()
+    {
+        var matches = Formula()
+            .Matches(Value);
+
+        return matches.Select(m => m.Value)
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
     }
 }

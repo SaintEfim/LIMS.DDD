@@ -16,7 +16,7 @@ public sealed record MeasuredValueDto(
         MeasuredValue mv)
     {
         return new MeasuredValueDto(mv.Id.Value, mv.StudyId.Value, mv.ParameterSnapshot.InputParameterId,
-            mv.ParameterSnapshot.Name.Value, mv.ParameterSnapshot.AliasName.Value, mv.ParameterSnapshot.MinValue,
-            mv.ParameterSnapshot.MaxValue, mv.Value);
+            mv.ParameterSnapshot.Name.Value, mv.ParameterSnapshot.AliasName.Value,
+            mv.ParameterSnapshot.Specification.MinValue, mv.ParameterSnapshot.Specification.MaxValue, mv.Value);
     }
 }

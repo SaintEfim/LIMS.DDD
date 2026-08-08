@@ -31,7 +31,7 @@ POST {{baseUrl}}/api/study-templates/{{moistureTemplateId}}/input-parameters
 Content-Type: application/json
 
 {
-  "aliasName": "X",
+  "aliasName": "m1",
   "name": "Масса бюксы с зерном до высушивания",
   "description": "Масса бюксы с навеской зерна до высушивания",
   "unit": "г",
@@ -53,7 +53,7 @@ POST {{baseUrl}}/api/study-templates/{{moistureTemplateId}}/input-parameters
 Content-Type: application/json
 
 {
-  "aliasName": "Y",
+  "aliasName": "m2",
   "name": "Масса бюксы с зерном после высушивания",
   "description": "Масса бюксы после высушивания при 130°C",
   "unit": "г",
@@ -75,7 +75,7 @@ POST {{baseUrl}}/api/study-templates/{{moistureTemplateId}}/input-parameters
 Content-Type: application/json
 
 {
-  "aliasName": "Z",
+  "aliasName": "m0",
   "name": "Масса пустой бюксы",
   "description": "Масса чистой сухой бюксы",
   "unit": "г",
@@ -162,7 +162,6 @@ POST {{baseUrl}}/api/study-templates/{{moistureTemplateId}}/calculation-rules/{{
 Content-Type: application/json
 
 {
-  "variableAlias": "m1",
   "inputParameterId": "{{massBeforeId}}"
 }
 
@@ -172,7 +171,6 @@ POST {{baseUrl}}/api/study-templates/{{moistureTemplateId}}/calculation-rules/{{
 Content-Type: application/json
 
 {
-  "variableAlias": "m2",
   "inputParameterId": "{{massAfterId}}"
 }
 
@@ -182,7 +180,6 @@ POST {{baseUrl}}/api/study-templates/{{moistureTemplateId}}/calculation-rules/{{
 Content-Type: application/json
 
 {
-  "variableAlias": "m0",
   "inputParameterId": "{{emptyMassId}}"
 }
 
@@ -331,10 +328,10 @@ GET {{baseUrl}}/api/samples/{{sampleId}}/studies/{{studyId}}
 
     const study = response.body;
 
-    // Ищем сырые данные по AliasName
-    const massBefore = study.measuredValues.find(mv => mv.parameterAlias === "X");
-    const massAfter = study.measuredValues.find(mv => mv.parameterAlias === "Y");
-    const emptyMass = study.measuredValues.find(mv => mv.parameterAlias === "Z");
+    // AliasName совпадают с переменными в формуле: m1, m2 и m0.
+    const massBefore = study.measuredValues.find(mv => mv.parameterAlias === "m1");
+    const massAfter = study.measuredValues.find(mv => mv.parameterAlias === "m2");
+    const emptyMass = study.measuredValues.find(mv => mv.parameterAlias === "m0");
 
     // Ищем результаты
     const moistureResult = study.testResults.find(tr => tr.resultInstance.includes("Вода"));
@@ -389,13 +386,8 @@ Content-Type: application/json
 ### ============================================
 
 # @name updateMoistureResult
-PATCH {{baseUrl}}/api/studies/{{studyId}}/test-results/{{moistureResultTrId}}
+POST {{baseUrl}}/api/studies/{{studyId}}/test-results/{{moistureResultTrId}}/execute
 Content-Type: application/json
-
-{
-  "value": 14.2,
-  "isOutOfSpec": false
-}
 
 ###
 
@@ -409,7 +401,7 @@ Content-Type: application/json
 }
 
 ### ============================================
-### 7. ЗАВЕРШЕНИЕ ИССЛЕДОВАНИЯ (CHANGE STATUS)
+### 6. ЗАВЕРШЕНИЕ ИССЛЕДОВАНИЯ (CHANGE STATUS)
 ### Переводим исследование из InWork в Completed
 ### ============================================
 
@@ -429,7 +421,7 @@ Content-Type: application/json
 %}
 
 ### ============================================
-### 8. ФИНАЛЬНАЯ ПРОВЕРКА: ПОЛУЧЕНИЕ ГОТОВОГО ИССЛЕДОВАНИЯ
+### 7. ФИНАЛЬНАЯ ПРОВЕРКА: ПОЛУЧЕНИЕ ГОТОВОГО ИССЛЕДОВАНИЯ
 ### Убеждаемся, что все данные сохранились и статус изменен
 ### ============================================
 

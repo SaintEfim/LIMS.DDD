@@ -49,11 +49,9 @@ public sealed class StudyCommandsHandler(
 
         var snapshot = new StudyTemplateCreateSnapshot(new TemplateId(template.Id.Value), template.Name,
             template.CanCreateStudy, template.InputParameters
-                .Select(p => new ParameterSnapshot(p.Id.Value, p.Name, p.AliasName, p.Specification.MinValue,
-                    p.Specification.MaxValue))
+                .Select(p => new ParameterSnapshot(p.Id.Value, p.Name, p.AliasName, p.Specification))
                 .ToList(), template.ResultDefinitions
-                .Select(r => new ResultSnapshot(r.Id.Value, r.ResultInstance, r.Unit, r.Specification.MinValue,
-                    r.Specification.MaxValue))
+                .Select(r => new ResultSnapshot(r.Id.Value, r.ResultInstance, r.Unit, r.Specification))
                 .ToList());
 
         var createResult = domainService.CreateStudyByTemplate(sample, order, snapshot);

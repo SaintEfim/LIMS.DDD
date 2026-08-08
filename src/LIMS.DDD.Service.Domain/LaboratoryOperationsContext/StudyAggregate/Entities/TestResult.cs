@@ -31,16 +31,23 @@ public sealed class TestResult : SoftDeletableModel
         };
     }
 
-    internal void Update(
-        double? value,
-        bool isOutOfSpec)
+    public void SetValue(
+        double value)
     {
-        if (value is not null)
+        Value = value;
+        RecalculateIsOutOfSpec();
+    }
+
+    private void RecalculateIsOutOfSpec()
+    {
+        if (!Value.HasValue)
         {
-            Value = value;
+            IsOutOfSpec = false;
+            return;
         }
 
-        IsOutOfSpec = isOutOfSpec;
+        var isWithinSpec = ResultSnapshot.Specification.IsWithinSpec(Value.Value);
+        IsOutOfSpec = !isWithinSpec;
     }
 
     internal void MarkAsDeleted()
