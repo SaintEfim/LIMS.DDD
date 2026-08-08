@@ -30,7 +30,7 @@ public sealed record Specification
         return Result<Specification, Exception>.Success(specification);
     }
 
-    public bool Contains(
+    public bool IsWithinSpec(
         double value)
     {
         if (value < MinValue)
@@ -38,6 +38,6 @@ public sealed record Specification
             return false;
         }
 
-        return !(value > MaxValue);
+        return !MaxValue.HasValue || !(value > MaxValue.Value);
     }
 }

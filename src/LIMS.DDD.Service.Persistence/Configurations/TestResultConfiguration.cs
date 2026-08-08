@@ -45,13 +45,13 @@ public class TestResultConfiguration : IEntityTypeConfiguration<TestResult>
                 .HasMaxLength(50)
                 .IsRequired();
 
-            snap.Property(p => p.MinValue)
-                .HasColumnName("ResSpecMin")
-                .HasColumnType("decimal(18,6)");
-
-            snap.Property(p => p.MaxValue)
-                .HasColumnName("ResSpecMax")
-                .HasColumnType("decimal(18,6)");
+            snap.OwnsOne(x => x.Specification, spec =>
+            {
+                spec.Property(p => p.MinValue)
+                    .HasColumnName("SpecMinValue");
+                spec.Property(p => p.MaxValue)
+                    .HasColumnName("SpecMaxValue");
+            });
         });
     }
 }

@@ -16,29 +16,6 @@ public sealed class TestResultCommandsHandler(
     IStudyTemplateRepository studyTemplateRepository,
     INoStringEvaluator noStringEvaluator)
 {
-    public async Task<Result<None, Exception>> UpdateAsync(
-        Guid studyId,
-        Guid testResultId,
-        UpdateTestResultCommand command,
-        CancellationToken cancellationToken = default)
-    {
-        var studyResult = await GetStudyForChangeAsync(studyId, cancellationToken);
-        if (studyResult.IsFailure)
-        {
-            return studyResult.CastFailure<None>();
-        }
-
-        var updateResult = studyResult.GetValue()
-            .UpdateTestResult(new TestResultId(testResultId), command.IsOutOfSpec);
-
-        if (updateResult.IsFailure)
-        {
-            return updateResult;
-        }
-
-        return await SaveChangesAsync(cancellationToken);
-    }
-
     public async Task<Result<None, Exception>> ExecuteTest(
         Guid studyId,
         Guid testResultId,
@@ -60,6 +37,10 @@ public sealed class TestResultCommandsHandler(
 
         var calculationRules = template?.CalculationRules.FirstOrDefault(x =>
             x.ResultDefinitionId == new ResultDefinitionId(result.ResultSnapshot.ResultDefinitionId));
+        if (calculationRules is null)
+        {
+            return Result<None, Exception>.Failure(new Exception("Calculation rule not found for this result"));
+        }
 
         var calculationInputs =
             calculationRules.CalculationInputs.ToDictionary(x => x.ParameterId.Value, x => x.VariableAlias);
@@ -71,11 +52,13 @@ public sealed class TestResultCommandsHandler(
             var parameter =
                 study.MeasuredValues.FirstOrDefault(x => x.ParameterSnapshot.InputParameterId == templateParameterId);
 
-            if (parameter != null)
+            if (parameter?.Value == null)
             {
-                // перед этим мы проверили что все параметры заполнены
-                calculationOutputs.Add(calculationInputs[templateParameterId], parameter.Value.Value);
+                return Result<None, Exception>.Failure(new Exception(
+                    $"Missing required input parameter value for '{calculationInputs[templateParameterId]}'"));
             }
+
+            calculationOutputs.Add(calculationInputs[templateParameterId], parameter.Value.Value);
         }
 
         var dictEvaluatorValue = calculationOutputs.ToDictionary(x => x.Key.Value, x => new EvaluatorValue(x.Value));

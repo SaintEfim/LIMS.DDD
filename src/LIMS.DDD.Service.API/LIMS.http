@@ -381,30 +381,7 @@ Content-Type: application/json
 }
 
 ### ============================================
-### 6. ВВОД/ОБНОВЛЕНИЕ РЕЗУЛЬТАТОВ (TEST RESULTS)
-### В реальной системе это может делать движок расчетов, но здесь мы эмулируем результат
-### ============================================
-
-# @name updateMoistureResult
-PATCH {{baseUrl}}/api/studies/{{studyId}}/test-results/{{moistureResultTrId}}
-Content-Type: application/json
-
-{
-  "isOutOfSpec": false
-}
-
-###
-
-# @name updateDryMatterResult
-PATCH {{baseUrl}}/api/studies/{{studyId}}/test-results/{{dryMatterResultTrId}}
-Content-Type: application/json
-
-{
-  "isOutOfSpec": false
-}
-
-### ============================================
-### 7. ЗАВЕРШЕНИЕ ИССЛЕДОВАНИЯ (CHANGE STATUS)
+### 6. ЗАВЕРШЕНИЕ ИССЛЕДОВАНИЯ (CHANGE STATUS)
 ### Переводим исследование из InWork в Completed
 ### ============================================
 

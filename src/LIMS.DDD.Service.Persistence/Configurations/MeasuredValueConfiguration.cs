@@ -47,13 +47,13 @@ public class MeasuredValueConfiguration : IEntityTypeConfiguration<MeasuredValue
                 .HasMaxLength(100)
                 .IsRequired();
 
-            snap.Property(p => p.MinValue)
-                .HasColumnName("ParamSpecMin")
-                .HasColumnType("decimal(18,6)");
-
-            snap.Property(p => p.MaxValue)
-                .HasColumnName("ParamSpecMax")
-                .HasColumnType("decimal(18,6)");
+            snap.OwnsOne(x => x.Specification, spec =>
+            {
+                spec.Property(p => p.MinValue)
+                    .HasColumnName("SpecMinValue");
+                spec.Property(p => p.MaxValue)
+                    .HasColumnName("SpecMaxValue");
+            });
         });
     }
 }

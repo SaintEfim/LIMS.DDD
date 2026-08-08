@@ -18,11 +18,6 @@ public class TestResultModule : ICarterModule
             .Produces<TestResultDto>()
             .Produces(StatusCodes.Status404NotFound);
 
-        group.MapPatch("/{testResultId:guid}", Update)
-            .Produces(StatusCodes.Status204NoContent)
-            .Produces(StatusCodes.Status404NotFound)
-            .Produces(StatusCodes.Status400BadRequest);
-
         group.MapPost("/{testResultId:guid}", Execute)
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status404NotFound)
@@ -56,17 +51,6 @@ public class TestResultModule : ICarterModule
     {
         var dto = await services.Queries.GetByIdAsync(studyId, testResultId, ct);
         return dto is not null ? Results.Ok(dto) : Results.NotFound();
-    }
-
-    private static async Task<IResult> Update(
-        Guid studyId,
-        Guid testResultId,
-        UpdateTestResultCommand command,
-        [AsParameters] TestResultServices services,
-        CancellationToken ct)
-    {
-        var result = await services.Commands.UpdateAsync(studyId, testResultId, command, ct);
-        return result.IsFailure ? HandleFailure(result.GetError()) : Results.NoContent();
     }
 
     private static IResult HandleFailure(

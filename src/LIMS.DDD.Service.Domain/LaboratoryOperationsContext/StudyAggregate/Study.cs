@@ -116,29 +116,6 @@ public sealed class Study
         return Result<None, Exception>.Success();
     }
 
-    public Result<None, Exception> UpdateTestResult(
-        TestResultId testResultId,
-        bool isOutOfSpec)
-    {
-        if (!Status.CanEdit)
-        {
-            return Result<None, Exception>.Failure(
-                new InvalidOperationException("Cannot update test results when study is not InWork."));
-        }
-
-        var testResult = _testResults.FirstOrDefault(tr => tr.Id == testResultId);
-
-        if (testResult is null)
-        {
-            return Result<None, Exception>.Failure(
-                new InvalidOperationException("Test result not found in this study."));
-        }
-
-        testResult.UpdateIsOutOfSpec(isOutOfSpec);
-
-        return Result<None, Exception>.Success();
-    }
-
     internal Result<None, Exception> ChangeStatus(
         StudyStatus newStatus)
     {
