@@ -229,7 +229,31 @@ public sealed class StudyTemplate
             return result.CastFailure<None>();
         }
 
+        if (newStatus == Status.Active)
+        {
+            var validationResult = ValidateCalculationRulesForActivation();
+            if (validationResult.IsFailure)
+            {
+                return validationResult;
+            }
+        }
+
         Status = newStatus;
+
+        return Result<None, Exception>.Success();
+    }
+
+    private Result<None, Exception> ValidateCalculationRulesForActivation()
+    {
+        var activeRules = _calculationRules.ToList();
+
+        var activeParameters = _inputParameters.ToList();
+
+        foreach (var ruleValidation in activeRules.Select(rule => rule.ValidateVariables(activeParameters))
+                     .Where(ruleValidation => ruleValidation.IsFailure))
+        {
+            return ruleValidation;
+        }
 
         return Result<None, Exception>.Success();
     }

@@ -109,4 +109,34 @@ public sealed class CalculationRule : SoftDeletableModel
         _calculationInputs.Remove(inputToRemove);
         return Result<None, Exception>.Success();
     }
+
+    internal Result<None, Exception> ValidateVariables(
+        IReadOnlyCollection<InputParameter> templateParameters)
+    {
+        var variables = FormulaExpression.ExtractVariables();
+
+        foreach (var variable in variables)
+        {
+            var input = _calculationInputs.FirstOrDefault(i =>
+                string.Equals(i.VariableAlias.Value, variable, StringComparison.OrdinalIgnoreCase));
+
+            if (input is null)
+            {
+                return Result<None, Exception>.Failure(new InvalidOperationException(
+                    $"Calculation rule '{Name.Value}': variable '{variable}' in formula " +
+                    $"is not bound to any input parameter."));
+            }
+
+            var parameter = templateParameters.FirstOrDefault(p => p.Id == input.ParameterId && !p.IsDeleted);
+
+            if (parameter is null)
+            {
+                return Result<None, Exception>.Failure(new InvalidOperationException(
+                    $"Calculation rule '{Name.Value}': variable '{variable}' references " +
+                    $"a missing or deleted input parameter (ID: {input.ParameterId.Value})."));
+            }
+        }
+
+        return Result<None, Exception>.Success();
+    }
 }

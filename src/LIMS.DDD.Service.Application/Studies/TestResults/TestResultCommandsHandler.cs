@@ -93,4 +93,27 @@ public sealed class TestResultCommandsHandler(
             return Result<None, Exception>.Failure(new Exception($"Failed to save changes: {ex.Message}", ex));
         }
     }
+
+    public async Task<Result<None, Exception>> UpdateAsync(
+        Guid studyId,
+        Guid testResultId,
+        UpdateTestResultCommand command,
+        CancellationToken cancellationToken = default)
+    {
+        var studyResult = await GetStudyForChangeAsync(studyId, cancellationToken);
+        if (studyResult.IsFailure)
+        {
+            return studyResult.CastFailure<None>();
+        }
+
+        var updateResult = studyResult.GetValue()
+            .UpdateTestResult(new TestResultId(testResultId), command.Value);
+
+        if (updateResult.IsFailure)
+        {
+            return updateResult;
+        }
+
+        return await SaveChangesAsync(cancellationToken);
+    }
 }

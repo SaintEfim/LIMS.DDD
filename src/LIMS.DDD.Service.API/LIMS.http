@@ -381,6 +381,26 @@ Content-Type: application/json
 }
 
 ### ============================================
+### 6. ВВОД/ОБНОВЛЕНИЕ РЕЗУЛЬТАТОВ (TEST RESULTS)
+### В реальной системе это может делать движок расчетов, но здесь мы эмулируем результат
+### ============================================
+
+# @name updateMoistureResult
+POST {{baseUrl}}/api/studies/{{studyId}}/test-results/{{moistureResultTrId}}/execute
+Content-Type: application/json
+
+###
+
+# @name updateDryMatterResult
+PATCH {{baseUrl}}/api/studies/{{studyId}}/test-results/{{dryMatterResultTrId}}
+Content-Type: application/json
+
+{
+  "value": 85.8,
+  "isOutOfSpec": false
+}
+
+### ============================================
 ### 6. ЗАВЕРШЕНИЕ ИССЛЕДОВАНИЯ (CHANGE STATUS)
 ### Переводим исследование из InWork в Completed
 ### ============================================
@@ -401,7 +421,7 @@ Content-Type: application/json
 %}
 
 ### ============================================
-### 8. ФИНАЛЬНАЯ ПРОВЕРКА: ПОЛУЧЕНИЕ ГОТОВОГО ИССЛЕДОВАНИЯ
+### 7. ФИНАЛЬНАЯ ПРОВЕРКА: ПОЛУЧЕНИЕ ГОТОВОГО ИССЛЕДОВАНИЯ
 ### Убеждаемся, что все данные сохранились и статус изменен
 ### ============================================
 

@@ -93,6 +93,29 @@ public sealed class Study
         return Result<None, Exception>.Success();
     }
 
+    public Result<None, Exception> UpdateTestResult(
+        TestResultId testResultId,
+        double? value)
+    {
+        if (!Status.CanEdit)
+        {
+            return Result<None, Exception>.Failure(
+                new InvalidOperationException("Cannot update test results when study is not InWork."));
+        }
+
+        var testResult = _testResults.FirstOrDefault(tr => tr.Id == testResultId);
+
+        if (testResult is null)
+        {
+            return Result<None, Exception>.Failure(
+                new InvalidOperationException("Test result not found in this study."));
+        }
+
+        if (value is not null) testResult.SetValue(value.Value);
+
+        return Result<None, Exception>.Success();
+    }
+
     public Result<None, Exception> UpdateMeasuredValue(
         MeasuredValueId measuredValueId,
         double? value)
