@@ -41,9 +41,7 @@ public sealed class StudyTemplate
 
     public IReadOnlyList<CalculationRule> CalculationRules => _calculationRules.AsReadOnly();
 
-    public bool CanCreateStudy =>
-        Status == Status.Active ||
-        Status == Status.Archived;
+    public bool CanCreateStudy => Status == Status.Active || Status == Status.Archived;
 
     internal void SetParentId(
         StudyTemplateId parentId)
@@ -182,8 +180,7 @@ public sealed class StudyTemplate
         var parameter = _inputParameters.SingleOrDefault(p => p.Id == inputParameterId);
 
         return parameter is null
-            ? Result<None, Exception>.Failure(
-                new InvalidOperationException("InputParameter not found in template."))
+            ? Result<None, Exception>.Failure(new InvalidOperationException("InputParameter not found in template."))
             : rule.AddInput(parameter.AliasName, inputParameterId);
     }
 
@@ -273,8 +270,7 @@ public sealed class StudyTemplate
         var resultDef = _resultDefinitions.SingleOrDefault(r => r.Id == resultDefinitionId);
         if (resultDef == null)
         {
-            return Result<None, Exception>.Failure(
-                new InvalidOperationException("Determination result not found."));
+            return Result<None, Exception>.Failure(new InvalidOperationException("Determination result not found."));
         }
 
         var isUsedInCalculations = _calculationRules.Any(rule => rule.ResultDefinitionId == resultDefinitionId);

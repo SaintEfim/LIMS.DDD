@@ -13,7 +13,6 @@ public sealed class StudyCanceledState : IState<Study>
         IState<Study> newState,
         Study study)
     {
-        return Result<None, Exception>.Failure(
-            new InvalidOperationException("Canceled studies cannot change status."));
+        return Result<None, Exception>.Failure(new InvalidOperationException("Canceled studies cannot change status."));
     }
 }

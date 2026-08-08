@@ -1,9 +1,10 @@
 ﻿using LIMS.DDD.Service.Application.Studies.Core.Commands;
 using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.OrderAggregate;
 using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.SampleAggregate;
+using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.Services;
 using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.StudyAggregate;
-using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.StudyAggregate.Services;
 using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.StudyAggregate.ValueObjects;
+using LIMS.DDD.Service.Domain.SeedWork;
 using LIMS.DDD.Service.Domain.SeedWork.Result;
 using LIMS.DDD.Service.Domain.SeedWork.ValueObjects;
 using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate;
@@ -11,11 +12,13 @@ using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate;
 namespace LIMS.DDD.Service.Application.Studies.Core;
 
 public sealed class StudyCommandsHandler(
+    IUnitOfWork unitOfWork,
     IStudyRepository studyRepository,
     ISampleRepository sampleRepository,
     IOrderRepository orderRepository,
     IStudyTemplateRepository templateRepository,
-    StudyCreationDomainService domainService)
+    StudyCreationDomainService domainService,
+    StudyStatusChangeDomainService statusChangeDomainService)
 {
     public async Task<Result<Study, Exception>> CreateAsync(
         SampleId sampleId,
@@ -53,7 +56,7 @@ public sealed class StudyCommandsHandler(
                     r.Specification.MaxValue))
                 .ToList());
 
-        var createResult = domainService.Create(sample, order, snapshot);
+        var createResult = domainService.CreateStudyByTemplate(sample, order, snapshot);
         if (createResult.IsFailure)
         {
             return createResult;
@@ -134,20 +137,30 @@ public sealed class StudyCommandsHandler(
             return studyResult.CastFailure<None>();
         }
 
-        if (!StudyStatus.TryParse(command.Status, out var newStatus))
+        var study = studyResult.GetValue();
+
+        if (!StudyStatus.TryParse(command.Status, out var newStatus) || newStatus is null)
         {
             return Result<None, Exception>.Failure(
                 new InvalidOperationException($"Unknown status '{command.Status}'."));
         }
 
-        var changeResult = studyResult.GetValue()
-            .ChangeStatus(newStatus);
+        var sample = await sampleRepository.GetByIdAsync(study.SampleId, cancellationToken);
+        if (sample is null)
+        {
+            return Result<None, Exception>.Failure(
+                new KeyNotFoundException($"Parent sample with id {study.SampleId.Value} not found."));
+        }
+
+        var changeResult = statusChangeDomainService.ValidateAndChangeStatus(study, newStatus, sample);
         if (changeResult.IsFailure)
         {
             return changeResult;
         }
 
-        return await SaveChangesAsync(cancellationToken);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
+
+        return Result<None, Exception>.Success();
     }
 
     public async Task<Result<None, Exception>> DeleteAsync(
@@ -189,7 +202,7 @@ public sealed class StudyCommandsHandler(
         try
         {
             studyRepository.Add(study);
-            await studyRepository.SaveChangesAsync(cancellationToken);
+            await unitOfWork.SaveChangesAsync(cancellationToken);
             return Result<Study, Exception>.Success(study);
         }
         catch (Exception ex)
@@ -203,7 +216,7 @@ public sealed class StudyCommandsHandler(
     {
         try
         {
-            await studyRepository.SaveChangesAsync(cancellationToken);
+            await unitOfWork.SaveChangesAsync(cancellationToken);
             return Result<None, Exception>.Success();
         }
         catch (Exception ex)

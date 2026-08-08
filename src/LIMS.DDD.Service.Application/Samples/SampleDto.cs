@@ -1,6 +1,6 @@
 using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.SampleAggregate;
 
-namespace LIMS.DDD.Service.Application.LaboratoryOperations.Samples.Queries;
+namespace LIMS.DDD.Service.Application.Samples;
 
 public sealed record SampleDto(
     Guid Id,
@@ -17,7 +17,7 @@ public sealed record SampleDto(
         Sample sample)
     {
         return new SampleDto(sample.Id.Value, sample.OrderId.Value, sample.Name.Value, sample.GatherDate.Begin,
-            sample.GatherDate.End, sample.Code?.Value, sample.Volume.Value, sample.Volume.Unit,
+            sample.GatherDate.End, sample.Code.Value, sample.Volume.Value, sample.Volume.Unit,
             sample.SampleStatus.Name);
     }
 }

@@ -26,16 +26,16 @@ public sealed record Status : StatusBase<IState<StudyTemplate>, StudyTemplate>
 
     public static bool TryParse(
         string name,
-        out Status status)
+        out Status? status)
     {
-        return Registry.TryGetValue(name, out status!);
+        return Registry.TryGetValue(name, out status);
     }
 
     public static Status ConvertStatus(
         string value)
     {
         return TryParse(value, out var status)
-            ? status
+            ? status!
             : throw new InvalidOperationException($"Unknown status '{value}'");
     }
 }

@@ -1,5 +1,5 @@
 ﻿using Carter;
-using LIMS.DDD.Service.Application.LaboratoryOperations.Samples.Queries;
+using LIMS.DDD.Service.Application.Samples;
 using LIMS.DDD.Service.Application.Samples.Commands;
 using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.OrderAggregate;
 
@@ -112,12 +112,14 @@ public class SampleModule : ICarterModule
     }
 
     private static IResult HandleFailure(
-        Exception error) =>
-        error switch
+        Exception error)
+    {
+        return error switch
         {
             KeyNotFoundException => Results.NotFound(new { error.Message }),
             ArgumentException or InvalidOperationException => Results.BadRequest(new { error.Message }),
             _ => Results.Problem(error.Message, statusCode: StatusCodes.Status500InternalServerError,
                 title: "An unexpected error occurred")
         };
+    }
 }

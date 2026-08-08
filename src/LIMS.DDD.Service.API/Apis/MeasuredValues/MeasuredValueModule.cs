@@ -55,12 +55,14 @@ public class MeasuredValueModule : ICarterModule
     }
 
     private static IResult HandleFailure(
-        Exception error) =>
-        error switch
+        Exception error)
+    {
+        return error switch
         {
             KeyNotFoundException => Results.NotFound(new { error.Message }),
             ArgumentException or InvalidOperationException => Results.BadRequest(new { error.Message }),
             _ => Results.Problem(error.Message, statusCode: StatusCodes.Status500InternalServerError,
                 title: "An unexpected error occurred")
         };
+    }
 }

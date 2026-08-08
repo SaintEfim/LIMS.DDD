@@ -12,7 +12,6 @@ public sealed class StudyApprovedState : IState<Study>
         IState<Study> newState,
         Study study)
     {
-        return Result<None, Exception>.Failure(
-            new InvalidOperationException("Approved studies cannot change status."));
+        return Result<None, Exception>.Failure(new InvalidOperationException("Approved studies cannot change status."));
     }
 }

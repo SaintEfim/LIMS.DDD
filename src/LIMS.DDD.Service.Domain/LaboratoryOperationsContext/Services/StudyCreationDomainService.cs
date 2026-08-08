@@ -1,14 +1,15 @@
 ﻿using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.OrderAggregate;
 using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.SampleAggregate;
+using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.StudyAggregate;
 using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.StudyAggregate.Entities;
 using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.StudyAggregate.ValueObjects;
 using LIMS.DDD.Service.Domain.SeedWork.Result;
 
-namespace LIMS.DDD.Service.Domain.LaboratoryOperationsContext.StudyAggregate.Services;
+namespace LIMS.DDD.Service.Domain.LaboratoryOperationsContext.Services;
 
 public sealed class StudyCreationDomainService
 {
-    public Result<Study, Exception> Create(
+    public Result<Study, Exception> CreateStudyByTemplate(
         Sample sample,
         Order order,
         StudyTemplateCreateSnapshot templateSnapshot)

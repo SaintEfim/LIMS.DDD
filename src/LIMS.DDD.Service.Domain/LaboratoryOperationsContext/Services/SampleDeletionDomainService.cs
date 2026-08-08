@@ -1,16 +1,16 @@
 ﻿using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.OrderAggregate;
+using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.SampleAggregate;
 using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.SampleAggregate.ValueObjects;
-using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.StudyAggregate;
 using LIMS.DDD.Service.Domain.SeedWork.Result;
 
-namespace LIMS.DDD.Service.Domain.LaboratoryOperationsContext.SampleAggregate.Services;
+namespace LIMS.DDD.Service.Domain.LaboratoryOperationsContext.Services;
 
 public sealed class SampleDeletionDomainService
 {
-    public Result<None, Exception> Delete(
+    public Result<None, Exception> DeleteSample(
         Sample sample,
         Order order,
-        IReadOnlyCollection<Study> studies)
+        bool hasAssociatedStudies)
     {
         if (!order.CanDeleteAssociatedEntities)
         {
@@ -19,10 +19,10 @@ public sealed class SampleDeletionDomainService
                 "Order must be in Draft or InProgress status."));
         }
 
-        if (studies.Count > 0)
+        if (hasAssociatedStudies)
         {
             return Result<None, Exception>.Failure(new InvalidOperationException(
-                $"Cannot delete sample because it has {studies.Count} associated study(ies). " +
+                "Cannot delete sample because it has associated study(ies). " +
                 "Please cancel or delete the studies first."));
         }
 

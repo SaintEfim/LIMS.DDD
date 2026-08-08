@@ -110,7 +110,7 @@ public class Sample
         return Result<None, Exception>.Success();
     }
 
-    public Result<None, Exception> ChangeStatus(
+    internal Result<None, Exception> ChangeStatus(
         SampleStatus newSampleStatus)
     {
         var result = SampleStatus.CanTransitionTo(newSampleStatus, this);

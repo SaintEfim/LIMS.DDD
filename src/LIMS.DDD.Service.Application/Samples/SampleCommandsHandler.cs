@@ -1,21 +1,24 @@
 ﻿using LIMS.DDD.Service.Application.Samples.Commands;
 using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.OrderAggregate;
 using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.SampleAggregate;
-using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.SampleAggregate.Services;
 using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.SampleAggregate.ValueObjects;
+using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.Services;
 using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.StudyAggregate;
 using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.ValueObjects;
+using LIMS.DDD.Service.Domain.SeedWork;
 using LIMS.DDD.Service.Domain.SeedWork.Result;
 using LIMS.DDD.Service.Domain.SeedWork.ValueObjects;
 
 namespace LIMS.DDD.Service.Application.Samples;
 
 public sealed class SampleCommandsHandler(
+    IUnitOfWork unitOfWork,
     ISampleRepository repository,
     IOrderRepository orderRepository,
     IStudyRepository studyRepository,
     SampleCreationDomainService creationDomainService,
-    SampleDeletionDomainService deletionDomainService)
+    SampleDeletionDomainService deletionDomainService,
+    SampleStatusChangeDomainService statusChangeDomainService)
 {
     public async Task<Result<Sample, Exception>> CreateAsync(
         OrderId orderId,
@@ -97,38 +100,37 @@ public sealed class SampleCommandsHandler(
             return updateResult.CastFailure<None>();
         }
 
-        await repository.SaveChangesAsync(cancellationToken);
-        return Result<None, Exception>.Success();
+        return await SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<Result<Sample, Exception>> ChangeStatusAsync(
+    public async Task<Result<None, Exception>> ChangeStatusAsync(
         Guid id,
         string statusCommand,
         CancellationToken cancellationToken = default)
     {
-        var templateResult = await GetSampleForChangeAsync(id, cancellationToken);
-
-        if (templateResult.IsFailure)
+        var sampleResult = await GetSampleForChangeAsync(id, cancellationToken);
+        if (sampleResult.IsFailure)
         {
-            return templateResult.CastFailure<Sample>();
+            return sampleResult.CastFailure<None>();
         }
 
-        var template = templateResult.GetValue();
+        var sample = sampleResult.GetValue();
 
-        if (!SampleStatus.TryParse(statusCommand, out var newStatus))
+        if (!SampleStatus.TryParse(statusCommand, out var newStatus) || newStatus is null)
         {
-            return Result<Sample, Exception>.Failure(
-                new InvalidOperationException($"Unknown status '{statusCommand}'."));
+            return Result<None, Exception>.Failure(new InvalidOperationException($"Unknown status '{statusCommand}'."));
         }
 
-        var changeResult = template.ChangeStatus(newStatus!);
+        var studies = (await studyRepository.GetBySampleIdAsync(sample.Id, cancellationToken)).ToList()
+            .AsReadOnly();
 
+        var changeResult = statusChangeDomainService.ValidateAndChangeStatus(sample, newStatus, studies);
         if (changeResult.IsFailure)
         {
-            return changeResult.CastFailure<Sample>();
+            return changeResult;
         }
 
-        return await SaveChangesAsync(template, cancellationToken);
+        return await SaveChangesAsync(cancellationToken);
     }
 
     public async Task<Result<None, Exception>> DeleteAsync(
@@ -153,15 +155,13 @@ public sealed class SampleCommandsHandler(
         var studies = (await studyRepository.GetBySampleIdAsync(sample.Id, cancellationToken)).ToList()
             .AsReadOnly();
 
-        var deleteResult = deletionDomainService.Delete(sample, order, studies);
+        var deleteResult = deletionDomainService.DeleteSample(sample, order, studies.Count != 0);
         if (deleteResult.IsFailure)
         {
             return deleteResult;
         }
 
-        await repository.SaveChangesAsync(cancellationToken);
-
-        return Result<None, Exception>.Success();
+        return await SaveChangesAsync(cancellationToken);
     }
 
     private async Task<Result<Sample, Exception>> SaveNewAsync(
@@ -171,7 +171,7 @@ public sealed class SampleCommandsHandler(
         try
         {
             repository.Add(sample);
-            await repository.SaveChangesAsync(cancellationToken);
+            await unitOfWork.SaveChangesAsync(cancellationToken);
             return Result<Sample, Exception>.Success(sample);
         }
         catch (Exception ex)
@@ -180,18 +180,17 @@ public sealed class SampleCommandsHandler(
         }
     }
 
-    private async Task<Result<Sample, Exception>> SaveChangesAsync(
-        Sample sample,
+    private async Task<Result<None, Exception>> SaveChangesAsync(
         CancellationToken cancellationToken)
     {
         try
         {
-            await repository.SaveChangesAsync(cancellationToken);
-            return Result<Sample, Exception>.Success(sample);
+            await unitOfWork.SaveChangesAsync(cancellationToken);
+            return Result<None, Exception>.Success();
         }
         catch (Exception ex)
         {
-            return Result<Sample, Exception>.Failure(new Exception($"Failed to save Sample: {ex.Message}", ex));
+            return Result<None, Exception>.Failure(new Exception($"Failed to save Sample: {ex.Message}", ex));
         }
     }
 

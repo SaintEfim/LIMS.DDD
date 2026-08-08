@@ -19,7 +19,4 @@ public interface IStudyRepository : IRepository<Study>
 
     void Add(
         Study study);
-
-    Task<int> SaveChangesAsync(
-        CancellationToken cancellationToken = default);
 }

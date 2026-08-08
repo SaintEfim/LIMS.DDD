@@ -140,7 +140,7 @@ public sealed class Study
         return Result<None, Exception>.Success();
     }
 
-    public Result<None, Exception> ChangeStatus(
+    internal Result<None, Exception> ChangeStatus(
         StudyStatus newStatus)
     {
         var result = Status.CanTransitionTo(newStatus, this);

@@ -105,7 +105,7 @@ public sealed class StudyTemplateCommandsHandler(
 
         var template = templateResult.GetValue();
 
-        if (!Status.TryParse(statusCommand, out var newStatus))
+        if (!Status.TryParse(statusCommand, out var newStatus) || newStatus is null)
         {
             return Result<StudyTemplate, Exception>.Failure(
                 new InvalidOperationException($"Unknown status '{statusCommand}'."));

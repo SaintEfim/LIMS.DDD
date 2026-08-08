@@ -14,8 +14,8 @@ public sealed class OrderDraftState : IState<Order>
     {
         return newState switch
         {
-            OrderInProgressState or OrderCanceledState or OrderDraftState => Result<None, Exception>.Success(
-                new None()),
+            OrderInProgressState or OrderCanceledState or OrderDraftState =>
+                Result<None, Exception>.Success(new None()),
             _ => Result<None, Exception>.Failure(new InvalidOperationException("Invalid transition from Draft"))
         };
     }

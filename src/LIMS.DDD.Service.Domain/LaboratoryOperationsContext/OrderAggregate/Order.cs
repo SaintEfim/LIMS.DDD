@@ -104,7 +104,7 @@ public class Order
         return Result<None, Exception>.Success();
     }
 
-    public Result<None, Exception> ChangeStatus(
+    internal Result<None, Exception> ChangeStatus(
         OrderStatus newOrderStatus)
     {
         var result = OrderStatus.CanTransitionTo(newOrderStatus, this);

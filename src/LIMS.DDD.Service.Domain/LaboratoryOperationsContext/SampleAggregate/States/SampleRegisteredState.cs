@@ -16,8 +16,7 @@ public sealed class SampleRegisteredState : IState<Sample>
         {
             SampleInProgressState or SampleRegisteredState => Result<None, Exception>.Success(new None()),
             SampleCanceledState => Result<None, Exception>.Success(new None()),
-            _ => Result<None, Exception>.Failure(
-                new InvalidOperationException("Invalid transition from Registered"))
+            _ => Result<None, Exception>.Failure(new InvalidOperationException("Invalid transition from Registered"))
         };
     }
 }

@@ -12,7 +12,6 @@ public sealed class OrderCanceledState : IState<Order>
         IState<Order> newState,
         Order template)
     {
-        return Result<None, Exception>.Failure(
-            new InvalidOperationException("Canceled orders cannot change status."));
+        return Result<None, Exception>.Failure(new InvalidOperationException("Canceled orders cannot change status."));
     }
 }

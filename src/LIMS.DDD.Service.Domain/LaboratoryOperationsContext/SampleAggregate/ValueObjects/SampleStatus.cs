@@ -29,18 +29,17 @@ public sealed record SampleStatus : StatusBase<IState<Sample>, Sample>
     };
 
     public static bool TryParse(
-        string? name,
+        string name,
         out SampleStatus? status)
     {
-        status = null;
-        return !string.IsNullOrWhiteSpace(name) && Registry.TryGetValue(name, out status);
+        return Registry.TryGetValue(name, out status);
     }
 
     public static SampleStatus ConvertStatus(
-        string? value)
+        string value)
     {
         return TryParse(value, out var status)
             ? status!
-            : throw new InvalidOperationException($"Unknown status '{value ?? "null"}'");
+            : throw new InvalidOperationException($"Unknown status '{value}'");
     }
 }

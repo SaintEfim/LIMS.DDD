@@ -16,8 +16,7 @@ public sealed class StudyCompletedState : IState<Study>
         {
             StudyCompletedState or StudyApprovedState or StudyInProgressState => Result<None, Exception>.Success(
                 new None()),
-            _ => Result<None, Exception>.Failure(
-                new InvalidOperationException("Invalid transition from Completed"))
+            _ => Result<None, Exception>.Failure(new InvalidOperationException("Invalid transition from Completed"))
         };
     }
 }

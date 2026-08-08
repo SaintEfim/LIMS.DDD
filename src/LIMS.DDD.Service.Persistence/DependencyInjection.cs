@@ -1,6 +1,7 @@
 ﻿using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.OrderAggregate;
 using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.SampleAggregate;
 using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.StudyAggregate;
+using LIMS.DDD.Service.Domain.SeedWork;
 using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate;
 using LIMS.DDD.Service.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -16,6 +17,8 @@ public static class DependencyInjection
         IConfiguration configuration)
     {
         services.AddScoped<IStudyTemplateRepository, StudyTemplateRepository>();
+
+        services.AddScoped<IUnitOfWork>(provider => provider.GetRequiredService<ApplicationDbContext>());
 
         services.AddScoped<IOrderRepository, OrderRepository>();
         services.AddScoped<ISampleRepository, SampleRepository>();

@@ -1,4 +1,3 @@
-using LIMS.DDD.Service.Application.LaboratoryOperations.Samples.Queries;
 using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.OrderAggregate;
 using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.SampleAggregate;
 
