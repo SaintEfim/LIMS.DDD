@@ -1,6 +1,6 @@
 LIMS.DDD
 
-<img width="1730" height="1110" alt="image" src="https://github.com/user-attachments/assets/319e461c-63eb-415a-bd46-6e5c1a555576" />
+<img width="1757" height="1129" alt="image" src="https://github.com/user-attachments/assets/904ae00a-6b4b-4adc-a00f-e24446cb6800" />
 
 ## Жизненный цикл методики
 
