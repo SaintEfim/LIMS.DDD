@@ -16,9 +16,8 @@ public sealed record TestResultDto(
     public static TestResultDto FromDomain(
         TestResult tr)
     {
-        return new TestResultDto(tr.Id.Value, tr.StudyId.Value, tr.ResultSnapshot.ResultDefinitionId,
-            tr.ResultSnapshot.ResultInstance, tr.ResultSnapshot.Unit,
-            tr.ResultSnapshot.Specification?.MinValue, tr.ResultSnapshot.Specification?.MaxValue,
-            tr.Value, tr.IsOutOfSpec);
+        return new TestResultDto(tr.Id.Value, tr.StudyId.Value, tr.ResultSnapshot.ResultDefinitionId.Value,
+            tr.ResultSnapshot.ResultInstance, tr.ResultSnapshot.Unit, tr.ResultSnapshot.Specification?.MinValue,
+            tr.ResultSnapshot.Specification?.MaxValue, tr.Value, tr.IsOutOfSpec);
     }
 }

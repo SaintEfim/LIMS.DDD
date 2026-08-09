@@ -1,5 +1,6 @@
 ﻿using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.StudyAggregate;
 using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.StudyAggregate.Entities;
+using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.StudyAggregate.ValueObjects;
 using LIMS.DDD.Service.Domain.SeedWork.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -30,6 +31,9 @@ public class MeasuredValueConfiguration : IEntityTypeConfiguration<MeasuredValue
 
         builder.OwnsOne(x => x.ParameterSnapshot, snap =>
         {
+            snap.Property(x => x.InputParameterId)
+                .HasConversion(id => id.Value, value => new ParameterTemplateId(value));
+
             snap.Property(p => p.InputParameterId)
                 .HasColumnName("ParameterId");
 

@@ -36,7 +36,7 @@ public sealed class TestResultCommandsHandler(
             await studyTemplateRepository.GetByIdAsync(new StudyTemplateId(study.TemplateId.Value), cancellationToken);
 
         var calculationRules = template?.CalculationRules.FirstOrDefault(x =>
-            x.ResultDefinitionId == new ResultDefinitionId(result.ResultSnapshot.ResultDefinitionId));
+            x.ResultDefinitionId == new ResultDefinitionId(result.ResultSnapshot.ResultDefinitionId.Value));
         if (calculationRules is null)
         {
             return Result<None, Exception>.Failure(new Exception("Calculation rule not found for this result"));
@@ -50,7 +50,8 @@ public sealed class TestResultCommandsHandler(
         foreach (var templateParameterId in calculationInputs.Keys)
         {
             var parameter =
-                study.MeasuredValues.FirstOrDefault(x => x.ParameterSnapshot.InputParameterId == templateParameterId);
+                study.MeasuredValues.FirstOrDefault(x =>
+                    x.ParameterSnapshot.InputParameterId.Value == templateParameterId);
 
             if (parameter?.Value == null)
             {
