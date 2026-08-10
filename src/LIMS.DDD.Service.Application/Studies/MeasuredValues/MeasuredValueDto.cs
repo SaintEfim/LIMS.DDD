@@ -15,7 +15,7 @@ public sealed record MeasuredValueDto(
     public static MeasuredValueDto FromDomain(
         MeasuredValue mv)
     {
-        return new MeasuredValueDto(mv.Id.Value, mv.StudyId.Value, mv.ParameterSnapshot.InputParameterId,
+        return new MeasuredValueDto(mv.Id.Value, mv.StudyId.Value, mv.ParameterSnapshot.InputParameterId.Value,
             mv.ParameterSnapshot.Name.Value, mv.ParameterSnapshot.AliasName.Value,
             mv.ParameterSnapshot.Specification.MinValue, mv.ParameterSnapshot.Specification.MaxValue, mv.Value);
     }

@@ -8,6 +8,16 @@ public readonly record struct TemplateId(Guid Value) : IValueObjectId
     public Guid Value { get; } = Value;
 }
 
+public readonly record struct ParameterTemplateId(Guid Value) : IValueObjectId
+{
+    public Guid Value { get; } = Value;
+}
+
+public readonly record struct ResultTemplateId(Guid Value) : IValueObjectId
+{
+    public Guid Value { get; } = Value;
+}
+
 public sealed record StudyTemplateCreateSnapshot(
     TemplateId TemplateId,
     Name Name,
@@ -22,7 +32,7 @@ public sealed record ParameterSnapshot
     }
 
     public ParameterSnapshot(
-        Guid inputParameterId,
+        ParameterTemplateId inputParameterId,
         Name name,
         AliasName aliasName,
         Specification specification)
@@ -33,7 +43,7 @@ public sealed record ParameterSnapshot
         Specification = specification;
     }
 
-    public Guid InputParameterId { get; private set; }
+    public ParameterTemplateId InputParameterId { get; private set; }
 
     public Name Name { get; private set; }
 
@@ -49,7 +59,7 @@ public sealed record ResultSnapshot
     }
 
     public ResultSnapshot(
-        Guid resultDefinitionId,
+        ResultTemplateId resultDefinitionId,
         string resultInstance,
         string unit,
         Specification specification)
@@ -60,7 +70,7 @@ public sealed record ResultSnapshot
         Specification = specification;
     }
 
-    public Guid ResultDefinitionId { get; private set; }
+    public ResultTemplateId ResultDefinitionId { get; private set; }
 
     public string ResultInstance { get; private set; }
 

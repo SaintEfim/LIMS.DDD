@@ -8,6 +8,7 @@ using LIMS.DDD.Service.Domain.SeedWork;
 using LIMS.DDD.Service.Domain.SeedWork.Result;
 using LIMS.DDD.Service.Domain.SeedWork.ValueObjects;
 using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate;
+using StudyTemplateId = LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.StudyTemplateId;
 
 namespace LIMS.DDD.Service.Application.Studies.Core;
 
@@ -49,9 +50,11 @@ public sealed class StudyCommandsHandler(
 
         var snapshot = new StudyTemplateCreateSnapshot(new TemplateId(template.Id.Value), template.Name,
             template.CanCreateStudy, template.InputParameters
-                .Select(p => new ParameterSnapshot(p.Id.Value, p.Name, p.AliasName, p.Specification))
+                .Select(p =>
+                    new ParameterSnapshot(new ParameterTemplateId(p.Id.Value), p.Name, p.AliasName, p.Specification))
                 .ToList(), template.ResultDefinitions
-                .Select(r => new ResultSnapshot(r.Id.Value, r.ResultInstance, r.Unit, r.Specification))
+                .Select(r =>
+                    new ResultSnapshot(new ResultTemplateId(r.Id.Value), r.ResultInstance, r.Unit, r.Specification))
                 .ToList());
 
         var createResult = domainService.CreateStudyByTemplate(sample, order, snapshot);

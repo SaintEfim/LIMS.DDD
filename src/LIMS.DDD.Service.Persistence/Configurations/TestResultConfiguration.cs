@@ -1,5 +1,6 @@
 ﻿using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.StudyAggregate;
 using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.StudyAggregate.Entities;
+using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.StudyAggregate.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -32,6 +33,9 @@ public class TestResultConfiguration : IEntityTypeConfiguration<TestResult>
 
         builder.OwnsOne(x => x.ResultSnapshot, snap =>
         {
+            snap.Property(x => x.ResultDefinitionId)
+                .HasConversion(id => id.Value, value => new ResultTemplateId(value));
+
             snap.Property(p => p.ResultDefinitionId)
                 .HasColumnName("ResultDefinitionId");
 
