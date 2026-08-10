@@ -1,5 +1,7 @@
 # LIMS.DDD
 
+<img width="2907" height="1674" alt="image" src="https://github.com/user-attachments/assets/07821cd8-8129-48fe-9158-9a7e4575debb" />
+
 ## Содержание
 
 - [Жизненные циклы](#жизненные-циклы)
