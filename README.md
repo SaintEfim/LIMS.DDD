@@ -1,6 +1,6 @@
 # LIMS.DDD
 
-<img width="2907" height="1674" alt="image" src="https://github.com/user-attachments/assets/07821cd8-8129-48fe-9158-9a7e4575debb" />
+<img width="2912" height="1686" alt="image" src="https://github.com/user-attachments/assets/2fa6608e-bfbe-46fc-9902-7d9f969e9831" />
 
 ## Содержание
 
