@@ -1,6 +1,6 @@
 <mxfile host="app.diagrams.net" agent="ChatGPT">
   <diagram name="DDD Domain Model" id="ddd-lims">
-    <mxGraphModel dx="3160" dy="1751" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="1920" pageHeight="1200" background="#F7F8FA" math="0" shadow="0">
+    <mxGraphModel dx="3160" dy="1746" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="1920" pageHeight="1200" background="#F7F8FA" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -186,11 +186,11 @@
         <mxCell id="st_status" parent="E7JM40OYpG2JVPDRpQiT-12" style="ellipse;whiteSpace=wrap;html=1;fillColor=#DAE8FC;strokeColor=#6C8EBF;strokeWidth=1.5;fontSize=12;fontFamily=Helvetica;fontColor=#263238;" value="Status" vertex="1">
           <mxGeometry height="35" width="85" x="565" y="86" as="geometry" />
         </mxCell>
-        <mxCell id="st_eq" parent="E7JM40OYpG2JVPDRpQiT-12" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#D5E8D4;strokeColor=#82B366;strokeWidth=1.5;fontSize=13;fontFamily=Helvetica;fontColor=#263238;" value="&lt;b&gt;EquipmentRequirements&lt;/b&gt;&lt;br&gt;&lt;font style=&#39;font-size:11px&#39;&gt;Требования к оборудованию&lt;/font&gt;" vertex="1">
+        <mxCell id="st_eq" parent="E7JM40OYpG2JVPDRpQiT-12" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#D5E8D4;strokeColor=#82B366;strokeWidth=1.5;fontSize=13;fontFamily=Helvetica;fontColor=#263238;dashed=1;dashPattern=8 8;" value="&lt;b&gt;EquipmentRequirements&lt;/b&gt;&lt;br&gt;&lt;font style=&#39;font-size:11px&#39;&gt;Требования к оборудованию&lt;/font&gt;" vertex="1">
           <mxGeometry height="58" width="155" x="20" y="201" as="geometry" />
         </mxCell>
         <mxCell id="st_inp" parent="E7JM40OYpG2JVPDRpQiT-12" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#D5E8D4;strokeColor=#82B366;strokeWidth=1.5;fontSize=13;fontFamily=Helvetica;fontColor=#263238;" value="&lt;b&gt;InputParameters&lt;/b&gt;&lt;br&gt;&lt;font style=&#39;font-size:11px&#39;&gt;Входные показатели&lt;/font&gt;" vertex="1">
-          <mxGeometry height="58" width="150" x="190" y="201" as="geometry" />
+          <mxGeometry height="58" width="150" x="190" y="202" as="geometry" />
         </mxCell>
         <mxCell id="st_res" parent="E7JM40OYpG2JVPDRpQiT-12" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#D5E8D4;strokeColor=#82B366;strokeWidth=1.5;fontSize=13;fontFamily=Helvetica;fontColor=#263238;" value="&lt;b&gt;ResultDefinitions&lt;/b&gt;&lt;br&gt;&lt;font style=&#39;font-size:11px&#39;&gt;Определяемые показатели&lt;/font&gt;" vertex="1">
           <mxGeometry height="58" width="160" x="440" y="201" as="geometry" />
@@ -198,10 +198,10 @@
         <mxCell id="st_calc" parent="E7JM40OYpG2JVPDRpQiT-12" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#D5E8D4;strokeColor=#82B366;strokeWidth=1.5;fontSize=13;fontFamily=Helvetica;fontColor=#263238;" value="&lt;b&gt;CalculationRules&lt;/b&gt;&lt;br&gt;&lt;font style=&#39;font-size:11px&#39;&gt;Расчёты&lt;/font&gt;" vertex="1">
           <mxGeometry height="58" width="140" x="620" y="201" as="geometry" />
         </mxCell>
-        <mxCell id="st_pers" parent="E7JM40OYpG2JVPDRpQiT-12" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#D5E8D4;strokeColor=#82B366;strokeWidth=1.5;fontSize=13;fontFamily=Helvetica;fontColor=#263238;" value="&lt;b&gt;PersonnelRequirements&lt;/b&gt;&lt;br&gt;&lt;font style=&#39;font-size:11px&#39;&gt;Требования к сотрудникам&lt;/font&gt;" vertex="1">
+        <mxCell id="st_pers" parent="E7JM40OYpG2JVPDRpQiT-12" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#D5E8D4;strokeColor=#82B366;strokeWidth=1.5;fontSize=13;fontFamily=Helvetica;fontColor=#263238;dashed=1;dashPattern=8 8;" value="&lt;b&gt;PersonnelRequirements&lt;/b&gt;&lt;br&gt;&lt;font style=&#39;font-size:11px&#39;&gt;Требования к сотрудникам&lt;/font&gt;" vertex="1">
           <mxGeometry height="58" width="180" x="255" y="305" as="geometry" />
         </mxCell>
-        <mxCell id="e_01396487" edge="1" parent="E7JM40OYpG2JVPDRpQiT-12" source="study_template" style="edgeStyle=orthogonalEdgeStyle;rounded=1;jettySize=auto;html=1;strokeColor=#B85450;endArrow=block;" target="st_eq" value="">
+        <mxCell id="e_01396487" edge="1" parent="E7JM40OYpG2JVPDRpQiT-12" source="study_template" style="edgeStyle=orthogonalEdgeStyle;rounded=1;jettySize=auto;html=1;strokeColor=#B85450;endArrow=block;dashed=1;dashPattern=8 8;" target="st_eq" value="">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="e_bb80cd30" edge="1" parent="E7JM40OYpG2JVPDRpQiT-12" source="study_template" style="edgeStyle=orthogonalEdgeStyle;rounded=1;jettySize=auto;html=1;strokeColor=#B85450;endArrow=block;" target="st_inp" value="">
@@ -213,7 +213,7 @@
         <mxCell id="e_b463db9a" edge="1" parent="E7JM40OYpG2JVPDRpQiT-12" source="study_template" style="edgeStyle=orthogonalEdgeStyle;rounded=1;jettySize=auto;html=1;strokeColor=#B85450;endArrow=block;" target="st_calc" value="">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="e_837c7260" edge="1" parent="E7JM40OYpG2JVPDRpQiT-12" source="study_template" style="edgeStyle=orthogonalEdgeStyle;rounded=1;jettySize=auto;html=1;strokeColor=#B85450;endArrow=block;" target="st_pers" value="">
+        <mxCell id="e_837c7260" edge="1" parent="E7JM40OYpG2JVPDRpQiT-12" source="study_template" style="edgeStyle=orthogonalEdgeStyle;rounded=1;jettySize=auto;html=1;strokeColor=#B85450;endArrow=block;dashed=1;dashPattern=8 8;" target="st_pers" value="">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="e_3e81b83b" edge="1" parent="E7JM40OYpG2JVPDRpQiT-12" source="study_template" style="edgeStyle=orthogonalEdgeStyle;rounded=1;jettySize=auto;html=1;strokeColor=#6C8EBF;endArrow=block;" target="st_status" value="">
