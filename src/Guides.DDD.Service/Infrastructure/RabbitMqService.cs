@@ -18,7 +18,7 @@ public class RabbitMqService : IMessageBusService
         string message,
         CancellationToken cancellationToken = default)
     {
-        var factory = new ConnectionFactory() { HostName = "localhost" };
+        var factory = new ConnectionFactory { HostName = "localhost" };
         await using var connection = await factory.CreateConnectionAsync(cancellationToken);
         await using var channel = await connection.CreateChannelAsync(cancellationToken: cancellationToken);
 
