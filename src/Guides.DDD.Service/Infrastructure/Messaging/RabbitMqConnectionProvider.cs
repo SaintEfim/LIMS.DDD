@@ -3,7 +3,7 @@ using RabbitMQ.Client.Events;
 
 namespace Guides.DDD.Service.Infrastructure.Messaging;
 
-public class RabbitMqConnectionService : IAsyncDisposable
+public class RabbitMqConnectionProvider : IAsyncDisposable
 {
     private const int MaxReconnectAttempts = 10;
     private const int MaxBackoffDelaySeconds = 30;
@@ -16,7 +16,7 @@ public class RabbitMqConnectionService : IAsyncDisposable
     private readonly CancellationTokenSource _disposeCts = new();
     private readonly ILogger<RabbitMqChannelManager> _logger;
 
-    public RabbitMqConnectionService(
+    public RabbitMqConnectionProvider(
         ILogger<RabbitMqChannelManager> logger)
     {
         _logger = logger;
@@ -25,18 +25,18 @@ public class RabbitMqConnectionService : IAsyncDisposable
             _connectionFactory.HostName, _connectionFactory.Port);
     }
 
-    public async Task EnsureConnected(
+    public async Task EnsureConnectedAsync(
         CancellationToken cancellationToken = default)
     {
         if (Connection is not null && Connection.IsOpen) return;
 
-        await Reconnect(cancellationToken);
+        await ReconnectAsync(cancellationToken);
 
         if (Connection is null || !Connection.IsOpen)
             throw new InvalidOperationException("RabbitMQ connection is not available after reconnection attempts");
     }
 
-    private async Task ConnectInternal(
+    private async Task ConnectInternalAsync(
         CancellationToken cancellationToken)
     {
         using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, _disposeCts.Token);
@@ -50,7 +50,7 @@ public class RabbitMqConnectionService : IAsyncDisposable
             _logger.LogDebug("Creating new RabbitMQ connection...");
 
             var connection = await _connectionFactory.CreateConnectionAsync(linkedCts.Token);
-            connection.ConnectionShutdownAsync += OnConnectionShutdown;
+            connection.ConnectionShutdownAsync += OnConnectionShutdownAsync;
 
             Connection = connection;
 
@@ -72,10 +72,10 @@ public class RabbitMqConnectionService : IAsyncDisposable
         }
     }
 
-    private async Task Reconnect(
+    private async Task ReconnectAsync(
         CancellationToken cancellationToken)
     {
-        await CleanUp(cancellationToken);
+        await CleanUpAsync(cancellationToken);
 
         for (var attempt = 1; attempt <= MaxReconnectAttempts; attempt++)
         {
@@ -83,7 +83,7 @@ public class RabbitMqConnectionService : IAsyncDisposable
 
             try
             {
-                await ConnectInternal(cancellationToken);
+                await ConnectInternalAsync(cancellationToken);
                 return;
             }
             catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
@@ -103,17 +103,17 @@ public class RabbitMqConnectionService : IAsyncDisposable
         }
     }
 
-    private async Task OnConnectionShutdown(
+    private async Task OnConnectionShutdownAsync(
         object sender,
         ShutdownEventArgs ev)
     {
         _logger.LogWarning("RabbitMQ connection shut down. Reason: {Reason}, Initiator: {Initiator}", ev.ReplyText,
             ev.Initiator);
 
-        await Reconnect(_disposeCts.Token);
+        await ReconnectAsync(_disposeCts.Token);
     }
 
-    private async Task CleanUp(
+    private async Task CleanUpAsync(
         CancellationToken cancellationToken = default)
     {
         try
@@ -136,7 +136,7 @@ public class RabbitMqConnectionService : IAsyncDisposable
         {
             if (Connection is not null)
             {
-                Connection.ConnectionShutdownAsync -= OnConnectionShutdown;
+                Connection.ConnectionShutdownAsync -= OnConnectionShutdownAsync;
             }
 
             Connection = null;
@@ -148,7 +148,7 @@ public class RabbitMqConnectionService : IAsyncDisposable
         _logger.LogInformation("Disposing RabbitMQ connection factory...");
 
         await _disposeCts.CancelAsync();
-        await CleanUp();
+        await CleanUpAsync();
         _semaphore.Dispose();
         _disposeCts.Dispose();
 

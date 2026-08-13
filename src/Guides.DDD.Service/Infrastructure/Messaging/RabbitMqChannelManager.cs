@@ -6,10 +6,10 @@ public sealed class RabbitMqChannelManager
 {
     private readonly ILogger<RabbitMqChannelManager> _logger;
 
-    private RabbitMqConnectionService ConnectionService { get; }
+    private RabbitMqConnectionProvider ConnectionService { get; }
 
     public RabbitMqChannelManager(
-        RabbitMqConnectionService connectionService,
+        RabbitMqConnectionProvider connectionService,
         ILogger<RabbitMqChannelManager> logger)
     {
         ConnectionService = connectionService;
