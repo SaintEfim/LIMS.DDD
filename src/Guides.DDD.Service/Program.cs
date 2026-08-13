@@ -10,6 +10,8 @@ builder.Services.AddCarter();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddSingleton<RabbitMqConnectionProvider>();
+builder.Services.AddHostedService<RabbitMqConnectionBackgroundService>();
 builder.Services.AddScoped<IMessageBusService, RabbitMqService>();
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>

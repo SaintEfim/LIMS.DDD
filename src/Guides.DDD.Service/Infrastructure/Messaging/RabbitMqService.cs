@@ -4,7 +4,9 @@ using RabbitMQ.Client;
 
 namespace Guides.DDD.Service.Infrastructure.Messaging;
 
-public class RabbitMqService : IMessageBusService
+public class RabbitMqService(
+    RabbitMqConnectionProvider provider,
+    ILogger<RabbitMqConnectionProvider> logger) : IMessageBusService
 {
     public async Task SendMessage(
         object obj,
@@ -18,9 +20,12 @@ public class RabbitMqService : IMessageBusService
         string message,
         CancellationToken cancellationToken = default)
     {
-        var factory = new ConnectionFactory { HostName = "localhost" };
-        await using var connection = await factory.CreateConnectionAsync(cancellationToken);
-        await using var channel = await connection.CreateChannelAsync(cancellationToken: cancellationToken);
+        await using var channel = await provider.CreateChannelAsync(cancellationToken);
+        if (channel is null || !channel.IsOpen)
+        {
+            logger.LogWarning("RabbitMQ is not available. Message dropped: {Message}", message);
+            return;
+        }
 
         await channel.QueueDeclareAsync(queue: "unit_queue", durable: false, exclusive: false, autoDelete: false,
             arguments: null, cancellationToken: cancellationToken);
