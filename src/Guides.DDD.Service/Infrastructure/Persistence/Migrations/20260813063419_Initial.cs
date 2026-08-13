@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace Guides.DDD.Service.Migrations
+namespace Guides.DDD.Service.Infrastructure.Persistence.Migrations
 {
     /// <inheritdoc />
     public partial class Initial : Migration
@@ -16,7 +16,7 @@ namespace Guides.DDD.Service.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Name = table.Column<string>(type: "text", nullable: false),
+                    Name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     IsDeleted = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
                     DeletedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
                 },

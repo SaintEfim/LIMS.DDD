@@ -2,7 +2,7 @@
 using System.Text.Json;
 using RabbitMQ.Client;
 
-namespace Guides.DDD.Service.Infrastructure;
+namespace Guides.DDD.Service.Infrastructure.Messaging;
 
 public class RabbitMqService : IMessageBusService
 {
@@ -22,7 +22,7 @@ public class RabbitMqService : IMessageBusService
         await using var connection = await factory.CreateConnectionAsync(cancellationToken);
         await using var channel = await connection.CreateChannelAsync(cancellationToken: cancellationToken);
 
-        await channel.QueueDeclareAsync(queue: "MyQueue", durable: false, exclusive: false, autoDelete: false,
+        await channel.QueueDeclareAsync(queue: "unit_queue", durable: false, exclusive: false, autoDelete: false,
             arguments: null, cancellationToken: cancellationToken);
 
         var body = Encoding.UTF8.GetBytes(message);

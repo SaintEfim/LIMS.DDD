@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Guides.DDD.Service.Persistence;
+namespace Guides.DDD.Service.Infrastructure.Persistence;
 
 public class UnitConfiguration : IEntityTypeConfiguration<Unit>
 {
@@ -18,5 +18,9 @@ public class UnitConfiguration : IEntityTypeConfiguration<Unit>
             .IsRequired(false);
 
         builder.HasQueryFilter(x => !x.IsDeleted);
+
+        builder.Property(x => x.Name)
+            .HasMaxLength(100)
+            .IsRequired();
     }
 }

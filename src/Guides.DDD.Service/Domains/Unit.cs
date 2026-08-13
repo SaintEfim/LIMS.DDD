@@ -1,4 +1,4 @@
-﻿using Guides.DDD.Service.SeedWork;
+﻿using Guides.DDD.Service.Domains.SeedWork;
 
 namespace Guides.DDD.Service.Domains;
 

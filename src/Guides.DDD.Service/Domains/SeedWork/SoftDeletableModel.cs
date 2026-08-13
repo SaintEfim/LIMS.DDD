@@ -1,4 +1,4 @@
-﻿namespace Guides.DDD.Service.SeedWork;
+﻿namespace Guides.DDD.Service.Domains.SeedWork;
 
 public abstract class SoftDeletableModel
 {

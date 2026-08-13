@@ -1,4 +1,4 @@
-﻿namespace Guides.DDD.Service.Infrastructure;
+﻿namespace Guides.DDD.Service.Infrastructure.Messaging;
 
 public interface IMessageBusService
 {

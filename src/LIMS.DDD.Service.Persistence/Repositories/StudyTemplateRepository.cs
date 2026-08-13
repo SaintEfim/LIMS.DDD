@@ -65,10 +65,4 @@ public class StudyTemplateRepository : IStudyTemplateRepository
             .Include(t => t.ResultDefinitions)
             .Include(t => t.CalculationRules);
     }
-
-    public void Remove(
-        StudyTemplate studyTemplate)
-    {
-        _context.StudyTemplates.Remove(studyTemplate);
-    }
 }

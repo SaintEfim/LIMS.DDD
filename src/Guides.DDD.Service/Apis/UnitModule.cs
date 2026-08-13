@@ -1,6 +1,8 @@
 ﻿using Carter;
+using Guides.DDD.Service.Commands;
 using Guides.DDD.Service.Domains;
-using Guides.DDD.Service.Persistence;
+using Guides.DDD.Service.Infrastructure.Messaging;
+using Guides.DDD.Service.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
 namespace Guides.DDD.Service.Apis;
@@ -35,11 +37,17 @@ public class UnitModule : ICarterModule
         });
 
         group.MapPost("/", async (
-            Unit unit,
+            CreateUnitCommand unitCommand,
+            IMessageBusService busService,
             ApplicationDbContext db) =>
         {
+            var unit = new Unit { Name = unitCommand.Name };
+
             db.Units.Add(unit);
+
             await db.SaveChangesAsync();
+
+            await busService.SendMessage(unit);
 
             return Results.Created($"/api/units/{unit.Id}", unit);
         });
