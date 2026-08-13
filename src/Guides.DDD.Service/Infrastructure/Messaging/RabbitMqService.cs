@@ -5,8 +5,8 @@ using RabbitMQ.Client;
 namespace Guides.DDD.Service.Infrastructure.Messaging;
 
 public class RabbitMqService(
-    RabbitMqConnectionProvider provider,
-    ILogger<RabbitMqConnectionProvider> logger) : IMessageBusService
+    RabbitMqChannelManager provider,
+    ILogger<RabbitMqChannelManager> logger) : IMessageBusService
 {
     public async Task SendMessage(
         object obj,

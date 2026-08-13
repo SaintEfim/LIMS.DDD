@@ -1,5 +1,4 @@
 using Carter;
-using Guides.DDD.Service.Infrastructure;
 using Guides.DDD.Service.Infrastructure.Messaging;
 using Guides.DDD.Service.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -10,7 +9,7 @@ builder.Services.AddCarter();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddSingleton<RabbitMqConnectionProvider>();
+builder.Services.AddSingleton<RabbitMqChannelManager>();
 builder.Services.AddHostedService<RabbitMqConnectionBackgroundService>();
 builder.Services.AddScoped<IMessageBusService, RabbitMqService>();
 

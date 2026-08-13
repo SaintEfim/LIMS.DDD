@@ -3,21 +3,21 @@ using RabbitMQ.Client.Events;
 
 namespace Guides.DDD.Service.Infrastructure.Messaging;
 
-public sealed class RabbitMqConnectionProvider : IAsyncDisposable
+public sealed class RabbitMqChannelManager : IAsyncDisposable
 {
-    private const int MaxReconnectAttempts = 100;
+    private const int MaxReconnectAttempts = 10;
     private const int MaxBackoffDelaySeconds = 30;
     private const int BackoffBase = 2;
 
-    private IConnection? Connection { get; set; }
+    private IConnection? _connection;
 
     private readonly ConnectionFactory _connectionFactory = new() { HostName = "localhost" };
     private readonly SemaphoreSlim _semaphore = new(1, 1);
     private readonly CancellationTokenSource _disposeCts = new();
-    private readonly ILogger<RabbitMqConnectionProvider> _logger;
+    private readonly ILogger<RabbitMqChannelManager> _logger;
 
-    public RabbitMqConnectionProvider(
-        ILogger<RabbitMqConnectionProvider> logger)
+    public RabbitMqChannelManager(
+        ILogger<RabbitMqChannelManager> logger)
     {
         _logger = logger;
 
@@ -28,19 +28,27 @@ public sealed class RabbitMqConnectionProvider : IAsyncDisposable
     public async Task<IChannel?> CreateChannelAsync(
         CancellationToken cancellationToken = default)
     {
-        if (Connection is null || !Connection.IsOpen) _logger.LogDebug("Creating RabbitMQ connection...");
+        if (_connection is not null && _connection.IsOpen)
+        {
+            return _connection is null
+                ? null
+                : await _connection.CreateChannelAsync(cancellationToken: cancellationToken);
+        }
 
-        return Connection is null ? null : await Connection.CreateChannelAsync(cancellationToken: cancellationToken);
+        _logger.LogDebug("RabbitMQ connection is currently unavailable.");
+
+        return null;
     }
 
+    // for background service
     public async Task EnsureConnected(
         CancellationToken cancellationToken = default)
     {
-        if (Connection is not null && Connection.IsOpen) return;
+        if (_connection is not null && _connection.IsOpen) return;
 
         await Reconnect(cancellationToken);
 
-        if (Connection is null || !Connection.IsOpen)
+        if (_connection is null || !_connection.IsOpen)
             throw new InvalidOperationException("RabbitMQ connection is not available after reconnection attempts");
     }
 
@@ -53,14 +61,14 @@ public sealed class RabbitMqConnectionProvider : IAsyncDisposable
 
         try
         {
-            if (Connection is not null && Connection.IsOpen) return;
+            if (_connection is not null && _connection.IsOpen) return;
 
             _logger.LogDebug("Creating new RabbitMQ connection...");
 
             var connection = await _connectionFactory.CreateConnectionAsync(linkedCts.Token);
             connection.ConnectionShutdownAsync += OnConnectionShutdown;
 
-            Connection = connection;
+            _connection = connection;
 
             _logger.LogInformation("RabbitMQ connection established successfully");
         }
@@ -126,10 +134,10 @@ public sealed class RabbitMqConnectionProvider : IAsyncDisposable
     {
         try
         {
-            if (Connection is { IsOpen: true })
+            if (_connection is { IsOpen: true })
             {
                 _logger.LogDebug("Closing RabbitMQ connection gracefully...");
-                await Connection.CloseAsync(cancellationToken: cancellationToken);
+                await _connection.CloseAsync(cancellationToken: cancellationToken);
             }
         }
         catch (IOException ex)
@@ -142,12 +150,12 @@ public sealed class RabbitMqConnectionProvider : IAsyncDisposable
         }
         finally
         {
-            if (Connection is not null)
+            if (_connection is not null)
             {
-                Connection.ConnectionShutdownAsync -= OnConnectionShutdown;
+                _connection.ConnectionShutdownAsync -= OnConnectionShutdown;
             }
 
-            Connection = null;
+            _connection = null;
         }
     }
 
