@@ -21,6 +21,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Guides.DDD.Service", "Guide
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Guides.DDD.Service", "src\Guides.DDD.Service\Guides.DDD.Service.csproj", "{9EDAEF6A-F590-495C-B262-EABC3657860D}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Messages", "Messages", "{7570D6EF-62DD-4245-B8DC-8630259BB493}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Guides.Messages", "src\Guides.Messages\Guides.Messages.csproj", "{ADD698B0-821B-4B14-9A9E-52481CC0FBE2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -32,6 +36,7 @@ Global
 		{5E6E8E07-C7A4-4DBE-9215-02A83828CC6F} = {5160D0A8-BCC4-42F3-8102-6680FB4C4533}
 		{CFC1F006-AB3E-4906-9B83-0DB95B3D7B71} = {5160D0A8-BCC4-42F3-8102-6680FB4C4533}
 		{9EDAEF6A-F590-495C-B262-EABC3657860D} = {ECDC5063-8703-4563-90ED-9CA188064DC8}
+		{ADD698B0-821B-4B14-9A9E-52481CC0FBE2} = {7570D6EF-62DD-4245-B8DC-8630259BB493}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{84FBFE31-7AC3-462A-9B67-CB6887BC21C0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -54,5 +59,9 @@ Global
 		{9EDAEF6A-F590-495C-B262-EABC3657860D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9EDAEF6A-F590-495C-B262-EABC3657860D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9EDAEF6A-F590-495C-B262-EABC3657860D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ADD698B0-821B-4B14-9A9E-52481CC0FBE2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ADD698B0-821B-4B14-9A9E-52481CC0FBE2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ADD698B0-821B-4B14-9A9E-52481CC0FBE2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ADD698B0-821B-4B14-9A9E-52481CC0FBE2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

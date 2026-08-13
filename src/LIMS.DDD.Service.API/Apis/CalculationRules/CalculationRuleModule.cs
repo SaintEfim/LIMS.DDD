@@ -55,9 +55,9 @@ public class CalculationRuleModule : ICarterModule
     private static async Task<IResult> GetAll(
         Guid studyTemplateId,
         [AsParameters] CalculationRuleServices services,
-        CancellationToken ct)
+        CancellationToken cancellationToken = default)
     {
-        var results = await services.Queries.GetAllByTemplateIdAsync(studyTemplateId, ct);
+        var results = await services.Queries.GetAllByTemplateIdAsync(studyTemplateId, cancellationToken);
         return Results.Ok(results);
     }
 
@@ -65,9 +65,9 @@ public class CalculationRuleModule : ICarterModule
         Guid studyTemplateId,
         Guid ruleId,
         [AsParameters] CalculationRuleServices services,
-        CancellationToken ct)
+        CancellationToken cancellationToken = default)
     {
-        var result = await services.Queries.GetByIdAsync(studyTemplateId, ruleId, ct);
+        var result = await services.Queries.GetByIdAsync(studyTemplateId, ruleId, cancellationToken);
         return result is not null ? Results.Ok(result) : Results.NotFound();
     }
 
@@ -75,9 +75,9 @@ public class CalculationRuleModule : ICarterModule
         Guid studyTemplateId,
         CreateCalculationRuleCommand command,
         [AsParameters] CalculationRuleServices services,
-        CancellationToken ct)
+        CancellationToken cancellationToken = default)
     {
-        var result = await services.Commands.CreateAsync(studyTemplateId, command, ct);
+        var result = await services.Commands.CreateAsync(studyTemplateId, command, cancellationToken);
 
         if (result.IsFailure)
         {
@@ -93,9 +93,9 @@ public class CalculationRuleModule : ICarterModule
         Guid studyTemplateId,
         Guid ruleId,
         [AsParameters] CalculationRuleServices services,
-        CancellationToken ct)
+        CancellationToken cancellationToken = default)
     {
-        var result = await services.Commands.RemoveAsync(studyTemplateId, ruleId, ct);
+        var result = await services.Commands.RemoveAsync(studyTemplateId, ruleId, cancellationToken);
         return result.IsFailure ? HandleFailure(result.GetError()) : Results.NoContent();
     }
 
@@ -104,9 +104,9 @@ public class CalculationRuleModule : ICarterModule
         Guid ruleId,
         AddCalculationInputCommand command,
         [AsParameters] CalculationRuleServices services,
-        CancellationToken ct)
+        CancellationToken cancellationToken = default)
     {
-        var result = await services.Commands.CreateInputAsync(studyTemplateId, ruleId, command, ct);
+        var result = await services.Commands.CreateInputAsync(studyTemplateId, ruleId, command, cancellationToken);
         return result.IsFailure ? HandleFailure(result.GetError()) : Results.Created();
     }
 
@@ -115,10 +115,10 @@ public class CalculationRuleModule : ICarterModule
         Guid ruleId,
         string variableAlias,
         [AsParameters] CalculationRuleServices services,
-        CancellationToken ct)
+        CancellationToken cancellationToken = default)
     {
         var command = new RemoveCalculationInputCommand(variableAlias);
-        var result = await services.Commands.RemoveInputAsync(studyTemplateId, ruleId, command, ct);
+        var result = await services.Commands.RemoveInputAsync(studyTemplateId, ruleId, command, cancellationToken);
         return result.IsFailure ? HandleFailure(result.GetError()) : Results.NoContent();
     }
 
@@ -127,9 +127,9 @@ public class CalculationRuleModule : ICarterModule
         Guid ruleId,
         UpdateCalculationRuleCommand command,
         [AsParameters] CalculationRuleServices services,
-        CancellationToken ct)
+        CancellationToken cancellationToken = default)
     {
-        var result = await services.Commands.UpdateAsync(studyTemplateId, ruleId, command, ct);
+        var result = await services.Commands.UpdateAsync(studyTemplateId, ruleId, command, cancellationToken);
         return result.IsFailure ? HandleFailure(result.GetError()) : Results.NoContent();
     }
 

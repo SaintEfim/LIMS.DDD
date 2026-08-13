@@ -3,6 +3,7 @@ using Guides.DDD.Service.Commands;
 using Guides.DDD.Service.Domains;
 using Guides.DDD.Service.Infrastructure.Messaging;
 using Guides.DDD.Service.Infrastructure.Persistence;
+using Guides.Messages;
 using Microsoft.EntityFrameworkCore;
 
 namespace Guides.DDD.Service.Apis;
@@ -16,22 +17,24 @@ public class UnitModule : ICarterModule
             .WithTags("Units");
 
         group.MapGet("/", async (
-            ApplicationDbContext db) =>
+            ApplicationDbContext db,
+            CancellationToken cancellationToken = default) =>
         {
             var units = await db.Units
                 .AsNoTracking()
-                .ToListAsync();
+                .ToListAsync(cancellationToken);
 
             return Results.Ok(units);
         });
 
         group.MapGet("/{id:guid}", async (
             Guid id,
-            ApplicationDbContext db) =>
+            ApplicationDbContext db,
+            CancellationToken cancellationToken = default) =>
         {
             var unit = await db.Units
                 .AsNoTracking()
-                .FirstOrDefaultAsync(u => u.Id == id);
+                .FirstOrDefaultAsync(u => u.Id == id, cancellationToken);
 
             return unit is null ? Results.NotFound() : Results.Ok(unit);
         });
@@ -39,15 +42,16 @@ public class UnitModule : ICarterModule
         group.MapPost("/", async (
             CreateUnitCommand unitCommand,
             IMessageBus busService,
-            ApplicationDbContext db) =>
+            ApplicationDbContext db,
+            CancellationToken cancellationToken = default) =>
         {
             var unit = new Unit { Name = unitCommand.Name };
 
             db.Units.Add(unit);
 
-            await db.SaveChangesAsync();
+            await db.SaveChangesAsync(cancellationToken);
 
-            await busService.Send(unit);
+            await busService.SendAsync(new UnitCreated(unit.Name), cancellationToken);
 
             return Results.Created($"/api/units/{unit.Id}", unit);
         });
@@ -55,28 +59,31 @@ public class UnitModule : ICarterModule
         group.MapPut("/{id:guid}", async (
             Guid id,
             Unit updatedUnit,
-            ApplicationDbContext db) =>
+            ApplicationDbContext db,
+            CancellationToken cancellationToken = default) =>
         {
             if (id != updatedUnit.Id) return Results.BadRequest();
 
-            var existingUnit = await db.Units.FindAsync(id);
+            var existingUnit = await db.Units.FindAsync([id], cancellationToken);
             if (existingUnit is null) return Results.NotFound();
 
             existingUnit.Name = updatedUnit.Name;
-            await db.SaveChangesAsync();
+            await db.SaveChangesAsync(cancellationToken);
 
             return Results.NoContent();
         });
 
         group.MapDelete("/{id:guid}", async (
             Guid id,
-            ApplicationDbContext db) =>
+            ApplicationDbContext db,
+            CancellationToken cancellationToken = default) =>
         {
-            var unit = await db.Units.FindAsync(id);
+            var unit = await db.Units.FindAsync([id], cancellationToken);
+
             if (unit is null) return Results.NotFound();
 
             unit.IsDeleted = true;
-            await db.SaveChangesAsync();
+            await db.SaveChangesAsync(cancellationToken);
 
             return Results.NoContent();
         });

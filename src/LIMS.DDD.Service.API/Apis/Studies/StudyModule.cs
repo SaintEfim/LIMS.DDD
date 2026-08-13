@@ -50,9 +50,9 @@ public class StudyModule : ICarterModule
     private static async Task<IResult> GetAll(
         Guid sampleId,
         [AsParameters] StudyServices services,
-        CancellationToken ct)
+        CancellationToken cancellationToken = default)
     {
-        var studies = await services.Queries.GetAllBySampleIdAsync(sampleId, ct);
+        var studies = await services.Queries.GetAllBySampleIdAsync(sampleId, cancellationToken);
         return Results.Ok(studies);
     }
 
@@ -60,9 +60,9 @@ public class StudyModule : ICarterModule
         Guid sampleId,
         Guid studyId,
         [AsParameters] StudyServices services,
-        CancellationToken ct)
+        CancellationToken cancellationToken = default)
     {
-        var dto = await services.Queries.GetByIdAsync(studyId, ct);
+        var dto = await services.Queries.GetByIdAsync(studyId, cancellationToken);
         return dto is not null ? Results.Ok(dto) : Results.NotFound();
     }
 
@@ -70,9 +70,9 @@ public class StudyModule : ICarterModule
         Guid sampleId,
         CreateStudyCommand command,
         [AsParameters] StudyServices services,
-        CancellationToken ct)
+        CancellationToken cancellationToken = default)
     {
-        var result = await services.Commands.CreateAsync(new SampleId(sampleId), command, ct);
+        var result = await services.Commands.CreateAsync(new SampleId(sampleId), command, cancellationToken);
 
         if (result.IsFailure)
         {
@@ -89,9 +89,9 @@ public class StudyModule : ICarterModule
         Guid studyId,
         UpdateStudyNotesCommand command,
         [AsParameters] StudyServices services,
-        CancellationToken ct)
+        CancellationToken cancellationToken = default)
     {
-        var result = await services.Commands.UpdateNotesAsync(studyId, command, ct);
+        var result = await services.Commands.UpdateNotesAsync(studyId, command, cancellationToken);
         return result.IsFailure ? HandleFailure(result.GetError()) : Results.NoContent();
     }
 
@@ -100,9 +100,9 @@ public class StudyModule : ICarterModule
         Guid studyId,
         ReassignStudySampleCommand command,
         [AsParameters] StudyServices services,
-        CancellationToken ct)
+        CancellationToken cancellationToken = default)
     {
-        var result = await services.Commands.ReassignSampleAsync(studyId, command, ct);
+        var result = await services.Commands.ReassignSampleAsync(studyId, command, cancellationToken);
         return result.IsFailure ? HandleFailure(result.GetError()) : Results.NoContent();
     }
 
@@ -111,9 +111,9 @@ public class StudyModule : ICarterModule
         Guid studyId,
         ChangeStudyStatusCommand command,
         [AsParameters] StudyServices services,
-        CancellationToken ct)
+        CancellationToken cancellationToken = default)
     {
-        var result = await services.Commands.ChangeStatusAsync(studyId, command, ct);
+        var result = await services.Commands.ChangeStatusAsync(studyId, command, cancellationToken);
         return result.IsFailure ? HandleFailure(result.GetError()) : Results.NoContent();
     }
 
@@ -121,9 +121,9 @@ public class StudyModule : ICarterModule
         Guid sampleId,
         Guid studyId,
         [AsParameters] StudyServices services,
-        CancellationToken ct)
+        CancellationToken cancellationToken = default)
     {
-        var result = await services.Commands.DeleteAsync(studyId, ct);
+        var result = await services.Commands.DeleteAsync(studyId, cancellationToken);
         return result.IsFailure ? HandleFailure(result.GetError()) : Results.NoContent();
     }
 

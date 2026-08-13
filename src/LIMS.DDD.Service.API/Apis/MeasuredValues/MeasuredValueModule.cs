@@ -27,9 +27,9 @@ public class MeasuredValueModule : ICarterModule
     private static async Task<IResult> GetAll(
         Guid studyId,
         [AsParameters] MeasuredValueServices services,
-        CancellationToken ct)
+        CancellationToken cancellationToken = default)
     {
-        var values = await services.Queries.GetAllByStudyIdAsync(studyId, ct);
+        var values = await services.Queries.GetAllByStudyIdAsync(studyId, cancellationToken);
         return Results.Ok(values);
     }
 
@@ -37,9 +37,9 @@ public class MeasuredValueModule : ICarterModule
         Guid studyId,
         Guid measuredValueId,
         [AsParameters] MeasuredValueServices services,
-        CancellationToken ct)
+        CancellationToken cancellationToken = default)
     {
-        var dto = await services.Queries.GetByIdAsync(studyId, measuredValueId, ct);
+        var dto = await services.Queries.GetByIdAsync(studyId, measuredValueId, cancellationToken);
         return dto is not null ? Results.Ok(dto) : Results.NotFound();
     }
 
@@ -48,9 +48,9 @@ public class MeasuredValueModule : ICarterModule
         Guid measuredValueId,
         UpdateMeasuredValueCommand command,
         [AsParameters] MeasuredValueServices services,
-        CancellationToken ct)
+        CancellationToken cancellationToken = default)
     {
-        var result = await services.Commands.UpdateAsync(studyId, measuredValueId, command, ct);
+        var result = await services.Commands.UpdateAsync(studyId, measuredValueId, command, cancellationToken);
         return result.IsFailure ? HandleFailure(result.GetError()) : Results.NoContent();
     }
 

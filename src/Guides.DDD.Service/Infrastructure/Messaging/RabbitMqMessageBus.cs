@@ -1,20 +1,28 @@
 ﻿using System.Text;
 using System.Text.Json;
+using Guides.Messages;
 using RabbitMQ.Client;
 
 namespace Guides.DDD.Service.Infrastructure.Messaging;
 
 public class RabbitMqMessageBus(RabbitMqChannelManager provider, ILogger<RabbitMqChannelManager> logger) : IMessageBus
 {
-    public async Task Send(
-        object obj,
-        CancellationToken cancellationToken = default)
+    private static readonly JsonSerializerOptions JsonOptions = new()
     {
-        var message = JsonSerializer.Serialize(obj);
-        await Send(message, cancellationToken);
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        WriteIndented = false
+    };
+
+    public Task SendAsync<T>(
+        T message,
+        CancellationToken cancellationToken = default)
+        where T : MessageBase
+    {
+        var json = JsonSerializer.Serialize(message, JsonOptions);
+        return SendAsync(json, cancellationToken);
     }
 
-    public async Task Send(
+    private async Task SendAsync(
         string message,
         CancellationToken cancellationToken = default)
     {
@@ -25,14 +33,21 @@ public class RabbitMqMessageBus(RabbitMqChannelManager provider, ILogger<RabbitM
             return;
         }
 
-        await channel.QueueDeclareAsync(queue: "unit_queue", durable: false, exclusive: false, autoDelete: false,
+        await channel.QueueDeclareAsync(queue: "unit_queue", durable: true, exclusive: false, autoDelete: false,
             arguments: null, cancellationToken: cancellationToken);
 
         var body = Encoding.UTF8.GetBytes(message);
 
-        var properties = new BasicProperties { Persistent = true };
+        var properties = new BasicProperties
+        {
+            Persistent = true,
+            ContentType = "application/json",
+            MessageId = Guid.NewGuid()
+                .ToString(),
+            Timestamp = new AmqpTimestamp(DateTimeOffset.UtcNow.ToUnixTimeSeconds())
+        };
 
-        await channel.BasicPublishAsync(exchange: string.Empty, routingKey: "unit_queue", mandatory: true,
+        await channel.BasicPublishAsync(exchange: "", routingKey: "unit_queue", mandatory: false,
             basicProperties: properties, body: body, cancellationToken: cancellationToken);
     }
 }

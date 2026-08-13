@@ -1,4 +1,5 @@
-﻿using RabbitMQ.Client;
+﻿using System.Threading.RateLimiting;
+using RabbitMQ.Client;
 
 namespace Guides.DDD.Service.Infrastructure.Messaging;
 
@@ -23,7 +24,11 @@ public sealed class RabbitMqChannelManager
 
         if (connection is not null && connection.IsOpen)
         {
-            return await connection.CreateChannelAsync(cancellationToken: cancellationToken);
+            var options = new CreateChannelOptions(publisherConfirmationsEnabled: true,
+                publisherConfirmationTrackingEnabled: true, outstandingPublisherConfirmationsRateLimiter: null,
+                consumerDispatchConcurrency: 1);
+
+            return await connection.CreateChannelAsync(options, cancellationToken: cancellationToken);
         }
 
         _logger.LogDebug("RabbitMQ connection is currently unavailable.");

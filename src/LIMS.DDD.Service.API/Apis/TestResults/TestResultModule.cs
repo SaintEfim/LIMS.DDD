@@ -33,9 +33,9 @@ public class TestResultModule : ICarterModule
         Guid studyId,
         Guid testResultId,
         [AsParameters] TestResultServices services,
-        CancellationToken ct)
+        CancellationToken cancellationToken = default)
     {
-        var result = await services.Commands.ExecuteTest(studyId, testResultId, ct);
+        var result = await services.Commands.ExecuteTest(studyId, testResultId, cancellationToken);
         return result.IsFailure ? HandleFailure(result.GetError()) : Results.NoContent();
     }
 
@@ -44,18 +44,18 @@ public class TestResultModule : ICarterModule
         Guid testResultId,
         UpdateTestResultCommand command,
         [AsParameters] TestResultServices services,
-        CancellationToken ct)
+        CancellationToken cancellationToken = default)
     {
-        var result = await services.Commands.UpdateAsync(studyId, testResultId, command, ct);
+        var result = await services.Commands.UpdateAsync(studyId, testResultId, command, cancellationToken);
         return result.IsFailure ? HandleFailure(result.GetError()) : Results.NoContent();
     }
 
     private static async Task<IResult> GetAll(
         Guid studyId,
         [AsParameters] TestResultServices services,
-        CancellationToken ct)
+        CancellationToken cancellationToken = default)
     {
-        var results = await services.Queries.GetAllByStudyIdAsync(studyId, ct);
+        var results = await services.Queries.GetAllByStudyIdAsync(studyId, cancellationToken);
         return Results.Ok(results);
     }
 
@@ -63,9 +63,9 @@ public class TestResultModule : ICarterModule
         Guid studyId,
         Guid testResultId,
         [AsParameters] TestResultServices services,
-        CancellationToken ct)
+        CancellationToken cancellationToken = default)
     {
-        var dto = await services.Queries.GetByIdAsync(studyId, testResultId, ct);
+        var dto = await services.Queries.GetByIdAsync(studyId, testResultId, cancellationToken);
         return dto is not null ? Results.Ok(dto) : Results.NotFound();
     }
 
