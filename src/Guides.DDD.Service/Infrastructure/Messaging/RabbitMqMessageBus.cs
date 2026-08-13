@@ -4,19 +4,17 @@ using RabbitMQ.Client;
 
 namespace Guides.DDD.Service.Infrastructure.Messaging;
 
-public class RabbitMqService(
-    RabbitMqChannelManager provider,
-    ILogger<RabbitMqChannelManager> logger) : IMessageBusService
+public class RabbitMqMessageBus(RabbitMqChannelManager provider, ILogger<RabbitMqChannelManager> logger) : IMessageBus
 {
-    public async Task SendMessage(
+    public async Task Send(
         object obj,
         CancellationToken cancellationToken = default)
     {
         var message = JsonSerializer.Serialize(obj);
-        await SendMessage(message, cancellationToken);
+        await Send(message, cancellationToken);
     }
 
-    public async Task SendMessage(
+    public async Task Send(
         string message,
         CancellationToken cancellationToken = default)
     {

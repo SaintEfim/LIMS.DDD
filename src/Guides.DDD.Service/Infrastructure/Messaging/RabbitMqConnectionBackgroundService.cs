@@ -1,10 +1,10 @@
 ﻿namespace Guides.DDD.Service.Infrastructure.Messaging;
 
-public class RabbitMqConnectionBackgroundService(RabbitMqChannelManager provider) : BackgroundService
+public class RabbitMqConnectionBackgroundService(RabbitMqConnectionService connectionService) : BackgroundService
 {
     protected override async Task ExecuteAsync(
         CancellationToken stoppingToken)
     {
-        await provider.EnsureConnected(stoppingToken);
+        await connectionService.EnsureConnected(stoppingToken);
     }
 }

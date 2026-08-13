@@ -9,9 +9,10 @@ builder.Services.AddCarter();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddSingleton<RabbitMqConnectionService>();
 builder.Services.AddSingleton<RabbitMqChannelManager>();
 builder.Services.AddHostedService<RabbitMqConnectionBackgroundService>();
-builder.Services.AddScoped<IMessageBusService, RabbitMqService>();
+builder.Services.AddScoped<IMessageBus, RabbitMqMessageBus>();
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("ServiceDB")));

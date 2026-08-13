@@ -38,7 +38,7 @@ public class UnitModule : ICarterModule
 
         group.MapPost("/", async (
             CreateUnitCommand unitCommand,
-            IMessageBusService busService,
+            IMessageBus busService,
             ApplicationDbContext db) =>
         {
             var unit = new Unit { Name = unitCommand.Name };
@@ -47,7 +47,7 @@ public class UnitModule : ICarterModule
 
             await db.SaveChangesAsync();
 
-            await busService.SendMessage(unit);
+            await busService.Send(unit);
 
             return Results.Created($"/api/units/{unit.Id}", unit);
         });

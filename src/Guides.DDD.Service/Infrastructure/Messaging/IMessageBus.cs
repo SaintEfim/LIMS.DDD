@@ -1,12 +1,12 @@
 ﻿namespace Guides.DDD.Service.Infrastructure.Messaging;
 
-public interface IMessageBusService
+public interface IMessageBus
 {
-    Task SendMessage(
+    Task Send(
         object obj,
         CancellationToken cancellationToken = default);
 
-    Task SendMessage(
+    Task Send(
         string message,
         CancellationToken cancellationToken = default);
 }
