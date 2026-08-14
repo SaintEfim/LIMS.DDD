@@ -3,12 +3,11 @@ using LIMS.DDD.Service.Domain.SeedWork.Result;
 
 namespace LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.Entities.CalculationRules.ValueObjects;
 
-public sealed partial record FormulaExpression
+public sealed record FormulaExpression
 {
     private const int MaxLength = 2000;
 
-    [GeneratedRegex(@"\b[a-zA-Z_][a-zA-Z0-9_]*\b")]
-    private static partial Regex Formula();
+    private static Regex Formula() => new(@"\b[a-zA-Z_][a-zA-Z0-9_]*\b", RegexOptions.Compiled);
 
     private FormulaExpression(
         string value)
