@@ -2,6 +2,7 @@
 
 public sealed class RabbitMqConnectionMonitor(
     RabbitMqConnectionProvider connectionProvider,
+    RabbitMqTopologyDeclarator rabbitMqTopologyDeclarator,
     ILogger<RabbitMqConnectionMonitor> logger) : BackgroundService
 {
     protected override async Task ExecuteAsync(
@@ -12,6 +13,8 @@ public sealed class RabbitMqConnectionMonitor(
             try
             {
                 await connectionProvider.EnsureConnectedAsync(stoppingToken);
+
+                await rabbitMqTopologyDeclarator.DeclareAllAsync(stoppingToken);
 
                 await Task.Delay(TimeSpan.FromSeconds(30), stoppingToken);
             }

@@ -1,5 +1,4 @@
-﻿using System.Threading.RateLimiting;
-using RabbitMQ.Client;
+﻿using RabbitMQ.Client;
 
 namespace Guides.DDD.Service.Infrastructure.Messaging;
 

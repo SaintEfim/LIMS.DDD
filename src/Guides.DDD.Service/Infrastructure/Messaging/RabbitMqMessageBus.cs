@@ -1,11 +1,14 @@
-﻿using System.Text;
+﻿using System.Reflection;
+using System.Text;
 using System.Text.Json;
 using Guides.Messages;
 using RabbitMQ.Client;
 
 namespace Guides.DDD.Service.Infrastructure.Messaging;
 
-public class RabbitMqMessageBus(RabbitMqChannelManager provider, ILogger<RabbitMqChannelManager> logger) : IMessageBus
+public class RabbitMqMessageBus(
+    RabbitMqChannelManager channelManager,
+    ILogger<RabbitMqChannelManager> logger) : IMessageBus
 {
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
@@ -13,30 +16,21 @@ public class RabbitMqMessageBus(RabbitMqChannelManager provider, ILogger<RabbitM
         WriteIndented = false
     };
 
-    public Task SendAsync<T>(
-        T message,
+    public async Task SendAsync<T>(
+        T messageObject,
         CancellationToken cancellationToken = default)
-        where T : MessageBase
+        where T : IIntegrationEvent
     {
-        var json = JsonSerializer.Serialize(message, JsonOptions);
-        return SendAsync(json, cancellationToken);
-    }
+        var messageString = JsonSerializer.Serialize(messageObject, JsonOptions);
 
-    private async Task SendAsync(
-        string message,
-        CancellationToken cancellationToken = default)
-    {
-        await using var channel = await provider.CreateChannelAsync(cancellationToken);
+        await using var channel = await channelManager.CreateChannelAsync(cancellationToken);
         if (channel is null || !channel.IsOpen)
         {
-            logger.LogWarning("RabbitMQ is not available. Message dropped: {Message}", message);
+            logger.LogWarning("RabbitMQ is not available. Message dropped: {Message}", messageString);
             return;
         }
 
-        await channel.QueueDeclareAsync(queue: "unit_queue", durable: true, exclusive: false, autoDelete: false,
-            arguments: null, cancellationToken: cancellationToken);
-
-        var body = Encoding.UTF8.GetBytes(message);
+        var body = Encoding.UTF8.GetBytes(messageString);
 
         var properties = new BasicProperties
         {
@@ -47,7 +41,14 @@ public class RabbitMqMessageBus(RabbitMqChannelManager provider, ILogger<RabbitM
             Timestamp = new AmqpTimestamp(DateTimeOffset.UtcNow.ToUnixTimeSeconds())
         };
 
-        await channel.BasicPublishAsync(exchange: "", routingKey: "unit_queue", mandatory: false,
+        var typeObject = messageObject.GetType();
+
+        var attribute = typeObject.GetCustomAttribute<IntegrationEventAttribute>();
+
+        if (attribute == null)
+            throw new InvalidOperationException($"Integration event {messageObject} has no IntegrationEventAttribute.");
+
+        await channel.BasicPublishAsync(exchange: "", routingKey: attribute.QueueName, mandatory: false,
             basicProperties: properties, body: body, cancellationToken: cancellationToken);
     }
 }

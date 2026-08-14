@@ -1,6 +1,7 @@
 using Carter;
 using Guides.DDD.Service.Infrastructure.Messaging;
 using Guides.DDD.Service.Infrastructure.Persistence;
+using Guides.Messages;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,10 +10,7 @@ builder.Services.AddCarter();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddSingleton<RabbitMqConnectionProvider>();
-builder.Services.AddSingleton<RabbitMqChannelManager>();
-builder.Services.AddHostedService<RabbitMqConnectionMonitor>();
-builder.Services.AddScoped<IMessageBus, RabbitMqMessageBus>();
+builder.Services.AddRabbitMq(typeof(UnitCreated).Assembly);
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("ServiceDB")));

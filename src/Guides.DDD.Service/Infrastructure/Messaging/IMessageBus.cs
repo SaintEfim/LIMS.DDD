@@ -7,5 +7,5 @@ public interface IMessageBus
     Task SendAsync<T>(
         T message,
         CancellationToken cancellationToken = default)
-        where T : MessageBase;
+        where T : IIntegrationEvent;
 }

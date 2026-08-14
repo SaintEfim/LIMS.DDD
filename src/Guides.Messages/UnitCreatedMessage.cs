@@ -1,6 +1,4 @@
 ﻿namespace Guides.Messages;
 
-public record UnitCreated(string Name) : MessageBase
-{
-    public override string MessageType => "unit.created";
-}
+[IntegrationEvent("unit.created")]
+public record UnitCreated(string Name) : IIntegrationEvent;
