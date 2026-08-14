@@ -2,24 +2,24 @@
 
 namespace Guides.DDD.Service.Infrastructure.Messaging;
 
-public sealed class RabbitMqChannelManager
+public sealed class RabbitMqChannelFactory
 {
-    private readonly ILogger<RabbitMqChannelManager> _logger;
+    private readonly ILogger<RabbitMqChannelFactory> _logger;
 
-    private RabbitMqConnectionProvider ConnectionService { get; }
+    private RabbitMqConnectionProvider ConnectionProvider { get; }
 
-    public RabbitMqChannelManager(
+    public RabbitMqChannelFactory(
         RabbitMqConnectionProvider connectionService,
-        ILogger<RabbitMqChannelManager> logger)
+        ILogger<RabbitMqChannelFactory> logger)
     {
-        ConnectionService = connectionService;
+        ConnectionProvider = connectionService;
         _logger = logger;
     }
 
     public async Task<IChannel?> CreateChannelAsync(
         CancellationToken cancellationToken = default)
     {
-        var connection = ConnectionService.Connection;
+        var connection = ConnectionProvider.Connection;
 
         if (connection is not null && connection.IsOpen)
         {

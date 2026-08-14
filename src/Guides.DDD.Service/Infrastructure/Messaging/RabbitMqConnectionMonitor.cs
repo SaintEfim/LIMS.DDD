@@ -12,9 +12,12 @@ public sealed class RabbitMqConnectionMonitor(
         {
             try
             {
-                await connectionProvider.EnsureConnectedAsync(stoppingToken);
+                var reconnected = await connectionProvider.EnsureConnectedAsync(stoppingToken);
 
-                await rabbitMqTopologyDeclarator.DeclareAllAsync(stoppingToken);
+                if (reconnected)
+                {
+                    await rabbitMqTopologyDeclarator.DeclareAllAsync(stoppingToken);
+                }
 
                 await Task.Delay(TimeSpan.FromSeconds(30), stoppingToken);
             }

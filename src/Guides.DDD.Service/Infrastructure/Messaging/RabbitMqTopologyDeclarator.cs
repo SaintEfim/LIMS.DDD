@@ -1,11 +1,12 @@
 ﻿namespace Guides.DDD.Service.Infrastructure.Messaging;
 
 public class RabbitMqTopologyDeclarator(
-    IReadOnlyCollection<IntegrationEventDescriptor> events,
-    RabbitMqChannelManager channelManager,
+    IReadOnlyDictionary<Type, IntegrationEventDescriptor> events,
+    RabbitMqChannelFactory channelManager,
     ILogger<RabbitMqTopologyDeclarator> logger)
 {
-    public async Task DeclareAllAsync(CancellationToken ct)
+    public async Task DeclareAllAsync(
+        CancellationToken ct)
     {
         if (events.Count == 0)
         {
@@ -13,8 +14,7 @@ public class RabbitMqTopologyDeclarator(
             return;
         }
 
-        await using var channel =
-            await channelManager.CreateChannelAsync(ct);
+        await using var channel = await channelManager.CreateChannelAsync(ct);
 
         if (channel is null || !channel.IsOpen)
         {
@@ -22,24 +22,14 @@ public class RabbitMqTopologyDeclarator(
             return;
         }
 
-        foreach (var @event in events)
+        foreach (var @event in events.Values)
         {
-            await channel.QueueDeclareAsync(
-                queue: @event.QueueName,
-                durable: true,
-                exclusive: false,
-                autoDelete: false,
-                arguments: null,
-                cancellationToken: ct);
+            await channel.QueueDeclareAsync(queue: @event.QueueName, durable: true, exclusive: false, autoDelete: false,
+                arguments: null, cancellationToken: ct);
 
-            logger.LogInformation(
-                "Declared queue {Queue} for type {Type}",
-                @event.QueueName,
-                @event.EventType.Name);
+            logger.LogInformation("Declared queue {Queue} for type {Type}", @event.QueueName, @event.EventType.Name);
         }
 
-        logger.LogInformation(
-            "RabbitMQ topology declared: {Count} queues",
-            events.Count);
+        logger.LogInformation("RabbitMQ topology declared: {Count} queues", events.Count);
     }
 }

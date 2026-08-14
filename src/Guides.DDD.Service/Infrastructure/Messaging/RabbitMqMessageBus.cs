@@ -1,5 +1,4 @@
-﻿using System.Reflection;
-using System.Text;
+﻿using System.Text;
 using System.Text.Json;
 using Guides.Messages;
 using RabbitMQ.Client;
@@ -7,8 +6,9 @@ using RabbitMQ.Client;
 namespace Guides.DDD.Service.Infrastructure.Messaging;
 
 public class RabbitMqMessageBus(
-    RabbitMqChannelManager channelManager,
-    ILogger<RabbitMqChannelManager> logger) : IMessageBus
+    IIntegrationEventRegistry eventRegistry,
+    RabbitMqChannelFactory channelManager,
+    ILogger<RabbitMqMessageBus> logger) : IMessageBus
 {
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
@@ -41,14 +41,9 @@ public class RabbitMqMessageBus(
             Timestamp = new AmqpTimestamp(DateTimeOffset.UtcNow.ToUnixTimeSeconds())
         };
 
-        var typeObject = messageObject.GetType();
+        var descriptor = eventRegistry.Get<T>();
 
-        var attribute = typeObject.GetCustomAttribute<IntegrationEventAttribute>();
-
-        if (attribute == null)
-            throw new InvalidOperationException($"Integration event {messageObject} has no IntegrationEventAttribute.");
-
-        await channel.BasicPublishAsync(exchange: "", routingKey: attribute.QueueName, mandatory: false,
+        await channel.BasicPublishAsync(exchange: "", routingKey: descriptor.QueueName, mandatory: false,
             basicProperties: properties, body: body, cancellationToken: cancellationToken);
     }
 }

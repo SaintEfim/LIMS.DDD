@@ -11,15 +11,16 @@ public static class DependencyInjection
     {
         var events = DiscoverIntegrationEvents(assembly);
 
-        services.AddSingleton<IReadOnlyCollection<IntegrationEventDescriptor>>(events);
+        services.AddSingleton(events);
+        services.AddSingleton<IIntegrationEventRegistry, IntegrationEventRegistry>();
         services.AddSingleton<RabbitMqTopologyDeclarator>();
         services.AddSingleton<RabbitMqConnectionProvider>();
-        services.AddSingleton<RabbitMqChannelManager>();
+        services.AddSingleton<RabbitMqChannelFactory>();
         services.AddHostedService<RabbitMqConnectionMonitor>();
         services.AddScoped<IMessageBus, RabbitMqMessageBus>();
     }
 
-    private static IntegrationEventDescriptor[] DiscoverIntegrationEvents(
+    private static IReadOnlyDictionary<Type, IntegrationEventDescriptor> DiscoverIntegrationEvents(
         Assembly assembly)
     {
         var events = assembly.GetTypes()
@@ -34,18 +35,7 @@ public static class DependencyInjection
                     throw new InvalidOperationException(
                         $"Integration event '{x.FullName}' is missing [IntegrationEvent] attribute."));
             })
-            .ToArray();
-
-        var duplicates = events.GroupBy(e => e.QueueName)
-            .Where(g => g.Count() > 1)
-            .Select(g => g.Key)
-            .ToArray();
-
-        if (duplicates.Length > 0)
-        {
-            throw new InvalidOperationException($"Duplicate queue names detected: [{string.Join(", ", duplicates)}]. " +
-                                                "Each integration event must have a unique queue name.");
-        }
+            .ToDictionary(x => x.EventType, x => x);
 
         return events;
     }
