@@ -6,24 +6,36 @@ namespace RabbitMq.Library.QuickStart.Connection;
 
 public class RabbitMqConnectionProvider : IAsyncDisposable
 {
-    private const int MaxReconnectAttempts = 10;
-    private const int MaxBackoffDelaySeconds = 30;
-    private const int BackoffBase = 2;
-
     public IConnection? Connection { get; private set; }
 
-    private readonly ConnectionFactory _connectionFactory = new() { HostName = "localhost" };
+    private readonly RabbitMqOptions _options;
+    private ConnectionFactory ConnectionFactory { get; }
     private readonly SemaphoreSlim _semaphore = new(1, 1);
     private readonly CancellationTokenSource _disposeCts = new();
     private readonly ILogger<RabbitMqConnectionProvider> _logger;
 
     public RabbitMqConnectionProvider(
+        RabbitMqOptions options,
         ILogger<RabbitMqConnectionProvider> logger)
     {
+        _options = options;
         _logger = logger;
 
+        ConnectionFactory = new ConnectionFactory
+        {
+            HostName = options.HostName,
+            Port = options.Port,
+            UserName = options.UserName,
+            Password = options.Password,
+            VirtualHost = options.VirtualHost,
+            RequestedHeartbeat = options.RequestedHeartbeat,
+            AutomaticRecoveryEnabled = options.AutomaticRecoveryEnabled,
+            TopologyRecoveryEnabled = options.TopologyRecoveryEnabled,
+            NetworkRecoveryInterval = options.NetworkRecoveryInterval
+        };
+
         _logger.LogInformation("RabbitMQ connection factory initialized for host {Host}:{Port}",
-            _connectionFactory.HostName, _connectionFactory.Port);
+            ConnectionFactory.HostName, ConnectionFactory.Port);
     }
 
     public async Task<bool> EnsureConnectedAsync(
@@ -52,14 +64,14 @@ public class RabbitMqConnectionProvider : IAsyncDisposable
 
             await CleanUpAsync(linkedCts.Token);
 
-            for (var attempt = 1; attempt <= MaxReconnectAttempts; attempt++)
+            for (var attempt = 1; attempt <= _options.MaxReconnectAttempts; attempt++)
             {
                 try
                 {
                     _logger.LogDebug("Creating new RabbitMQ connection. Attempt {Attempt}/{MaxAttempts}", attempt,
-                        MaxReconnectAttempts);
+                        _options.MaxReconnectAttempts);
 
-                    var connection = await _connectionFactory.CreateConnectionAsync(linkedCts.Token);
+                    var connection = await ConnectionFactory.CreateConnectionAsync(linkedCts.Token);
 
                     connection.ConnectionShutdownAsync += OnConnectionShutdownAsync;
 
@@ -75,11 +87,12 @@ public class RabbitMqConnectionProvider : IAsyncDisposable
                 }
                 catch (Exception ex)
                 {
-                    var delay = Math.Min((int) Math.Pow(BackoffBase, attempt), MaxBackoffDelaySeconds);
+                    var delay = Math.Min((int) Math.Pow(_options.BackoffBaseSeconds, attempt),
+                        _options.MaxBackoffDelaySeconds);
 
                     _logger.LogWarning(ex,
                         "RabbitMQ connection attempt {Attempt}/{MaxAttempts} failed. " + "Next retry in {Delay}s",
-                        attempt, MaxReconnectAttempts, delay);
+                        attempt, _options.MaxReconnectAttempts, delay);
 
                     await Task.Delay(TimeSpan.FromSeconds(delay), linkedCts.Token);
                 }

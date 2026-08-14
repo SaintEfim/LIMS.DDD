@@ -1,4 +1,4 @@
-﻿namespace RabbitMq.Library.QuickStart.Events;
+﻿namespace RabbitMq.Library.QuickStart;
 
 public sealed record IntegrationEventDescriptor(
     Type EventType,

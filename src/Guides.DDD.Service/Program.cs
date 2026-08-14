@@ -2,7 +2,7 @@ using Carter;
 using Guides.DDD.Service.Persistence;
 using Guides.Messages;
 using Microsoft.EntityFrameworkCore;
-using RabbitMq.Library.QuickStart.DependencyInjection;
+using RabbitMq.Library.QuickStart;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,7 +10,13 @@ builder.Services.AddCarter();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddRabbitMq(typeof(UnitCreated).Assembly);
+builder.Services.AddRabbitMq(x =>
+{
+    x.HostName = "localhost";
+    x.Port = 5672;
+    x.UserName = "guest";
+    x.Password = "guest";
+}, [typeof(UnitCreated).Assembly]);
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("ServiceDB")));

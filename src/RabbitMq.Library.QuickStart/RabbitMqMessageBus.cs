@@ -6,7 +6,7 @@ using RabbitMq.Library.QuickStart.Abstractions;
 using RabbitMq.Library.QuickStart.Connection;
 using RabbitMq.Library.QuickStart.Messages;
 
-namespace RabbitMq.Library.QuickStart.Publishing;
+namespace RabbitMq.Library.QuickStart;
 
 public class RabbitMqMessageBus(
     IIntegrationEventRegistry eventRegistry,

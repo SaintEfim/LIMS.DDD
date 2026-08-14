@@ -1,8 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using RabbitMq.Library.QuickStart.Connection;
-using RabbitMq.Library.QuickStart.Events;
 
-namespace RabbitMq.Library.QuickStart.Topology;
+namespace RabbitMq.Library.QuickStart;
 
 public class RabbitMqTopologyDeclarator(
     IReadOnlyDictionary<Type, IntegrationEventDescriptor> events,

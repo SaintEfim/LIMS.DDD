@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using RabbitMq.Library.QuickStart.Topology;
 
 namespace RabbitMq.Library.QuickStart.Connection;
 

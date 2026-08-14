@@ -1,5 +1,4 @@
-﻿using RabbitMq.Library.QuickStart.Events;
-using RabbitMq.Library.QuickStart.Messages;
+﻿using RabbitMq.Library.QuickStart.Messages;
 
 namespace RabbitMq.Library.QuickStart.Abstractions;
 
