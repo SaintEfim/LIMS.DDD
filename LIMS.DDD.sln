@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "LIMS.DDD.Service", "LIMS.DDD.Service", "{5160D0A8-BCC4-42F3-8102-6680FB4C4533}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "LIMS", "LIMS", "{5160D0A8-BCC4-42F3-8102-6680FB4C4533}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Files", "Solution Files", "{25C25A69-5166-4FE8-B612-26BF5BA8D344}"
 	ProjectSection(SolutionItems) = preProject
@@ -17,7 +17,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LIMS.DDD.Service.Applicatio
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LIMS.DDD.Service.API", "src\LIMS.DDD.Service.API\LIMS.DDD.Service.API.csproj", "{CFC1F006-AB3E-4906-9B83-0DB95B3D7B71}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Guides.DDD.Service", "Guides.DDD.Service", "{ECDC5063-8703-4563-90ED-9CA188064DC8}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Guides", "Guides", "{ECDC5063-8703-4563-90ED-9CA188064DC8}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Guides.DDD.Service", "src\Guides.DDD.Service\Guides.DDD.Service.csproj", "{9EDAEF6A-F590-495C-B262-EABC3657860D}"
 EndProject
