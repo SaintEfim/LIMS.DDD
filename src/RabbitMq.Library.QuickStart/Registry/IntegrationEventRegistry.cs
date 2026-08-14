@@ -1,6 +1,8 @@
-﻿using Guides.Messages;
+﻿using RabbitMq.Library.QuickStart.Abstractions;
+using RabbitMq.Library.QuickStart.Events;
+using RabbitMq.Library.QuickStart.Messages;
 
-namespace Guides.DDD.Service.Infrastructure.Messaging;
+namespace RabbitMq.Library.QuickStart.Registry;
 
 public sealed class IntegrationEventRegistry(
     IReadOnlyDictionary<Type, IntegrationEventDescriptor> events)

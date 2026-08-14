@@ -1,7 +1,14 @@
 ﻿using System.Reflection;
-using Guides.Messages;
+using Microsoft.Extensions.DependencyInjection;
+using RabbitMq.Library.QuickStart.Abstractions;
+using RabbitMq.Library.QuickStart.Connection;
+using RabbitMq.Library.QuickStart.Events;
+using RabbitMq.Library.QuickStart.Messages;
+using RabbitMq.Library.QuickStart.Publishing;
+using RabbitMq.Library.QuickStart.Registry;
+using RabbitMq.Library.QuickStart.Topology;
 
-namespace Guides.DDD.Service.Infrastructure.Messaging;
+namespace RabbitMq.Library.QuickStart.DependencyInjection;
 
 public static class DependencyInjection
 {

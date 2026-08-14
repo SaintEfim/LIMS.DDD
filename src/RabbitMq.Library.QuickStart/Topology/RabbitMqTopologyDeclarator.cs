@@ -1,4 +1,8 @@
-﻿namespace Guides.DDD.Service.Infrastructure.Messaging;
+﻿using Microsoft.Extensions.Logging;
+using RabbitMq.Library.QuickStart.Connection;
+using RabbitMq.Library.QuickStart.Events;
+
+namespace RabbitMq.Library.QuickStart.Topology;
 
 public class RabbitMqTopologyDeclarator(
     IReadOnlyDictionary<Type, IntegrationEventDescriptor> events,

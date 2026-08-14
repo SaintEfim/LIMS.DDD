@@ -6,8 +6,4 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
-    <ItemGroup>
-      <ProjectReference Include="..\RabbitMq.Library.QuickStart.Messages\RabbitMq.Library.QuickStart.Messages.csproj" />
-    </ItemGroup>
-
 </Project>

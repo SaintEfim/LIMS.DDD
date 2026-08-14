@@ -1,4 +1,4 @@
-﻿namespace Guides.DDD.Service.Infrastructure.Messaging;
+﻿namespace RabbitMq.Library.QuickStart.Events;
 
 public sealed record IntegrationEventDescriptor(
     Type EventType,

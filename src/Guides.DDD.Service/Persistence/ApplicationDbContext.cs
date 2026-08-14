@@ -1,7 +1,7 @@
 ﻿using Guides.DDD.Service.Domains;
 using Microsoft.EntityFrameworkCore;
 
-namespace Guides.DDD.Service.Infrastructure.Persistence;
+namespace Guides.DDD.Service.Persistence;
 
 public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : DbContext(options)
 {

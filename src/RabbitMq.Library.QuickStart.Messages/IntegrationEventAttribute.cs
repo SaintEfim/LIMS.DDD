@@ -1,4 +1,4 @@
-﻿namespace Guides.Messages;
+﻿namespace RabbitMq.Library.QuickStart.Messages;
 
 [AttributeUsage(AttributeTargets.Class)]
 public sealed class IntegrationEventAttribute(string queueName) : Attribute

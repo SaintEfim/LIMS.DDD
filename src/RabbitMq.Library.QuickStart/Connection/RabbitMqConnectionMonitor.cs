@@ -1,4 +1,8 @@
-﻿namespace Guides.DDD.Service.Infrastructure.Messaging;
+﻿using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using RabbitMq.Library.QuickStart.Topology;
+
+namespace RabbitMq.Library.QuickStart.Connection;
 
 public sealed class RabbitMqConnectionMonitor(
     RabbitMqConnectionProvider connectionProvider,

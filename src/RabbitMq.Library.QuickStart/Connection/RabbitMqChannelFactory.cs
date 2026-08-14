@@ -1,6 +1,7 @@
-﻿using RabbitMQ.Client;
+﻿using Microsoft.Extensions.Logging;
+using RabbitMQ.Client;
 
-namespace Guides.DDD.Service.Infrastructure.Messaging;
+namespace RabbitMq.Library.QuickStart.Connection;
 
 public sealed class RabbitMqChannelFactory
 {

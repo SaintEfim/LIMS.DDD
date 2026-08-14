@@ -1,9 +1,12 @@
 ﻿using System.Text;
 using System.Text.Json;
-using Guides.Messages;
+using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;
+using RabbitMq.Library.QuickStart.Abstractions;
+using RabbitMq.Library.QuickStart.Connection;
+using RabbitMq.Library.QuickStart.Messages;
 
-namespace Guides.DDD.Service.Infrastructure.Messaging;
+namespace RabbitMq.Library.QuickStart.Publishing;
 
 public class RabbitMqMessageBus(
     IIntegrationEventRegistry eventRegistry,

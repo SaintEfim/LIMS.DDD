@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Guides.DDD.Service.Infrastructure.Persistence;
+namespace Guides.DDD.Service.Persistence;
 
 public class UnitConfiguration : IEntityTypeConfiguration<Unit>
 {

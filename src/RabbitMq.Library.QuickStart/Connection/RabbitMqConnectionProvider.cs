@@ -1,7 +1,8 @@
-﻿using RabbitMQ.Client;
+﻿using Microsoft.Extensions.Logging;
+using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 
-namespace Guides.DDD.Service.Infrastructure.Messaging;
+namespace RabbitMq.Library.QuickStart.Connection;
 
 public class RabbitMqConnectionProvider : IAsyncDisposable
 {

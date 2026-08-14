@@ -1,6 +1,6 @@
-﻿using Guides.Messages;
+﻿using RabbitMq.Library.QuickStart.Messages;
 
-namespace Guides.DDD.Service.Infrastructure.Messaging;
+namespace RabbitMq.Library.QuickStart.Abstractions;
 
 public interface IMessageBus
 {

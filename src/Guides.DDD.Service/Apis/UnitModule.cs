@@ -1,10 +1,10 @@
 ﻿using Carter;
 using Guides.DDD.Service.Commands;
 using Guides.DDD.Service.Domains;
-using Guides.DDD.Service.Infrastructure.Messaging;
-using Guides.DDD.Service.Infrastructure.Persistence;
+using Guides.DDD.Service.Persistence;
 using Guides.Messages;
 using Microsoft.EntityFrameworkCore;
+using RabbitMq.Library.QuickStart.Abstractions;
 
 namespace Guides.DDD.Service.Apis;
 
