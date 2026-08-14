@@ -11,11 +11,11 @@ public sealed class CalculationRule : SoftDeletableModel
 {
     private readonly HashSet<CalculationInput> _calculationInputs = [];
 
-    public ResultDefinitionId ResultDefinitionId { get; private set; }
-
     private CalculationRule()
     {
     }
+
+    public ResultDefinitionId ResultDefinitionId { get; private set; }
 
     public CalculationRuleId Id { get; private set; }
 

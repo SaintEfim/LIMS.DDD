@@ -179,7 +179,7 @@ public sealed class StudyTemplateCommandsHandler(
 
     private async Task<Result<StudyTemplate, Exception>> GetTemplateForChangeAsync(
         Guid id,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken = default)
     {
         var template = await repository.GetByIdForChangeAsync(new StudyTemplateId(id), cancellationToken);
         return template is null
@@ -190,7 +190,7 @@ public sealed class StudyTemplateCommandsHandler(
 
     private async Task<Result<StudyTemplate, Exception>> SaveNewAsync(
         StudyTemplate template,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken = default)
     {
         try
         {
@@ -207,7 +207,7 @@ public sealed class StudyTemplateCommandsHandler(
 
     private async Task<Result<StudyTemplate, Exception>> SaveChangesAsync(
         StudyTemplate template,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken = default)
     {
         try
         {

@@ -160,7 +160,7 @@ public sealed class OrderCommandsHandler(
 
     private async Task<Result<Order, Exception>> SaveNewAsync(
         Order order,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken = default)
     {
         try
         {
@@ -175,7 +175,7 @@ public sealed class OrderCommandsHandler(
     }
 
     private async Task<Result<None, Exception>> SaveChangesAsync(
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken = default)
     {
         try
         {

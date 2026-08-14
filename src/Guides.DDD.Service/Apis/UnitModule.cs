@@ -62,10 +62,16 @@ public class UnitModule : ICarterModule
             ApplicationDbContext db,
             CancellationToken cancellationToken = default) =>
         {
-            if (id != updatedUnit.Id) return Results.BadRequest();
+            if (id != updatedUnit.Id)
+            {
+                return Results.BadRequest();
+            }
 
             var existingUnit = await db.Units.FindAsync([id], cancellationToken);
-            if (existingUnit is null) return Results.NotFound();
+            if (existingUnit is null)
+            {
+                return Results.NotFound();
+            }
 
             existingUnit.Name = updatedUnit.Name;
             await db.SaveChangesAsync(cancellationToken);
@@ -80,7 +86,10 @@ public class UnitModule : ICarterModule
         {
             var unit = await db.Units.FindAsync([id], cancellationToken);
 
-            if (unit is null) return Results.NotFound();
+            if (unit is null)
+            {
+                return Results.NotFound();
+            }
 
             unit.IsDeleted = true;
             await db.SaveChangesAsync(cancellationToken);

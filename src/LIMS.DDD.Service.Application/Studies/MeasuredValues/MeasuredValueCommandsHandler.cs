@@ -41,7 +41,7 @@ public sealed class MeasuredValueCommandsHandler(IUnitOfWork unitOfWork, IStudyR
     }
 
     private async Task<Result<None, Exception>> SaveChangesAsync(
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken = default)
     {
         try
         {

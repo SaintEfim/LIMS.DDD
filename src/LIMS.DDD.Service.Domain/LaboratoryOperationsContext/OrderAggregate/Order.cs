@@ -77,8 +77,7 @@ public class Order
         if (!OrderStatus.CanEdit)
         {
             return Result<None, Exception>.Failure(
-                new InvalidOperationException(
-                    "Cannot modify order details when the order is not editable."));
+                new InvalidOperationException("Cannot modify order details when the order is not editable."));
         }
 
         if (name is not null)

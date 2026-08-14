@@ -111,7 +111,10 @@ public sealed class Study
                 new InvalidOperationException("Test result not found in this study."));
         }
 
-        if (value is not null) testResult.SetValue(value.Value);
+        if (value is not null)
+        {
+            testResult.SetValue(value.Value);
+        }
 
         return Result<None, Exception>.Success();
     }

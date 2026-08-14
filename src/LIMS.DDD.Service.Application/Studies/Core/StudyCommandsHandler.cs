@@ -186,7 +186,7 @@ public sealed class StudyCommandsHandler(
 
     private async Task<Result<Study, Exception>> GetStudyForChangeAsync(
         Guid id,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken = default)
     {
         var study = await studyRepository.GetByIdForChangeAsync(new StudyId(id), cancellationToken);
         return study is null
@@ -196,7 +196,7 @@ public sealed class StudyCommandsHandler(
 
     private async Task<Result<Study, Exception>> SaveNewAsync(
         Study study,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken = default)
     {
         try
         {
@@ -211,7 +211,7 @@ public sealed class StudyCommandsHandler(
     }
 
     private async Task<Result<None, Exception>> SaveChangesAsync(
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken = default)
     {
         try
         {

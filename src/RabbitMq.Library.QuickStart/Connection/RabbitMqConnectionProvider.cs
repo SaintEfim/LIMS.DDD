@@ -6,13 +6,11 @@ namespace RabbitMq.Library.QuickStart.Connection;
 
 public class RabbitMqConnectionProvider : IAsyncDisposable
 {
-    public IConnection? Connection { get; private set; }
-
-    private readonly RabbitMqOptions _options;
-    private ConnectionFactory ConnectionFactory { get; }
-    private readonly SemaphoreSlim _semaphore = new(1, 1);
     private readonly CancellationTokenSource _disposeCts = new();
     private readonly ILogger<RabbitMqConnectionProvider> _logger;
+
+    private readonly RabbitMqOptions _options;
+    private readonly SemaphoreSlim _semaphore = new(1, 1);
 
     public RabbitMqConnectionProvider(
         RabbitMqOptions options,
@@ -38,21 +36,41 @@ public class RabbitMqConnectionProvider : IAsyncDisposable
             ConnectionFactory.HostName, ConnectionFactory.Port);
     }
 
+    public IConnection? Connection { get; private set; }
+    private ConnectionFactory ConnectionFactory { get; }
+
+    public async ValueTask DisposeAsync()
+    {
+        _logger.LogInformation("Disposing RabbitMQ connection factory...");
+
+        await _disposeCts.CancelAsync();
+        await CleanUpAsync();
+        _semaphore.Dispose();
+        _disposeCts.Dispose();
+
+        _logger.LogInformation("RabbitMQ connection factory disposed");
+    }
+
     public async Task<bool> EnsureConnectedAsync(
         CancellationToken cancellationToken = default)
     {
-        if (Connection is not null && Connection.IsOpen) return false;
+        if (Connection is not null && Connection.IsOpen)
+        {
+            return false;
+        }
 
         await ReconnectAsync(cancellationToken);
 
         if (Connection is null || !Connection.IsOpen)
+        {
             throw new InvalidOperationException("RabbitMQ connection is not available after reconnection attempts.");
+        }
 
         return true;
     }
 
     private async Task ReconnectAsync(
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken = default)
     {
         using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, _disposeCts.Token);
 
@@ -60,7 +78,10 @@ public class RabbitMqConnectionProvider : IAsyncDisposable
 
         try
         {
-            if (Connection is not null && Connection.IsOpen) return;
+            if (Connection is not null && Connection.IsOpen)
+            {
+                return;
+            }
 
             await CleanUpAsync(linkedCts.Token);
 
@@ -135,7 +156,7 @@ public class RabbitMqConnectionProvider : IAsyncDisposable
             {
                 _logger.LogDebug("Closing RabbitMQ connection gracefully...");
 
-                await connection.CloseAsync(cancellationToken: cancellationToken);
+                await connection.CloseAsync(cancellationToken);
             }
         }
         catch (IOException ex)
@@ -146,17 +167,5 @@ public class RabbitMqConnectionProvider : IAsyncDisposable
         {
             _logger.LogError(ex, "Unexpected error during connection cleanup");
         }
-    }
-
-    public async ValueTask DisposeAsync()
-    {
-        _logger.LogInformation("Disposing RabbitMQ connection factory...");
-
-        await _disposeCts.CancelAsync();
-        await CleanUpAsync();
-        _semaphore.Dispose();
-        _disposeCts.Dispose();
-
-        _logger.LogInformation("RabbitMQ connection factory disposed");
     }
 }
