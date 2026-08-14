@@ -52,7 +52,5 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
         builder.HasIndex(x => x.Code)
             .IsUnique()
             .HasFilter("\"IsDeleted\" = false");
-
-        builder.HasQueryFilter(x => !x.IsDeleted);
     }
 }

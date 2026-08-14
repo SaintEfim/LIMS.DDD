@@ -51,27 +51,27 @@ public class StudyTemplateModule : ICarterModule
 
     private static async Task<IResult> GetAl(
         [AsParameters] StudyTemplateServices services,
-        CancellationToken ct)
+        CancellationToken cancellationToken = default)
     {
-        var studyTemplates = await services.Queries.GetAllAsync(ct);
+        var studyTemplates = await services.Queries.GetAllAsync(cancellationToken);
         return Results.Ok(studyTemplates);
     }
 
     private static async Task<IResult> GetById(
         Guid id,
         [AsParameters] StudyTemplateServices services,
-        CancellationToken ct)
+        CancellationToken cancellationToken = default)
     {
-        var dto = await services.Queries.GetByIdAsync(id, ct);
+        var dto = await services.Queries.GetByIdAsync(id, cancellationToken);
         return dto is null ? Results.NotFound() : Results.Ok(dto);
     }
 
     private static async Task<IResult> Create(
         CreateStudyTemplateCommand createCommand,
         [AsParameters] StudyTemplateServices services,
-        CancellationToken ct)
+        CancellationToken cancellationToken = default)
     {
-        var result = await services.Commands.CreateAsync(createCommand, ct);
+        var result = await services.Commands.CreateAsync(createCommand, cancellationToken);
 
         if (result.IsFailure)
         {
@@ -87,9 +87,9 @@ public class StudyTemplateModule : ICarterModule
         Guid id,
         UpdateStudyTemplateCommand updateCommand,
         [AsParameters] StudyTemplateServices services,
-        CancellationToken ct)
+        CancellationToken cancellationToken = default)
     {
-        var result = await services.Commands.UpdateAsync(id, updateCommand, ct);
+        var result = await services.Commands.UpdateAsync(id, updateCommand, cancellationToken);
         return result.IsFailure ? HandleFailure(result.GetError()) : Results.NoContent();
     }
 
@@ -97,9 +97,9 @@ public class StudyTemplateModule : ICarterModule
         Guid id,
         string newStatus,
         [AsParameters] StudyTemplateServices services,
-        CancellationToken ct)
+        CancellationToken cancellationToken = default)
     {
-        var result = await services.Commands.ChangeStatusAsync(id, newStatus, ct);
+        var result = await services.Commands.ChangeStatusAsync(id, newStatus, cancellationToken);
         return result.IsFailure ? HandleFailure(result.GetError()) : Results.Ok();
     }
 
@@ -107,9 +107,9 @@ public class StudyTemplateModule : ICarterModule
         Guid id,
         CreateStudyTemplateRevisionCommand command,
         [AsParameters] StudyTemplateServices services,
-        CancellationToken ct)
+        CancellationToken cancellationToken = default)
     {
-        var result = await services.Commands.CreateRevisionAsync(id, command, ct);
+        var result = await services.Commands.CreateRevisionAsync(id, command, cancellationToken);
 
         if (result.IsFailure)
         {
@@ -123,9 +123,9 @@ public class StudyTemplateModule : ICarterModule
     private static async Task<IResult> Delete(
         Guid id,
         [AsParameters] StudyTemplateServices services,
-        CancellationToken ct)
+        CancellationToken cancellationToken = default)
     {
-        var result = await services.Commands.DeleteAsync(id, ct);
+        var result = await services.Commands.DeleteAsync(id, cancellationToken);
 
         return result.IsFailure ? HandleFailure(result.GetError()) : Results.NoContent();
     }

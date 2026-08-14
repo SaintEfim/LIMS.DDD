@@ -18,7 +18,7 @@ public class StudyRepository : IStudyRepository
         StudyId id,
         CancellationToken cancellationToken = default)
     {
-        var query = _context.Studies.AsSplitQuery();
+        var query = _context.Studies;
         return await StudyBaseQuery(query)
             .SingleOrDefaultAsync(s => s.Id == id, cancellationToken);
     }
@@ -28,7 +28,6 @@ public class StudyRepository : IStudyRepository
         CancellationToken cancellationToken = default)
     {
         var query = _context.Studies
-            .AsSplitQuery()
             .AsNoTracking();
         return await StudyBaseQuery(query)
             .SingleOrDefaultAsync(s => s.Id == id, cancellationToken);
@@ -40,7 +39,6 @@ public class StudyRepository : IStudyRepository
     {
         return await _context.Studies
             .AsNoTracking()
-            .AsSplitQuery()
             .Include(s => s.MeasuredValues)
             .Include(s => s.TestResults)
             .Where(s => s.SampleId == sampleId)

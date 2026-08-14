@@ -17,16 +17,13 @@ public class OrderRepository : IOrderRepository
         OrderId id,
         CancellationToken cancellationToken = default)
     {
-        return await _context.Orders
-            .AsNoTracking()
-            .SingleOrDefaultAsync(o => o.Id == id, cancellationToken);
+        return await _context.Orders.FindAsync([id], cancellationToken);
     }
 
     public async Task<ICollection<Order>> GetAllAsync(
         CancellationToken cancellationToken = default)
     {
         var orderQuery = await _context.Orders
-            .AsSplitQuery()
             .AsNoTracking()
             .ToListAsync(cancellationToken);
 
@@ -37,7 +34,7 @@ public class OrderRepository : IOrderRepository
         OrderId id,
         CancellationToken cancellationToken = default)
     {
-        return await _context.Orders.SingleOrDefaultAsync(o => o.Id == id, cancellationToken);
+        return await _context.Orders.FindAsync([id], cancellationToken);
     }
 
     public void Add(
@@ -45,5 +42,4 @@ public class OrderRepository : IOrderRepository
     {
         _context.Orders.Add(order);
     }
-
 }

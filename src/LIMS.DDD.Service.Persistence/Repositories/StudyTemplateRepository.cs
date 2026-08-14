@@ -17,9 +17,7 @@ public class StudyTemplateRepository : IStudyTemplateRepository
         StudyTemplateId id,
         CancellationToken cancellationToken = default)
     {
-        var studyTemplateQuery = _context.StudyTemplates
-            .AsSplitQuery()
-            .AsNoTracking();
+        var studyTemplateQuery = _context.StudyTemplates.AsNoTracking();
 
         var studyTemplate = await StudyTemplateBaseQuery(studyTemplateQuery)
             .SingleOrDefaultAsync(t => t.Id == id, cancellationToken);
@@ -31,7 +29,7 @@ public class StudyTemplateRepository : IStudyTemplateRepository
         StudyTemplateId id,
         CancellationToken cancellationToken = default)
     {
-        var studyTemplateQuery = _context.StudyTemplates.AsSplitQuery();
+        var studyTemplateQuery = _context.StudyTemplates;
 
         var studyTemplate = await StudyTemplateBaseQuery(studyTemplateQuery)
             .SingleOrDefaultAsync(t => t.Id == id, cancellationToken);
@@ -42,9 +40,7 @@ public class StudyTemplateRepository : IStudyTemplateRepository
     public async Task<ICollection<StudyTemplate>> GetAllAsync(
         CancellationToken cancellationToken = default)
     {
-        var studyTemplateQuery = _context.StudyTemplates
-            .AsSplitQuery()
-            .AsNoTracking();
+        var studyTemplateQuery = _context.StudyTemplates.AsNoTracking();
 
         var studyTemplates = await StudyTemplateBaseQuery(studyTemplateQuery)
             .ToListAsync(cancellationToken);
@@ -64,11 +60,5 @@ public class StudyTemplateRepository : IStudyTemplateRepository
         return query.Include(t => t.InputParameters)
             .Include(t => t.ResultDefinitions)
             .Include(t => t.CalculationRules);
-    }
-
-    public void Remove(
-        StudyTemplate studyTemplate)
-    {
-        _context.StudyTemplates.Remove(studyTemplate);
     }
 }

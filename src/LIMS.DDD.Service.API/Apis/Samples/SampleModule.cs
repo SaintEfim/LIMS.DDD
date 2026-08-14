@@ -45,9 +45,9 @@ public class SampleModule : ICarterModule
     private static async Task<IResult> GetAll(
         Guid orderId,
         [AsParameters] SampleServices services,
-        CancellationToken ct)
+        CancellationToken cancellationToken = default)
     {
-        var samples = await services.Queries.GetAllByOrderIdAsync(orderId, ct);
+        var samples = await services.Queries.GetAllByOrderIdAsync(orderId, cancellationToken);
         return Results.Ok(samples);
     }
 
@@ -55,9 +55,9 @@ public class SampleModule : ICarterModule
         Guid orderId,
         Guid sampleId,
         [AsParameters] SampleServices services,
-        CancellationToken ct)
+        CancellationToken cancellationToken = default)
     {
-        var dto = await services.Queries.GetByIdAsync(sampleId, ct);
+        var dto = await services.Queries.GetByIdAsync(sampleId, cancellationToken);
         return dto is not null ? Results.Ok(dto) : Results.NotFound();
     }
 
@@ -65,9 +65,9 @@ public class SampleModule : ICarterModule
         Guid orderId,
         CreateSampleCommand command,
         [AsParameters] SampleServices services,
-        CancellationToken ct)
+        CancellationToken cancellationToken = default)
     {
-        var result = await services.Commands.CreateAsync(new OrderId(orderId), command, ct);
+        var result = await services.Commands.CreateAsync(new OrderId(orderId), command, cancellationToken);
 
         if (result.IsFailure)
         {
@@ -84,9 +84,9 @@ public class SampleModule : ICarterModule
         Guid sampleId,
         UpdateSampleCommand command,
         [AsParameters] SampleServices services,
-        CancellationToken ct)
+        CancellationToken cancellationToken = default)
     {
-        var result = await services.Commands.UpdateAsync(sampleId, command, ct);
+        var result = await services.Commands.UpdateAsync(sampleId, command, cancellationToken);
         return result.IsFailure ? HandleFailure(result.GetError()) : Results.NoContent();
     }
 
@@ -95,9 +95,9 @@ public class SampleModule : ICarterModule
         Guid sampleId,
         string newStatus,
         [AsParameters] SampleServices services,
-        CancellationToken ct)
+        CancellationToken cancellationToken = default)
     {
-        var result = await services.Commands.ChangeStatusAsync(sampleId, newStatus, ct);
+        var result = await services.Commands.ChangeStatusAsync(sampleId, newStatus, cancellationToken);
         return result.IsFailure ? HandleFailure(result.GetError()) : Results.Ok();
     }
 
@@ -105,9 +105,9 @@ public class SampleModule : ICarterModule
         Guid orderId,
         Guid sampleId,
         [AsParameters] SampleServices services,
-        CancellationToken ct)
+        CancellationToken cancellationToken = default)
     {
-        var result = await services.Commands.DeleteAsync(sampleId, ct);
+        var result = await services.Commands.DeleteAsync(sampleId, cancellationToken);
         return result.IsFailure ? HandleFailure(result.GetError()) : Results.NoContent();
     }
 

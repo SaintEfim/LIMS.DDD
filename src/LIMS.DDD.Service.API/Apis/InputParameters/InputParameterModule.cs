@@ -40,9 +40,9 @@ public class InputParameterModule : ICarterModule
     private static async Task<IResult> GetAll(
         Guid studyTemplateId,
         [AsParameters] InputParameterServices services,
-        CancellationToken ct)
+        CancellationToken cancellationToken = default)
     {
-        var parameters = await services.Queries.GetAllByTemplateIdAsync(studyTemplateId, ct);
+        var parameters = await services.Queries.GetAllByTemplateIdAsync(studyTemplateId, cancellationToken);
         return Results.Ok(parameters);
     }
 
@@ -50,9 +50,9 @@ public class InputParameterModule : ICarterModule
         Guid studyTemplateId,
         Guid parameterId,
         [AsParameters] InputParameterServices services,
-        CancellationToken ct)
+        CancellationToken cancellationToken = default)
     {
-        var parameter = await services.Queries.GetByIdAsync(studyTemplateId, parameterId, ct);
+        var parameter = await services.Queries.GetByIdAsync(studyTemplateId, parameterId, cancellationToken);
         return parameter is not null ? Results.Ok(parameter) : Results.NotFound();
     }
 
@@ -60,9 +60,9 @@ public class InputParameterModule : ICarterModule
         Guid studyTemplateId,
         CreateInputParameterCommand command,
         [AsParameters] InputParameterServices services,
-        CancellationToken ct)
+        CancellationToken cancellationToken = default)
     {
-        var result = await services.Commands.CreateAsync(studyTemplateId, command, ct);
+        var result = await services.Commands.CreateAsync(studyTemplateId, command, cancellationToken);
 
         if (result.IsFailure)
         {
@@ -78,9 +78,9 @@ public class InputParameterModule : ICarterModule
         Guid studyTemplateId,
         Guid parameterId,
         [AsParameters] InputParameterServices services,
-        CancellationToken ct)
+        CancellationToken cancellationToken = default)
     {
-        var result = await services.Commands.RemoveAsync(studyTemplateId, parameterId, ct);
+        var result = await services.Commands.RemoveAsync(studyTemplateId, parameterId, cancellationToken);
 
         return result.IsFailure ? HandleFailure(result.GetError()) : Results.NoContent();
     }
@@ -90,9 +90,9 @@ public class InputParameterModule : ICarterModule
         Guid parameterId,
         UpdateInputParameterCommand command,
         [AsParameters] InputParameterServices services,
-        CancellationToken ct)
+        CancellationToken cancellationToken = default)
     {
-        var result = await services.Commands.UpdateAsync(studyTemplateId, parameterId, command, ct);
+        var result = await services.Commands.UpdateAsync(studyTemplateId, parameterId, command, cancellationToken);
         return result.IsFailure ? HandleFailure(result.GetError()) : Results.NoContent();
     }
 

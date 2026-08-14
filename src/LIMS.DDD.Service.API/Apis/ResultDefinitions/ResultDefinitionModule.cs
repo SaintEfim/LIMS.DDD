@@ -40,9 +40,9 @@ public class ResultDefinitionModule : ICarterModule
     private static async Task<IResult> GetAll(
         Guid studyTemplateId,
         [AsParameters] ResultDefinitionServices services,
-        CancellationToken ct)
+        CancellationToken cancellationToken = default)
     {
-        var results = await services.Queries.GetAllByTemplateIdAsync(studyTemplateId, ct);
+        var results = await services.Queries.GetAllByTemplateIdAsync(studyTemplateId, cancellationToken);
         return Results.Ok(results);
     }
 
@@ -50,9 +50,9 @@ public class ResultDefinitionModule : ICarterModule
         Guid studyTemplateId,
         Guid resultId,
         [AsParameters] ResultDefinitionServices services,
-        CancellationToken ct)
+        CancellationToken cancellationToken = default)
     {
-        var result = await services.Queries.GetByIdAsync(studyTemplateId, resultId, ct);
+        var result = await services.Queries.GetByIdAsync(studyTemplateId, resultId, cancellationToken);
         return result is not null ? Results.Ok(result) : Results.NotFound();
     }
 
@@ -60,9 +60,9 @@ public class ResultDefinitionModule : ICarterModule
         Guid studyTemplateId,
         CreateResultDefinitionCommand command,
         [AsParameters] ResultDefinitionServices services,
-        CancellationToken ct)
+        CancellationToken cancellationToken = default)
     {
-        var result = await services.Commands.CreateAsync(studyTemplateId, command, ct);
+        var result = await services.Commands.CreateAsync(studyTemplateId, command, cancellationToken);
 
         if (result.IsFailure)
         {
@@ -77,9 +77,9 @@ public class ResultDefinitionModule : ICarterModule
         Guid studyTemplateId,
         Guid resultId,
         [AsParameters] ResultDefinitionServices services,
-        CancellationToken ct)
+        CancellationToken cancellationToken = default)
     {
-        var result = await services.Commands.RemoveAsync(studyTemplateId, resultId, ct);
+        var result = await services.Commands.RemoveAsync(studyTemplateId, resultId, cancellationToken);
 
         return result.IsFailure ? HandleFailure(result.GetError()) : Results.NoContent();
     }
@@ -89,9 +89,9 @@ public class ResultDefinitionModule : ICarterModule
         Guid determinationId,
         UpdateResultDefinitionCommand command,
         [AsParameters] ResultDefinitionServices services,
-        CancellationToken ct)
+        CancellationToken cancellationToken = default)
     {
-        var result = await services.Commands.UpdateAsync(studyTemplateId, determinationId, command, ct);
+        var result = await services.Commands.UpdateAsync(studyTemplateId, determinationId, command, cancellationToken);
         return result.IsFailure ? HandleFailure(result.GetError()) : Results.NoContent();
     }
 

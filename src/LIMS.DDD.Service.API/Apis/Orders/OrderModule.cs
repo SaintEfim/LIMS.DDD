@@ -42,27 +42,27 @@ public class OrderModule : ICarterModule
 
     private static async Task<IResult> GetAll(
         [AsParameters] OrderServices services,
-        CancellationToken ct)
+        CancellationToken cancellationToken = default)
     {
-        var orders = await services.Queries.GetAllAsync(ct);
+        var orders = await services.Queries.GetAllAsync(cancellationToken);
         return Results.Ok(orders);
     }
 
     private static async Task<IResult> GetById(
         Guid id,
         [AsParameters] OrderServices services,
-        CancellationToken ct)
+        CancellationToken cancellationToken = default)
     {
-        var dto = await services.Queries.GetByIdAsync(id, ct);
+        var dto = await services.Queries.GetByIdAsync(id, cancellationToken);
         return dto is not null ? Results.Ok(dto) : Results.NotFound();
     }
 
     private static async Task<IResult> Create(
         CreateOrderCommand command,
         [AsParameters] OrderServices services,
-        CancellationToken ct)
+        CancellationToken cancellationToken = default)
     {
-        var result = await services.Commands.CreateAsync(command, ct);
+        var result = await services.Commands.CreateAsync(command, cancellationToken);
 
         if (result.IsFailure)
         {
@@ -78,9 +78,9 @@ public class OrderModule : ICarterModule
         Guid id,
         UpdateOrderCommand command,
         [AsParameters] OrderServices services,
-        CancellationToken ct)
+        CancellationToken cancellationToken = default)
     {
-        var result = await services.Commands.UpdateAsync(id, command, ct);
+        var result = await services.Commands.UpdateAsync(id, command, cancellationToken);
         return result.IsFailure ? HandleFailure(result.GetError()) : Results.NoContent();
     }
 
@@ -88,18 +88,18 @@ public class OrderModule : ICarterModule
         Guid id,
         ChangeOrderStatusCommand command,
         [AsParameters] OrderServices services,
-        CancellationToken ct)
+        CancellationToken cancellationToken = default)
     {
-        var result = await services.Commands.ChangeStatusAsync(id, command, ct);
+        var result = await services.Commands.ChangeStatusAsync(id, command, cancellationToken);
         return result.IsFailure ? HandleFailure(result.GetError()) : Results.NoContent();
     }
 
     private static async Task<IResult> Delete(
         Guid id,
         [AsParameters] OrderServices services,
-        CancellationToken ct)
+        CancellationToken cancellationToken = default)
     {
-        var result = await services.Commands.DeleteAsync(id, ct);
+        var result = await services.Commands.DeleteAsync(id, cancellationToken);
         return result.IsFailure ? HandleFailure(result.GetError()) : Results.NoContent();
     }
 

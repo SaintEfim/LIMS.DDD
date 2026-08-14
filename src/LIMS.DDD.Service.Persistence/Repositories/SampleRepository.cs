@@ -19,22 +19,20 @@ public class SampleRepository : ISampleRepository
         CancellationToken cancellationToken = default)
     {
         return await _context.Samples
-            .AsNoTracking()
-            .SingleOrDefaultAsync(s => s.Id == id, cancellationToken);
+            .FindAsync([id], cancellationToken);
     }
 
     public async Task<Sample?> GetByIdForChangeAsync(
         SampleId id,
         CancellationToken cancellationToken = default)
     {
-        return await _context.Samples.SingleOrDefaultAsync(s => s.Id == id, cancellationToken);
+        return await _context.Samples.FindAsync([id], cancellationToken);
     }
 
     public async Task<ICollection<Sample>> GetAllAsync(
         CancellationToken cancellationToken = default)
     {
         var sampleQuery = await _context.Samples
-            .AsSplitQuery()
             .AsNoTracking()
             .ToListAsync(cancellationToken);
 
