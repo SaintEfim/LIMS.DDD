@@ -95,8 +95,7 @@ public sealed class SampleCommandsHandler(
         GatherDate? gatherDate = null;
         if (command.GatherDateBegin is not null || command.GatherDateEnd is not null)
         {
-            var gatherDateResult = GatherDate.Create(
-                command.GatherDateBegin ?? sample.GatherDate.Begin,
+            var gatherDateResult = GatherDate.Create(command.GatherDateBegin ?? sample.GatherDate.Begin,
                 command.GatherDateEnd ?? sample.GatherDate.End);
             if (gatherDateResult.IsFailure)
             {
@@ -190,7 +189,7 @@ public sealed class SampleCommandsHandler(
 
     private async Task<Result<Sample, Exception>> SaveNewAsync(
         Sample sample,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken = default)
     {
         try
         {
@@ -205,7 +204,7 @@ public sealed class SampleCommandsHandler(
     }
 
     private async Task<Result<None, Exception>> SaveChangesAsync(
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken = default)
     {
         try
         {

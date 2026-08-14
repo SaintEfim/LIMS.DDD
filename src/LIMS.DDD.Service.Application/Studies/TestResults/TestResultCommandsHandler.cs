@@ -30,7 +30,10 @@ public sealed class TestResultCommandsHandler(
         var study = studyResult.GetValue();
 
         var result = study.TestResults.SingleOrDefault(t => t.Id == new TestResultId(testResultId));
-        if (result is null) return Result<None, Exception>.Failure(new Exception("Not found result"));
+        if (result is null)
+        {
+            return Result<None, Exception>.Failure(new Exception("Not found result"));
+        }
 
         var template =
             await studyTemplateRepository.GetByIdAsync(new StudyTemplateId(study.TemplateId.Value), cancellationToken);
@@ -82,7 +85,7 @@ public sealed class TestResultCommandsHandler(
     }
 
     private async Task<Result<None, Exception>> SaveChangesAsync(
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken = default)
     {
         try
         {

@@ -27,8 +27,7 @@ public class StudyRepository : IStudyRepository
         StudyId id,
         CancellationToken cancellationToken = default)
     {
-        var query = _context.Studies
-            .AsNoTracking();
+        var query = _context.Studies.AsNoTracking();
         return await StudyBaseQuery(query)
             .SingleOrDefaultAsync(s => s.Id == id, cancellationToken);
     }

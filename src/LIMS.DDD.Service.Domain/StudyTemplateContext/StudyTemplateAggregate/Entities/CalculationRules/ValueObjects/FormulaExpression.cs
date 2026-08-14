@@ -7,8 +7,6 @@ public sealed record FormulaExpression
 {
     private const int MaxLength = 2000;
 
-    private static Regex Formula() => new(@"\b[a-zA-Z_][a-zA-Z0-9_]*\b", RegexOptions.Compiled);
-
     private FormulaExpression(
         string value)
     {
@@ -16,6 +14,11 @@ public sealed record FormulaExpression
     }
 
     public string Value { get; }
+
+    private static Regex Formula()
+    {
+        return new Regex(@"\b[a-zA-Z_][a-zA-Z0-9_]*\b", RegexOptions.Compiled);
+    }
 
     public static Result<FormulaExpression, Exception> Create(
         string value)

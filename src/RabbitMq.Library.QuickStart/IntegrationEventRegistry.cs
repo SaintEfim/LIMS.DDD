@@ -3,8 +3,7 @@ using RabbitMq.Library.QuickStart.Messages;
 
 namespace RabbitMq.Library.QuickStart;
 
-public sealed class IntegrationEventRegistry(
-    IReadOnlyDictionary<Type, IntegrationEventDescriptor> events)
+public sealed class IntegrationEventRegistry(IReadOnlyDictionary<Type, IntegrationEventDescriptor> events)
     : IIntegrationEventRegistry
 {
     public IntegrationEventDescriptor Get<T>()
@@ -14,7 +13,6 @@ public sealed class IntegrationEventRegistry(
 
         return events.TryGetValue(eventType, out var descriptor)
             ? descriptor
-            : throw new InvalidOperationException(
-                $"Integration event '{eventType.FullName}' is not registered.");
+            : throw new InvalidOperationException($"Integration event '{eventType.FullName}' is not registered.");
     }
 }

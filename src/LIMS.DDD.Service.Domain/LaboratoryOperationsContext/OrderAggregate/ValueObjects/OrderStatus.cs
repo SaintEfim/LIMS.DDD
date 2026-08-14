@@ -6,6 +6,14 @@ namespace LIMS.DDD.Service.Domain.LaboratoryOperationsContext.OrderAggregate.Val
 
 public sealed record OrderStatus : StatusBase<IState<Order>, Order>
 {
+    private static readonly Dictionary<string, OrderStatus> Registry = new(StringComparer.OrdinalIgnoreCase)
+    {
+        ["Draft"] = Draft,
+        ["InProgress"] = InProgress,
+        ["Completed"] = Completed,
+        ["Canceled"] = Canceled
+    };
+
     private OrderStatus(
         IState<Order> state)
         : base(state)
@@ -19,14 +27,6 @@ public sealed record OrderStatus : StatusBase<IState<Order>, Order>
     public static OrderStatus Completed { get; } = new(new OrderCompletedState());
 
     public static OrderStatus Canceled { get; } = new(new OrderCanceledState());
-
-    private static readonly Dictionary<string, OrderStatus> Registry = new(StringComparer.OrdinalIgnoreCase)
-    {
-        ["Draft"] = Draft,
-        ["InProgress"] = InProgress,
-        ["Completed"] = Completed,
-        ["Canceled"] = Canceled
-    };
 
     public static bool TryParse(
         string? name,

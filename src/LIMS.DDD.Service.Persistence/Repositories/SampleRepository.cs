@@ -18,8 +18,7 @@ public class SampleRepository : ISampleRepository
         SampleId id,
         CancellationToken cancellationToken = default)
     {
-        return await _context.Samples
-            .FindAsync([id], cancellationToken);
+        return await _context.Samples.FindAsync([id], cancellationToken);
     }
 
     public async Task<Sample?> GetByIdForChangeAsync(
@@ -54,5 +53,4 @@ public class SampleRepository : ISampleRepository
     {
         _context.Samples.Add(sample);
     }
-
 }

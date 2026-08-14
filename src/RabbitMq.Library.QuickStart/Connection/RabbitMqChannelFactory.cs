@@ -7,8 +7,6 @@ public sealed class RabbitMqChannelFactory
 {
     private readonly ILogger<RabbitMqChannelFactory> _logger;
 
-    private RabbitMqConnectionProvider ConnectionProvider { get; }
-
     public RabbitMqChannelFactory(
         RabbitMqConnectionProvider connectionService,
         ILogger<RabbitMqChannelFactory> logger)
@@ -17,6 +15,8 @@ public sealed class RabbitMqChannelFactory
         _logger = logger;
     }
 
+    private RabbitMqConnectionProvider ConnectionProvider { get; }
+
     public async Task<IChannel?> CreateChannelAsync(
         CancellationToken cancellationToken = default)
     {
@@ -24,11 +24,9 @@ public sealed class RabbitMqChannelFactory
 
         if (connection is not null && connection.IsOpen)
         {
-            var options = new CreateChannelOptions(publisherConfirmationsEnabled: true,
-                publisherConfirmationTrackingEnabled: true, outstandingPublisherConfirmationsRateLimiter: null,
-                consumerDispatchConcurrency: 1);
+            var options = new CreateChannelOptions(true, true, null, 1);
 
-            return await connection.CreateChannelAsync(options, cancellationToken: cancellationToken);
+            return await connection.CreateChannelAsync(options, cancellationToken);
         }
 
         _logger.LogDebug("RabbitMQ connection is currently unavailable.");

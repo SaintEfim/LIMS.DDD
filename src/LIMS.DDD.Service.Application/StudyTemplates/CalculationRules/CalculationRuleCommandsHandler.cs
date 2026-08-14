@@ -10,9 +10,7 @@ using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.Entiti
 
 namespace LIMS.DDD.Service.Application.StudyTemplates.CalculationRules;
 
-public sealed class CalculationRuleCommandsHandler(
-    IStudyTemplateRepository repository,
-    IUnitOfWork unitOfWork)
+public sealed class CalculationRuleCommandsHandler(IStudyTemplateRepository repository, IUnitOfWork unitOfWork)
 {
     public async Task<Result<Guid, Exception>> CreateAsync(
         Guid studyTemplateId,
@@ -198,7 +196,7 @@ public sealed class CalculationRuleCommandsHandler(
 
     private async Task<Result<StudyTemplate, Exception>> GetTemplateForChangeAsync(
         Guid studyTemplateId,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken = default)
     {
         var template = await repository.GetByIdForChangeAsync(new StudyTemplateId(studyTemplateId), cancellationToken);
         return template is null
@@ -208,7 +206,7 @@ public sealed class CalculationRuleCommandsHandler(
     }
 
     private async Task<Result<None, Exception>> SaveChangesAsync(
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken = default)
     {
         try
         {
