@@ -9,7 +9,7 @@ using RabbitMq.Library.QuickStart.Messages;
 namespace RabbitMq.Library.QuickStart;
 
 public class RabbitMqMessageBus(
-    IIntegrationEventRegistry eventRegistry,
+    IntegrationEventRegistry eventRegistry,
     RabbitMqChannelFactory channelManager,
     ILogger<RabbitMqMessageBus> logger) : IMessageBus
 {
