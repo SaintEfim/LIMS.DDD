@@ -1,10 +1,8 @@
-﻿using RabbitMq.Library.QuickStart.Abstractions;
-using RabbitMq.Library.QuickStart.Messages;
+﻿using RabbitMq.Library.QuickStart.Messages;
 
 namespace RabbitMq.Library.QuickStart;
 
 public sealed class IntegrationEventRegistry(IReadOnlyDictionary<Type, IntegrationEventDescriptor> events)
-    : IIntegrationEventRegistry
 {
     public IntegrationEventDescriptor Get<T>()
         where T : IIntegrationEvent

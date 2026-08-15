@@ -51,7 +51,7 @@ public class UnitModule : ICarterModule
 
             await db.SaveChangesAsync(cancellationToken);
 
-            await busService.SendAsync(new UnitCreated(unit.Name), cancellationToken);
+            await busService.SendAsync(new UnitCreatedMessage(unit.Name), cancellationToken);
 
             return Results.Created($"/api/units/{unit.Id}", unit);
         });

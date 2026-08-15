@@ -16,7 +16,7 @@ builder.Services.AddRabbitMq(x =>
     x.Port = 5672;
     x.UserName = "guest";
     x.Password = "guest";
-}, [typeof(UnitCreated).Assembly]);
+}, [typeof(UnitCreatedMessage)]);
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("ServiceDB")));

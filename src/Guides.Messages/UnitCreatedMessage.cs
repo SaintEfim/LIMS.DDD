@@ -3,4 +3,4 @@
 namespace Guides.Messages;
 
 [IntegrationEvent("unit.created")]
-public record UnitCreated(string Name) : IIntegrationEvent;
+public record UnitCreatedMessage(string Name) : IIntegrationEvent;
