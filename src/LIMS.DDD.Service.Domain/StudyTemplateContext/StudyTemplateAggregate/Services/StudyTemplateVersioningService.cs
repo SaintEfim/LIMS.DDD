@@ -79,7 +79,8 @@ public class StudyTemplateVersioningService
                 return specResult.CastFailure<None>();
             }
 
-            var addResult = newTemplate.AddResultDefinition(result.ResultInstance, result.Unit, specResult.GetValue());
+            var addResult =
+                newTemplate.AddResultDefinition(result.ResultInstance, result.UnitId, specResult.GetValue());
 
             if (addResult.IsFailure)
             {

@@ -22,10 +22,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="StudyTemplateContext\"/>
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="NoStringEvaluating" Version="2.6.1"/>
   </ItemGroup>
 

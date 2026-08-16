@@ -7,6 +7,7 @@ using LIMS.DDD.Service.Application.StudyTemplates.CalculationRules;
 using LIMS.DDD.Service.Application.StudyTemplates.Core;
 using LIMS.DDD.Service.Application.StudyTemplates.InputParameters;
 using LIMS.DDD.Service.Application.StudyTemplates.ResultDefinitions;
+using LIMS.DDD.Service.Application.Units;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace LIMS.DDD.Service.Application;
@@ -16,6 +17,8 @@ public static class DependencyInjection
     public static void AddApplication(
         this IServiceCollection services)
     {
+        services.AddScoped<UnitSnapshotCommandsHandler>();
+
         services.AddScoped<StudyTemplateCommandsHandler>();
         services.AddScoped<InputParameterCommandsHandler>();
         services.AddScoped<ResultDefinitionCommandsHandler>();

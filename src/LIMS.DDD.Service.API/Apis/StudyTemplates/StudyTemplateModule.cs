@@ -1,6 +1,7 @@
 ﻿using Carter;
 using LIMS.DDD.Service.Application.StudyTemplates.Core;
 using LIMS.DDD.Service.Application.StudyTemplates.Core.Commands;
+using Microsoft.AspNetCore.Mvc;
 
 namespace LIMS.DDD.Service.API.Apis.StudyTemplates;
 
@@ -50,7 +51,7 @@ public class StudyTemplateModule : ICarterModule
     }
 
     private static async Task<IResult> GetAl(
-        [AsParameters] StudyTemplateServices services,
+        [FromServices] StudyTemplateServices services,
         CancellationToken cancellationToken = default)
     {
         var studyTemplates = await services.Queries.GetAllAsync(cancellationToken);
@@ -59,7 +60,7 @@ public class StudyTemplateModule : ICarterModule
 
     private static async Task<IResult> GetById(
         Guid id,
-        [AsParameters] StudyTemplateServices services,
+        [FromServices] StudyTemplateServices services,
         CancellationToken cancellationToken = default)
     {
         var dto = await services.Queries.GetByIdAsync(id, cancellationToken);
@@ -68,7 +69,7 @@ public class StudyTemplateModule : ICarterModule
 
     private static async Task<IResult> Create(
         CreateStudyTemplateCommand createCommand,
-        [AsParameters] StudyTemplateServices services,
+        [FromServices] StudyTemplateServices services,
         CancellationToken cancellationToken = default)
     {
         var result = await services.Commands.CreateAsync(createCommand, cancellationToken);
@@ -86,7 +87,7 @@ public class StudyTemplateModule : ICarterModule
     private static async Task<IResult> Update(
         Guid id,
         UpdateStudyTemplateCommand updateCommand,
-        [AsParameters] StudyTemplateServices services,
+        [FromServices] StudyTemplateServices services,
         CancellationToken cancellationToken = default)
     {
         var result = await services.Commands.UpdateAsync(id, updateCommand, cancellationToken);
@@ -96,7 +97,7 @@ public class StudyTemplateModule : ICarterModule
     private static async Task<IResult> ChangeStatus(
         Guid id,
         string newStatus,
-        [AsParameters] StudyTemplateServices services,
+        [FromServices] StudyTemplateServices services,
         CancellationToken cancellationToken = default)
     {
         var result = await services.Commands.ChangeStatusAsync(id, newStatus, cancellationToken);
@@ -106,7 +107,7 @@ public class StudyTemplateModule : ICarterModule
     private static async Task<IResult> CreateRevision(
         Guid id,
         CreateStudyTemplateRevisionCommand command,
-        [AsParameters] StudyTemplateServices services,
+        [FromServices] StudyTemplateServices services,
         CancellationToken cancellationToken = default)
     {
         var result = await services.Commands.CreateRevisionAsync(id, command, cancellationToken);
@@ -122,7 +123,7 @@ public class StudyTemplateModule : ICarterModule
 
     private static async Task<IResult> Delete(
         Guid id,
-        [AsParameters] StudyTemplateServices services,
+        [FromServices] StudyTemplateServices services,
         CancellationToken cancellationToken = default)
     {
         var result = await services.Commands.DeleteAsync(id, cancellationToken);

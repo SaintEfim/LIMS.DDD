@@ -1,6 +1,7 @@
 ﻿using Carter;
 using LIMS.DDD.Service.Application.StudyTemplates.InputParameters;
 using LIMS.DDD.Service.Application.StudyTemplates.InputParameters.Commands;
+using Microsoft.AspNetCore.Mvc;
 
 namespace LIMS.DDD.Service.API.Apis.InputParameters;
 
@@ -39,7 +40,7 @@ public class InputParameterModule : ICarterModule
 
     private static async Task<IResult> GetAll(
         Guid studyTemplateId,
-        [AsParameters] InputParameterServices services,
+        [FromServices] InputParameterServices services,
         CancellationToken cancellationToken = default)
     {
         var parameters = await services.Queries.GetAllByTemplateIdAsync(studyTemplateId, cancellationToken);
@@ -49,7 +50,7 @@ public class InputParameterModule : ICarterModule
     private static async Task<IResult> GetById(
         Guid studyTemplateId,
         Guid parameterId,
-        [AsParameters] InputParameterServices services,
+        [FromServices] InputParameterServices services,
         CancellationToken cancellationToken = default)
     {
         var parameter = await services.Queries.GetByIdAsync(studyTemplateId, parameterId, cancellationToken);
@@ -59,7 +60,7 @@ public class InputParameterModule : ICarterModule
     private static async Task<IResult> Create(
         Guid studyTemplateId,
         CreateInputParameterCommand command,
-        [AsParameters] InputParameterServices services,
+        [FromServices] InputParameterServices services,
         CancellationToken cancellationToken = default)
     {
         var result = await services.Commands.CreateAsync(studyTemplateId, command, cancellationToken);
@@ -77,7 +78,7 @@ public class InputParameterModule : ICarterModule
     private static async Task<IResult> Delete(
         Guid studyTemplateId,
         Guid parameterId,
-        [AsParameters] InputParameterServices services,
+        [FromServices] InputParameterServices services,
         CancellationToken cancellationToken = default)
     {
         var result = await services.Commands.RemoveAsync(studyTemplateId, parameterId, cancellationToken);
@@ -89,7 +90,7 @@ public class InputParameterModule : ICarterModule
         Guid studyTemplateId,
         Guid parameterId,
         UpdateInputParameterCommand command,
-        [AsParameters] InputParameterServices services,
+        [FromServices] InputParameterServices services,
         CancellationToken cancellationToken = default)
     {
         var result = await services.Commands.UpdateAsync(studyTemplateId, parameterId, command, cancellationToken);

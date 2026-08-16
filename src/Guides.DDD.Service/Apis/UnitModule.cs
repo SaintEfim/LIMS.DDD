@@ -3,6 +3,7 @@ using Guides.DDD.Service.Commands;
 using Guides.DDD.Service.Domains;
 using Guides.DDD.Service.Persistence;
 using Guides.Messages;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RabbitMq.Library.QuickStart.Abstractions;
 
@@ -17,7 +18,7 @@ public class UnitModule : ICarterModule
             .WithTags("Units");
 
         group.MapGet("/", async (
-            ApplicationDbContext db,
+            [FromServices] ApplicationDbContext db,
             CancellationToken cancellationToken = default) =>
         {
             var units = await db.Units
@@ -29,7 +30,7 @@ public class UnitModule : ICarterModule
 
         group.MapGet("/{id:guid}", async (
             Guid id,
-            ApplicationDbContext db,
+            [FromServices] ApplicationDbContext db,
             CancellationToken cancellationToken = default) =>
         {
             var unit = await db.Units
@@ -41,8 +42,8 @@ public class UnitModule : ICarterModule
 
         group.MapPost("/", async (
             CreateUnitCommand unitCommand,
-            IMessageBus busService,
-            ApplicationDbContext db,
+            [FromServices] IMessageBus busService,
+            [FromServices] ApplicationDbContext db,
             CancellationToken cancellationToken = default) =>
         {
             var unit = new Unit { Name = unitCommand.Name };
@@ -51,7 +52,7 @@ public class UnitModule : ICarterModule
 
             await db.SaveChangesAsync(cancellationToken);
 
-            await busService.SendAsync(new UnitCreatedMessage(unit.Name), cancellationToken);
+            await busService.SendAsync(new UnitCreatedMessage(unit.Id, unit.Name), cancellationToken);
 
             return Results.Created($"/api/units/{unit.Id}", unit);
         });
@@ -59,7 +60,7 @@ public class UnitModule : ICarterModule
         group.MapPut("/{id:guid}", async (
             Guid id,
             Unit updatedUnit,
-            ApplicationDbContext db,
+            [FromServices] ApplicationDbContext db,
             CancellationToken cancellationToken = default) =>
         {
             if (id != updatedUnit.Id)
@@ -81,7 +82,7 @@ public class UnitModule : ICarterModule
 
         group.MapDelete("/{id:guid}", async (
             Guid id,
-            ApplicationDbContext db,
+            [FromServices] ApplicationDbContext db,
             CancellationToken cancellationToken = default) =>
         {
             var unit = await db.Units.FindAsync([id], cancellationToken);

@@ -8,7 +8,6 @@ using LIMS.DDD.Service.Domain.SeedWork;
 using LIMS.DDD.Service.Domain.SeedWork.Result;
 using LIMS.DDD.Service.Domain.SeedWork.ValueObjects;
 using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate;
-using StudyTemplateId = LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.StudyTemplateId;
 
 namespace LIMS.DDD.Service.Application.Studies.Core;
 
@@ -26,44 +25,46 @@ public sealed class StudyCommandsHandler(
         CreateStudyCommand command,
         CancellationToken cancellationToken = default)
     {
-        var sample = await sampleRepository.GetByIdAsync(sampleId, cancellationToken);
-        if (sample is null)
-        {
-            return Result<Study, Exception>.Failure(
-                new KeyNotFoundException($"Sample with id {sampleId.Value} not found."));
-        }
+        // var sample = await sampleRepository.GetByIdAsync(sampleId, cancellationToken);
+        // if (sample is null)
+        // {
+        //     return Result<Study, Exception>.Failure(
+        //         new KeyNotFoundException($"Sample with id {sampleId.Value} not found."));
+        // }
+        //
+        // var order = await orderRepository.GetByIdAsync(sample.OrderId, cancellationToken);
+        // if (order is null)
+        // {
+        //     return Result<Study, Exception>.Failure(
+        //         new KeyNotFoundException($"Order with id {sample.OrderId} not found."));
+        // }
+        //
+        // var template =
+        //     await templateRepository.GetByIdAsync(new StudyTemplateId(command.TemplateId), cancellationToken);
+        // if (template is null)
+        // {
+        //     return Result<Study, Exception>.Failure(
+        //         new KeyNotFoundException($"StudyTemplate with id {command.TemplateId} not found."));
+        // }
+        //
+        // var snapshot = new StudyTemplateCreateSnapshot(new TemplateId(template.Id.Value), template.Name,
+        //     template.CanCreateStudy, template.InputParameters
+        //         .Select(p =>
+        //             new ParameterSnapshot(new ParameterTemplateId(p.Id.Value), p.Name, p.AliasName, p.Specification))
+        //         .ToList(), template.ResultDefinitions
+        //         .Select(r => new ResultSnapshot(new ResultTemplateId(r.Id.Value), r.ResultInstance, r.Unit.Name.Value,
+        //             r.Specification))
+        //         .ToList());
+        //
+        // var createResult = domainService.CreateStudyByTemplate(sample, order, snapshot);
+        // if (createResult.IsFailure)
+        // {
+        //     return createResult;
+        // }
+        //
+        // return await SaveNewAsync(createResult.GetValue(), cancellationToken);
 
-        var order = await orderRepository.GetByIdAsync(sample.OrderId, cancellationToken);
-        if (order is null)
-        {
-            return Result<Study, Exception>.Failure(
-                new KeyNotFoundException($"Order with id {sample.OrderId} not found."));
-        }
-
-        var template =
-            await templateRepository.GetByIdAsync(new StudyTemplateId(command.TemplateId), cancellationToken);
-        if (template is null)
-        {
-            return Result<Study, Exception>.Failure(
-                new KeyNotFoundException($"StudyTemplate with id {command.TemplateId} not found."));
-        }
-
-        var snapshot = new StudyTemplateCreateSnapshot(new TemplateId(template.Id.Value), template.Name,
-            template.CanCreateStudy, template.InputParameters
-                .Select(p =>
-                    new ParameterSnapshot(new ParameterTemplateId(p.Id.Value), p.Name, p.AliasName, p.Specification))
-                .ToList(), template.ResultDefinitions
-                .Select(r =>
-                    new ResultSnapshot(new ResultTemplateId(r.Id.Value), r.ResultInstance, r.Unit, r.Specification))
-                .ToList());
-
-        var createResult = domainService.CreateStudyByTemplate(sample, order, snapshot);
-        if (createResult.IsFailure)
-        {
-            return createResult;
-        }
-
-        return await SaveNewAsync(createResult.GetValue(), cancellationToken);
+        return null!;
     }
 
     public async Task<Result<None, Exception>> UpdateNotesAsync(

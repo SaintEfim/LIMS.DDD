@@ -1,6 +1,7 @@
 ﻿using Carter;
 using LIMS.DDD.Service.Application.StudyTemplates.CalculationRules.Commands;
 using LIMS.DDD.Service.Application.StudyTemplates.CalculationRules.Queries;
+using Microsoft.AspNetCore.Mvc;
 
 namespace LIMS.DDD.Service.API.Apis.CalculationRules;
 
@@ -54,7 +55,7 @@ public class CalculationRuleModule : ICarterModule
 
     private static async Task<IResult> GetAll(
         Guid studyTemplateId,
-        [AsParameters] CalculationRuleServices services,
+        [FromServices] CalculationRuleServices services,
         CancellationToken cancellationToken = default)
     {
         var results = await services.Queries.GetAllByTemplateIdAsync(studyTemplateId, cancellationToken);
@@ -64,7 +65,7 @@ public class CalculationRuleModule : ICarterModule
     private static async Task<IResult> GetById(
         Guid studyTemplateId,
         Guid ruleId,
-        [AsParameters] CalculationRuleServices services,
+        [FromServices] CalculationRuleServices services,
         CancellationToken cancellationToken = default)
     {
         var result = await services.Queries.GetByIdAsync(studyTemplateId, ruleId, cancellationToken);
@@ -74,7 +75,7 @@ public class CalculationRuleModule : ICarterModule
     private static async Task<IResult> Create(
         Guid studyTemplateId,
         CreateCalculationRuleCommand command,
-        [AsParameters] CalculationRuleServices services,
+        [FromServices] CalculationRuleServices services,
         CancellationToken cancellationToken = default)
     {
         var result = await services.Commands.CreateAsync(studyTemplateId, command, cancellationToken);
@@ -92,7 +93,7 @@ public class CalculationRuleModule : ICarterModule
     private static async Task<IResult> Delete(
         Guid studyTemplateId,
         Guid ruleId,
-        [AsParameters] CalculationRuleServices services,
+        [FromServices] CalculationRuleServices services,
         CancellationToken cancellationToken = default)
     {
         var result = await services.Commands.RemoveAsync(studyTemplateId, ruleId, cancellationToken);
@@ -103,7 +104,7 @@ public class CalculationRuleModule : ICarterModule
         Guid studyTemplateId,
         Guid ruleId,
         AddCalculationInputCommand command,
-        [AsParameters] CalculationRuleServices services,
+        [FromServices] CalculationRuleServices services,
         CancellationToken cancellationToken = default)
     {
         var result = await services.Commands.CreateInputAsync(studyTemplateId, ruleId, command, cancellationToken);
@@ -114,7 +115,7 @@ public class CalculationRuleModule : ICarterModule
         Guid studyTemplateId,
         Guid ruleId,
         string variableAlias,
-        [AsParameters] CalculationRuleServices services,
+        [FromServices] CalculationRuleServices services,
         CancellationToken cancellationToken = default)
     {
         var command = new RemoveCalculationInputCommand(variableAlias);
@@ -126,7 +127,7 @@ public class CalculationRuleModule : ICarterModule
         Guid studyTemplateId,
         Guid ruleId,
         UpdateCalculationRuleCommand command,
-        [AsParameters] CalculationRuleServices services,
+        [FromServices] CalculationRuleServices services,
         CancellationToken cancellationToken = default)
     {
         var result = await services.Commands.UpdateAsync(studyTemplateId, ruleId, command, cancellationToken);
