@@ -1,4 +1,5 @@
 ﻿using LIMS.DDD.Service.Domain.SeedWork;
+using LIMS.DDD.Service.Domain.SeedWork.Snapshots;
 using LIMS.DDD.Service.Domain.SeedWork.ValueObjects;
 
 namespace LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.Entities.ResultDefinitions;
@@ -15,14 +16,14 @@ public sealed class ResultDefinition : SoftDeletableModel
 
     public StudyTemplateId StudyTemplateId { get; private set; }
 
-    public string Unit { get; private set; } = string.Empty;
+    public UnitId UnitId { get; private set; }
 
     public Specification Specification { get; private set; } = null!;
 
     internal static ResultDefinition Create(
         StudyTemplateId studyTemplateId,
         string resultInstance,
-        string unit,
+        UnitId unitId,
         Specification specification)
     {
         var result = new ResultDefinition
@@ -30,7 +31,7 @@ public sealed class ResultDefinition : SoftDeletableModel
             Id = new ResultDefinitionId(Guid.NewGuid()),
             StudyTemplateId = studyTemplateId,
             ResultInstance = resultInstance,
-            Unit = unit,
+            UnitId = unitId,
             Specification = specification
         };
 
@@ -39,7 +40,7 @@ public sealed class ResultDefinition : SoftDeletableModel
 
     internal void Update(
         string? resultInstance,
-        string? unit,
+        UnitId? unitId,
         Specification? specification)
     {
         if (resultInstance is not null)
@@ -47,9 +48,9 @@ public sealed class ResultDefinition : SoftDeletableModel
             ResultInstance = resultInstance;
         }
 
-        if (unit is not null)
+        if (unitId is not null)
         {
-            Unit = unit;
+            UnitId = unitId.Value;
         }
 
         if (specification is not null)

@@ -2,6 +2,6 @@
 
 public sealed record CreateResultDefinitionCommand(
     string ResultInstance,
-    string Unit,
+    Guid UnitId,
     double? MinValue,
     double? MaxValue);

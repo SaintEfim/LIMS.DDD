@@ -1,6 +1,7 @@
 ﻿using Carter;
 using LIMS.DDD.Service.Application.Orders;
 using LIMS.DDD.Service.Application.Orders.Commands;
+using Microsoft.AspNetCore.Mvc;
 
 namespace LIMS.DDD.Service.API.Apis.Orders;
 
@@ -41,7 +42,7 @@ public class OrderModule : ICarterModule
     }
 
     private static async Task<IResult> GetAll(
-        [AsParameters] OrderServices services,
+        [FromServices] OrderServices services,
         CancellationToken cancellationToken = default)
     {
         var orders = await services.Queries.GetAllAsync(cancellationToken);
@@ -50,7 +51,7 @@ public class OrderModule : ICarterModule
 
     private static async Task<IResult> GetById(
         Guid id,
-        [AsParameters] OrderServices services,
+        [FromServices] OrderServices services,
         CancellationToken cancellationToken = default)
     {
         var dto = await services.Queries.GetByIdAsync(id, cancellationToken);
@@ -59,7 +60,7 @@ public class OrderModule : ICarterModule
 
     private static async Task<IResult> Create(
         CreateOrderCommand command,
-        [AsParameters] OrderServices services,
+        [FromServices] OrderServices services,
         CancellationToken cancellationToken = default)
     {
         var result = await services.Commands.CreateAsync(command, cancellationToken);
@@ -77,7 +78,7 @@ public class OrderModule : ICarterModule
     private static async Task<IResult> Update(
         Guid id,
         UpdateOrderCommand command,
-        [AsParameters] OrderServices services,
+        [FromServices] OrderServices services,
         CancellationToken cancellationToken = default)
     {
         var result = await services.Commands.UpdateAsync(id, command, cancellationToken);
@@ -87,7 +88,7 @@ public class OrderModule : ICarterModule
     private static async Task<IResult> ChangeStatus(
         Guid id,
         ChangeOrderStatusCommand command,
-        [AsParameters] OrderServices services,
+        [FromServices] OrderServices services,
         CancellationToken cancellationToken = default)
     {
         var result = await services.Commands.ChangeStatusAsync(id, command, cancellationToken);
@@ -96,7 +97,7 @@ public class OrderModule : ICarterModule
 
     private static async Task<IResult> Delete(
         Guid id,
-        [AsParameters] OrderServices services,
+        [FromServices] OrderServices services,
         CancellationToken cancellationToken = default)
     {
         var result = await services.Commands.DeleteAsync(id, cancellationToken);

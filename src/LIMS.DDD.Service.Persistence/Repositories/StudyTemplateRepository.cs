@@ -1,23 +1,16 @@
 ﻿using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate;
+using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.Entities.ResultDefinitions;
 using Microsoft.EntityFrameworkCore;
 
 namespace LIMS.DDD.Service.Persistence.Repositories;
 
-public class StudyTemplateRepository : IStudyTemplateRepository
+public class StudyTemplateRepository(ApplicationDbContext context) : IStudyTemplateRepository
 {
-    private readonly ApplicationDbContext _context;
-
-    public StudyTemplateRepository(
-        ApplicationDbContext context)
-    {
-        _context = context;
-    }
-
     public async Task<StudyTemplate?> GetByIdAsync(
         StudyTemplateId id,
         CancellationToken cancellationToken = default)
     {
-        var studyTemplateQuery = _context.StudyTemplates.AsNoTracking();
+        var studyTemplateQuery = context.StudyTemplates.AsNoTracking();
 
         var studyTemplate = await StudyTemplateBaseQuery(studyTemplateQuery)
             .SingleOrDefaultAsync(t => t.Id == id, cancellationToken);
@@ -25,11 +18,34 @@ public class StudyTemplateRepository : IStudyTemplateRepository
         return studyTemplate;
     }
 
+    public async Task<ResultDefinition?> GetResultDefinitionAsync(
+        StudyTemplateId studyTemplateId,
+        ResultDefinitionId resultDefinitionId,
+        CancellationToken cancellationToken = default)
+    {
+        return await context.StudyTemplates
+            .AsNoTracking()
+            .Where(t => t.Id == studyTemplateId)
+            .SelectMany(t => t.ResultDefinitions)
+            .SingleOrDefaultAsync(r => r.Id == resultDefinitionId, cancellationToken);
+    }
+
+    public async Task<IReadOnlyList<ResultDefinition>> GetResultDefinitionsAsync(
+        StudyTemplateId studyTemplateId,
+        CancellationToken cancellationToken = default)
+    {
+        return await context.StudyTemplates
+            .AsNoTracking()
+            .Where(t => t.Id == studyTemplateId)
+            .SelectMany(t => t.ResultDefinitions)
+            .ToListAsync(cancellationToken);
+    }
+
     public async Task<StudyTemplate?> GetByIdForChangeAsync(
         StudyTemplateId id,
         CancellationToken cancellationToken = default)
     {
-        var studyTemplateQuery = _context.StudyTemplates;
+        var studyTemplateQuery = context.StudyTemplates;
 
         var studyTemplate = await StudyTemplateBaseQuery(studyTemplateQuery)
             .SingleOrDefaultAsync(t => t.Id == id, cancellationToken);
@@ -40,7 +56,7 @@ public class StudyTemplateRepository : IStudyTemplateRepository
     public async Task<ICollection<StudyTemplate>> GetAllAsync(
         CancellationToken cancellationToken = default)
     {
-        var studyTemplateQuery = _context.StudyTemplates.AsNoTracking();
+        var studyTemplateQuery = context.StudyTemplates.AsNoTracking();
 
         var studyTemplates = await StudyTemplateBaseQuery(studyTemplateQuery)
             .ToListAsync(cancellationToken);
@@ -51,7 +67,7 @@ public class StudyTemplateRepository : IStudyTemplateRepository
     public void Add(
         StudyTemplate studyTemplate)
     {
-        _context.StudyTemplates.Add(studyTemplate);
+        context.StudyTemplates.Add(studyTemplate);
     }
 
     private static IQueryable<StudyTemplate> StudyTemplateBaseQuery(

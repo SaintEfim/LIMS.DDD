@@ -2,6 +2,7 @@
 using LIMS.DDD.Service.Application.Studies.Core;
 using LIMS.DDD.Service.Application.Studies.Core.Commands;
 using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.SampleAggregate;
+using Microsoft.AspNetCore.Mvc;
 
 namespace LIMS.DDD.Service.API.Apis.Studies;
 
@@ -49,7 +50,7 @@ public class StudyModule : ICarterModule
 
     private static async Task<IResult> GetAll(
         Guid sampleId,
-        [AsParameters] StudyServices services,
+        [FromServices] StudyServices services,
         CancellationToken cancellationToken = default)
     {
         var studies = await services.Queries.GetAllBySampleIdAsync(sampleId, cancellationToken);
@@ -59,7 +60,7 @@ public class StudyModule : ICarterModule
     private static async Task<IResult> GetById(
         Guid sampleId,
         Guid studyId,
-        [AsParameters] StudyServices services,
+        [FromServices] StudyServices services,
         CancellationToken cancellationToken = default)
     {
         var dto = await services.Queries.GetByIdAsync(studyId, cancellationToken);
@@ -69,7 +70,7 @@ public class StudyModule : ICarterModule
     private static async Task<IResult> Create(
         Guid sampleId,
         CreateStudyCommand command,
-        [AsParameters] StudyServices services,
+        [FromServices] StudyServices services,
         CancellationToken cancellationToken = default)
     {
         var result = await services.Commands.CreateAsync(new SampleId(sampleId), command, cancellationToken);
@@ -88,7 +89,7 @@ public class StudyModule : ICarterModule
         Guid sampleId,
         Guid studyId,
         UpdateStudyNotesCommand command,
-        [AsParameters] StudyServices services,
+        [FromServices] StudyServices services,
         CancellationToken cancellationToken = default)
     {
         var result = await services.Commands.UpdateNotesAsync(studyId, command, cancellationToken);
@@ -99,7 +100,7 @@ public class StudyModule : ICarterModule
         Guid sampleId,
         Guid studyId,
         ReassignStudySampleCommand command,
-        [AsParameters] StudyServices services,
+        [FromServices] StudyServices services,
         CancellationToken cancellationToken = default)
     {
         var result = await services.Commands.ReassignSampleAsync(studyId, command, cancellationToken);
@@ -110,7 +111,7 @@ public class StudyModule : ICarterModule
         Guid sampleId,
         Guid studyId,
         ChangeStudyStatusCommand command,
-        [AsParameters] StudyServices services,
+        [FromServices] StudyServices services,
         CancellationToken cancellationToken = default)
     {
         var result = await services.Commands.ChangeStatusAsync(studyId, command, cancellationToken);
@@ -120,7 +121,7 @@ public class StudyModule : ICarterModule
     private static async Task<IResult> Delete(
         Guid sampleId,
         Guid studyId,
-        [AsParameters] StudyServices services,
+        [FromServices] StudyServices services,
         CancellationToken cancellationToken = default)
     {
         var result = await services.Commands.DeleteAsync(studyId, cancellationToken);

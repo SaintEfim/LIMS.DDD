@@ -1,5 +1,6 @@
 ﻿using LIMS.DDD.Service.Domain.SeedWork;
 using LIMS.DDD.Service.Domain.SeedWork.Result;
+using LIMS.DDD.Service.Domain.SeedWork.Snapshots;
 using LIMS.DDD.Service.Domain.SeedWork.ValueObjects;
 using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.Entities.CalculationRules;
 using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.Entities.CalculationRules.ValueObjects;
@@ -260,7 +261,7 @@ public sealed class StudyTemplate
 
     public Result<ResultDefinition, Exception> AddResultDefinition(
         string resultInstance,
-        string unit,
+        UnitId unitId,
         Specification valueRange)
     {
         if (!Status.CanEdit)
@@ -269,14 +270,14 @@ public sealed class StudyTemplate
                 new InvalidOperationException("Cannot add determination to an Active template."));
         }
 
-        var existsResult = _resultDefinitions.Any(x => x.ResultInstance == resultInstance && x.Unit == unit);
+        var existsResult = _resultDefinitions.Any(x => x.ResultInstance == resultInstance && x.UnitId == unitId);
         if (existsResult)
         {
             return Result<ResultDefinition, Exception>.Failure(
                 new InvalidOperationException("Determination result instance already exists."));
         }
 
-        var result = ResultDefinition.Create(Id, resultInstance, unit, valueRange);
+        var result = ResultDefinition.Create(Id, resultInstance, unitId, valueRange);
         _resultDefinitions.Add(result);
 
         return Result<ResultDefinition, Exception>.Success(result);
@@ -356,7 +357,7 @@ public sealed class StudyTemplate
     public Result<None, Exception> UpdateResultDefinition(
         ResultDefinitionId resultDefinitionId,
         string? resultInstance,
-        string? unit,
+        UnitId? unitId,
         double? minValue,
         double? maxValue)
     {
@@ -383,7 +384,7 @@ public sealed class StudyTemplate
 
         var specification = specificationResult.GetValue();
 
-        resultDef.Update(resultInstance, unit, specification);
+        resultDef.Update(resultInstance, unitId, specification);
         return Result<None, Exception>.Success();
     }
 

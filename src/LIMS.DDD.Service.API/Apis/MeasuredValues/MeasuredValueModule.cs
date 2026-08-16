@@ -1,5 +1,6 @@
 ﻿using Carter;
 using LIMS.DDD.Service.Application.Studies.MeasuredValues;
+using Microsoft.AspNetCore.Mvc;
 
 namespace LIMS.DDD.Service.API.Apis.MeasuredValues;
 
@@ -26,7 +27,7 @@ public class MeasuredValueModule : ICarterModule
 
     private static async Task<IResult> GetAll(
         Guid studyId,
-        [AsParameters] MeasuredValueServices services,
+        [FromServices] MeasuredValueServices services,
         CancellationToken cancellationToken = default)
     {
         var values = await services.Queries.GetAllByStudyIdAsync(studyId, cancellationToken);
@@ -36,7 +37,7 @@ public class MeasuredValueModule : ICarterModule
     private static async Task<IResult> GetById(
         Guid studyId,
         Guid measuredValueId,
-        [AsParameters] MeasuredValueServices services,
+        [FromServices] MeasuredValueServices services,
         CancellationToken cancellationToken = default)
     {
         var dto = await services.Queries.GetByIdAsync(studyId, measuredValueId, cancellationToken);
@@ -47,7 +48,7 @@ public class MeasuredValueModule : ICarterModule
         Guid studyId,
         Guid measuredValueId,
         UpdateMeasuredValueCommand command,
-        [AsParameters] MeasuredValueServices services,
+        [FromServices] MeasuredValueServices services,
         CancellationToken cancellationToken = default)
     {
         var result = await services.Commands.UpdateAsync(studyId, measuredValueId, command, cancellationToken);

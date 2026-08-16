@@ -1,5 +1,6 @@
 ﻿using Carter;
 using LIMS.DDD.Service.Application.Studies.TestResults;
+using Microsoft.AspNetCore.Mvc;
 
 namespace LIMS.DDD.Service.API.Apis.TestResults;
 
@@ -32,7 +33,7 @@ public class TestResultModule : ICarterModule
     private static async Task<IResult> Execute(
         Guid studyId,
         Guid testResultId,
-        [AsParameters] TestResultServices services,
+        [FromServices] TestResultServices services,
         CancellationToken cancellationToken = default)
     {
         var result = await services.Commands.ExecuteTest(studyId, testResultId, cancellationToken);
@@ -43,7 +44,7 @@ public class TestResultModule : ICarterModule
         Guid studyId,
         Guid testResultId,
         UpdateTestResultCommand command,
-        [AsParameters] TestResultServices services,
+        [FromServices] TestResultServices services,
         CancellationToken cancellationToken = default)
     {
         var result = await services.Commands.UpdateAsync(studyId, testResultId, command, cancellationToken);
@@ -52,7 +53,7 @@ public class TestResultModule : ICarterModule
 
     private static async Task<IResult> GetAll(
         Guid studyId,
-        [AsParameters] TestResultServices services,
+        [FromServices] TestResultServices services,
         CancellationToken cancellationToken = default)
     {
         var results = await services.Queries.GetAllByStudyIdAsync(studyId, cancellationToken);
@@ -62,7 +63,7 @@ public class TestResultModule : ICarterModule
     private static async Task<IResult> GetById(
         Guid studyId,
         Guid testResultId,
-        [AsParameters] TestResultServices services,
+        [FromServices] TestResultServices services,
         CancellationToken cancellationToken = default)
     {
         var dto = await services.Queries.GetByIdAsync(studyId, testResultId, cancellationToken);

@@ -2,6 +2,6 @@
 
 public sealed record UpdateResultDefinitionCommand(
     string? ResultInstance,
-    string? Unit,
+    Guid? UnitId,
     double? MinValue,
     double? MaxValue);

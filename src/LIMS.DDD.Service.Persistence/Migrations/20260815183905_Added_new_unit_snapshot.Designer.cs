@@ -3,6 +3,7 @@ using System;
 using LIMS.DDD.Service.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace LIMS.DDD.Service.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260815183905_Added_new_unit_snapshot")]
+    partial class Added_new_unit_snapshot
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -207,7 +210,7 @@ namespace LIMS.DDD.Service.Persistence.Migrations
                     b.ToTable("Studies", (string)null);
                 });
 
-            modelBuilder.Entity("LIMS.DDD.Service.Domain.SeedWork.Snapshots.UnitSnapshot", b =>
+            modelBuilder.Entity("LIMS.DDD.Service.Domain.References.UnitSnapshot", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
@@ -331,14 +334,14 @@ namespace LIMS.DDD.Service.Persistence.Migrations
                     b.Property<Guid>("StudyTemplateId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("UnitId")
-                        .HasColumnType("uuid");
+                    b.Property<string>("Unit")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UnitId");
-
-                    b.HasIndex("StudyTemplateId", "ResultInstance", "UnitId")
+                    b.HasIndex("StudyTemplateId", "ResultInstance", "Unit")
                         .IsUnique()
                         .HasFilter("\"IsDeleted\" = false");
 
@@ -662,12 +665,6 @@ namespace LIMS.DDD.Service.Persistence.Migrations
                         .WithMany("ResultDefinitions")
                         .HasForeignKey("StudyTemplateId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("LIMS.DDD.Service.Domain.SeedWork.Snapshots.UnitSnapshot", null)
-                        .WithMany()
-                        .HasForeignKey("UnitId")
-                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.OwnsOne("LIMS.DDD.Service.Domain.SeedWork.ValueObjects.Specification", "Specification", b1 =>

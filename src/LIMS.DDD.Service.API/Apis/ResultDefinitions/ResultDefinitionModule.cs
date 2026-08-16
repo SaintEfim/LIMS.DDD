@@ -1,6 +1,7 @@
 ﻿using Carter;
 using LIMS.DDD.Service.Application.StudyTemplates.ResultDefinitions;
 using LIMS.DDD.Service.Application.StudyTemplates.ResultDefinitions.Commands;
+using Microsoft.AspNetCore.Mvc;
 
 namespace LIMS.DDD.Service.API.Apis.ResultDefinitions;
 
@@ -39,7 +40,7 @@ public class ResultDefinitionModule : ICarterModule
 
     private static async Task<IResult> GetAll(
         Guid studyTemplateId,
-        [AsParameters] ResultDefinitionServices services,
+        [FromServices] ResultDefinitionServices services,
         CancellationToken cancellationToken = default)
     {
         var results = await services.Queries.GetAllByTemplateIdAsync(studyTemplateId, cancellationToken);
@@ -49,7 +50,7 @@ public class ResultDefinitionModule : ICarterModule
     private static async Task<IResult> GetById(
         Guid studyTemplateId,
         Guid resultId,
-        [AsParameters] ResultDefinitionServices services,
+        [FromServices] ResultDefinitionServices services,
         CancellationToken cancellationToken = default)
     {
         var result = await services.Queries.GetByIdAsync(studyTemplateId, resultId, cancellationToken);
@@ -59,7 +60,7 @@ public class ResultDefinitionModule : ICarterModule
     private static async Task<IResult> Create(
         Guid studyTemplateId,
         CreateResultDefinitionCommand command,
-        [AsParameters] ResultDefinitionServices services,
+        [FromServices] ResultDefinitionServices services,
         CancellationToken cancellationToken = default)
     {
         var result = await services.Commands.CreateAsync(studyTemplateId, command, cancellationToken);
@@ -76,7 +77,7 @@ public class ResultDefinitionModule : ICarterModule
     private static async Task<IResult> Delete(
         Guid studyTemplateId,
         Guid resultId,
-        [AsParameters] ResultDefinitionServices services,
+        [FromServices] ResultDefinitionServices services,
         CancellationToken cancellationToken = default)
     {
         var result = await services.Commands.RemoveAsync(studyTemplateId, resultId, cancellationToken);
@@ -88,7 +89,7 @@ public class ResultDefinitionModule : ICarterModule
         Guid studyTemplateId,
         Guid determinationId,
         UpdateResultDefinitionCommand command,
-        [AsParameters] ResultDefinitionServices services,
+        [FromServices] ResultDefinitionServices services,
         CancellationToken cancellationToken = default)
     {
         var result = await services.Commands.UpdateAsync(studyTemplateId, determinationId, command, cancellationToken);

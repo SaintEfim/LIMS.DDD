@@ -2,6 +2,7 @@
 using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.SampleAggregate;
 using LIMS.DDD.Service.Domain.LaboratoryOperationsContext.StudyAggregate;
 using LIMS.DDD.Service.Domain.SeedWork;
+using LIMS.DDD.Service.Domain.SeedWork.Snapshots;
 using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,6 +16,8 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<Order> Orders { get; set; }
     public DbSet<Sample> Samples { get; set; }
     public DbSet<Study> Studies { get; set; }
+
+    public DbSet<UnitSnapshot> UnitSnapshots { get; set; }
 
     protected override void OnModelCreating(
         ModelBuilder modelBuilder)

@@ -8,7 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="Carter" Version="10.0.0"/>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.10">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.11">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
@@ -18,7 +18,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\LIMS.DDD.Service.Application\LIMS.DDD.Service.Application.csproj"/>
-    <ProjectReference Include="..\LIMS.DDD.Service.Persistence\LIMS.DDD.Service.Persistence.csproj"/>
+    <ProjectReference Include="..\LIMS.DDD.Service.Infrastructure\LIMS.DDD.Service.Infrastructure.csproj" />
+    <ProjectReference Include="..\LIMS.DDD.Service.Persistence\LIMS.DDD.Service.Persistence.csproj" />
   </ItemGroup>
 
 </Project>

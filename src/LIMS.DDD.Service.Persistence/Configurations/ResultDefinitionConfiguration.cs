@@ -1,4 +1,5 @@
-﻿using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate;
+﻿using LIMS.DDD.Service.Domain.SeedWork.Snapshots;
+using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate;
 using LIMS.DDD.Service.Domain.StudyTemplateContext.StudyTemplateAggregate.Entities.ResultDefinitions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -24,9 +25,14 @@ public class ResultDefinitionConfiguration : IEntityTypeConfiguration<ResultDefi
             .HasMaxLength(100)
             .IsRequired();
 
-        builder.Property(x => x.Unit)
-            .HasMaxLength(50)
+        builder.Property(x => x.UnitId)
+            .HasConversion(id => id.Value, v => new UnitId(v))
             .IsRequired();
+
+        builder.HasOne<UnitSnapshot>()
+            .WithMany()
+            .HasForeignKey(x => x.UnitId)
+            .OnDelete(DeleteBehavior.Restrict);
 
         builder.OwnsOne(x => x.Specification, spec =>
         {
@@ -47,7 +53,7 @@ public class ResultDefinitionConfiguration : IEntityTypeConfiguration<ResultDefi
             {
                 x.StudyTemplateId,
                 x.ResultInstance,
-                x.Unit
+                x.UnitId
             })
             .IsUnique()
             .HasFilter("\"IsDeleted\" = false");
