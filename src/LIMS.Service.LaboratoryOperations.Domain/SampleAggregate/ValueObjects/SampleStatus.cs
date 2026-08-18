@@ -1,0 +1,46 @@
+﻿using LIMS.Service.LaboratoryOperations.Domain.SampleAggregate.States;
+using LIMS.Service.LaboratoryOperations.Domain.SeedWork;
+using LIMS.Service.LaboratoryOperations.Domain.SeedWork.ValueObjects;
+
+namespace LIMS.Service.LaboratoryOperations.Domain.SampleAggregate.ValueObjects;
+
+public sealed record SampleStatus : StatusBase<IState<Sample>, Sample>
+{
+    public static SampleStatus Registered { get; } = new(new SampleRegisteredState());
+
+    public static SampleStatus InProgress { get; } = new(new SampleInProgressState());
+
+    public static SampleStatus Completed { get; } = new(new SampleCompletedState());
+
+    public static SampleStatus Canceled { get; } = new(new SampleCanceledState());
+
+    private static readonly Dictionary<string, SampleStatus> Registry = new(StringComparer.OrdinalIgnoreCase)
+    {
+        ["Registered"] = Registered,
+        ["InProgress"] = InProgress,
+        ["Completed"] = Completed,
+        ["Canceled"] = Canceled
+    };
+
+    private SampleStatus(
+        IState<Sample> state)
+        : base(state)
+    {
+    }
+
+    public static bool TryParse(
+        string? name,
+        out SampleStatus? status)
+    {
+        status = null;
+        return name is not null && Registry.TryGetValue(name, out status);
+    }
+
+    public static SampleStatus ConvertStatus(
+        string? value)
+    {
+        return TryParse(value, out var status) && status is not null
+            ? status
+            : throw new InvalidOperationException($"Unknown status '{value}'");
+    }
+}

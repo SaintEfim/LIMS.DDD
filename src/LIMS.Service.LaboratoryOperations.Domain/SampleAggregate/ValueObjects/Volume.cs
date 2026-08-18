@@ -1,0 +1,36 @@
+using LIMS.Service.LaboratoryOperations.Domain.SeedWork.Result;
+
+namespace LIMS.Service.LaboratoryOperations.Domain.SampleAggregate.ValueObjects;
+
+public sealed record Volume
+{
+    private Volume(
+        double? value,
+        string? unit)
+    {
+        Value = value;
+        Unit = unit;
+    }
+
+    public double? Value { get; }
+
+    public string? Unit { get; }
+
+    public static Result<Volume, Exception> Create(
+        double? value,
+        string? unit)
+    {
+        if (value is < 0)
+        {
+            return Result<Volume, Exception>.Failure(new ArgumentException("Volume cannot be negative"));
+        }
+
+        if (value.HasValue && string.IsNullOrWhiteSpace(unit))
+        {
+            return Result<Volume, Exception>.Failure(
+                new ArgumentException("Unit is required when volume is specified"));
+        }
+
+        return Result<Volume, Exception>.Success(new Volume(value, unit));
+    }
+}

@@ -1,0 +1,20 @@
+﻿using LIMS.Service.LaboratoryOperations.Domain.SeedWork;
+
+namespace LIMS.Service.LaboratoryOperations.Domain.OrderAggregate;
+
+public interface IOrderRepository : IRepository<Order>
+{
+    Task<Order?> GetByIdAsync(
+        OrderId id,
+        CancellationToken cancellationToken = default);
+
+    Task<ICollection<Order>> GetAllAsync(
+        CancellationToken cancellationToken = default);
+
+    Task<Order?> GetByIdForChangeAsync(
+        OrderId id,
+        CancellationToken cancellationToken = default);
+
+    void Add(
+        Order order);
+}
