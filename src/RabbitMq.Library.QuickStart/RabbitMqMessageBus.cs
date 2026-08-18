@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;
 using RabbitMq.Library.QuickStart.Abstractions;
 using RabbitMq.Library.QuickStart.Connection;
+using RabbitMq.Library.QuickStart.IntegrationEvents;
 using RabbitMq.Library.QuickStart.Messages;
 
 namespace RabbitMq.Library.QuickStart;

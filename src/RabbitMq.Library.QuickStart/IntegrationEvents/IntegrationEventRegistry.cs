@@ -1,6 +1,6 @@
 ﻿using RabbitMq.Library.QuickStart.Messages;
 
-namespace RabbitMq.Library.QuickStart;
+namespace RabbitMq.Library.QuickStart.IntegrationEvents;
 
 public sealed class IntegrationEventRegistry
 {

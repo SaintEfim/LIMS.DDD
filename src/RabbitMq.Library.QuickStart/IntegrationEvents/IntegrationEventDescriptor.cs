@@ -1,3 +1,3 @@
-﻿namespace RabbitMq.Library.QuickStart;
+﻿namespace RabbitMq.Library.QuickStart.IntegrationEvents;
 
 public sealed record IntegrationEventDescriptor(Type EventType, string QueueName);

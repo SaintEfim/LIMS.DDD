@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
+using RabbitMq.Library.QuickStart.IntegrationEvents;
 using RabbitMq.Library.QuickStart.Messages;
 using RabbitMq.Library.QuickStart.Receive;
 

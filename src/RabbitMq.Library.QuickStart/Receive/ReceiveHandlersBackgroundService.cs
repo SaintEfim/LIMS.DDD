@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using RabbitMq.Library.QuickStart.IntegrationEvents;
 
 namespace RabbitMq.Library.QuickStart.Receive;
 

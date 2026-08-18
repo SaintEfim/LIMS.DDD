@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using RabbitMq.Library.QuickStart.Abstractions;
 using RabbitMq.Library.QuickStart.Connection;
+using RabbitMq.Library.QuickStart.IntegrationEvents;
 
 namespace RabbitMq.Library.QuickStart.DependencyInjection;
 
