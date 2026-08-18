@@ -10,13 +10,14 @@ builder.Services.AddCarter();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddRabbitMq(x =>
-{
-    x.HostName = "localhost";
-    x.Port = 5672;
-    x.UserName = "guest";
-    x.Password = "guest";
-}, typeof(UnitCreatedMessage).Assembly).Build();
+builder.Services.AddRabbitMq(options =>
+    {
+        options.HostName = "localhost";
+        options.Port = 5672;
+        options.UserName = "guest";
+        options.Password = "guest";
+    })
+    .AddMessage<UnitCreatedMessage>();
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("ServiceDB")));

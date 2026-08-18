@@ -2,15 +2,36 @@
 
 namespace RabbitMq.Library.QuickStart;
 
-public sealed class IntegrationEventRegistry(IReadOnlyDictionary<Type, IntegrationEventDescriptor> events)
+public sealed class IntegrationEventRegistry
 {
+    private readonly IReadOnlyDictionary<Type, IntegrationEventDescriptor> _events;
+    private readonly IReadOnlyDictionary<Type, IntegrationEventDescriptor> _consumedEvents;
+
+    public IntegrationEventRegistry(
+        IReadOnlyDictionary<Type, IntegrationEventDescriptor> events,
+        IReadOnlyDictionary<Type, IntegrationEventDescriptor> consumedEvents)
+    {
+        _events = events;
+        _consumedEvents = consumedEvents;
+    }
+
     public IntegrationEventDescriptor Get<T>()
         where T : IIntegrationEvent
     {
         var eventType = typeof(T);
-
-        return events.TryGetValue(eventType, out var descriptor)
+        return _events.TryGetValue(eventType, out var descriptor)
             ? descriptor
             : throw new InvalidOperationException($"Integration event '{eventType.FullName}' is not registered.");
     }
+
+    public IntegrationEventDescriptor Get(Type eventType)
+    {
+        return _events.TryGetValue(eventType, out var descriptor)
+            ? descriptor
+            : throw new InvalidOperationException($"Integration event '{eventType.FullName}' is not registered.");
+    }
+
+    public IReadOnlyDictionary<Type, IntegrationEventDescriptor> All => _events;
+
+    public IReadOnlyDictionary<Type, IntegrationEventDescriptor> Consumed => _consumedEvents;
 }

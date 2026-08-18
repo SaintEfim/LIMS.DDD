@@ -1,8 +1,6 @@
-﻿using System.Reflection;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using RabbitMq.Library.QuickStart.Abstractions;
 using RabbitMq.Library.QuickStart.Connection;
-using RabbitMq.Library.QuickStart.Messages;
 
 namespace RabbitMq.Library.QuickStart.DependencyInjection;
 
@@ -10,16 +8,18 @@ public static class DependencyInjection
 {
     public static RabbitMqBuilder AddRabbitMq(
         this IServiceCollection services,
-        Action<RabbitMqOptions> options,
-        params Assembly[] assemblies)
+        Action<RabbitMqOptions> options)
     {
-        var events = DiscoverIntegrationEvents(assemblies);
-        services.AddSingleton(events);
-        services.AddSingleton<IntegrationEventRegistry>();
+        var events = new Dictionary<Type, IntegrationEventDescriptor>();
+        var consumedEvents = new Dictionary<Type, IntegrationEventDescriptor>();
 
         var rabbitOptions = new RabbitMqOptions();
         options(rabbitOptions);
+
         services.AddSingleton(rabbitOptions);
+
+        services.AddSingleton<IntegrationEventRegistry>(sp =>
+            new IntegrationEventRegistry(events, consumedEvents));
 
         services.AddSingleton<RabbitMqConnectionProvider>();
         services.AddSingleton<RabbitMqChannelFactory>();
@@ -27,28 +27,49 @@ public static class DependencyInjection
         services.AddHostedService<RabbitMqConnectionMonitor>();
         services.AddScoped<IMessageBus, RabbitMqMessageBus>();
 
-        return new RabbitMqBuilder(services);
+        return new RabbitMqBuilder(services, events, consumedEvents);
     }
 
-    private static IReadOnlyDictionary<Type, IntegrationEventDescriptor> DiscoverIntegrationEvents(
-        Assembly[] assemblyMarkers)
+    public sealed class RegisteredEventsDictionary(
+        Dictionary<Type, IntegrationEventDescriptor> dictionary)
+        : IReadOnlyDictionary<Type, IntegrationEventDescriptor>
     {
-        if (assemblyMarkers.Length == 0)
-        {
-            throw new ArgumentException("At least one assembly must be provided for integration event discovery.",
-                nameof(assemblyMarkers));
-        }
+        public IntegrationEventDescriptor this[Type key] => dictionary[key];
+        public IEnumerable<Type> Keys => dictionary.Keys;
+        public IEnumerable<IntegrationEventDescriptor> Values => dictionary.Values;
+        public int Count => dictionary.Count;
+        public bool ContainsKey(Type key) => dictionary.ContainsKey(key);
+        public bool TryGetValue(Type key, out IntegrationEventDescriptor value)
+            => dictionary.TryGetValue(key, out value!);
+        public IEnumerator<KeyValuePair<Type, IntegrationEventDescriptor>> GetEnumerator()
+            => dictionary.GetEnumerator();
+        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+            => GetEnumerator();
+    }
 
-        return assemblyMarkers.SelectMany(a => a.GetTypes())
-            .Where(t => t is { IsClass: true, IsPublic: true, IsAbstract: false } &&
-                        typeof(IIntegrationEvent).IsAssignableFrom(t))
-            .Select(t => new
-            {
-                Type = t,
-                Attribute = t.GetCustomAttribute<IntegrationEventAttribute>() ??
-                            throw new InvalidOperationException(
-                                $"Integration event '{t.FullName}' is missing [IntegrationEvent] attribute.")
-            })
-            .ToDictionary(x => x.Type, x => new IntegrationEventDescriptor(x.Type, x.Attribute.QueueName));
+    public sealed class ConsumedEventsDictionary(Dictionary<Type, IntegrationEventDescriptor> dictionary)
+        : IReadOnlyDictionary<Type, IntegrationEventDescriptor>
+    {
+        public IntegrationEventDescriptor this[
+            Type key] =>
+            dictionary[key];
+
+        public IEnumerable<Type> Keys => dictionary.Keys;
+        public IEnumerable<IntegrationEventDescriptor> Values => dictionary.Values;
+        public int Count => dictionary.Count;
+
+        public bool ContainsKey(
+            Type key) =>
+            dictionary.ContainsKey(key);
+
+        public bool TryGetValue(
+            Type key,
+            out IntegrationEventDescriptor value) =>
+            dictionary.TryGetValue(key, out value!);
+
+        public IEnumerator<KeyValuePair<Type, IntegrationEventDescriptor>> GetEnumerator() =>
+            dictionary.GetEnumerator();
+
+        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => GetEnumerator();
     }
 }

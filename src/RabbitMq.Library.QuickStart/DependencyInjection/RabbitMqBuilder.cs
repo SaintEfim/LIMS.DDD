@@ -1,67 +1,107 @@
 ﻿using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
+using RabbitMq.Library.QuickStart.Messages;
 using RabbitMq.Library.QuickStart.Receive;
 
 namespace RabbitMq.Library.QuickStart.DependencyInjection;
 
-public class RabbitMqBuilder
+public sealed class RabbitMqBuilder
 {
     private readonly IServiceCollection _services;
-    private readonly List<Assembly> _handlerAssemblies = [];
-    private bool _hasConsumers;
+    private readonly Dictionary<Type, IntegrationEventDescriptor> _events;
+    private readonly Dictionary<Type, IntegrationEventDescriptor> _consumedEvents;
+    private bool _receiveInfrastructureRegistered;
 
-    internal RabbitMqBuilder(IServiceCollection services)
+    internal RabbitMqBuilder(
+        IServiceCollection services,
+        Dictionary<Type, IntegrationEventDescriptor> events,
+        Dictionary<Type, IntegrationEventDescriptor> consumedEvents)
     {
         _services = services;
+        _events = events;
+        _consumedEvents = consumedEvents;
     }
 
-    public RabbitMqBuilder AddMessageHandler<THandler>() where THandler : class
+    public RabbitMqBuilder AddMessage<TMessage>()
+        where TMessage : IIntegrationEvent
     {
-        var handlerType = typeof(THandler);
-        var interfaceType = handlerType.GetInterfaces()
-            .FirstOrDefault(i => i.IsGenericType
-                              && i.GetGenericTypeDefinition() == typeof(IReceiveHandler<>));
+        var messageType = typeof(TMessage);
 
-        if (interfaceType is null)
-            throw new InvalidOperationException(
-                $"Type '{handlerType.Name}' does not implement IReceiveHandler<T>.");
+        if (_events.ContainsKey(messageType)) return this;
 
-        _services.AddScoped(interfaceType, handlerType);
-        _hasConsumers = true;
-        return this;
-    }
+        var attribute = messageType.GetCustomAttributes(typeof(IntegrationEventAttribute), false)
+            .Cast<IntegrationEventAttribute>()
+            .SingleOrDefault();
 
-    public RabbitMqBuilder AddMessageHandlersFrom(Assembly assembly)
-    {
-        _handlerAssemblies.Add(assembly);
-        _hasConsumers = true;
-        return this;
-    }
-
-    public void Build()
-    {
-        if (!_hasConsumers) return;
-
-        // Сканирование сборок
-        foreach (var assembly in _handlerAssemblies)
+        if (attribute is null)
         {
-            var handlerTypes = assembly.GetTypes()
-                .Where(t => t is { IsClass: true, IsAbstract: false }
-                         && t.GetInterfaces().Any(i =>
-                             i.IsGenericType
-                             && i.GetGenericTypeDefinition() == typeof(IReceiveHandler<>)));
-
-            foreach (var handlerType in handlerTypes)
-            {
-                var interfaceType = handlerType.GetInterfaces()
-                    .First(i => i.IsGenericType
-                             && i.GetGenericTypeDefinition() == typeof(IReceiveHandler<>));
-
-                _services.AddScoped(interfaceType, handlerType);
-            }
+            throw new InvalidOperationException(
+                $"Integration event '{messageType.FullName}' is missing [{nameof(IntegrationEventAttribute)}].");
         }
 
-        // ✅ Consumer-инфраструктура регистрируется ТОЛЬКО при наличии обработчиков
+        if (string.IsNullOrWhiteSpace(attribute.QueueName))
+        {
+            throw new InvalidOperationException($"Integration event '{messageType.FullName}' has an empty queue name.");
+        }
+
+        var duplicateQueue =
+            _events.Values.FirstOrDefault(x => x.QueueName == attribute.QueueName && x.EventType != messageType);
+
+        if (duplicateQueue is not null)
+        {
+            throw new InvalidOperationException(
+                $"Queue '{attribute.QueueName}' is already registered for event '{duplicateQueue.EventType.FullName}'.");
+        }
+
+        _events.Add(messageType, new IntegrationEventDescriptor(messageType, attribute.QueueName));
+
+        return this;
+    }
+
+    public RabbitMqBuilder AddMessageHandler<THandler>()
+        where THandler : class
+    {
+        var handlerType = typeof(THandler);
+
+        var interfaceType = handlerType.GetInterfaces()
+            .SingleOrDefault(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IReceiveHandler<>));
+
+        if (interfaceType is null)
+        {
+            throw new InvalidOperationException(
+                $"Type '{handlerType.FullName}' does not implement IReceiveHandler<TMessage>.");
+        }
+
+        var messageType = interfaceType.GetGenericArguments()[0];
+
+        AddMessageInternal(messageType);
+
+        _services.AddScoped(interfaceType, handlerType);
+
+        if (_events.TryGetValue(messageType, out var descriptor))
+        {
+            _consumedEvents.TryAdd(messageType, descriptor);
+        }
+
+        RegisterReceiveInfrastructure();
+
+        return this;
+    }
+
+    private void AddMessageInternal(
+        Type messageType)
+    {
+        var method = typeof(RabbitMqBuilder).GetMethod(nameof(AddMessage), BindingFlags.Public | BindingFlags.Instance)!
+            .MakeGenericMethod(messageType);
+        method.Invoke(this, null);
+    }
+
+    private void RegisterReceiveInfrastructure()
+    {
+        if (_receiveInfrastructureRegistered) return;
+
+        _receiveInfrastructureRegistered = true;
+
         _services.AddSingleton<ReceiveDispatcher>();
         _services.AddSingleton<RabbitMqMessageReceiver>();
         _services.AddHostedService<ReceiveHandlersBackgroundService>();

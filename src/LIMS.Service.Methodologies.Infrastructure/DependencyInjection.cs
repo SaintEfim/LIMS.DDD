@@ -10,14 +10,14 @@ public static class DependencyInjection
         this IServiceCollection services)
     {
         // TODO сделать регистрацию event более внятной
-        services.AddRabbitMq(x =>
+        services.AddRabbitMq(options =>
             {
-                x.HostName = "localhost";
-                x.Port = 5672;
-                x.UserName = "guest";
-                x.Password = "guest";
-            }, typeof(UnitCreatedMessage).Assembly)
-            .AddMessageHandler<UnitCreatedMessageHandler>()
-            .Build();
+                options.HostName = "localhost";
+                options.Port = 5672;
+                options.UserName = "guest";
+                options.Password = "guest";
+            })
+            .AddMessage<StudyTemplatePublishedMessage>()
+            .AddMessageHandler<UnitCreatedMessageHandler>();
     }
 }

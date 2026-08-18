@@ -8,33 +8,33 @@ using RabbitMq.Library.QuickStart.Messages;
 
 namespace RabbitMq.Library.QuickStart;
 
-public class RabbitMqMessageBus(
+public sealed class RabbitMqMessageBus(
     IntegrationEventRegistry eventRegistry,
-    RabbitMqChannelFactory channelManager,
+    RabbitMqChannelFactory channelFactory,
     ILogger<RabbitMqMessageBus> logger) : IMessageBus
 {
-    private static readonly JsonSerializerOptions JsonOptions = new()
-    {
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-        WriteIndented = false
-    };
+    private static readonly JsonSerializerOptions JsonOptions =
+        new()
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            WriteIndented = false
+        };
 
     public async Task SendAsync<T>(
-        T messageObject,
+        T message,
         CancellationToken cancellationToken = default)
         where T : IIntegrationEvent
     {
-        var messageString = JsonSerializer.Serialize(messageObject, JsonOptions);
-
-        await using var channel = await channelManager.CreateChannelAsync(cancellationToken);
+        var descriptor = eventRegistry.Get<T>();
+        var json = JsonSerializer.Serialize(message, JsonOptions);
+        await using var channel = await channelFactory.CreateChannelAsync(cancellationToken);
         if (channel is null || !channel.IsOpen)
         {
-            logger.LogWarning("RabbitMQ is not available. Message dropped: {Message}", messageString);
+            logger.LogWarning("RabbitMQ is not available. Message dropped: {EventType}", typeof(T).Name);
             return;
         }
 
-        var body = Encoding.UTF8.GetBytes(messageString);
-
+        var body = Encoding.UTF8.GetBytes(json);
         var properties = new BasicProperties
         {
             Persistent = true,
@@ -43,9 +43,7 @@ public class RabbitMqMessageBus(
                 .ToString(),
             Timestamp = new AmqpTimestamp(DateTimeOffset.UtcNow.ToUnixTimeSeconds())
         };
-
-        var descriptor = eventRegistry.Get<T>();
-
-        await channel.BasicPublishAsync("", descriptor.QueueName, false, properties, body, cancellationToken);
+        await channel.BasicPublishAsync(exchange: "", routingKey: descriptor.QueueName, mandatory: false,
+            basicProperties: properties, body: body, cancellationToken: cancellationToken);
     }
 }

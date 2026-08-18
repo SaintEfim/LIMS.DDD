@@ -3,18 +3,23 @@ using Microsoft.Extensions.Logging;
 
 namespace RabbitMq.Library.QuickStart.Receive;
 
-public class ReceiveHandlersBackgroundService(
-    IReadOnlyDictionary<Type, IntegrationEventDescriptor> events,
+public sealed class ReceiveHandlersBackgroundService(
+    IReadOnlyDictionary<Type, IntegrationEventDescriptor> consumedEvents,
     RabbitMqMessageReceiver rabbitMqMessageReceiver,
     ILogger<ReceiveHandlersBackgroundService> logger) : BackgroundService
 {
     protected override async Task ExecuteAsync(
         CancellationToken stoppingToken)
     {
-        var tasks = events.Values
+        if (consumedEvents.Count == 0)
+        {
+            logger.LogInformation("No message handlers registered.");
+            return;
+        }
+
+        var tasks = consumedEvents.Values
             .Select(descriptor => RunConsumerAsync(descriptor, stoppingToken))
             .ToArray();
-
         await Task.WhenAll(tasks);
     }
 

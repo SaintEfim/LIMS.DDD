@@ -19,7 +19,7 @@ public sealed class RabbitMqConnectionMonitor(
 
                 if (reconnected)
                 {
-                    await rabbitMqTopologyDeclarator.DeclareAllAsync(stoppingToken);
+                    await rabbitMqTopologyDeclarator.DeclareAsync(stoppingToken);
                 }
 
                 await Task.Delay(TimeSpan.FromSeconds(30), stoppingToken);
