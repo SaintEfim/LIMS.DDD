@@ -9,14 +9,14 @@ namespace RabbitMq.Library.QuickStart.DependencyInjection;
 public sealed class RabbitMqBuilder
 {
     private readonly IServiceCollection _services;
-    private readonly Dictionary<Type, IntegrationEventDescriptor> _events;
-    private readonly Dictionary<Type, IntegrationEventDescriptor> _consumedEvents;
+    private readonly RegisteredEventsDictionary _events;
+    private readonly ConsumedEventsDictionary _consumedEvents;
     private bool _receiveInfrastructureRegistered;
 
     internal RabbitMqBuilder(
         IServiceCollection services,
-        Dictionary<Type, IntegrationEventDescriptor> events,
-        Dictionary<Type, IntegrationEventDescriptor> consumedEvents)
+        RegisteredEventsDictionary events,
+        ConsumedEventsDictionary consumedEvents)
     {
         _services = services;
         _events = events;

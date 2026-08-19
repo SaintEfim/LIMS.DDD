@@ -11,16 +11,15 @@ public static class DependencyInjection
         this IServiceCollection services,
         Action<RabbitMqOptions> options)
     {
-        var events = new Dictionary<Type, IntegrationEventDescriptor>();
-        var consumedEvents = new Dictionary<Type, IntegrationEventDescriptor>();
+        var events = new RegisteredEventsDictionary(new Dictionary<Type, IntegrationEventDescriptor>());
+        var consumedEvents = new ConsumedEventsDictionary(new Dictionary<Type, IntegrationEventDescriptor>());
 
         var rabbitOptions = new RabbitMqOptions();
         options(rabbitOptions);
 
         services.AddSingleton(rabbitOptions);
 
-        services.AddSingleton<IntegrationEventRegistry>(sp =>
-            new IntegrationEventRegistry(events, consumedEvents));
+        services.AddSingleton<IntegrationEventRegistry>(_ => new IntegrationEventRegistry(events, consumedEvents));
 
         services.AddSingleton<RabbitMqConnectionProvider>();
         services.AddSingleton<RabbitMqChannelFactory>();
@@ -29,48 +28,5 @@ public static class DependencyInjection
         services.AddScoped<IMessageBus, RabbitMqMessageBus>();
 
         return new RabbitMqBuilder(services, events, consumedEvents);
-    }
-
-    public sealed class RegisteredEventsDictionary(
-        Dictionary<Type, IntegrationEventDescriptor> dictionary)
-        : IReadOnlyDictionary<Type, IntegrationEventDescriptor>
-    {
-        public IntegrationEventDescriptor this[Type key] => dictionary[key];
-        public IEnumerable<Type> Keys => dictionary.Keys;
-        public IEnumerable<IntegrationEventDescriptor> Values => dictionary.Values;
-        public int Count => dictionary.Count;
-        public bool ContainsKey(Type key) => dictionary.ContainsKey(key);
-        public bool TryGetValue(Type key, out IntegrationEventDescriptor value)
-            => dictionary.TryGetValue(key, out value!);
-        public IEnumerator<KeyValuePair<Type, IntegrationEventDescriptor>> GetEnumerator()
-            => dictionary.GetEnumerator();
-        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
-            => GetEnumerator();
-    }
-
-    public sealed class ConsumedEventsDictionary(Dictionary<Type, IntegrationEventDescriptor> dictionary)
-        : IReadOnlyDictionary<Type, IntegrationEventDescriptor>
-    {
-        public IntegrationEventDescriptor this[
-            Type key] =>
-            dictionary[key];
-
-        public IEnumerable<Type> Keys => dictionary.Keys;
-        public IEnumerable<IntegrationEventDescriptor> Values => dictionary.Values;
-        public int Count => dictionary.Count;
-
-        public bool ContainsKey(
-            Type key) =>
-            dictionary.ContainsKey(key);
-
-        public bool TryGetValue(
-            Type key,
-            out IntegrationEventDescriptor value) =>
-            dictionary.TryGetValue(key, out value!);
-
-        public IEnumerator<KeyValuePair<Type, IntegrationEventDescriptor>> GetEnumerator() =>
-            dictionary.GetEnumerator();
-
-        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => GetEnumerator();
     }
 }

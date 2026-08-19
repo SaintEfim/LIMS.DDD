@@ -9,13 +9,12 @@ public static class DependencyInjection
     public static void AddInfrastructure(
         this IServiceCollection services)
     {
-        // TODO сделать регистрацию event более внятной
-        services.AddRabbitMq(options =>
+        services.AddRabbitMq(x =>
             {
-                options.HostName = "localhost";
-                options.Port = 5672;
-                options.UserName = "guest";
-                options.Password = "guest";
+                x.HostName = "localhost";
+                x.Port = 5672;
+                x.UserName = "guest";
+                x.Password = "guest";
             })
             .AddMessage<StudyTemplatePublishedMessage>()
             .AddMessageHandler<UnitCreatedMessageHandler>();

@@ -5,20 +5,21 @@ using RabbitMq.Library.QuickStart.IntegrationEvents;
 namespace RabbitMq.Library.QuickStart.Receive;
 
 public sealed class ReceiveHandlersBackgroundService(
-    IReadOnlyDictionary<Type, IntegrationEventDescriptor> consumedEvents,
+    IntegrationEventRegistry eventRegistry,
     RabbitMqMessageReceiver rabbitMqMessageReceiver,
     ILogger<ReceiveHandlersBackgroundService> logger) : BackgroundService
 {
     protected override async Task ExecuteAsync(
         CancellationToken stoppingToken)
     {
-        if (consumedEvents.Count == 0)
+        if (eventRegistry.Consumed.Count == 0)
         {
             logger.LogInformation("No message handlers registered.");
             return;
         }
 
-        var tasks = consumedEvents.Values
+        var tasks = eventRegistry.Consumed
+            .Values
             .Select(descriptor => RunConsumerAsync(descriptor, stoppingToken))
             .ToArray();
         await Task.WhenAll(tasks);
