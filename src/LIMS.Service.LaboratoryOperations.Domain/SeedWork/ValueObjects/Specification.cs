@@ -4,9 +4,6 @@ namespace LIMS.Service.LaboratoryOperations.Domain.SeedWork.ValueObjects;
 
 public sealed record Specification
 {
-    // for EF Core
-    private Specification() { }
-
     private Specification(
         double? minValue,
         double? maxValue)
@@ -14,6 +11,9 @@ public sealed record Specification
         MinValue = minValue;
         MaxValue = maxValue;
     }
+
+    // for EF Core
+    private Specification() { }
 
     public double? MinValue { get; init; }
 
@@ -25,12 +25,11 @@ public sealed record Specification
     {
         if (minValue.HasValue && maxValue.HasValue && minValue.Value > maxValue.Value)
         {
-            return Result<Specification, Exception>.Failure(
-                new ArgumentException($"Min value ({minValue}) cannot be greater than max value ({maxValue})."));
+            return new ArgumentException($"Min value ({minValue}) cannot be greater than max value ({maxValue}).");
         }
 
         var specification = new Specification(minValue, maxValue);
-        return Result<Specification, Exception>.Success(specification);
+        return specification;
     }
 
     public bool IsWithinSpec(

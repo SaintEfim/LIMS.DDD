@@ -8,38 +8,31 @@ namespace LIMS.Service.Methodologies.Domain.StudyTemplateAggregate.Entities.Calc
 
 public sealed class CalculationRule : SoftDeletableModel
 {
-    private CalculationRule()
-    {
-    }
-
     public ResultDefinitionId ResultDefinitionId { get; private set; }
 
     public CalculationRuleId Id { get; private set; }
 
     public StudyTemplateId StudyTemplateId { get; private set; }
 
-    public Name Name { get; private set; } = null!;
+    public Name Name { get; private set; }
 
-    public FormulaExpression FormulaExpression { get; private set; } = null!;
+    public FormulaExpression FormulaExpression { get; private set; }
 
-    public Description Description { get; private set; } = null!;
+    public Description Description { get; private set; }
 
-    internal static CalculationRule Create(
+    internal CalculationRule(
         StudyTemplateId studyTemplateId,
         Name name,
         FormulaExpression formulaExpression,
         Description description,
         ResultDefinitionId resultDefinitionId)
     {
-        return new CalculationRule
-        {
-            Id = new CalculationRuleId(Guid.NewGuid()),
-            StudyTemplateId = studyTemplateId,
-            Name = name,
-            FormulaExpression = formulaExpression,
-            Description = description,
-            ResultDefinitionId = resultDefinitionId
-        };
+        Id = new CalculationRuleId(Guid.NewGuid());
+        StudyTemplateId = studyTemplateId;
+        Name = name;
+        FormulaExpression = formulaExpression;
+        Description = description;
+        ResultDefinitionId = resultDefinitionId;
     }
 
     internal void Update(
@@ -86,11 +79,11 @@ public sealed class CalculationRule : SoftDeletableModel
 
             if (parameter is null)
             {
-                return Result<None, Exception>.Failure(new InvalidOperationException(
-                    $"Calculation rule '{Name.Value}': variable '{variable}' references."));
+                return new InvalidOperationException(
+                    $"Calculation rule '{Name.Value}': variable '{variable}' references.");
             }
         }
 
-        return Result<None, Exception>.Success();
+        return new None();
     }
 }

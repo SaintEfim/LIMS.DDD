@@ -1,5 +1,4 @@
 ﻿using LIMS.Service.Methodologies.Domain.SeedWork;
-using LIMS.Service.Methodologies.Domain.SeedWork.Result;
 using LIMS.Service.Methodologies.Domain.SeedWork.ValueObjects;
 
 namespace LIMS.Service.Methodologies.Domain.UnitSnapshots;
@@ -17,16 +16,11 @@ public sealed class UnitSnapshot
     {
     }
 
-    public static Result<UnitSnapshot, Exception> Create(
+    public UnitSnapshot(
         UnitId id,
         Name name)
     {
-        var unit = new UnitSnapshot
-        {
-            Id = id,
-            Name = name
-        };
-
-        return Result<UnitSnapshot, Exception>.Success(unit);
+        Id = id;
+        Name = name;
     }
 }

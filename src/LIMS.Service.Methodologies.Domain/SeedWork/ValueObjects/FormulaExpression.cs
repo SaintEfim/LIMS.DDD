@@ -28,26 +28,24 @@ public sealed record FormulaExpression
     {
         if (string.IsNullOrWhiteSpace(value))
         {
-            return Result<FormulaExpression, Exception>.Failure(
-                new ArgumentException("Formula expression cannot be empty.", nameof(value)));
+            return new ArgumentException("Formula expression cannot be empty.", nameof(value));
         }
 
         if (value.Length > MaxLength)
         {
-            return Result<FormulaExpression, Exception>.Failure(new ArgumentException(
+            return new ArgumentException(
                 $"Formula expression length cannot exceed {MaxLength} characters. Current length: {value.Length}.",
-                nameof(value)));
+                nameof(value));
         }
 
         if (value.StartsWith("=") || value.StartsWith("+") || value.StartsWith("-"))
         {
-            return Result<FormulaExpression, Exception>.Failure(
-                new ArgumentException("Formula expression cannot start or end with '=', '+', '-' characters.",
-                    nameof(value)));
+            return new ArgumentException("Formula expression cannot start or end with '=', '+', '-' characters.",
+                nameof(value));
         }
 
         var formula = new FormulaExpression(value.Trim());
-        return Result<FormulaExpression, Exception>.Success(formula);
+        return formula;
     }
 
     public IReadOnlyCollection<string> ExtractVariables()

@@ -22,17 +22,17 @@ public sealed record AliasName
     {
         if (string.IsNullOrWhiteSpace(value))
         {
-            return Result<AliasName, Exception>.Failure(new ArgumentException("Invalid name.", nameof(value)));
+            return new ArgumentException("Invalid name.", nameof(value));
         }
 
         if (value.Length > MaxAliasNameLength)
         {
-            return Result<AliasName, Exception>.Failure(new ArgumentException(
+            return new ArgumentException(
                 $"AliasName length cannot exceed {MaxAliasNameLength} characters. " +
-                $"Current length: {value.Length}.", nameof(value)));
+                $"Current length: {value.Length}.", nameof(value));
         }
 
         var aliasName = new AliasName(value);
-        return Result<AliasName, Exception>.Success(aliasName);
+        return aliasName;
     }
 }

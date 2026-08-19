@@ -6,11 +6,7 @@ namespace LIMS.Service.Methodologies.Domain.StudyTemplateAggregate.Entities.Resu
 
 public sealed class ResultDefinition : SoftDeletableModel
 {
-    private ResultDefinition()
-    {
-    }
-
-    public string ResultInstance { get; private set; } = string.Empty;
+    public string ResultInstance { get; private set; }
 
     public ResultDefinitionId Id { get; private set; }
 
@@ -18,24 +14,19 @@ public sealed class ResultDefinition : SoftDeletableModel
 
     public UnitId UnitId { get; private set; }
 
-    public Specification Specification { get; private set; } = null!;
+    public Specification Specification { get; private set; }
 
-    internal static ResultDefinition Create(
+    internal ResultDefinition(
         StudyTemplateId studyTemplateId,
         string resultInstance,
         UnitId unitId,
         Specification specification)
     {
-        var result = new ResultDefinition
-        {
-            Id = new ResultDefinitionId(Guid.NewGuid()),
-            StudyTemplateId = studyTemplateId,
-            ResultInstance = resultInstance,
-            UnitId = unitId,
-            Specification = specification
-        };
-
-        return result;
+        Id = new ResultDefinitionId(Guid.NewGuid());
+        StudyTemplateId = studyTemplateId;
+        ResultInstance = resultInstance;
+        UnitId = unitId;
+        Specification = specification;
     }
 
     internal void Update(

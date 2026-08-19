@@ -14,8 +14,7 @@ public class StudyTemplateVersioningService
     {
         if (original.Status != Status.Active && original.Status != Status.Archived)
         {
-            return Result<StudyTemplate, Exception>.Failure(
-                new InvalidOperationException("Can only create revisions from Active or Archived templates."));
+            return new InvalidOperationException("Can only create revisions from Active or Archived templates.");
         }
 
         var createResult = StudyTemplate.Create(original.Name, original.Description, newRevisionValue);
@@ -35,20 +34,17 @@ public class StudyTemplateVersioningService
 
         if (original.Status != Status.Active)
         {
-            return Result<StudyTemplate, Exception>.Success(newTemplate);
+            return newTemplate;
         }
 
         var archiveResult = original.ChangeStatus(Status.Archived);
-        return archiveResult.IsFailure
-            ? archiveResult.CastFailure<StudyTemplate>()
-            : Result<StudyTemplate, Exception>.Success(newTemplate);
+        return archiveResult.IsFailure ? archiveResult.CastFailure<StudyTemplate>() : newTemplate;
     }
 
     private static Result<None, Exception> CopyChildren(
         StudyTemplate original,
         StudyTemplate newTemplate)
     {
-        var paramIdMap = new Dictionary<InputParameterId, InputParameterId>();
         var resultDefIdMap = new Dictionary<ResultDefinitionId, ResultDefinitionId>();
 
         foreach (var param in original.InputParameters)
@@ -66,9 +62,6 @@ public class StudyTemplateVersioningService
             {
                 return addResult.CastFailure<None>();
             }
-
-            paramIdMap[param.Id] = addResult.GetValue()
-                .Id;
         }
 
         foreach (var result in original.ResultDefinitions)
@@ -107,6 +100,6 @@ public class StudyTemplateVersioningService
             }
         }
 
-        return Result<None, Exception>.Success();
+        return new None();
     }
 }

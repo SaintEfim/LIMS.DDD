@@ -112,8 +112,7 @@ public sealed class StudyTemplateCommandsHandler(
 
         if (!Status.TryParse(statusCommand, out var newStatus) || newStatus is null)
         {
-            return Result<StudyTemplate, Exception>.Failure(
-                new InvalidOperationException($"Unknown status '{statusCommand}'."));
+            return new InvalidOperationException($"Unknown status '{statusCommand}'.");
         }
 
         var changeResult = template.ChangeStatus(newStatus);
@@ -169,7 +168,7 @@ public sealed class StudyTemplateCommandsHandler(
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return Result<None, Exception>.Success();
+        return new None();
     }
 
     public async Task<Result<Guid, Exception>> CreateRevisionAsync(
@@ -200,7 +199,7 @@ public sealed class StudyTemplateCommandsHandler(
         var saveResult = await SaveNewAsync(creationResult, cancellationToken);
         return saveResult.IsFailure
             ? saveResult.CastFailure<Guid>()
-            : Result<Guid, Exception>.Success(creationResult.Id.Value);
+            : creationResult.Id.Value;
     }
 
     private async Task<Result<StudyTemplate, Exception>> GetTemplateForChangeAsync(
@@ -209,9 +208,8 @@ public sealed class StudyTemplateCommandsHandler(
     {
         var template = await repository.GetByIdForChangeAsync(new StudyTemplateId(id), cancellationToken);
         return template is null
-            ? Result<StudyTemplate, Exception>.Failure(
-                new KeyNotFoundException($"StudyTemplate with id {id} not found."))
-            : Result<StudyTemplate, Exception>.Success(template);
+            ? new KeyNotFoundException($"StudyTemplate with id {id} not found.")
+            : template;
     }
 
     private async Task<Result<StudyTemplate, Exception>> SaveNewAsync(
@@ -222,12 +220,11 @@ public sealed class StudyTemplateCommandsHandler(
         {
             repository.Add(template);
             await unitOfWork.SaveChangesAsync(cancellationToken);
-            return Result<StudyTemplate, Exception>.Success(template);
+            return template;
         }
         catch (Exception ex)
         {
-            return Result<StudyTemplate, Exception>.Failure(new Exception($"Failed to save StudyTemplate: {ex.Message}",
-                ex));
+            return new Exception($"Failed to save StudyTemplate: {ex.Message}", ex);
         }
     }
 
@@ -238,12 +235,11 @@ public sealed class StudyTemplateCommandsHandler(
         try
         {
             await unitOfWork.SaveChangesAsync(cancellationToken);
-            return Result<StudyTemplate, Exception>.Success(template);
+            return template;
         }
         catch (Exception ex)
         {
-            return Result<StudyTemplate, Exception>.Failure(new Exception($"Failed to save StudyTemplate: {ex.Message}",
-                ex));
+            return new Exception($"Failed to save StudyTemplate: {ex.Message}", ex);
         }
     }
 }

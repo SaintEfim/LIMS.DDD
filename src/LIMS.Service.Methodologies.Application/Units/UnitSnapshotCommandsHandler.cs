@@ -19,13 +19,9 @@ public sealed class UnitSnapshotCommandsHandler(IUnitOfWork unitOfWork, IUnitSna
             return nameResult.CastFailure<UnitSnapshot>();
         }
 
-        var snapshotResult = UnitSnapshot.Create(idResult, nameResult.GetValue());
-        if (snapshotResult.IsFailure)
-        {
-            return snapshotResult.CastFailure<UnitSnapshot>();
-        }
+        var snapshot = new UnitSnapshot(idResult, nameResult.GetValue());
 
-        return await SaveNewAsync(snapshotResult.GetValue(), cancellationToken);
+        return await SaveNewAsync(snapshot, cancellationToken);
     }
 
     private async Task<Result<UnitSnapshot, Exception>> SaveNewAsync(
@@ -37,12 +33,11 @@ public sealed class UnitSnapshotCommandsHandler(IUnitOfWork unitOfWork, IUnitSna
             snapshotRepository.Add(snapshot);
             await unitOfWork.SaveChangesAsync(cancellationToken);
 
-            return Result<UnitSnapshot, Exception>.Success(snapshot);
+            return snapshot;
         }
         catch (Exception ex)
         {
-            return Result<UnitSnapshot, Exception>.Failure(new Exception($"Failed to save UnitSnapshot: {ex.Message}",
-                ex));
+            return new Exception($"Failed to save UnitSnapshot: {ex.Message}", ex);
         }
     }
 }

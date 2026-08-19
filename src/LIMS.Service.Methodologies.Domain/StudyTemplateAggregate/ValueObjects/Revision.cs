@@ -19,17 +19,17 @@ public sealed record Revision
     {
         if (string.IsNullOrWhiteSpace(value))
         {
-            return Result<Revision, Exception>.Failure(new ArgumentException("Invalid revision.", nameof(value)));
+            return new ArgumentException("Invalid revision.", nameof(value));
         }
 
         if (value.Length > MaxRevisionLength)
         {
-            return Result<Revision, Exception>.Failure(new ArgumentException(
+            return new ArgumentException(
                 $"Revision length cannot exceed {MaxRevisionLength} characters. " + $"Current length: {value.Length}.",
-                nameof(value)));
+                nameof(value));
         }
 
         var revision = new Revision(value);
-        return Result<Revision, Exception>.Success(revision);
+        return revision;
     }
 }

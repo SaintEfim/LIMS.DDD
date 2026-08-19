@@ -25,12 +25,11 @@ public sealed record Specification
     {
         if (minValue.HasValue && maxValue.HasValue && minValue.Value > maxValue.Value)
         {
-            return Result<Specification, Exception>.Failure(
-                new ArgumentException($"Min value ({minValue}) cannot be greater than max value ({maxValue})."));
+            return new ArgumentException($"Min value ({minValue}) cannot be greater than max value ({maxValue}).");
         }
 
         var specification = new Specification(minValue, maxValue);
-        return Result<Specification, Exception>.Success(specification);
+        return specification;
     }
 
     public bool IsWithinSpec(

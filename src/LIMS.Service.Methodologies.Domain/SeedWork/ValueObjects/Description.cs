@@ -24,12 +24,12 @@ public sealed record Description
 
         if (descriptionValue.Length > MaxDescriptionLength)
         {
-            return Result<Description, Exception>.Failure(new ArgumentException(
+            return new ArgumentException(
                 $"Description length cannot exceed {MaxDescriptionLength} characters. " +
-                $"Current length: {descriptionValue.Length}.", nameof(value)));
+                $"Current length: {descriptionValue.Length}.", nameof(value));
         }
 
         var description = new Description(descriptionValue);
-        return Result<Description, Exception>.Success(description);
+        return description;
     }
 }

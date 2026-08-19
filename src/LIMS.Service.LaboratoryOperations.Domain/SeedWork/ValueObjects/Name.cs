@@ -22,17 +22,17 @@ public sealed record Name
     {
         if (string.IsNullOrWhiteSpace(value))
         {
-            return Result<Name, Exception>.Failure(new ArgumentException("Invalid name.", nameof(value)));
+            return new ArgumentException("Invalid name.", nameof(value));
         }
 
         if (value.Length > MaxNameLength)
         {
-            return Result<Name, Exception>.Failure(new ArgumentException(
+            return new ArgumentException(
                 $"Name length cannot exceed {MaxNameLength} characters. " + $"Current length: {value.Length}.",
-                nameof(value)));
+                nameof(value));
         }
 
         var name = new Name(value);
-        return Result<Name, Exception>.Success(name);
+        return name;
     }
 }

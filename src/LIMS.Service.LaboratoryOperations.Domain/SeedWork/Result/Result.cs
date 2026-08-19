@@ -20,6 +20,14 @@ public class Result<TValue, TError>
     private TValue? Value { get; }
     private TError? Error { get; }
 
+    public static implicit operator Result<TValue, TError>(
+        TValue value) =>
+        new(true, value, null);
+
+    public static implicit operator Result<TValue, TError>(
+        TError error) =>
+        new(false, default, error);
+
     public static Result<None, TError> Success()
     {
         return Result<None, TError>.Success(new None());

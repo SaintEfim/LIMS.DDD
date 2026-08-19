@@ -50,8 +50,7 @@ public sealed class CalculationRuleCommandsHandler(IStudyTemplateRepository repo
         var saveResult = await SaveChangesAsync(cancellationToken);
         return saveResult.IsFailure
             ? saveResult.CastFailure<Guid>()
-            : Result<Guid, Exception>.Success(addResult.GetValue()
-                .Id.Value);
+            : addResult.GetValue().Id.Value;
     }
 
     public async Task<Result<None, Exception>> RemoveAsync(
@@ -143,9 +142,8 @@ public sealed class CalculationRuleCommandsHandler(IStudyTemplateRepository repo
     {
         var template = await repository.GetByIdForChangeAsync(new StudyTemplateId(studyTemplateId), cancellationToken);
         return template is null
-            ? Result<StudyTemplate, Exception>.Failure(
-                new KeyNotFoundException($"StudyTemplate with id {studyTemplateId} not found."))
-            : Result<StudyTemplate, Exception>.Success(template);
+            ? new KeyNotFoundException($"StudyTemplate with id {studyTemplateId} not found.")
+            : template;
     }
 
     private async Task<Result<None, Exception>> SaveChangesAsync(
@@ -154,11 +152,11 @@ public sealed class CalculationRuleCommandsHandler(IStudyTemplateRepository repo
         try
         {
             await unitOfWork.SaveChangesAsync(cancellationToken);
-            return Result<None, Exception>.Success();
+            return new None();
         }
         catch (Exception ex)
         {
-            return Result<None, Exception>.Failure(new Exception($"Failed to save changes: {ex.Message}", ex));
+            return new Exception($"Failed to save changes: {ex.Message}", ex);
         }
     }
 }

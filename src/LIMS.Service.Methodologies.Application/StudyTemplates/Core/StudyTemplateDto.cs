@@ -23,8 +23,7 @@ public sealed record StudyTemplateDto(
     {
         return new StudyTemplateDto(template.ParentId?.Value, template.Id.Value, template.Name.Value,
             template.Description.Value, template.Revision.Value, template.Status.Name,
-            template.ResultDefinitions.Select(r =>
-                ResultDefinitionDto.FromDomain(units.GetValueOrDefault(r.UnitId), r)),
+            template.ResultDefinitions.Select(r => ResultDefinitionDto.FromDomain(units[r.UnitId], r)),
             template.InputParameters.Select(InputParameterDto.FromDomain),
             template.CalculationRules.Select(CalculationRuleDto.FromDomain));
     }
