@@ -4,21 +4,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LIMS.Service.LaboratoryOperations.Persistence.Repositories;
 
-public class StudyRepository : IStudyRepository
+public class StudyRepository(ApplicationDbContext context) : IStudyRepository
 {
-    private readonly ApplicationDbContext _context;
-
-    public StudyRepository(
-        ApplicationDbContext context)
-    {
-        _context = context;
-    }
-
     public async Task<Study?> GetByIdForChangeAsync(
         StudyId id,
         CancellationToken cancellationToken = default)
     {
-        var query = _context.Studies;
+        var query = context.Studies;
         return await StudyBaseQuery(query)
             .SingleOrDefaultAsync(s => s.Id == id, cancellationToken);
     }
@@ -27,7 +19,7 @@ public class StudyRepository : IStudyRepository
         StudyId id,
         CancellationToken cancellationToken = default)
     {
-        var query = _context.Studies.AsNoTracking();
+        var query = context.Studies.AsNoTracking();
         return await StudyBaseQuery(query)
             .SingleOrDefaultAsync(s => s.Id == id, cancellationToken);
     }
@@ -36,7 +28,7 @@ public class StudyRepository : IStudyRepository
         SampleId sampleId,
         CancellationToken cancellationToken = default)
     {
-        return await _context.Studies
+        return await context.Studies
             .AsNoTracking()
             .Include(s => s.MeasuredValues)
             .Include(s => s.TestResults)
@@ -47,7 +39,7 @@ public class StudyRepository : IStudyRepository
     public void Add(
         Study study)
     {
-        _context.Studies.Add(study);
+        context.Studies.Add(study);
     }
 
     private static IQueryable<Study> StudyBaseQuery(

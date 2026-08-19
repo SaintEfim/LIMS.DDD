@@ -4,34 +4,26 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LIMS.Service.LaboratoryOperations.Persistence.Repositories;
 
-public class SampleRepository : ISampleRepository
+public class SampleRepository(ApplicationDbContext context) : ISampleRepository
 {
-    private readonly ApplicationDbContext _context;
-
-    public SampleRepository(
-        ApplicationDbContext context)
-    {
-        _context = context;
-    }
-
     public async Task<Sample?> GetByIdAsync(
         SampleId id,
         CancellationToken cancellationToken = default)
     {
-        return await _context.Samples.FindAsync([id], cancellationToken);
+        return await context.Samples.FindAsync([id], cancellationToken);
     }
 
     public async Task<Sample?> GetByIdForChangeAsync(
         SampleId id,
         CancellationToken cancellationToken = default)
     {
-        return await _context.Samples.FindAsync([id], cancellationToken);
+        return await context.Samples.FindAsync([id], cancellationToken);
     }
 
     public async Task<ICollection<Sample>> GetAllAsync(
         CancellationToken cancellationToken = default)
     {
-        var sampleQuery = await _context.Samples
+        var sampleQuery = await context.Samples
             .AsNoTracking()
             .ToListAsync(cancellationToken);
 
@@ -42,7 +34,7 @@ public class SampleRepository : ISampleRepository
         OrderId orderId,
         CancellationToken cancellationToken = default)
     {
-        return await _context.Samples
+        return await context.Samples
             .AsNoTracking()
             .Where(s => s.OrderId == orderId)
             .ToListAsync(cancellationToken);
@@ -51,6 +43,6 @@ public class SampleRepository : ISampleRepository
     public void Add(
         Sample sample)
     {
-        _context.Samples.Add(sample);
+        context.Samples.Add(sample);
     }
 }

@@ -3,27 +3,19 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LIMS.Service.LaboratoryOperations.Persistence.Repositories;
 
-public class OrderRepository : IOrderRepository
+public class OrderRepository(ApplicationDbContext context) : IOrderRepository
 {
-    private readonly ApplicationDbContext _context;
-
-    public OrderRepository(
-        ApplicationDbContext context)
-    {
-        _context = context;
-    }
-
     public async Task<Order?> GetByIdAsync(
         OrderId id,
         CancellationToken cancellationToken = default)
     {
-        return await _context.Orders.FindAsync([id], cancellationToken);
+        return await context.Orders.FindAsync([id], cancellationToken);
     }
 
     public async Task<ICollection<Order>> GetAllAsync(
         CancellationToken cancellationToken = default)
     {
-        var orderQuery = await _context.Orders
+        var orderQuery = await context.Orders
             .AsNoTracking()
             .ToListAsync(cancellationToken);
 
@@ -34,12 +26,12 @@ public class OrderRepository : IOrderRepository
         OrderId id,
         CancellationToken cancellationToken = default)
     {
-        return await _context.Orders.FindAsync([id], cancellationToken);
+        return await context.Orders.FindAsync([id], cancellationToken);
     }
 
     public void Add(
         Order order)
     {
-        _context.Orders.Add(order);
+        context.Orders.Add(order);
     }
 }
