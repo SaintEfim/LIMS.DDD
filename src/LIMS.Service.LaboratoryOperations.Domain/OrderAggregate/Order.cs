@@ -1,6 +1,7 @@
 ﻿using LIMS.Service.LaboratoryOperations.Domain.OrderAggregate.ValueObjects;
 using LIMS.Service.LaboratoryOperations.Domain.SeedWork;
 using LIMS.Service.LaboratoryOperations.Domain.SeedWork.Result;
+using LIMS.Service.LaboratoryOperations.Domain.SeedWork.SoftDeletable;
 using LIMS.Service.LaboratoryOperations.Domain.SeedWork.ValueObjects;
 using LIMS.Service.LaboratoryOperations.Domain.ValueObjects;
 
