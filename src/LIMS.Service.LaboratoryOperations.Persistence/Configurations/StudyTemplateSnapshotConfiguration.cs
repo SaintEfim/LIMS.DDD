@@ -55,5 +55,13 @@ public class StudyTemplateSnapshotConfiguration : IEntityTypeConfiguration<Study
             .WithOne()
             .HasForeignKey(x => x.StudyTemplateId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasIndex(x => new
+            {
+                x.Name,
+                x.Revision
+            })
+            .IsUnique()
+            .HasFilter("\"IsDeleted\" = false");
     }
 }

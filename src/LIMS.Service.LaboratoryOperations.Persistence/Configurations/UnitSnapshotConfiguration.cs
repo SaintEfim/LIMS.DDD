@@ -28,5 +28,9 @@ public class UnitSnapshotConfiguration : IEntityTypeConfiguration<UnitSnapshot>
                 .GetValue())
             .HasMaxLength(200)
             .IsRequired();
+
+        builder.HasIndex(x => x.Name)
+            .IsUnique()
+            .HasFilter("\"IsDeleted\" = false");
     }
 }
