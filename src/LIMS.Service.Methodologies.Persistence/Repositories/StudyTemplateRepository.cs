@@ -1,4 +1,5 @@
 ﻿using LIMS.Service.Methodologies.Domain.StudyTemplateAggregate;
+using LIMS.Service.Methodologies.Domain.StudyTemplateAggregate.Entities.InputParameters;
 using LIMS.Service.Methodologies.Domain.StudyTemplateAggregate.Entities.ResultDefinitions;
 using Microsoft.EntityFrameworkCore;
 
@@ -38,6 +39,29 @@ public class StudyTemplateRepository(ApplicationDbContext context) : IStudyTempl
             .AsNoTracking()
             .Where(t => t.Id == studyTemplateId)
             .SelectMany(t => t.ResultDefinitions)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<InputParameter?> GetInputParameterAsync(
+        StudyTemplateId studyTemplateId,
+        InputParameterId requiredResultDefinitionId,
+        CancellationToken cancellationToken = default)
+    {
+        return await context.StudyTemplates
+            .AsNoTracking()
+            .Where(t => t.Id == studyTemplateId)
+            .SelectMany(t => t.InputParameters)
+            .SingleOrDefaultAsync(p => p.Id == requiredResultDefinitionId, cancellationToken);
+    }
+
+    public async Task<IReadOnlyList<InputParameter>> GetInputParameterSnapshotsAsync(
+        StudyTemplateId studyTemplateId,
+        CancellationToken cancellationToken = default)
+    {
+        return await context.StudyTemplates
+            .AsNoTracking()
+            .Where(t => t.Id == studyTemplateId)
+            .SelectMany(t => t.InputParameters)
             .ToListAsync(cancellationToken);
     }
 

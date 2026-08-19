@@ -10,9 +10,8 @@ public sealed class InputParameterQueries(IStudyTemplateRepository repository)
         Guid parameterId,
         CancellationToken cancellationToken = default)
     {
-        var studyTemplate = await repository.GetByIdAsync(new StudyTemplateId(studyTemplateId), cancellationToken);
-
-        var parameter = studyTemplate?.InputParameters.SingleOrDefault(p => p.Id == new InputParameterId(parameterId));
+        var parameter = await repository.GetInputParameterAsync(new StudyTemplateId(studyTemplateId),
+            new InputParameterId(parameterId), cancellationToken);
 
         return parameter != null ? InputParameterDto.FromDomain(parameter) : null;
     }
@@ -21,15 +20,15 @@ public sealed class InputParameterQueries(IStudyTemplateRepository repository)
         Guid studyTemplateId,
         CancellationToken cancellationToken = default)
     {
-        var studyTemplate = await repository.GetByIdAsync(new StudyTemplateId(studyTemplateId), cancellationToken);
+        var parameters = await repository.GetInputParameterSnapshotsAsync(
+            new StudyTemplateId(studyTemplateId), cancellationToken);
 
-        if (studyTemplate is null)
+        if (parameters.Count == 0)
         {
             return [];
         }
 
-        return studyTemplate.InputParameters
-            .Select(InputParameterDto.FromDomain)
+        return parameters.Select(InputParameterDto.FromDomain)
             .ToList();
     }
 }

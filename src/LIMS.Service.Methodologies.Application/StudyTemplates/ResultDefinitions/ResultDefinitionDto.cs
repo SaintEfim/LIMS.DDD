@@ -1,17 +1,18 @@
-﻿using LIMS.Service.Methodologies.Domain.StudyTemplateAggregate.Entities.ResultDefinitions;
+﻿using LIMS.Service.Methodologies.Application.Units;
+using LIMS.Service.Methodologies.Domain.StudyTemplateAggregate.Entities.ResultDefinitions;
 using LIMS.Service.Methodologies.Domain.UnitSnapshots;
 
 namespace LIMS.Service.Methodologies.Application.StudyTemplates.ResultDefinitions;
 
 public sealed record ResultDefinitionDto(
     Guid Id,
-    UnitDto? Unit,
+    UnitDto Unit,
     string ResultInstance,
     double? MinValue,
     double? MaxValue)
 {
     public static ResultDefinitionDto FromDomain(
-        UnitSnapshot? unit,
+        UnitSnapshot unit,
         ResultDefinition resultDefinition)
     {
         return new ResultDefinitionDto(resultDefinition.Id.Value, UnitDto.FromSnapshot(unit),
