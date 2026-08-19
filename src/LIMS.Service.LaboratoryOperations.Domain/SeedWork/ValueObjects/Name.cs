@@ -6,6 +6,9 @@ public sealed record Name
 {
     private const int MaxNameLength = 100;
 
+    // for EF Core
+    private Name() { }
+
     private Name(
         string value)
     {

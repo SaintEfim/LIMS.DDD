@@ -4,6 +4,9 @@ namespace LIMS.Service.LaboratoryOperations.Domain.SeedWork.ValueObjects;
 
 public sealed record Specification
 {
+    // for EF Core
+    private Specification() { }
+
     private Specification(
         double? minValue,
         double? maxValue)

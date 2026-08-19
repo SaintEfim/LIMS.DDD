@@ -7,6 +7,9 @@ public sealed record FormulaExpression
 {
     private const int MaxLength = 2000;
 
+    // for EF Core
+    private FormulaExpression() { }
+
     private FormulaExpression(
         string value)
     {

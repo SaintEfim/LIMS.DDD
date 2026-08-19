@@ -6,6 +6,9 @@ public sealed record Description
 {
     private const int MaxDescriptionLength = 1000;
 
+    // for EF Core
+    private Description() { }
+
     private Description(
         string? value)
     {

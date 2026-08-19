@@ -6,6 +6,9 @@ public sealed record Revision
 {
     private const int MaxRevisionLength = 100;
 
+    // for EF Core
+    private Revision() { }
+
     private Revision(
         string value)
     {

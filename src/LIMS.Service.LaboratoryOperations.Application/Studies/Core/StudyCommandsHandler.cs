@@ -8,8 +8,6 @@ using LIMS.Service.LaboratoryOperations.Domain.Services;
 using LIMS.Service.LaboratoryOperations.Domain.StudyAggregate;
 using LIMS.Service.LaboratoryOperations.Domain.StudyAggregate.ValueObjects;
 using LIMS.Service.LaboratoryOperations.Domain.StudyTemplateSnapshots;
-using LIMS.Service.LaboratoryOperations.Domain.StudyTemplateSnapshots.InputParameters;
-using LIMS.Service.LaboratoryOperations.Domain.StudyTemplateSnapshots.ResultDefinitions;
 
 namespace LIMS.Service.LaboratoryOperations.Application.Studies.Core;
 
@@ -56,8 +54,6 @@ public sealed class StudyCommandsHandler(
         }
 
         return await SaveNewAsync(createResult.GetValue(), cancellationToken);
-
-        return null!;
     }
 
     public async Task<Result<None, Exception>> UpdateNotesAsync(
