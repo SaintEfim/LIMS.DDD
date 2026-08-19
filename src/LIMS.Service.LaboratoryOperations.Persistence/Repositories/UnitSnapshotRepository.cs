@@ -24,6 +24,14 @@ public sealed class UnitSnapshotRepository(ApplicationDbContext context) : IUnit
         context.UnitSnapshots.Add(unit);
     }
 
+    public async Task<ICollection<UnitSnapshot>> GetAllAsync(
+        CancellationToken cancellationToken = default)
+    {
+        return await context.UnitSnapshots
+            .AsNoTracking()
+            .ToListAsync(cancellationToken);
+    }
+
     public async Task<UnitSnapshot?> GetByIdAsync(
         UnitId id,
         CancellationToken cancellationToken = default)

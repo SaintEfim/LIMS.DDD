@@ -8,6 +8,9 @@ public interface IUnitSnapshotRepository : IRepository<UnitSnapshot>
         UnitId id,
         CancellationToken cancellationToken = default);
 
+    Task<ICollection<UnitSnapshot>> GetAllAsync(
+        CancellationToken cancellationToken = default);
+
     Task<UnitSnapshot?> GetByIdForChangeAsync(
         UnitId id,
         CancellationToken cancellationToken = default);
