@@ -1,3 +1,4 @@
+using Application.SeedWork.SeedWork;
 using Domain.SeedWork.SeedWork;
 using Domain.SeedWork.SeedWork.Result;
 using Domain.SeedWork.SeedWork.ValueObjects;
@@ -5,7 +6,9 @@ using LIMS.Service.Methodologies.Domain.UnitSnapshots;
 
 namespace LIMS.Service.Methodologies.Application.Units;
 
-public sealed class UnitSnapshotCommandsHandler(IUnitOfWork unitOfWork, IUnitSnapshotRepository snapshotRepository)
+public sealed class UnitSnapshotCommandsHandler(
+    IUnitOfWork unitOfWork,
+    IUnitSnapshotRepository snapshotRepository) : ICommandsHandler
 {
     public async Task<Result<UnitSnapshot, Exception>> CreateAsync(
         CreateUnitSnapshotCommand message,

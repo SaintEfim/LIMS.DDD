@@ -18,7 +18,7 @@ public sealed record FormulaExpression
         Value = value;
     }
 
-    public string Value { get; }
+    public string Value { get; } = null!;
 
     private static Regex Formula()
     {

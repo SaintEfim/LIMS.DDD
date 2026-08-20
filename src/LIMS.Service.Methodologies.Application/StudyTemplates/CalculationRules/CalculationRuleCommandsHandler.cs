@@ -1,4 +1,5 @@
-﻿using Domain.SeedWork.SeedWork;
+﻿using Application.SeedWork.SeedWork;
+using Domain.SeedWork.SeedWork;
 using Domain.SeedWork.SeedWork.Result;
 using Domain.SeedWork.SeedWork.ValueObjects;
 using LIMS.Service.Methodologies.Application.StudyTemplates.CalculationRules.Commands;
@@ -9,6 +10,7 @@ using LIMS.Service.Methodologies.Domain.StudyTemplateAggregate.Entities.ResultDe
 namespace LIMS.Service.Methodologies.Application.StudyTemplates.CalculationRules;
 
 public sealed class CalculationRuleCommandsHandler(IStudyTemplateRepository repository, IUnitOfWork unitOfWork)
+    : ICommandsHandler
 {
     public async Task<Result<Guid, Exception>> CreateAsync(
         Guid studyTemplateId,

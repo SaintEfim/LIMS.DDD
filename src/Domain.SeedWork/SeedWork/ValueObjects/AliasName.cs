@@ -17,7 +17,7 @@ public sealed record AliasName
         Value = value;
     }
 
-    public string Value { get; }
+    public string Value { get; } = null!;
 
     public static Result<AliasName, Exception> Create(
         string value)

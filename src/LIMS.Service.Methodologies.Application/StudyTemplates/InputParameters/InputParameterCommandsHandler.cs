@@ -1,4 +1,5 @@
-﻿using Domain.SeedWork.SeedWork;
+﻿using Application.SeedWork.SeedWork;
+using Domain.SeedWork.SeedWork;
 using Domain.SeedWork.SeedWork.Result;
 using Domain.SeedWork.SeedWork.ValueObjects;
 using LIMS.Service.Methodologies.Application.StudyTemplates.InputParameters.Commands;
@@ -8,6 +9,7 @@ using LIMS.Service.Methodologies.Domain.StudyTemplateAggregate.Entities.InputPar
 namespace LIMS.Service.Methodologies.Application.StudyTemplates.InputParameters;
 
 public sealed class InputParameterCommandsHandler(IStudyTemplateRepository repository, IUnitOfWork unitOfWork)
+    : ICommandsHandler
 {
     public async Task<Result<Guid, Exception>> CreateAsync(
         Guid studyTemplateId,

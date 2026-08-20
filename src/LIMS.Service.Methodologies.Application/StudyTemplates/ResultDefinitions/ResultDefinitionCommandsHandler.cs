@@ -1,4 +1,5 @@
-﻿using Domain.SeedWork.SeedWork;
+﻿using Application.SeedWork.SeedWork;
+using Domain.SeedWork.SeedWork;
 using Domain.SeedWork.SeedWork.Result;
 using Domain.SeedWork.SeedWork.ValueObjects;
 using LIMS.Service.Methodologies.Application.StudyTemplates.ResultDefinitions.Commands;
@@ -11,7 +12,7 @@ namespace LIMS.Service.Methodologies.Application.StudyTemplates.ResultDefinition
 public sealed class ResultDefinitionCommandsHandler(
     IStudyTemplateRepository repository,
     IUnitSnapshotRepository unitSnapshotRepository,
-    IUnitOfWork unitOfWork)
+    IUnitOfWork unitOfWork) : ICommandsHandler
 {
     public async Task<Result<Guid, Exception>> CreateAsync(
         Guid studyTemplateId,

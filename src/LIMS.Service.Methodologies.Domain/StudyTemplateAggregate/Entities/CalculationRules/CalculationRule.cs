@@ -23,17 +23,22 @@ public sealed class CalculationRule : SoftDeletableModel
         ResultDefinitionId = resultDefinitionId;
     }
 
+    // for EF Core
+    private CalculationRule()
+    {
+    }
+
     public ResultDefinitionId ResultDefinitionId { get; private set; }
 
     public CalculationRuleId Id { get; private set; }
 
     public StudyTemplateId StudyTemplateId { get; private set; }
 
-    public Name Name { get; private set; }
+    public Name Name { get; private set; } = null!;
 
-    public FormulaExpression FormulaExpression { get; private set; }
+    public FormulaExpression FormulaExpression { get; private set; } = null!;
 
-    public Description Description { get; private set; }
+    public Description Description { get; private set; } = null!;
 
     internal void Update(
         Name? name,

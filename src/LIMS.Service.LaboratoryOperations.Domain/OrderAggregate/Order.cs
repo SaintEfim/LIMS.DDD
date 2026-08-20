@@ -24,15 +24,20 @@ public class Order
         Code = code;
     }
 
+    // for EF Core
+    private Order()
+    {
+    }
+
     public OrderId Id { get; private set; }
 
-    public Name Name { get; private set; }
+    public Name Name { get; private set; } = null!;
 
-    public Description Description { get; private set; }
+    public Description Description { get; private set; } = null!;
 
-    public Code Code { get; private set; }
+    public Code Code { get; private set; } = null!;
 
-    public string Contractor { get; private set; }
+    public string Contractor { get; private set; } = null!;
 
     public OrderStatus OrderStatus { get; private set; } = OrderStatus.Draft;
 

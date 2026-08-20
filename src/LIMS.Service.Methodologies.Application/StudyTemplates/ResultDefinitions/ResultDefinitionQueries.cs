@@ -1,4 +1,5 @@
-﻿using LIMS.Service.Methodologies.Domain.StudyTemplateAggregate;
+﻿using Application.SeedWork.SeedWork;
+using LIMS.Service.Methodologies.Domain.StudyTemplateAggregate;
 using LIMS.Service.Methodologies.Domain.StudyTemplateAggregate.Entities.ResultDefinitions;
 using LIMS.Service.Methodologies.Domain.UnitSnapshots;
 
@@ -6,7 +7,7 @@ namespace LIMS.Service.Methodologies.Application.StudyTemplates.ResultDefinition
 
 public sealed class ResultDefinitionQueries(
     IStudyTemplateRepository repository,
-    IUnitSnapshotRepository unitSnapshotRepository)
+    IUnitSnapshotRepository unitSnapshotRepository) : IQueries
 {
     public async Task<ResultDefinitionDto?> GetByIdAsync(
         Guid studyTemplateId,

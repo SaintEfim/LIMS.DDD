@@ -1,4 +1,5 @@
-﻿using Domain.SeedWork.SeedWork;
+﻿using Application.SeedWork.SeedWork;
+using Domain.SeedWork.SeedWork;
 using Domain.SeedWork.SeedWork.Result;
 using Domain.SeedWork.SeedWork.ValueObjects;
 using Guides.Messages;
@@ -15,7 +16,7 @@ public sealed class StudyTemplateCommandsHandler(
     IMessageBus busService,
     IStudyTemplateRepository repository,
     IUnitOfWork unitOfWork,
-    StudyTemplateVersioningService domainService)
+    StudyTemplateVersioningService domainService) : ICommandsHandler
 {
     public async Task<Result<StudyTemplate, Exception>> CreateAsync(
         CreateStudyTemplateCommand command,

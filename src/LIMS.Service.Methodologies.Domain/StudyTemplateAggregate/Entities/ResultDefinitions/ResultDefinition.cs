@@ -19,7 +19,12 @@ public sealed class ResultDefinition : SoftDeletableModel
         Specification = specification;
     }
 
-    public string ResultInstance { get; private set; }
+    // for EF Core
+    private ResultDefinition()
+    {
+    }
+
+    public string ResultInstance { get; private set; } = null!;
 
     public ResultDefinitionId Id { get; private set; }
 
@@ -27,7 +32,7 @@ public sealed class ResultDefinition : SoftDeletableModel
 
     public UnitId UnitId { get; private set; }
 
-    public Specification Specification { get; private set; }
+    public Specification Specification { get; private set; } = null!;
 
     internal void Update(
         string? resultInstance,

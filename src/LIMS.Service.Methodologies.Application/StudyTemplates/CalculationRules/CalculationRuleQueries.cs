@@ -1,9 +1,10 @@
-﻿using LIMS.Service.Methodologies.Domain.StudyTemplateAggregate;
+﻿using Application.SeedWork.SeedWork;
+using LIMS.Service.Methodologies.Domain.StudyTemplateAggregate;
 using LIMS.Service.Methodologies.Domain.StudyTemplateAggregate.Entities.CalculationRules;
 
 namespace LIMS.Service.Methodologies.Application.StudyTemplates.CalculationRules;
 
-public sealed class CalculationRuleQueries(IStudyTemplateRepository repository)
+public sealed class CalculationRuleQueries(IStudyTemplateRepository repository) : IQueries
 {
     public async Task<CalculationRuleDto?> GetByIdAsync(
         Guid studyTemplateId,

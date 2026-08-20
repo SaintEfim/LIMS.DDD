@@ -21,6 +21,7 @@ public sealed class StudyTemplate
 
     private readonly List<ResultDefinition> _resultDefinitions = [];
 
+    // for EF Core
     private StudyTemplate()
     {
     }

@@ -1,11 +1,12 @@
-﻿using LIMS.Service.Methodologies.Domain.StudyTemplateAggregate;
+﻿using Application.SeedWork.SeedWork;
+using LIMS.Service.Methodologies.Domain.StudyTemplateAggregate;
 using LIMS.Service.Methodologies.Domain.UnitSnapshots;
 
 namespace LIMS.Service.Methodologies.Application.StudyTemplates.Core;
 
 public sealed class StudyTemplateQueries(
     IStudyTemplateRepository repository,
-    IUnitSnapshotRepository unitSnapshotRepository)
+    IUnitSnapshotRepository unitSnapshotRepository) : IQueries
 {
     public async Task<StudyTemplateDto?> GetByIdAsync(
         Guid id,

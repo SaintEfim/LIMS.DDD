@@ -37,17 +37,22 @@ public sealed class Study
         _testResults.AddRange(initialTestResults);
     }
 
+    // for EF Core
+    private Study()
+    {
+    }
+
     public StudyId Id { get; private set; }
 
     public SampleId SampleId { get; private set; }
 
-    public StudyStatus Status { get; private set; }
+    public StudyStatus Status { get; private set; } = null!;
 
-    public Name Name { get; private set; }
+    public Name Name { get; private set; } = null!;
 
     public StudyTemplateId StudyTemplateId { get; private set; }
 
-    public Description Description { get; private set; }
+    public Description Description { get; private set; } = null!;
 
     public IReadOnlyList<MeasuredValue> MeasuredValues => _measuredValues.AsReadOnly();
     public IReadOnlyList<TestResult> TestResults => _testResults.AsReadOnly();

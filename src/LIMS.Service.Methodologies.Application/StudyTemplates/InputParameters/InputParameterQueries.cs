@@ -1,9 +1,10 @@
-﻿using LIMS.Service.Methodologies.Domain.StudyTemplateAggregate;
+﻿using Application.SeedWork.SeedWork;
+using LIMS.Service.Methodologies.Domain.StudyTemplateAggregate;
 using LIMS.Service.Methodologies.Domain.StudyTemplateAggregate.Entities.InputParameters;
 
 namespace LIMS.Service.Methodologies.Application.StudyTemplates.InputParameters;
 
-public sealed class InputParameterQueries(IStudyTemplateRepository repository)
+public sealed class InputParameterQueries(IStudyTemplateRepository repository) : IQueries
 {
     public async Task<InputParameterDto?> GetByIdAsync(
         Guid studyTemplateId,
