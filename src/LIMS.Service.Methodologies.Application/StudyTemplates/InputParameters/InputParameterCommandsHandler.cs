@@ -55,7 +55,8 @@ public sealed class InputParameterCommandsHandler(IStudyTemplateRepository repos
         var saveResult = await SaveChangesAsync(cancellationToken);
         return saveResult.IsFailure
             ? saveResult.CastFailure<Guid>()
-            : addResult.GetValue().Id.Value;
+            : addResult.GetValue()
+                .Id.Value;
     }
 
     public async Task<Result<None, Exception>> RemoveAsync(

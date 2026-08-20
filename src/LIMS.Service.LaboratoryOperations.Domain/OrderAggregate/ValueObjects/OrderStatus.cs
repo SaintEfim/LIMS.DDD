@@ -6,14 +6,6 @@ namespace LIMS.Service.LaboratoryOperations.Domain.OrderAggregate.ValueObjects;
 
 public sealed record OrderStatus : StatusBase<IState<Order>, Order>
 {
-    public static OrderStatus Draft { get; } = new(new OrderDraftState());
-
-    public static OrderStatus InProgress { get; } = new(new OrderInProgressState());
-
-    public static OrderStatus Completed { get; } = new(new OrderCompletedState());
-
-    public static OrderStatus Canceled { get; } = new(new OrderCanceledState());
-
     private static readonly Dictionary<string, OrderStatus> Registry = new(StringComparer.OrdinalIgnoreCase)
     {
         ["Draft"] = Draft,
@@ -27,6 +19,14 @@ public sealed record OrderStatus : StatusBase<IState<Order>, Order>
         : base(state)
     {
     }
+
+    public static OrderStatus Draft { get; } = new(new OrderDraftState());
+
+    public static OrderStatus InProgress { get; } = new(new OrderInProgressState());
+
+    public static OrderStatus Completed { get; } = new(new OrderCompletedState());
+
+    public static OrderStatus Canceled { get; } = new(new OrderCanceledState());
 
     public static bool TryParse(
         string? name,

@@ -5,8 +5,13 @@ namespace LIMS.Service.LaboratoryOperations.Domain.StudyAggregate.Entities;
 
 public sealed class TestResult : SoftDeletableModel
 {
-    private TestResult()
+    internal TestResult(
+        StudyId studyId,
+        ResultDefinitionId resultDefinitionId)
     {
+        Id = new TestResultId(Guid.NewGuid());
+        StudyId = studyId;
+        ResultDefinitionId = resultDefinitionId;
     }
 
     public TestResultId Id { get; private set; }
@@ -18,18 +23,6 @@ public sealed class TestResult : SoftDeletableModel
     public double? Value { get; private set; }
 
     public bool IsOutOfSpec { get; private set; }
-
-    internal static TestResult Create(
-        StudyId studyId,
-        ResultDefinitionId resultDefinitionId)
-    {
-        return new TestResult
-        {
-            Id = new TestResultId(Guid.NewGuid()),
-            StudyId = studyId,
-            ResultDefinitionId = resultDefinitionId
-        };
-    }
 
     // TODO вынести в domain service
     public void SetValue(
@@ -44,11 +37,10 @@ public sealed class TestResult : SoftDeletableModel
         if (!Value.HasValue)
         {
             IsOutOfSpec = false;
-            return;
         }
 
         //var isWithinSpec = ResultSnapshot.Specification.IsWithinSpec(Value.Value);
-      //  IsOutOfSpec = !isWithinSpec;
+        //  IsOutOfSpec = !isWithinSpec;
     }
 
     internal void MarkAsDeleted()

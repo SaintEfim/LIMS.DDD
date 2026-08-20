@@ -21,15 +21,14 @@ public sealed record GatherDate
     {
         if (!begin.HasValue || !end.HasValue)
         {
-            return Result<GatherDate, Exception>.Success(new GatherDate(begin, end));
+            return new GatherDate(begin, end);
         }
 
         if (begin.Value > end.Value)
         {
-            return Result<GatherDate, Exception>.Failure(
-                new ArgumentException("Gather begin date cannot be later than gather end date."));
+            return new ArgumentException("Gather begin date cannot be later than gather end date.");
         }
 
-        return Result<GatherDate, Exception>.Success(new GatherDate(begin, end));
+        return new GatherDate(begin, end);
     }
 }

@@ -12,59 +12,50 @@ public class Sample
     : SoftDeletableModel,
         IAggregateRoot
 {
-    private Sample()
-    {
-    }
-
-    public SampleId Id { get; private set; }
-
-    public OrderId OrderId { get; private set; }
-
-    public Name Name { get; private set; } = null!;
-
-    public GatherDate GatherDate { get; private set; } = null!;
-
-    public Code Code { get; private set; } = null!;
-
-    public Volume Volume { get; private set; } = null!;
-
-    public SampleStatus SampleStatus { get; private set; } = SampleStatus.Registered;
-
-    public bool CanAcceptNewEntity =>
-        SampleStatus == SampleStatus.Registered || SampleStatus == SampleStatus.InProgress;
-
-    internal static Result<Sample, Exception> Create(
+    internal Sample(
         OrderId orderId,
         Name name,
         GatherDate gatherDate,
         Code code,
         Volume volume)
     {
-        var sample = new Sample
-        {
-            Id = new SampleId(Guid.NewGuid()),
-            OrderId = orderId,
-            Name = name,
-            GatherDate = gatherDate,
-            Code = code,
-            Volume = volume,
-            SampleStatus = SampleStatus.Registered
-        };
-
-        return Result<Sample, Exception>.Success(sample);
+        Id = new SampleId(Guid.NewGuid());
+        OrderId = orderId;
+        Name = name;
+        GatherDate = gatherDate;
+        Code = code;
+        Volume = volume;
+        SampleStatus = SampleStatus.Registered;
     }
+
+    public SampleId Id { get; private set; }
+
+    public OrderId OrderId { get; private set; }
+
+    public Name Name { get; private set; }
+
+    public GatherDate GatherDate { get; private set; }
+
+    public Code Code { get; private set; }
+
+    public Volume Volume { get; private set; }
+
+    public SampleStatus SampleStatus { get; private set; }
+
+    public bool CanAcceptNewEntity =>
+        SampleStatus == SampleStatus.Registered || SampleStatus == SampleStatus.InProgress;
 
     internal Result<None, Exception> Delete()
     {
         if (IsDeleted)
         {
-            return Result<None, Exception>.Failure(new InvalidOperationException("Sample is already deleted."));
+            return new InvalidOperationException("Sample is already deleted.");
         }
 
         IsDeleted = true;
         DeletedAt = DateTimeOffset.UtcNow;
 
-        return Result<None, Exception>.Success();
+        return new None();
     }
 
     public Result<None, Exception> UpdatePartial(
@@ -76,8 +67,7 @@ public class Sample
     {
         if (!SampleStatus.CanEdit)
         {
-            return Result<None, Exception>.Failure(
-                new InvalidOperationException("Cannot modify sample details when it is InWork or Completed."));
+            return new InvalidOperationException("Cannot modify sample details when it is InWork or Completed.");
         }
 
         if (name is not null)
@@ -108,7 +98,7 @@ public class Sample
 
         Volume = volume;
 
-        return Result<None, Exception>.Success();
+        return new None();
     }
 
     internal Result<None, Exception> ChangeStatus(
@@ -123,6 +113,6 @@ public class Sample
 
         SampleStatus = newSampleStatus;
 
-        return Result<None, Exception>.Success();
+        return new None();
     }
 }

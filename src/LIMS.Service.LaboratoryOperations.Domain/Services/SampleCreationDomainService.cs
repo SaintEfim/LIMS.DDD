@@ -18,12 +18,12 @@ public sealed class SampleCreationDomainService
     {
         if (!order.CanAcceptNewEntity)
         {
-            return Result<Sample, Exception>.Failure(new InvalidOperationException(
+            return new InvalidOperationException(
                 $"Cannot add samples to an order with status '{order.OrderStatus.Name}'. " +
-                "Order must be in Draft or InProgress status."));
+                "Order must be in Draft or InProgress status.");
         }
 
-        var sampleResult = Sample.Create(order.Id, name, gatherDate, code, volume);
+        var sampleResult = new Sample(order.Id, name, gatherDate, code, volume);
 
         return sampleResult;
     }

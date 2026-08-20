@@ -14,10 +14,9 @@ public sealed class ActiveState : IState<StudyTemplate>
     {
         return newState switch
         {
-            ActiveState or ArchivedState => Result<None, Exception>.Success(new None()),
-            DraftState => Result<None, Exception>.Failure(
-                new InvalidOperationException("Active templates cannot be reverted to Draft.")),
-            _ => Result<None, Exception>.Failure(new InvalidOperationException("Invalid transition from Active"))
+            ActiveState or ArchivedState => new None(),
+            DraftState => new InvalidOperationException("Active templates cannot be reverted to Draft."),
+            _ => new InvalidOperationException("Invalid transition from Active")
         };
     }
 }

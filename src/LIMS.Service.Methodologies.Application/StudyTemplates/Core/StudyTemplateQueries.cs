@@ -12,7 +12,10 @@ public sealed class StudyTemplateQueries(
         CancellationToken cancellationToken = default)
     {
         var studyTemplate = await repository.GetByIdAsync(new StudyTemplateId(id), cancellationToken);
-        if (studyTemplate is null) return null;
+        if (studyTemplate is null)
+        {
+            return null;
+        }
 
         var unitIds = studyTemplate.ResultDefinitions
             .Select(r => r.UnitId)
@@ -29,7 +32,10 @@ public sealed class StudyTemplateQueries(
         CancellationToken cancellationToken = default)
     {
         var studyTemplates = await repository.GetAllAsync(cancellationToken);
-        if (studyTemplates.Count == 0) return [];
+        if (studyTemplates.Count == 0)
+        {
+            return [];
+        }
 
         var unitIds = studyTemplates.SelectMany(t => t.ResultDefinitions)
             .Select(r => r.UnitId)

@@ -1,7 +1,5 @@
 ﻿using LIMS.Service.LaboratoryOperations.Domain.StudyAggregate;
 using LIMS.Service.LaboratoryOperations.Domain.StudyAggregate.Entities;
-using LIMS.Service.LaboratoryOperations.Domain.StudyAggregate.ValueObjects;
-using LIMS.Service.LaboratoryOperations.Domain.StudyTemplateSnapshots;
 using LIMS.Service.LaboratoryOperations.Domain.StudyTemplateSnapshots.ResultDefinitions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;

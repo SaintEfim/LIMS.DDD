@@ -11,19 +11,28 @@ public class Order
     : SoftDeletableModel,
         IAggregateRoot
 {
-    private Order()
+    public Order(
+        Name name,
+        Description description,
+        string contractor,
+        Code code)
     {
+        Id = new OrderId(Guid.NewGuid());
+        Name = name;
+        Description = description;
+        Contractor = contractor;
+        Code = code;
     }
 
     public OrderId Id { get; private set; }
 
-    public Name Name { get; private set; } = null!;
+    public Name Name { get; private set; }
 
-    public Description Description { get; private set; } = null!;
+    public Description Description { get; private set; }
 
-    public Code Code { get; private set; } = null!;
+    public Code Code { get; private set; }
 
-    public string Contractor { get; private set; } = string.Empty;
+    public string Contractor { get; private set; }
 
     public OrderStatus OrderStatus { get; private set; } = OrderStatus.Draft;
 
@@ -31,42 +40,23 @@ public class Order
 
     public bool CanDeleteAssociatedEntities => OrderStatus == OrderStatus.Draft;
 
-    public static Result<Order, Exception> Create(
-        Name name,
-        Description description,
-        string contractor,
-        Code code)
-    {
-        var order = new Order
-        {
-            Id = new OrderId(Guid.NewGuid()),
-            Name = name,
-            Description = description,
-            Contractor = contractor,
-            Code = code
-        };
-
-        return Result<Order, Exception>.Success(order);
-    }
-
     public Result<None, Exception> Delete()
     {
         if (OrderStatus != OrderStatus.Draft)
         {
-            return Result<None, Exception>.Failure(new InvalidOperationException(
-                $"Cannot delete order in '{OrderStatus.Name}' status. " +
-                "Only orders in 'Draft' status can be deleted. Use 'Cancel' status for others."));
+            return new InvalidOperationException($"Cannot delete order in '{OrderStatus.Name}' status. " +
+                                                 "Only orders in 'Draft' status can be deleted. Use 'Cancel' status for others.");
         }
 
         if (IsDeleted)
         {
-            return Result<None, Exception>.Failure(new InvalidOperationException("Order is already deleted."));
+            return new InvalidOperationException("Order is already deleted.");
         }
 
         IsDeleted = true;
         DeletedAt = DateTimeOffset.UtcNow;
 
-        return Result<None, Exception>.Success();
+        return new None();
     }
 
     public Result<None, Exception> UpdatePartial(
@@ -77,8 +67,7 @@ public class Order
     {
         if (!OrderStatus.CanEdit)
         {
-            return Result<None, Exception>.Failure(
-                new InvalidOperationException("Cannot modify order details when the order is not editable."));
+            return new InvalidOperationException("Cannot modify order details when the order is not editable.");
         }
 
         if (name is not null)
@@ -101,7 +90,7 @@ public class Order
             Code = code;
         }
 
-        return Result<None, Exception>.Success();
+        return new None();
     }
 
     internal Result<None, Exception> ChangeStatus(
@@ -116,6 +105,6 @@ public class Order
 
         OrderStatus = newOrderStatus;
 
-        return Result<None, Exception>.Success();
+        return new None();
     }
 }

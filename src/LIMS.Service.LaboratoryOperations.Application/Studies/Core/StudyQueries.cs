@@ -11,10 +11,16 @@ public sealed class StudyQueries(IStudyRepository repository, IStudyTemplateSnap
         CancellationToken cancellationToken = default)
     {
         var study = await repository.GetByIdAsync(new StudyId(id), cancellationToken);
-        if (study is null) return null;
+        if (study is null)
+        {
+            return null;
+        }
 
         var snapshot = await snapshotRepository.GetByIdAsync(study.StudyTemplateId, cancellationToken);
-        if (snapshot is null) throw new KeyNotFoundException("template not found");
+        if (snapshot is null)
+        {
+            throw new KeyNotFoundException("template not found");
+        }
 
         return StudyDto.FromDomain(study, snapshot);
     }
@@ -34,7 +40,10 @@ public sealed class StudyQueries(IStudyRepository repository, IStudyTemplateSnap
         foreach (var study in studies)
         {
             var snapshot = await snapshotRepository.GetByIdAsync(study.StudyTemplateId, cancellationToken);
-            if (snapshot is null) throw new KeyNotFoundException("template not found");
+            if (snapshot is null)
+            {
+                throw new KeyNotFoundException("template not found");
+            }
 
             studyDtos.Add(StudyDto.FromDomain(study, snapshot));
         }

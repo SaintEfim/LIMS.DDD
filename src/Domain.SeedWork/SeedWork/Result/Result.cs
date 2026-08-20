@@ -21,12 +21,16 @@ public class Result<TValue, TError>
     private TError? Error { get; }
 
     public static implicit operator Result<TValue, TError>(
-        TValue value) =>
-        new(true, value, null);
+        TValue value)
+    {
+        return new Result<TValue, TError>(true, value, null);
+    }
 
     public static implicit operator Result<TValue, TError>(
-        TError error) =>
-        new(false, default, error);
+        TError error)
+    {
+        return new Result<TValue, TError>(false, default, error);
+    }
 
     public static Result<None, TError> Success()
     {

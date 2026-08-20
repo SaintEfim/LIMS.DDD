@@ -8,7 +8,8 @@ namespace LIMS.Service.LaboratoryOperations.Persistence.Configurations;
 
 public class ResultDefinitionSnapshotConfiguration : IEntityTypeConfiguration<ResultDefinitionSnapshot>
 {
-    public void Configure(EntityTypeBuilder<ResultDefinitionSnapshot> builder)
+    public void Configure(
+        EntityTypeBuilder<ResultDefinitionSnapshot> builder)
     {
         builder.ToTable("ResultDefinitionSnapshots");
 

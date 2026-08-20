@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\LIMS.Service.LaboratoryOperations.Domain\LIMS.Service.LaboratoryOperations.Domain.csproj" />
+    <ProjectReference Include="..\LIMS.Service.LaboratoryOperations.Domain\LIMS.Service.LaboratoryOperations.Domain.csproj"/>
   </ItemGroup>
 
 </Project>

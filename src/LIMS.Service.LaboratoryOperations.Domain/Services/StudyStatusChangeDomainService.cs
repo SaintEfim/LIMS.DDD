@@ -16,8 +16,7 @@ public sealed class StudyStatusChangeDomainService
         if ((newStatus == StudyStatus.Completed || newStatus == StudyStatus.Approved) &&
             parentSample.SampleStatus == SampleStatus.Canceled)
         {
-            return Result<None, Exception>.Failure(
-                new InvalidOperationException("Cannot complete or approve a study for a canceled sample."));
+            return new InvalidOperationException("Cannot complete or approve a study for a canceled sample.");
         }
 
         return study.ChangeStatus(newStatus);

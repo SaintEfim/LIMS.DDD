@@ -1,4 +1,6 @@
-﻿namespace RabbitMq.Library.QuickStart.IntegrationEvents;
+﻿using System.Collections;
+
+namespace RabbitMq.Library.QuickStart.IntegrationEvents;
 
 public sealed class RegisteredEventsDictionary(Dictionary<Type, IntegrationEventDescriptor> dictionary)
     : IReadOnlyDictionary<Type, IntegrationEventDescriptor>
@@ -12,21 +14,32 @@ public sealed class RegisteredEventsDictionary(Dictionary<Type, IntegrationEvent
     public int Count => dictionary.Count;
 
     public bool ContainsKey(
-        Type key) =>
-        dictionary.ContainsKey(key);
+        Type key)
+    {
+        return dictionary.ContainsKey(key);
+    }
 
     public bool TryGetValue(
         Type key,
-        out IntegrationEventDescriptor value) =>
-        dictionary.TryGetValue(key, out value!);
+        out IntegrationEventDescriptor value)
+    {
+        return dictionary.TryGetValue(key, out value!);
+    }
 
-    public IEnumerator<KeyValuePair<Type, IntegrationEventDescriptor>> GetEnumerator() =>
-        dictionary.GetEnumerator();
+    public IEnumerator<KeyValuePair<Type, IntegrationEventDescriptor>> GetEnumerator()
+    {
+        return dictionary.GetEnumerator();
+    }
 
-    System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => GetEnumerator();
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return GetEnumerator();
+    }
 
     public void Add(
         Type messageType,
-        IntegrationEventDescriptor integrationEventDescriptor) =>
+        IntegrationEventDescriptor integrationEventDescriptor)
+    {
         dictionary.Add(messageType, integrationEventDescriptor);
+    }
 }

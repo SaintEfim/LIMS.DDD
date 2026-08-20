@@ -14,9 +14,9 @@ public sealed class SampleInProgressState : IState<Sample>
     {
         return newState switch
         {
-            SampleCompletedState => Result<None, Exception>.Success(new None()),
-            SampleCanceledState => Result<None, Exception>.Success(new None()),
-            _ => Result<None, Exception>.Failure(new InvalidOperationException("Invalid transition from InWork"))
+            SampleCompletedState => new None(),
+            SampleCanceledState => new None(),
+            _ => new InvalidOperationException("Invalid transition from InWork")
         };
     }
 }

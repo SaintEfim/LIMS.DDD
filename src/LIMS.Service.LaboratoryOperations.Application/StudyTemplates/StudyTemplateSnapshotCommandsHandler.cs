@@ -20,24 +20,42 @@ public sealed class StudyTemplateSnapshotCommandsHandler(
         var templateId = new StudyTemplateId(command.Id);
 
         var nameResult = Name.Create(command.Name);
-        if (nameResult.IsFailure) return nameResult.CastFailure<StudyTemplateSnapshot>();
+        if (nameResult.IsFailure)
+        {
+            return nameResult.CastFailure<StudyTemplateSnapshot>();
+        }
 
         var descriptionResult = Description.Create(command.Description);
-        if (descriptionResult.IsFailure) return descriptionResult.CastFailure<StudyTemplateSnapshot>();
+        if (descriptionResult.IsFailure)
+        {
+            return descriptionResult.CastFailure<StudyTemplateSnapshot>();
+        }
 
         var revisionResult = Revision.Create(command.Revision);
-        if (revisionResult.IsFailure) return revisionResult.CastFailure<StudyTemplateSnapshot>();
+        if (revisionResult.IsFailure)
+        {
+            return revisionResult.CastFailure<StudyTemplateSnapshot>();
+        }
 
         var inputParametersResult = MapInputParameters(templateId, command.InputParameters);
-        if (inputParametersResult.IsFailure) return inputParametersResult.CastFailure<StudyTemplateSnapshot>();
+        if (inputParametersResult.IsFailure)
+        {
+            return inputParametersResult.CastFailure<StudyTemplateSnapshot>();
+        }
 
         var resultDefinitionsResult = MapResultDefinitions(templateId, command.ResultDefinitions);
-        if (resultDefinitionsResult.IsFailure) return resultDefinitionsResult.CastFailure<StudyTemplateSnapshot>();
+        if (resultDefinitionsResult.IsFailure)
+        {
+            return resultDefinitionsResult.CastFailure<StudyTemplateSnapshot>();
+        }
 
         var calculationRulesResult = MapCalculationRules(templateId, command.CalculationRules);
-        if (calculationRulesResult.IsFailure) return calculationRulesResult.CastFailure<StudyTemplateSnapshot>();
+        if (calculationRulesResult.IsFailure)
+        {
+            return calculationRulesResult.CastFailure<StudyTemplateSnapshot>();
+        }
 
-        var snapshot = new StudyTemplateSnapshot(Id: templateId, Name: nameResult.GetValue(),
+        var snapshot = new StudyTemplateSnapshot(templateId, Name: nameResult.GetValue(),
             Description: descriptionResult.GetValue(), Revision: revisionResult.GetValue(),
             Parameters: inputParametersResult.GetValue(), Results: resultDefinitionsResult.GetValue(),
             CalculationRules: calculationRulesResult.GetValue());
@@ -54,27 +72,36 @@ public sealed class StudyTemplateSnapshotCommandsHandler(
         foreach (var dto in dtos)
         {
             var nameResult = Name.Create(dto.Name);
-            if (nameResult.IsFailure) return nameResult.CastFailure<IReadOnlyList<InputParameterSnapshot>>();
+            if (nameResult.IsFailure)
+            {
+                return nameResult.CastFailure<IReadOnlyList<InputParameterSnapshot>>();
+            }
 
             var descriptionResult = Description.Create(dto.Description);
             if (descriptionResult.IsFailure)
+            {
                 return descriptionResult.CastFailure<IReadOnlyList<InputParameterSnapshot>>();
+            }
 
             var aliasResult = AliasName.Create(dto.AliasName);
-            if (aliasResult.IsFailure) return aliasResult.CastFailure<IReadOnlyList<InputParameterSnapshot>>();
+            if (aliasResult.IsFailure)
+            {
+                return aliasResult.CastFailure<IReadOnlyList<InputParameterSnapshot>>();
+            }
 
             var specificationResult = Specification.Create(dto.SpecMin, dto.SpecMax);
             if (specificationResult.IsFailure)
+            {
                 return specificationResult.CastFailure<IReadOnlyList<InputParameterSnapshot>>();
+            }
 
-            var snapshot = new InputParameterSnapshot(Id: new InputParameterId(dto.Id), StudyTemplateId: templateId,
-                Name: nameResult.GetValue(), Description: descriptionResult.GetValue(),
-                AliasName: aliasResult.GetValue(), Specification: specificationResult.GetValue());
+            var snapshot = new InputParameterSnapshot(new InputParameterId(dto.Id), templateId, nameResult.GetValue(),
+                descriptionResult.GetValue(), aliasResult.GetValue(), specificationResult.GetValue());
 
             snapshots.Add(snapshot);
         }
 
-        return Result<IReadOnlyList<InputParameterSnapshot>, Exception>.Success(snapshots);
+        return snapshots;
     }
 
     private Result<IReadOnlyList<ResultDefinitionSnapshot>, Exception> MapResultDefinitions(
@@ -87,16 +114,17 @@ public sealed class StudyTemplateSnapshotCommandsHandler(
         {
             var specificationResult = Specification.Create(dto.SpecMin, dto.SpecMax);
             if (specificationResult.IsFailure)
+            {
                 return specificationResult.CastFailure<IReadOnlyList<ResultDefinitionSnapshot>>();
+            }
 
-            var snapshot = new ResultDefinitionSnapshot(Id: new ResultDefinitionId(dto.Id), StudyTemplateId: templateId,
-                ResultInstance: dto.ResultInstance, UnitId: new UnitId(dto.UnitId),
-                Specification: specificationResult.GetValue());
+            var snapshot = new ResultDefinitionSnapshot(new ResultDefinitionId(dto.Id), templateId, dto.ResultInstance,
+                new UnitId(dto.UnitId), specificationResult.GetValue());
 
             snapshots.Add(snapshot);
         }
 
-        return Result<IReadOnlyList<ResultDefinitionSnapshot>, Exception>.Success(snapshots);
+        return snapshots;
     }
 
     private static Result<IReadOnlyList<CalculationRuleSnapshot>, Exception> MapCalculationRules(
@@ -108,24 +136,30 @@ public sealed class StudyTemplateSnapshotCommandsHandler(
         foreach (var dto in dtos)
         {
             var nameResult = Name.Create(dto.Name);
-            if (nameResult.IsFailure) return nameResult.CastFailure<IReadOnlyList<CalculationRuleSnapshot>>();
+            if (nameResult.IsFailure)
+            {
+                return nameResult.CastFailure<IReadOnlyList<CalculationRuleSnapshot>>();
+            }
 
             var descriptionResult = Description.Create(dto.Description);
             if (descriptionResult.IsFailure)
+            {
                 return descriptionResult.CastFailure<IReadOnlyList<CalculationRuleSnapshot>>();
+            }
 
             var formulaResult = FormulaExpression.Create(dto.FormulaExpression);
-            if (formulaResult.IsFailure) return formulaResult.CastFailure<IReadOnlyList<CalculationRuleSnapshot>>();
+            if (formulaResult.IsFailure)
+            {
+                return formulaResult.CastFailure<IReadOnlyList<CalculationRuleSnapshot>>();
+            }
 
-            var snapshot = new CalculationRuleSnapshot(Id: new CalculationRuleId(dto.Id), StudyTemplateId: templateId,
-                Name: nameResult.GetValue(), Description: descriptionResult.GetValue(),
-                FormulaExpression: formulaResult.GetValue(),
-                ResultDefinitionId: new ResultDefinitionId(dto.ResultDefinitionId));
+            var snapshot = new CalculationRuleSnapshot(new CalculationRuleId(dto.Id), templateId, nameResult.GetValue(),
+                descriptionResult.GetValue(), formulaResult.GetValue(), new ResultDefinitionId(dto.ResultDefinitionId));
 
             snapshots.Add(snapshot);
         }
 
-        return Result<IReadOnlyList<CalculationRuleSnapshot>, Exception>.Success(snapshots);
+        return snapshots;
     }
 
     private async Task<Result<StudyTemplateSnapshot, Exception>> SaveAsync(
@@ -141,8 +175,7 @@ public sealed class StudyTemplateSnapshotCommandsHandler(
         }
         catch (Exception ex)
         {
-            return Result<StudyTemplateSnapshot, Exception>.Failure(
-                new Exception($"Failed to save StudyTemplateSnapshot: {ex.Message}", ex));
+            return new Exception($"Failed to save StudyTemplateSnapshot: {ex.Message}", ex);
         }
     }
 }

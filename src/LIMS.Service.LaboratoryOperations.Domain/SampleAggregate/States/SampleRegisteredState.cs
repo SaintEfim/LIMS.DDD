@@ -14,9 +14,9 @@ public sealed class SampleRegisteredState : IState<Sample>
     {
         return newState switch
         {
-            SampleInProgressState or SampleRegisteredState => Result<None, Exception>.Success(new None()),
-            SampleCanceledState => Result<None, Exception>.Success(new None()),
-            _ => Result<None, Exception>.Failure(new InvalidOperationException("Invalid transition from Registered"))
+            SampleInProgressState or SampleRegisteredState => new None(),
+            SampleCanceledState => new None(),
+            _ => new InvalidOperationException("Invalid transition from Registered")
         };
     }
 }

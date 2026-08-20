@@ -28,8 +28,7 @@ public sealed class RabbitMqMessageReceiver(
 
         try
         {
-            await channel.BasicQosAsync(prefetchSize: 0, prefetchCount: 10, global: false,
-                cancellationToken: cancellationToken);
+            await channel.BasicQosAsync(0, 10, false, cancellationToken);
             var consumer = new AsyncEventingBasicConsumer(channel);
             consumer.ReceivedAsync += async (
                 _,
@@ -50,18 +49,15 @@ public sealed class RabbitMqMessageReceiver(
                     await dispatcher.DispatchAsync(descriptor.EventType, message, cancellationToken);
                     logger.LogInformation("Successfully processed {EventType} from queue {QueueName}",
                         descriptor.EventType.Name, descriptor.QueueName);
-                    await channel.BasicAckAsync(deliveryTag: ea.DeliveryTag, multiple: false,
-                        cancellationToken: cancellationToken);
+                    await channel.BasicAckAsync(ea.DeliveryTag, false, cancellationToken);
                 }
                 catch (Exception ex)
                 {
                     logger.LogError(ex, "Failed to process message from queue {QueueName}", descriptor.QueueName);
-                    await channel.BasicNackAsync(deliveryTag: ea.DeliveryTag, multiple: false, requeue: false,
-                        cancellationToken: cancellationToken);
+                    await channel.BasicNackAsync(ea.DeliveryTag, false, false, cancellationToken);
                 }
             };
-            await channel.BasicConsumeAsync(queue: descriptor.QueueName, autoAck: false, consumer: consumer,
-                cancellationToken: cancellationToken);
+            await channel.BasicConsumeAsync(descriptor.QueueName, false, consumer, cancellationToken);
             logger.LogInformation("Consumer started for queue {QueueName}", descriptor.QueueName);
             await WaitUntilChannelClosedAsync(channel, cancellationToken);
         }

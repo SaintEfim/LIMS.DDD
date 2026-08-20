@@ -250,6 +250,7 @@ POST {{baseUrl}}/api/study-templates/{{moistureTemplateV2Id}}/change-status?newS
   client.log("Moisture Template V2 approved (Active)");
 %}
 #
+
 #### ============================================
 #### 1. СОЗДАНИЕ ЗАДАНИЯ (ORDER)
 #### ============================================

@@ -4,8 +4,8 @@ namespace RabbitMq.Library.QuickStart.IntegrationEvents;
 
 public sealed class IntegrationEventRegistry
 {
-    private readonly RegisteredEventsDictionary _events;
     private readonly ConsumedEventsDictionary _consumedEvents;
+    private readonly RegisteredEventsDictionary _events;
 
     public IntegrationEventRegistry(
         RegisteredEventsDictionary events,
@@ -14,6 +14,10 @@ public sealed class IntegrationEventRegistry
         _events = events;
         _consumedEvents = consumedEvents;
     }
+
+    public IReadOnlyDictionary<Type, IntegrationEventDescriptor> All => _events;
+
+    public IReadOnlyDictionary<Type, IntegrationEventDescriptor> Consumed => _consumedEvents;
 
     public IntegrationEventDescriptor Get<T>()
         where T : IIntegrationEvent
@@ -31,8 +35,4 @@ public sealed class IntegrationEventRegistry
             ? descriptor
             : throw new InvalidOperationException($"Integration event '{eventType.FullName}' is not registered.");
     }
-
-    public IReadOnlyDictionary<Type, IntegrationEventDescriptor> All => _events;
-
-    public IReadOnlyDictionary<Type, IntegrationEventDescriptor> Consumed => _consumedEvents;
 }

@@ -17,9 +17,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\LIMS.Service.Methodologies.Application\LIMS.Service.Methodologies.Application.csproj" />
-    <ProjectReference Include="..\LIMS.Service.Methodologies.Infrastructure\LIMS.Service.Methodologies.Infrastructure.csproj" />
-    <ProjectReference Include="..\LIMS.Service.Methodologies.Persistence\LIMS.Service.Methodologies.Persistence.csproj" />
+    <ProjectReference Include="..\LIMS.Service.Methodologies.Application\LIMS.Service.Methodologies.Application.csproj"/>
+    <ProjectReference Include="..\LIMS.Service.Methodologies.Infrastructure\LIMS.Service.Methodologies.Infrastructure.csproj"/>
+    <ProjectReference Include="..\LIMS.Service.Methodologies.Persistence\LIMS.Service.Methodologies.Persistence.csproj"/>
   </ItemGroup>
 
 </Project>

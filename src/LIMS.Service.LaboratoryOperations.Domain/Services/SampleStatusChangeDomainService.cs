@@ -18,9 +18,9 @@ public sealed class SampleStatusChangeDomainService
             var hasActiveStudies = associatedStudies.Any(s => s.Status == StudyStatus.InProgress);
             if (hasActiveStudies)
             {
-                return Result<None, Exception>.Failure(new InvalidOperationException(
+                return new InvalidOperationException(
                     "Cannot complete the sample because there are studies in 'InProgress' status. " +
-                    "Please complete all studies first."));
+                    "Please complete all studies first.");
             }
         }
 
@@ -30,9 +30,9 @@ public sealed class SampleStatusChangeDomainService
                 s.Status == StudyStatus.Completed || s.Status == StudyStatus.Approved);
             if (hasCompletedStudies)
             {
-                return Result<None, Exception>.Failure(new InvalidOperationException(
+                return new InvalidOperationException(
                     "Cannot cancel the sample because there are completed or approved studies. " +
-                    "Please cancel the studies first."));
+                    "Please cancel the studies first.");
             }
         }
 

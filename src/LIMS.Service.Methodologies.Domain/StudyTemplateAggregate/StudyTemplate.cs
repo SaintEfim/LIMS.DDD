@@ -241,7 +241,8 @@ public sealed class StudyTemplate
     {
         if (!Status.CanEdit)
         {
-            return new InvalidOperationException("Cannot remove result definition from an Active or Archived template.");
+            return new InvalidOperationException(
+                "Cannot remove result definition from an Active or Archived template.");
         }
 
         var resultDef = _resultDefinitions.SingleOrDefault(r => r.Id == resultDefinitionId);

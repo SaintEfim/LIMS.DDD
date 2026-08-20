@@ -14,9 +14,9 @@ public sealed class OrderInProgressState : IState<Order>
     {
         return newState switch
         {
-            OrderCompletedState => Result<None, Exception>.Success(new None()),
-            OrderCanceledState => Result<None, Exception>.Success(new None()),
-            _ => Result<None, Exception>.Failure(new InvalidOperationException("Invalid transition from InWork"))
+            OrderCompletedState => new None(),
+            OrderCanceledState => new None(),
+            _ => new InvalidOperationException("Invalid transition from InWork")
         };
     }
 }

@@ -8,11 +8,6 @@ public sealed class UnitSnapshot
     : SoftDeletableModel,
         IAggregateRoot
 {
-    // link for original unit id from guid service
-    public UnitId Id { get; init; }
-
-    public Name Name { get; set; } = null!;
-
     private UnitSnapshot()
     {
     }
@@ -24,4 +19,9 @@ public sealed class UnitSnapshot
         Id = id;
         Name = name;
     }
+
+    // link for original unit id from guid service
+    public UnitId Id { get; init; }
+
+    public Name Name { get; set; } = null!;
 }

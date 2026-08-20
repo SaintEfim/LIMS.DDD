@@ -12,7 +12,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Guides.Messages\Guides.Messages.csproj"/>
-    <ProjectReference Include="..\LIMS.Service.LaboratoryOperations.Application\LIMS.Service.LaboratoryOperations.Application.csproj" />
+    <ProjectReference Include="..\LIMS.Service.LaboratoryOperations.Application\LIMS.Service.LaboratoryOperations.Application.csproj"/>
     <ProjectReference Include="..\RabbitMq.Library.QuickStart\RabbitMq.Library.QuickStart.csproj"/>
   </ItemGroup>
 

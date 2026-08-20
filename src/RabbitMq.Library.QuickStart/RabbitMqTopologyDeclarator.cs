@@ -9,19 +9,18 @@ public sealed class RabbitMqTopologyDeclarator(
     RabbitMqChannelFactory channelFactory,
     ILogger<RabbitMqTopologyDeclarator> logger)
 {
-    public async Task DeclareAsync(CancellationToken cancellationToken = default)
+    public async Task DeclareAsync(
+        CancellationToken cancellationToken = default)
     {
         await using var channel = await channelFactory.CreateChannelAsync(cancellationToken);
-        if (channel is null || !channel.IsOpen) return;
+        if (channel is null || !channel.IsOpen)
+        {
+            return;
+        }
 
         foreach (var descriptor in eventRegistry.All.Values)
         {
-            await channel.QueueDeclareAsync(
-                queue: descriptor.QueueName,
-                durable: true,
-                exclusive: false,
-                autoDelete: false,
-                arguments: null,
+            await channel.QueueDeclareAsync(descriptor.QueueName, true, false, false, null,
                 cancellationToken: cancellationToken);
 
             logger.LogInformation("Declared queue: {QueueName}", descriptor.QueueName);

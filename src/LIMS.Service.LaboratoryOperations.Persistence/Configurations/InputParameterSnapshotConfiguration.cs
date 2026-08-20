@@ -8,7 +8,8 @@ namespace LIMS.Service.LaboratoryOperations.Persistence.Configurations;
 
 public class InputParameterSnapshotConfiguration : IEntityTypeConfiguration<InputParameterSnapshot>
 {
-    public void Configure(EntityTypeBuilder<InputParameterSnapshot> builder)
+    public void Configure(
+        EntityTypeBuilder<InputParameterSnapshot> builder)
     {
         builder.ToTable("InputParameterSnapshots");
 
@@ -29,16 +30,19 @@ public class InputParameterSnapshotConfiguration : IEntityTypeConfiguration<Inpu
             .HasConversion(id => id.Value, value => new StudyTemplateId(value));
 
         builder.Property(x => x.Name)
-            .HasConversion(n => n.Value, n => Name.Create(n).GetValue())
+            .HasConversion(n => n.Value, n => Name.Create(n)
+                .GetValue())
             .HasMaxLength(200)
             .IsRequired();
 
         builder.Property(x => x.Description)
-            .HasConversion(d => d.Value, d => Description.Create(d).GetValue())
+            .HasConversion(d => d.Value, d => Description.Create(d)
+                .GetValue())
             .HasMaxLength(2000);
 
         builder.Property(x => x.AliasName)
-            .HasConversion(a => a.Value, a => AliasName.Create(a).GetValue())
+            .HasConversion(a => a.Value, a => AliasName.Create(a)
+                .GetValue())
             .HasMaxLength(50)
             .IsRequired();
 

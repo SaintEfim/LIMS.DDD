@@ -17,26 +17,7 @@ public sealed class Study
 
     private readonly List<TestResult> _testResults = [];
 
-    private Study()
-    {
-    }
-
-    public StudyId Id { get; private set; }
-
-    public SampleId SampleId { get; private set; }
-
-    public StudyStatus Status { get; private set; } = StudyStatus.InProgress;
-
-    public Name Name { get; private set; } = null!;
-
-    public StudyTemplateId StudyTemplateId { get; private set; }
-
-    public Description Description { get; private set; } = null!;
-
-    public IReadOnlyList<MeasuredValue> MeasuredValues => _measuredValues.AsReadOnly();
-    public IReadOnlyList<TestResult> TestResults => _testResults.AsReadOnly();
-
-    internal static Result<Study, Exception> Create(
+    internal Study(
         StudyId studyId,
         SampleId sampleId,
         Name templateName,
@@ -44,29 +25,39 @@ public sealed class Study
         IReadOnlyList<MeasuredValue> initialMeasuredValues,
         IReadOnlyList<TestResult> initialTestResults)
     {
-        var study = new Study
-        {
-            Id = studyId,
-            SampleId = sampleId,
-            Name = templateName,
-            StudyTemplateId = templateId,
-            Description = Description.Create(null)
-                .GetValue()
-        };
+        Id = studyId;
+        SampleId = sampleId;
+        Name = templateName;
+        StudyTemplateId = templateId;
+        Description = Description.Create(null)
+            .GetValue();
+        Status = StudyStatus.InProgress;
 
-        study._measuredValues.AddRange(initialMeasuredValues);
-        study._testResults.AddRange(initialTestResults);
-
-        return Result<Study, Exception>.Success(study);
+        _measuredValues.AddRange(initialMeasuredValues);
+        _testResults.AddRange(initialTestResults);
     }
+
+    public StudyId Id { get; private set; }
+
+    public SampleId SampleId { get; private set; }
+
+    public StudyStatus Status { get; private set; }
+
+    public Name Name { get; private set; }
+
+    public StudyTemplateId StudyTemplateId { get; private set; }
+
+    public Description Description { get; private set; }
+
+    public IReadOnlyList<MeasuredValue> MeasuredValues => _measuredValues.AsReadOnly();
+    public IReadOnlyList<TestResult> TestResults => _testResults.AsReadOnly();
 
     public Result<None, Exception> UpdateNotes(
         Description? description)
     {
         if (!Status.CanEdit)
         {
-            return Result<None, Exception>.Failure(
-                new InvalidOperationException("Cannot update study notes when study is not InWork."));
+            return new InvalidOperationException("Cannot update study notes when study is not InWork.");
         }
 
         if (description is not null)
@@ -74,7 +65,7 @@ public sealed class Study
             Description = description;
         }
 
-        return Result<None, Exception>.Success();
+        return new None();
     }
 
     public Result<None, Exception> ReassignSample(
@@ -82,17 +73,16 @@ public sealed class Study
     {
         if (!Status.CanEdit)
         {
-            return Result<None, Exception>.Failure(
-                new InvalidOperationException("Cannot reassign sample when study is not InWork."));
+            return new InvalidOperationException("Cannot reassign sample when study is not InWork.");
         }
 
         if (newSampleId == SampleId)
         {
-            return Result<None, Exception>.Success();
+            return new None();
         }
 
         SampleId = newSampleId;
-        return Result<None, Exception>.Success();
+        return new None();
     }
 
     public Result<None, Exception> UpdateTestResult(
@@ -101,16 +91,14 @@ public sealed class Study
     {
         if (!Status.CanEdit)
         {
-            return Result<None, Exception>.Failure(
-                new InvalidOperationException("Cannot update test results when study is not InWork."));
+            return new InvalidOperationException("Cannot update test results when study is not InWork.");
         }
 
         var testResult = _testResults.FirstOrDefault(tr => tr.Id == testResultId);
 
         if (testResult is null)
         {
-            return Result<None, Exception>.Failure(
-                new InvalidOperationException("Test result not found in this study."));
+            return new InvalidOperationException("Test result not found in this study.");
         }
 
         if (value is not null)
@@ -118,7 +106,7 @@ public sealed class Study
             testResult.SetValue(value.Value);
         }
 
-        return Result<None, Exception>.Success();
+        return new None();
     }
 
     public Result<None, Exception> UpdateMeasuredValue(
@@ -127,21 +115,19 @@ public sealed class Study
     {
         if (!Status.CanEdit)
         {
-            return Result<None, Exception>.Failure(
-                new InvalidOperationException("Cannot update measured values when study is not InWork."));
+            return new InvalidOperationException("Cannot update measured values when study is not InWork.");
         }
 
         var measuredValue = _measuredValues.FirstOrDefault(mv => mv.Id == measuredValueId);
 
         if (measuredValue is null)
         {
-            return Result<None, Exception>.Failure(
-                new InvalidOperationException("Measured value not found in this study."));
+            return new InvalidOperationException("Measured value not found in this study.");
         }
 
         measuredValue.Update(value);
 
-        return Result<None, Exception>.Success();
+        return new None();
     }
 
     internal Result<None, Exception> ChangeStatus(
@@ -154,21 +140,20 @@ public sealed class Study
         }
 
         Status = newStatus;
-        return Result<None, Exception>.Success();
+        return new None();
     }
 
     public Result<None, Exception> Delete()
     {
         if (IsDeleted)
         {
-            return Result<None, Exception>.Failure(new InvalidOperationException("Study is already deleted."));
+            return new InvalidOperationException("Study is already deleted.");
         }
 
         if (Status == StudyStatus.Completed || Status == StudyStatus.Approved)
         {
-            return Result<None, Exception>.Failure(
-                new InvalidOperationException(
-                    "Cannot delete a Completed or Approved study. Use 'Cancel' status instead."));
+            return new InvalidOperationException(
+                "Cannot delete a Completed or Approved study. Use 'Cancel' status instead.");
         }
 
         IsDeleted = true;
@@ -184,6 +169,6 @@ public sealed class Study
             testResult.MarkAsDeleted();
         }
 
-        return Result<None, Exception>.Success();
+        return new None();
     }
 }

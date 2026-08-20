@@ -1,6 +1,4 @@
-﻿using Guides.Messages;
-using Microsoft.Extensions.DependencyInjection;
-using RabbitMq.Library.QuickStart.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 
 namespace LIMS.Service.LaboratoryOperations.Infrastructure;
 

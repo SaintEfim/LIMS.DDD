@@ -28,8 +28,7 @@ public sealed class SampleCommandsHandler(
         var order = await orderRepository.GetByIdAsync(orderId, cancellationToken);
         if (order is null)
         {
-            return Result<Sample, Exception>.Failure(
-                new KeyNotFoundException($"Order with id {orderId.Value} not found."));
+            return new KeyNotFoundException($"Order with id {orderId.Value} not found.");
         }
 
         var nameResult = Name.Create(command.Name);
@@ -141,7 +140,7 @@ public sealed class SampleCommandsHandler(
 
         if (!SampleStatus.TryParse(statusCommand, out var newStatus) || newStatus is null)
         {
-            return Result<None, Exception>.Failure(new InvalidOperationException($"Unknown status '{statusCommand}'."));
+            return new InvalidOperationException($"Unknown status '{statusCommand}'.");
         }
 
         var studies = (await studyRepository.GetBySampleIdAsync(sample.Id, cancellationToken)).ToList()
@@ -171,8 +170,7 @@ public sealed class SampleCommandsHandler(
         var order = await orderRepository.GetByIdAsync(sample.OrderId, cancellationToken);
         if (order is null)
         {
-            return Result<None, Exception>.Failure(
-                new KeyNotFoundException($"Parent Order with id {sample.OrderId} not found."));
+            return new KeyNotFoundException($"Parent Order with id {sample.OrderId} not found.");
         }
 
         var studies = (await studyRepository.GetBySampleIdAsync(sample.Id, cancellationToken)).ToList()
@@ -195,11 +193,11 @@ public sealed class SampleCommandsHandler(
         {
             repository.Add(sample);
             await unitOfWork.SaveChangesAsync(cancellationToken);
-            return Result<Sample, Exception>.Success(sample);
+            return sample;
         }
         catch (Exception ex)
         {
-            return Result<Sample, Exception>.Failure(new Exception($"Failed to save Sample: {ex.Message}", ex));
+            return new Exception($"Failed to save Sample: {ex.Message}", ex);
         }
     }
 
@@ -209,11 +207,11 @@ public sealed class SampleCommandsHandler(
         try
         {
             await unitOfWork.SaveChangesAsync(cancellationToken);
-            return Result<None, Exception>.Success();
+            return new None();
         }
         catch (Exception ex)
         {
-            return Result<None, Exception>.Failure(new Exception($"Failed to save Sample: {ex.Message}", ex));
+            return new Exception($"Failed to save Sample: {ex.Message}", ex);
         }
     }
 
@@ -222,8 +220,6 @@ public sealed class SampleCommandsHandler(
         CancellationToken ct)
     {
         var sample = await repository.GetByIdForChangeAsync(new SampleId(id), ct);
-        return sample is null
-            ? Result<Sample, Exception>.Failure(new KeyNotFoundException($"Sample with id {id} not found."))
-            : Result<Sample, Exception>.Success(sample);
+        return sample is null ? new KeyNotFoundException($"Sample with id {id} not found.") : sample;
     }
 }

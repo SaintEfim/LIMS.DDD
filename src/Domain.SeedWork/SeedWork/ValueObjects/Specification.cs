@@ -13,7 +13,9 @@ public sealed record Specification
     }
 
     // for EF Core
-    private Specification() { }
+    private Specification()
+    {
+    }
 
     public double? MinValue { get; init; }
 

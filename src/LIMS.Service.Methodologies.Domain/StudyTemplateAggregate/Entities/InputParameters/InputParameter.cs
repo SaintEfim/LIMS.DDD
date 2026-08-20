@@ -5,18 +5,6 @@ namespace LIMS.Service.Methodologies.Domain.StudyTemplateAggregate.Entities.Inpu
 
 public sealed class InputParameter : SoftDeletableModel
 {
-    public InputParameterId Id { get; private set; }
-
-    public StudyTemplateId StudyTemplateId { get; private set; }
-
-    public Name Name { get; private set; }
-
-    public Description Description { get; private set; }
-
-    public AliasName AliasName { get; private set; }
-
-    public Specification Specification { get; private set; }
-
     internal InputParameter(
         StudyTemplateId studyTemplateId,
         Name name,
@@ -31,6 +19,18 @@ public sealed class InputParameter : SoftDeletableModel
         AliasName = aliasName;
         Specification = specification;
     }
+
+    public InputParameterId Id { get; private set; }
+
+    public StudyTemplateId StudyTemplateId { get; private set; }
+
+    public Name Name { get; private set; }
+
+    public Description Description { get; private set; }
+
+    public AliasName AliasName { get; private set; }
+
+    public Specification Specification { get; private set; }
 
     internal void Update(
         Name? name,

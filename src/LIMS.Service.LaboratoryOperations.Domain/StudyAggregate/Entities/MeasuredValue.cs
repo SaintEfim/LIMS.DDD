@@ -5,8 +5,13 @@ namespace LIMS.Service.LaboratoryOperations.Domain.StudyAggregate.Entities;
 
 public sealed class MeasuredValue : SoftDeletableModel
 {
-    private MeasuredValue()
+    internal MeasuredValue(
+        StudyId studyId,
+        InputParameterId inputParameterId)
     {
+        Id = new MeasuredValueId(Guid.NewGuid());
+        StudyId = studyId;
+        InputParameterId = inputParameterId;
     }
 
     public MeasuredValueId Id { get; private set; }
@@ -16,18 +21,6 @@ public sealed class MeasuredValue : SoftDeletableModel
     public InputParameterId InputParameterId { get; private set; }
 
     public double? Value { get; private set; }
-
-    internal static MeasuredValue Create(
-        StudyId studyId,
-        InputParameterId inputParameterId)
-    {
-        return new MeasuredValue
-        {
-            Id = new MeasuredValueId(Guid.NewGuid()),
-            StudyId = studyId,
-            InputParameterId = inputParameterId
-        };
-    }
 
     internal void Update(
         double? value)

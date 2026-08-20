@@ -14,9 +14,8 @@ public sealed class ArchivedState : IState<StudyTemplate>
     {
         return newState switch
         {
-            ArchivedState => Result<None, Exception>.Success(new None()),
-            _ => Result<None, Exception>.Failure(
-                new InvalidOperationException("Archived templates cannot change status."))
+            ArchivedState => new None(),
+            _ => new InvalidOperationException("Archived templates cannot change status.")
         };
     }
 }

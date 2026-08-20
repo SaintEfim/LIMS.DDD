@@ -14,15 +14,24 @@ public sealed class MeasuredValueQueries(
         CancellationToken cancellationToken = default)
     {
         var study = await repository.GetByIdAsync(new StudyId(studyId), cancellationToken);
-        if (study is null) throw new KeyNotFoundException("study not found");
+        if (study is null)
+        {
+            throw new KeyNotFoundException("study not found");
+        }
 
         var measuredValue = study.MeasuredValues.SingleOrDefault(mv => mv.Id == new MeasuredValueId(measuredValueId));
 
-        if (measuredValue is null) return null;
+        if (measuredValue is null)
+        {
+            return null;
+        }
 
         var inputParameter = await snapshotRepository.GetInputParameterAsync(study.StudyTemplateId,
             measuredValue.InputParameterId, cancellationToken);
-        if (inputParameter is null) throw new KeyNotFoundException("input parameter not found");
+        if (inputParameter is null)
+        {
+            throw new KeyNotFoundException("input parameter not found");
+        }
 
         return MeasuredValueDto.FromDomain(measuredValue, inputParameter);
     }
@@ -32,10 +41,16 @@ public sealed class MeasuredValueQueries(
         CancellationToken cancellationToken = default)
     {
         var study = await repository.GetByIdAsync(new StudyId(studyId), cancellationToken);
-        if (study is null) return [];
+        if (study is null)
+        {
+            return [];
+        }
 
         var snapshot = await snapshotRepository.GetByIdAsync(study.StudyTemplateId, cancellationToken);
-        if (snapshot is null) throw new KeyNotFoundException("template not found");
+        if (snapshot is null)
+        {
+            throw new KeyNotFoundException("template not found");
+        }
 
         var inputParameters =
             await snapshotRepository.GetInputParameterSnapshotsAsync(study.StudyTemplateId, cancellationToken);

@@ -27,10 +27,16 @@ public sealed class TestResultCommandsHandler(
         CancellationToken cancellationToken = default)
     {
         var prepareResult = await PrepareCalculationContext(studyId, testResultId, cancellationToken);
-        if (prepareResult.IsFailure) return prepareResult.CastFailure<None>();
+        if (prepareResult.IsFailure)
+        {
+            return prepareResult.CastFailure<None>();
+        }
 
         var calcResult = CalculateFormula(prepareResult.GetValue());
-        if (calcResult.IsFailure) return calcResult.CastFailure<None>();
+        if (calcResult.IsFailure)
+        {
+            return calcResult.CastFailure<None>();
+        }
 
         var (result, value) = calcResult.GetValue();
         result.SetValue(value);
@@ -44,26 +50,32 @@ public sealed class TestResultCommandsHandler(
         CancellationToken cancellationToken)
     {
         var studyResult = await GetStudyForChangeAsync(studyId, cancellationToken);
-        if (studyResult.IsFailure) return Result<CalculationContext, Exception>.Failure(studyResult.GetError());
+        if (studyResult.IsFailure)
+        {
+            return studyResult.GetError();
+        }
 
         var study = studyResult.GetValue();
 
         var result = study.TestResults.FirstOrDefault(t => t.Id == new TestResultId(testResultId));
         if (result is null)
-            return Result<CalculationContext, Exception>.Failure(
-                new InvalidOperationException($"Test result '{testResultId}' not found in study '{studyId}'"));
+        {
+            return new InvalidOperationException($"Test result '{testResultId}' not found in study '{studyId}'");
+        }
 
         var template = await studyTemplateRepository.GetByIdAsync(study.StudyTemplateId, cancellationToken);
         if (template is null)
-            return Result<CalculationContext, Exception>.Failure(
-                new InvalidOperationException($"Study template '{study.StudyTemplateId}' not found"));
+        {
+            return new InvalidOperationException($"Study template '{study.StudyTemplateId}' not found");
+        }
 
         var calculationRules =
             template.CalculationRules.FirstOrDefault(x => x.ResultDefinitionId == result.ResultDefinitionId);
         if (calculationRules is null)
-            return Result<CalculationContext, Exception>.Failure(
-                new InvalidOperationException(
-                    $"Calculation rule not found for result definition '{result.ResultDefinitionId}'"));
+        {
+            return new InvalidOperationException(
+                $"Calculation rule not found for result definition '{result.ResultDefinitionId}'");
+        }
 
         var parametersByAlias = template.Parameters.ToDictionary(p => p.AliasName.Value, p => p);
 
@@ -75,25 +87,28 @@ public sealed class TestResultCommandsHandler(
         foreach (var variable in extractVariables)
         {
             if (!parametersByAlias.TryGetValue(variable, out var templateParameter))
-                return Result<CalculationContext, Exception>.Failure(
-                    new InvalidOperationException($"Template parameter not found for formula variable '{variable}'"));
+            {
+                return new InvalidOperationException($"Template parameter not found for formula variable '{variable}'");
+            }
 
             if (!measuredValuesByParamId.TryGetValue(templateParameter.Id, out var measuredValue))
-                return Result<CalculationContext, Exception>.Failure(
-                    new InvalidOperationException(
-                        $"Measured value not found for parameter '{templateParameter.AliasName}'"));
+            {
+                return new InvalidOperationException(
+                    $"Measured value not found for parameter '{templateParameter.AliasName}'");
+            }
 
             if (measuredValue.Value is null)
-                return Result<CalculationContext, Exception>.Failure(
-                    new InvalidOperationException(
-                        $"Missing required input parameter value for '{templateParameter.AliasName}'"));
+            {
+                return new InvalidOperationException(
+                    $"Missing required input parameter value for '{templateParameter.AliasName}'");
+            }
 
             calculationOutputs.Add(templateParameter.AliasName, measuredValue.Value.Value);
         }
 
         var calculationContext = new CalculationContext(result, calculationRules, calculationOutputs);
 
-        return Result<CalculationContext, Exception>.Success(calculationContext);
+        return calculationContext;
     }
 
     private Result<(TestResult Result, double Value), Exception> CalculateFormula(
@@ -105,13 +120,13 @@ public sealed class TestResultCommandsHandler(
 
             var calculatedValue = noStringEvaluator.CalcNumber(context.Rules.FormulaExpression.Value, evaluatorValues);
 
-            return Result<(TestResult, double), Exception>.Success((context.Result, calculatedValue));
+            return (context.Result, calculatedValue);
         }
         catch (Exception ex)
         {
-            return Result<(TestResult, double), Exception>.Failure(new InvalidOperationException(
+            return new InvalidOperationException(
                 $"Formula evaluation failed for result definition '{context.Result.ResultDefinitionId}': {ex.Message}",
-                ex));
+                ex);
         }
     }
 
@@ -120,9 +135,7 @@ public sealed class TestResultCommandsHandler(
         CancellationToken ct)
     {
         var study = await studyRepository.GetByIdForChangeAsync(new StudyId(studyId), ct);
-        return study is null
-            ? Result<Study, Exception>.Failure(new KeyNotFoundException($"Study with id {studyId} not found."))
-            : Result<Study, Exception>.Success(study);
+        return study is null ? new KeyNotFoundException($"Study with id {studyId} not found.") : study;
     }
 
     private async Task<Result<None, Exception>> SaveChangesAsync(
@@ -131,11 +144,11 @@ public sealed class TestResultCommandsHandler(
         try
         {
             await unitOfWork.SaveChangesAsync(cancellationToken);
-            return Result<None, Exception>.Success();
+            return new None();
         }
         catch (Exception ex)
         {
-            return Result<None, Exception>.Failure(new Exception($"Failed to save changes: {ex.Message}", ex));
+            return new Exception($"Failed to save changes: {ex.Message}", ex);
         }
     }
 

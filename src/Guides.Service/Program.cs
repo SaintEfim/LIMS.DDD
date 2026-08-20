@@ -1,6 +1,6 @@
 using Carter;
-using Guides.Service.Persistence;
 using Guides.Messages;
+using Guides.Service.Persistence;
 using Microsoft.EntityFrameworkCore;
 using RabbitMq.Library.QuickStart.DependencyInjection;
 
@@ -10,7 +10,8 @@ builder.Services.AddCarter();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddRabbitMq(options =>
+builder.Services
+    .AddRabbitMq(options =>
     {
         options.HostName = "localhost";
         options.Port = 5672;

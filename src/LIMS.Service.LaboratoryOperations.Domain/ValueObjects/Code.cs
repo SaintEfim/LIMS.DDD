@@ -19,10 +19,9 @@ public sealed record Code
     {
         if (code is not null && code.Length > MaxCodeLength)
         {
-            return Result<Code, Exception>.Failure(
-                new ArgumentException($"Code cannot exceed {MaxCodeLength} characters"));
+            return new ArgumentException($"Code cannot exceed {MaxCodeLength} characters");
         }
 
-        return Result<Code, Exception>.Success(new Code(code?.Trim()));
+        return new Code(code?.Trim());
     }
 }

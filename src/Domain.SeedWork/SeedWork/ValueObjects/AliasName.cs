@@ -7,7 +7,9 @@ public sealed record AliasName
     private const int MaxAliasNameLength = 100;
 
     // for EF Core
-    private AliasName() { }
+    private AliasName()
+    {
+    }
 
     private AliasName(
         string value)

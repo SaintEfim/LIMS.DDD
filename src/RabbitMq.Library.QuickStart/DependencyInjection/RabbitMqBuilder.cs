@@ -8,9 +8,9 @@ namespace RabbitMq.Library.QuickStart.DependencyInjection;
 
 public sealed class RabbitMqBuilder
 {
-    private readonly IServiceCollection _services;
-    private readonly RegisteredEventsDictionary _events;
     private readonly ConsumedEventsDictionary _consumedEvents;
+    private readonly RegisteredEventsDictionary _events;
+    private readonly IServiceCollection _services;
     private bool _receiveInfrastructureRegistered;
 
     internal RabbitMqBuilder(
@@ -28,7 +28,10 @@ public sealed class RabbitMqBuilder
     {
         var messageType = typeof(TMessage);
 
-        if (_events.ContainsKey(messageType)) return this;
+        if (_events.ContainsKey(messageType))
+        {
+            return this;
+        }
 
         var attribute = messageType.GetCustomAttributes(typeof(IntegrationEventAttribute), false)
             .Cast<IntegrationEventAttribute>()
@@ -99,7 +102,10 @@ public sealed class RabbitMqBuilder
 
     private void RegisterReceiveInfrastructure()
     {
-        if (_receiveInfrastructureRegistered) return;
+        if (_receiveInfrastructureRegistered)
+        {
+            return;
+        }
 
         _receiveInfrastructureRegistered = true;
 

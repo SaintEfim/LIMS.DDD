@@ -15,8 +15,8 @@ public sealed class DraftState : IState<StudyTemplate>
         return newState switch
         {
             ActiveState => ValidateForActivation(template),
-            DraftState or ArchivedState => Result<None, Exception>.Success(new None()),
-            _ => Result<None, Exception>.Failure(new InvalidOperationException("Invalid transition from Draft"))
+            DraftState or ArchivedState => new None(),
+            _ => new InvalidOperationException("Invalid transition from Draft")
         };
     }
 
@@ -25,22 +25,19 @@ public sealed class DraftState : IState<StudyTemplate>
     {
         if (template.InputParameters.Count == 0)
         {
-            return Result<None, Exception>.Failure(
-                new InvalidOperationException("Cannot activate without input parameters."));
+            return new InvalidOperationException("Cannot activate without input parameters.");
         }
 
         if (template.ResultDefinitions.Count == 0)
         {
-            return Result<None, Exception>.Failure(
-                new InvalidOperationException("Cannot activate without result definitions."));
+            return new InvalidOperationException("Cannot activate without result definitions.");
         }
 
         if (template.CalculationRules.Count == 0)
         {
-            return Result<None, Exception>.Failure(
-                new InvalidOperationException("Cannot activate without calculation rules."));
+            return new InvalidOperationException("Cannot activate without calculation rules.");
         }
 
-        return Result<None, Exception>.Success();
+        return new None();
     }
 }

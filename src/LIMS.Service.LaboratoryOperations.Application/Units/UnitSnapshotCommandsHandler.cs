@@ -33,12 +33,11 @@ public sealed class UnitSnapshotCommandsHandler(IUnitOfWork unitOfWork, IUnitSna
             snapshotRepository.Add(snapshot);
             await unitOfWork.SaveChangesAsync(cancellationToken);
 
-            return Result<UnitSnapshot, Exception>.Success(snapshot);
+            return snapshot;
         }
         catch (Exception ex)
         {
-            return Result<UnitSnapshot, Exception>.Failure(new Exception($"Failed to save UnitSnapshot: {ex.Message}",
-                ex));
+            return new Exception($"Failed to save UnitSnapshot: {ex.Message}", ex);
         }
     }
 }

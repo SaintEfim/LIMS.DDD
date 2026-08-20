@@ -35,9 +35,7 @@ public sealed class MeasuredValueCommandsHandler(IUnitOfWork unitOfWork, IStudyR
         CancellationToken ct)
     {
         var study = await studyRepository.GetByIdForChangeAsync(new StudyId(studyId), ct);
-        return study is null
-            ? Result<Study, Exception>.Failure(new KeyNotFoundException($"Study with id {studyId} not found."))
-            : Result<Study, Exception>.Success(study);
+        return study is null ? new KeyNotFoundException($"Study with id {studyId} not found.") : study;
     }
 
     private async Task<Result<None, Exception>> SaveChangesAsync(
@@ -46,11 +44,11 @@ public sealed class MeasuredValueCommandsHandler(IUnitOfWork unitOfWork, IStudyR
         try
         {
             await unitOfWork.SaveChangesAsync(cancellationToken);
-            return Result<None, Exception>.Success();
+            return new None();
         }
         catch (Exception ex)
         {
-            return Result<None, Exception>.Failure(new Exception($"Failed to save changes: {ex.Message}", ex));
+            return new Exception($"Failed to save changes: {ex.Message}", ex);
         }
     }
 }

@@ -22,15 +22,14 @@ public sealed record Volume
     {
         if (value is < 0)
         {
-            return Result<Volume, Exception>.Failure(new ArgumentException("Volume cannot be negative"));
+            return new ArgumentException("Volume cannot be negative");
         }
 
         if (value.HasValue && string.IsNullOrWhiteSpace(unit))
         {
-            return Result<Volume, Exception>.Failure(
-                new ArgumentException("Unit is required when volume is specified"));
+            return new ArgumentException("Unit is required when volume is specified");
         }
 
-        return Result<Volume, Exception>.Success(new Volume(value, unit));
+        return new Volume(value, unit);
     }
 }

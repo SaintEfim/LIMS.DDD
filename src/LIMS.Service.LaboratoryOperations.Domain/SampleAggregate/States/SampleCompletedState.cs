@@ -12,7 +12,6 @@ public sealed class SampleCompletedState : IState<Sample>
         IState<Sample> newState,
         Sample sample)
     {
-        return Result<None, Exception>.Failure(
-            new InvalidOperationException("Completed samples cannot change status."));
+        return new InvalidOperationException("Completed samples cannot change status.");
     }
 }

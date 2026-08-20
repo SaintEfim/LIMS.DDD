@@ -20,9 +20,9 @@ public sealed class OrderStatusChangeDomainService
 
             if (hasActiveSamples)
             {
-                return Result<None, Exception>.Failure(new InvalidOperationException(
+                return new InvalidOperationException(
                     "Cannot complete the order because there are samples in 'Registered' or 'InProgress' status. " +
-                    "Please complete or cancel all samples first."));
+                    "Please complete or cancel all samples first.");
             }
         }
 
@@ -33,8 +33,8 @@ public sealed class OrderStatusChangeDomainService
 
             if (hasActiveSamples)
             {
-                return Result<None, Exception>.Failure(new InvalidOperationException(
-                    "Cannot cancel the order because there are active samples. " + "Please cancel all samples first."));
+                return new InvalidOperationException("Cannot cancel the order because there are active samples. " +
+                                                     "Please cancel all samples first.");
             }
         }
 

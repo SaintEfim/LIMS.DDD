@@ -28,23 +28,20 @@ public sealed class StudyCommandsHandler(
         var sample = await sampleRepository.GetByIdAsync(sampleId, cancellationToken);
         if (sample is null)
         {
-            return Result<Study, Exception>.Failure(
-                new KeyNotFoundException($"Sample with id {sampleId.Value} not found."));
+            return new KeyNotFoundException($"Sample with id {sampleId.Value} not found.");
         }
 
         var order = await orderRepository.GetByIdAsync(sample.OrderId, cancellationToken);
         if (order is null)
         {
-            return Result<Study, Exception>.Failure(
-                new KeyNotFoundException($"Order with id {sample.OrderId} not found."));
+            return new KeyNotFoundException($"Order with id {sample.OrderId} not found.");
         }
 
         var template =
             await templateRepository.GetByIdAsync(new StudyTemplateId(command.TemplateId), cancellationToken);
         if (template is null)
         {
-            return Result<Study, Exception>.Failure(
-                new KeyNotFoundException($"StudyTemplate with id {command.TemplateId} not found."));
+            return new KeyNotFoundException($"StudyTemplate with id {command.TemplateId} not found.");
         }
 
         var createResult = domainService.CreateStudyByTemplate(sample, order, template);
@@ -103,8 +100,7 @@ public sealed class StudyCommandsHandler(
         var newSample = await sampleRepository.GetByIdAsync(new SampleId(command.NewSampleId), cancellationToken);
         if (newSample is null)
         {
-            return Result<None, Exception>.Failure(
-                new KeyNotFoundException($"New Sample with id {command.NewSampleId} not found."));
+            return new KeyNotFoundException($"New Sample with id {command.NewSampleId} not found.");
         }
 
         var reassignResult = studyResult.GetValue()
@@ -132,15 +128,13 @@ public sealed class StudyCommandsHandler(
 
         if (!StudyStatus.TryParse(command.Status, out var newStatus) || newStatus is null)
         {
-            return Result<None, Exception>.Failure(
-                new InvalidOperationException($"Unknown status '{command.Status}'."));
+            return new InvalidOperationException($"Unknown status '{command.Status}'.");
         }
 
         var sample = await sampleRepository.GetByIdAsync(study.SampleId, cancellationToken);
         if (sample is null)
         {
-            return Result<None, Exception>.Failure(
-                new KeyNotFoundException($"Parent sample with id {study.SampleId.Value} not found."));
+            return new KeyNotFoundException($"Parent sample with id {study.SampleId.Value} not found.");
         }
 
         var changeResult = statusChangeDomainService.ValidateAndChangeStatus(study, newStatus, sample);
@@ -179,9 +173,7 @@ public sealed class StudyCommandsHandler(
         CancellationToken cancellationToken = default)
     {
         var study = await studyRepository.GetByIdForChangeAsync(new StudyId(id), cancellationToken);
-        return study is null
-            ? Result<Study, Exception>.Failure(new KeyNotFoundException($"Study with id {id} not found."))
-            : Result<Study, Exception>.Success(study);
+        return study is null ? new KeyNotFoundException($"Study with id {id} not found.") : study;
     }
 
     private async Task<Result<Study, Exception>> SaveNewAsync(
@@ -192,11 +184,11 @@ public sealed class StudyCommandsHandler(
         {
             studyRepository.Add(study);
             await unitOfWork.SaveChangesAsync(cancellationToken);
-            return Result<Study, Exception>.Success(study);
+            return study;
         }
         catch (Exception ex)
         {
-            return Result<Study, Exception>.Failure(new Exception($"Failed to save Study: {ex.Message}", ex));
+            return new Exception($"Failed to save Study: {ex.Message}", ex);
         }
     }
 
@@ -206,11 +198,11 @@ public sealed class StudyCommandsHandler(
         try
         {
             await unitOfWork.SaveChangesAsync(cancellationToken);
-            return Result<None, Exception>.Success();
+            return new None();
         }
         catch (Exception ex)
         {
-            return Result<None, Exception>.Failure(new Exception($"Failed to save changes: {ex.Message}", ex));
+            return new Exception($"Failed to save changes: {ex.Message}", ex);
         }
     }
 

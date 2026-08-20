@@ -38,14 +38,10 @@ public sealed class OrderCommandsHandler(
             return codeResult.CastFailure<Order>();
         }
 
-        var createResult = Order.Create(nameResult.GetValue(), descResult.GetValue(), command.Contractor,
+        var createOrder = new Order(nameResult.GetValue(), descResult.GetValue(), command.Contractor,
             codeResult.GetValue());
-        if (createResult.IsFailure)
-        {
-            return createResult.CastFailure<Order>();
-        }
 
-        return await SaveNewAsync(createResult.GetValue(), cancellationToken);
+        return await SaveNewAsync(createOrder, cancellationToken);
     }
 
     public async Task<Result<None, Exception>> UpdateAsync(
@@ -121,8 +117,7 @@ public sealed class OrderCommandsHandler(
 
         if (!OrderStatus.TryParse(command.Status, out var newStatus) || newStatus is null)
         {
-            return Result<None, Exception>.Failure(
-                new InvalidOperationException($"Unknown status '{command.Status}'."));
+            return new InvalidOperationException($"Unknown status '{command.Status}'.");
         }
 
         var samples = (await sampleRepository.GetByOrderIdAsync(order.Id, cancellationToken)).ToList()
@@ -166,11 +161,11 @@ public sealed class OrderCommandsHandler(
         {
             repository.Add(order);
             await unitOfWork.SaveChangesAsync(cancellationToken);
-            return Result<Order, Exception>.Success(order);
+            return order;
         }
         catch (Exception ex)
         {
-            return Result<Order, Exception>.Failure(new Exception($"Failed to save Order: {ex.Message}", ex));
+            return new Exception($"Failed to save Order: {ex.Message}", ex);
         }
     }
 
@@ -180,11 +175,11 @@ public sealed class OrderCommandsHandler(
         try
         {
             await unitOfWork.SaveChangesAsync(cancellationToken);
-            return Result<None, Exception>.Success();
+            return new None();
         }
         catch (Exception ex)
         {
-            return Result<None, Exception>.Failure(new Exception($"Failed to save Order: {ex.Message}", ex));
+            return new Exception($"Failed to save Order: {ex.Message}", ex);
         }
     }
 
@@ -193,8 +188,6 @@ public sealed class OrderCommandsHandler(
         CancellationToken ct)
     {
         var order = await repository.GetByIdForChangeAsync(new OrderId(id), ct);
-        return order is null
-            ? Result<Order, Exception>.Failure(new KeyNotFoundException($"Order with id {id} not found."))
-            : Result<Order, Exception>.Success(order);
+        return order is null ? new KeyNotFoundException($"Order with id {id} not found.") : order;
     }
 }

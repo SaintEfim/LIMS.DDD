@@ -16,7 +16,10 @@ public sealed class ResultDefinitionQueries(
         var result = await repository.GetResultDefinitionAsync(new StudyTemplateId(studyTemplateId),
             new ResultDefinitionId(resultId), cancellationToken);
 
-        if (result is null) return null;
+        if (result is null)
+        {
+            return null;
+        }
 
         var unit = await unitSnapshotRepository.GetByIdAsync(result.UnitId, cancellationToken);
         return unit is null
@@ -31,7 +34,10 @@ public sealed class ResultDefinitionQueries(
         var results = await repository.GetResultDefinitionsAsync(
             new StudyTemplateId(studyTemplateId), cancellationToken);
 
-        if (results.Count == 0) return [];
+        if (results.Count == 0)
+        {
+            return [];
+        }
 
         var unitIds = results.Select(r => r.UnitId)
             .Distinct()

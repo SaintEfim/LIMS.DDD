@@ -12,14 +12,23 @@ public sealed class TestResultQueries(IStudyRepository repository, IStudyTemplat
         CancellationToken cancellationToken = default)
     {
         var study = await repository.GetByIdAsync(new StudyId(studyId), cancellationToken);
-        if (study is null) throw new KeyNotFoundException("study not found");
+        if (study is null)
+        {
+            throw new KeyNotFoundException("study not found");
+        }
 
         var testResult = study.TestResults.SingleOrDefault(tr => tr.Id == new TestResultId(testResultId));
-        if (testResult is null) return null;
+        if (testResult is null)
+        {
+            return null;
+        }
 
         var resultDefinition = await snapshotRepository.GetResultDefinitionAsync(study.StudyTemplateId,
             testResult.ResultDefinitionId, cancellationToken);
-        if (resultDefinition is null) throw new KeyNotFoundException("result definition not found");
+        if (resultDefinition is null)
+        {
+            throw new KeyNotFoundException("result definition not found");
+        }
 
         return TestResultDto.FromDomain(testResult, resultDefinition);
     }
@@ -29,10 +38,16 @@ public sealed class TestResultQueries(IStudyRepository repository, IStudyTemplat
         CancellationToken cancellationToken = default)
     {
         var study = await repository.GetByIdAsync(new StudyId(studyId), cancellationToken);
-        if (study is null) return [];
+        if (study is null)
+        {
+            return [];
+        }
 
         var snapshot = await snapshotRepository.GetByIdAsync(study.StudyTemplateId, cancellationToken);
-        if (snapshot is null) throw new KeyNotFoundException("template not found");
+        if (snapshot is null)
+        {
+            throw new KeyNotFoundException("template not found");
+        }
 
         var resultDefinitions =
             await snapshotRepository.GetResultDefinitionsAsync(study.StudyTemplateId, cancellationToken);

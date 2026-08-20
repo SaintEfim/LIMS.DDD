@@ -8,18 +8,6 @@ namespace LIMS.Service.Methodologies.Domain.StudyTemplateAggregate.Entities.Calc
 
 public sealed class CalculationRule : SoftDeletableModel
 {
-    public ResultDefinitionId ResultDefinitionId { get; private set; }
-
-    public CalculationRuleId Id { get; private set; }
-
-    public StudyTemplateId StudyTemplateId { get; private set; }
-
-    public Name Name { get; private set; }
-
-    public FormulaExpression FormulaExpression { get; private set; }
-
-    public Description Description { get; private set; }
-
     internal CalculationRule(
         StudyTemplateId studyTemplateId,
         Name name,
@@ -34,6 +22,18 @@ public sealed class CalculationRule : SoftDeletableModel
         Description = description;
         ResultDefinitionId = resultDefinitionId;
     }
+
+    public ResultDefinitionId ResultDefinitionId { get; private set; }
+
+    public CalculationRuleId Id { get; private set; }
+
+    public StudyTemplateId StudyTemplateId { get; private set; }
+
+    public Name Name { get; private set; }
+
+    public FormulaExpression FormulaExpression { get; private set; }
+
+    public Description Description { get; private set; }
 
     internal void Update(
         Name? name,

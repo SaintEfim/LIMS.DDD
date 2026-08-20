@@ -10,7 +10,10 @@ public sealed class UnitSnapshotRepository(ApplicationDbContext context) : IUnit
         CancellationToken cancellationToken = default)
     {
         var idList = ids.ToList();
-        if (idList.Count == 0) return [];
+        if (idList.Count == 0)
+        {
+            return [];
+        }
 
         return await context.UnitSnapshots
             .AsNoTracking()

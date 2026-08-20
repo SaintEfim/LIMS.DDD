@@ -14,9 +14,8 @@ public sealed class OrderCompletedState : IState<Order>
     {
         return newState switch
         {
-            OrderCompletedState => Result<None, Exception>.Success(new None()),
-            _ => Result<None, Exception>.Failure(
-                new InvalidOperationException("Completed orders cannot change status."))
+            OrderCompletedState => new None(),
+            _ => new InvalidOperationException("Completed orders cannot change status.")
         };
     }
 }

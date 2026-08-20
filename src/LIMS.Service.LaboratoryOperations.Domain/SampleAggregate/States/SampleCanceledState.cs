@@ -15,9 +15,8 @@ public sealed class SampleCanceledState : IState<Sample>
     {
         return newState switch
         {
-            SampleCanceledState => Result<None, Exception>.Success(new None()),
-            _ => Result<None, Exception>.Failure(
-                new InvalidOperationException("Cannot transition from Canceled state. A canceled sample is final."))
+            SampleCanceledState => new None(),
+            _ => new InvalidOperationException("Cannot transition from Canceled state. A canceled sample is final.")
         };
     }
 }

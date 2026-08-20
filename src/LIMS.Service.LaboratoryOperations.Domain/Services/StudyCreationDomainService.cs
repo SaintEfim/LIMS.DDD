@@ -16,29 +16,26 @@ public sealed class StudyCreationDomainService
     {
         if (!order.CanAcceptNewEntity)
         {
-            return Result<Study, Exception>.Failure(
-                new InvalidOperationException(
-                    $"Cannot create study for an order in '{order.OrderStatus.Name}' status."));
+            return new InvalidOperationException(
+                $"Cannot create study for an order in '{order.OrderStatus.Name}' status.");
         }
 
         if (!sample.CanAcceptNewEntity)
         {
-            return Result<Study, Exception>.Failure(
-                new InvalidOperationException(
-                    $"Cannot create study for a sample in '{sample.SampleStatus.Name}' status."));
+            return new InvalidOperationException(
+                $"Cannot create study for a sample in '{sample.SampleStatus.Name}' status.");
         }
 
         var studyId = new StudyId(Guid.NewGuid());
 
         var measuredValues = templateSnapshot.Parameters
-            .Select(p => MeasuredValue.Create(studyId, p.Id))
+            .Select(p => new MeasuredValue(studyId, p.Id))
             .ToList();
 
         var testResults = templateSnapshot.Results
-            .Select(r => TestResult.Create(studyId, r.Id))
+            .Select(r => new TestResult(studyId, r.Id))
             .ToList();
 
-        return Study.Create(studyId, sample.Id, templateSnapshot.Name, templateSnapshot.Id, measuredValues,
-            testResults);
+        return new Study(studyId, sample.Id, templateSnapshot.Name, templateSnapshot.Id, measuredValues, testResults);
     }
 }
