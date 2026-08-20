@@ -1,4 +1,4 @@
-﻿namespace LIMS.Service.LaboratoryOperations.Domain.SeedWork;
+﻿namespace Domain.SeedWork.SeedWork;
 
 public interface IUnitOfWork : IDisposable
 {

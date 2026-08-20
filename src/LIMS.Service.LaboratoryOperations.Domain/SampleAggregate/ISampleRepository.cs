@@ -1,5 +1,5 @@
-﻿using LIMS.Service.LaboratoryOperations.Domain.OrderAggregate;
-using LIMS.Service.LaboratoryOperations.Domain.SeedWork;
+﻿using Domain.SeedWork.SeedWork;
+using LIMS.Service.LaboratoryOperations.Domain.OrderAggregate;
 
 namespace LIMS.Service.LaboratoryOperations.Domain.SampleAggregate;
 

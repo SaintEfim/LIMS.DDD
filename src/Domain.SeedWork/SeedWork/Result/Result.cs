@@ -1,4 +1,4 @@
-﻿namespace LIMS.Service.Methodologies.Domain.SeedWork.Result;
+﻿namespace Domain.SeedWork.SeedWork.Result;
 
 public readonly record struct None;
 

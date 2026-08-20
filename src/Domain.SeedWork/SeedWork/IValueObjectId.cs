@@ -1,4 +1,4 @@
-﻿namespace LIMS.Service.Methodologies.Domain.SeedWork;
+﻿namespace Domain.SeedWork.SeedWork;
 
 public interface IValueObjectId
 {

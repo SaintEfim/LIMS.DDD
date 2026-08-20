@@ -1,10 +1,10 @@
-﻿using LIMS.Service.LaboratoryOperations.Application.Samples.Commands;
+﻿using Domain.SeedWork.SeedWork;
+using Domain.SeedWork.SeedWork.Result;
+using Domain.SeedWork.SeedWork.ValueObjects;
+using LIMS.Service.LaboratoryOperations.Application.Samples.Commands;
 using LIMS.Service.LaboratoryOperations.Domain.OrderAggregate;
 using LIMS.Service.LaboratoryOperations.Domain.SampleAggregate;
 using LIMS.Service.LaboratoryOperations.Domain.SampleAggregate.ValueObjects;
-using LIMS.Service.LaboratoryOperations.Domain.SeedWork;
-using LIMS.Service.LaboratoryOperations.Domain.SeedWork.Result;
-using LIMS.Service.LaboratoryOperations.Domain.SeedWork.ValueObjects;
 using LIMS.Service.LaboratoryOperations.Domain.Services;
 using LIMS.Service.LaboratoryOperations.Domain.StudyAggregate;
 using LIMS.Service.LaboratoryOperations.Domain.ValueObjects;

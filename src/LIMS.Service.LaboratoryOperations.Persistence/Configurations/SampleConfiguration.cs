@@ -1,7 +1,7 @@
-﻿using LIMS.Service.LaboratoryOperations.Domain.OrderAggregate;
+﻿using Domain.SeedWork.SeedWork.ValueObjects;
+using LIMS.Service.LaboratoryOperations.Domain.OrderAggregate;
 using LIMS.Service.LaboratoryOperations.Domain.SampleAggregate;
 using LIMS.Service.LaboratoryOperations.Domain.SampleAggregate.ValueObjects;
-using LIMS.Service.LaboratoryOperations.Domain.SeedWork.ValueObjects;
 using LIMS.Service.LaboratoryOperations.Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;

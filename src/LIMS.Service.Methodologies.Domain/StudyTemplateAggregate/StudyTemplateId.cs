@@ -1,4 +1,4 @@
-﻿using LIMS.Service.Methodologies.Domain.SeedWork;
+﻿using Domain.SeedWork.SeedWork;
 
 namespace LIMS.Service.Methodologies.Domain.StudyTemplateAggregate;
 

@@ -1,6 +1,6 @@
-﻿using LIMS.Service.Methodologies.Domain.SeedWork;
-using LIMS.Service.Methodologies.Domain.SeedWork.Result;
-using LIMS.Service.Methodologies.Domain.SeedWork.ValueObjects;
+﻿using Domain.SeedWork.SeedWork.Result;
+using Domain.SeedWork.SeedWork.SoftDeletable;
+using Domain.SeedWork.SeedWork.ValueObjects;
 using LIMS.Service.Methodologies.Domain.StudyTemplateAggregate.Entities.InputParameters;
 using LIMS.Service.Methodologies.Domain.StudyTemplateAggregate.Entities.ResultDefinitions;
 

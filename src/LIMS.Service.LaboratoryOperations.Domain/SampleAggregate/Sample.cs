@@ -1,9 +1,9 @@
-﻿using LIMS.Service.LaboratoryOperations.Domain.OrderAggregate;
+﻿using Domain.SeedWork.SeedWork;
+using Domain.SeedWork.SeedWork.Result;
+using Domain.SeedWork.SeedWork.SoftDeletable;
+using Domain.SeedWork.SeedWork.ValueObjects;
+using LIMS.Service.LaboratoryOperations.Domain.OrderAggregate;
 using LIMS.Service.LaboratoryOperations.Domain.SampleAggregate.ValueObjects;
-using LIMS.Service.LaboratoryOperations.Domain.SeedWork;
-using LIMS.Service.LaboratoryOperations.Domain.SeedWork.Result;
-using LIMS.Service.LaboratoryOperations.Domain.SeedWork.SoftDeletable;
-using LIMS.Service.LaboratoryOperations.Domain.SeedWork.ValueObjects;
 using LIMS.Service.LaboratoryOperations.Domain.ValueObjects;
 
 namespace LIMS.Service.LaboratoryOperations.Domain.SampleAggregate;

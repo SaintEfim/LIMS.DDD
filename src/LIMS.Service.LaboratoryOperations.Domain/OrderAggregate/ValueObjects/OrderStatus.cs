@@ -1,6 +1,6 @@
-﻿using LIMS.Service.LaboratoryOperations.Domain.OrderAggregate.States;
-using LIMS.Service.LaboratoryOperations.Domain.SeedWork;
-using LIMS.Service.LaboratoryOperations.Domain.SeedWork.ValueObjects;
+﻿using Domain.SeedWork.SeedWork;
+using Domain.SeedWork.SeedWork.ValueObjects;
+using LIMS.Service.LaboratoryOperations.Domain.OrderAggregate.States;
 
 namespace LIMS.Service.LaboratoryOperations.Domain.OrderAggregate.ValueObjects;
 

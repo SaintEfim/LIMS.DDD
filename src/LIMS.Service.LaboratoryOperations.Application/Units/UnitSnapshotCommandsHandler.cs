@@ -1,6 +1,6 @@
-using LIMS.Service.LaboratoryOperations.Domain.SeedWork;
-using LIMS.Service.LaboratoryOperations.Domain.SeedWork.Result;
-using LIMS.Service.LaboratoryOperations.Domain.SeedWork.ValueObjects;
+using Domain.SeedWork.SeedWork;
+using Domain.SeedWork.SeedWork.Result;
+using Domain.SeedWork.SeedWork.ValueObjects;
 using LIMS.Service.LaboratoryOperations.Domain.UnitSnapshots;
 
 namespace LIMS.Service.LaboratoryOperations.Application.Units;

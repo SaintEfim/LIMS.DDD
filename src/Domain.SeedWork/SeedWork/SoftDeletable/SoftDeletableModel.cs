@@ -1,4 +1,4 @@
-﻿namespace LIMS.Service.LaboratoryOperations.Domain.SeedWork.SoftDeletable;
+﻿namespace Domain.SeedWork.SeedWork.SoftDeletable;
 
 public abstract class SoftDeletableModel
 {

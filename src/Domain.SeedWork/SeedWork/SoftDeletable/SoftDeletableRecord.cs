@@ -1,6 +1,6 @@
-﻿namespace LIMS.Service.Methodologies.Domain.SeedWork;
+﻿namespace Domain.SeedWork.SeedWork.SoftDeletable;
 
-public abstract class SoftDeletableModel
+public abstract record SoftDeletableRecord
 {
     public bool IsDeleted { get; protected set; }
 

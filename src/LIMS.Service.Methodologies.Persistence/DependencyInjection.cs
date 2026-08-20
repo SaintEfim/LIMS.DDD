@@ -1,4 +1,4 @@
-﻿using LIMS.Service.Methodologies.Domain.SeedWork;
+﻿using Domain.SeedWork.SeedWork;
 using LIMS.Service.Methodologies.Domain.StudyTemplateAggregate;
 using LIMS.Service.Methodologies.Domain.UnitSnapshots;
 using LIMS.Service.Methodologies.Persistence.Repositories;

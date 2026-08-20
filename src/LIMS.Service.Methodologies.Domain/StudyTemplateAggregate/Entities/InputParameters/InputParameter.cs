@@ -1,5 +1,5 @@
-﻿using LIMS.Service.Methodologies.Domain.SeedWork;
-using LIMS.Service.Methodologies.Domain.SeedWork.ValueObjects;
+﻿using Domain.SeedWork.SeedWork.SoftDeletable;
+using Domain.SeedWork.SeedWork.ValueObjects;
 
 namespace LIMS.Service.Methodologies.Domain.StudyTemplateAggregate.Entities.InputParameters;
 
@@ -9,13 +9,13 @@ public sealed class InputParameter : SoftDeletableModel
 
     public StudyTemplateId StudyTemplateId { get; private set; }
 
-    public Name Name { get; private set; } = null!;
+    public Name Name { get; private set; }
 
-    public Description Description { get; private set; } = null!;
+    public Description Description { get; private set; }
 
-    public AliasName AliasName { get; private set; } = null!;
+    public AliasName AliasName { get; private set; }
 
-    public Specification Specification { get; private set; } = null!;
+    public Specification Specification { get; private set; }
 
     internal InputParameter(
         StudyTemplateId studyTemplateId,

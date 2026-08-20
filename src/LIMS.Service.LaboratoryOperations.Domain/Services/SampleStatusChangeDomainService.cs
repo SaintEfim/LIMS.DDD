@@ -1,6 +1,6 @@
-﻿using LIMS.Service.LaboratoryOperations.Domain.SampleAggregate;
+﻿using Domain.SeedWork.SeedWork.Result;
+using LIMS.Service.LaboratoryOperations.Domain.SampleAggregate;
 using LIMS.Service.LaboratoryOperations.Domain.SampleAggregate.ValueObjects;
-using LIMS.Service.LaboratoryOperations.Domain.SeedWork.Result;
 using LIMS.Service.LaboratoryOperations.Domain.StudyAggregate;
 using LIMS.Service.LaboratoryOperations.Domain.StudyAggregate.ValueObjects;
 

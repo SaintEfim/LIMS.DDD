@@ -1,4 +1,4 @@
-﻿using LIMS.Service.Methodologies.Domain.SeedWork;
+﻿using Domain.SeedWork.SeedWork;
 using LIMS.Service.Methodologies.Domain.StudyTemplateAggregate.Entities.InputParameters;
 using LIMS.Service.Methodologies.Domain.StudyTemplateAggregate.Entities.ResultDefinitions;
 

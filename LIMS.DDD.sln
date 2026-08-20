@@ -47,6 +47,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LIMS.Service.LaboratoryOper
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LIMS.Service.LaboratoryOperations.Persistence", "src\LIMS.Service.LaboratoryOperations.Persistence\LIMS.Service.LaboratoryOperations.Persistence.csproj", "{D034519E-AF4F-46F7-B09D-0D81B336D4A3}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Libraries", "Libraries", "{42E5E72B-4D07-4D36-BAA6-29885F103F1A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Domain.SeedWork", "src\Domain.SeedWork\Domain.SeedWork.csproj", "{3B4EF734-3AC9-4DF6-B637-7B079D0F34B8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -69,6 +73,7 @@ Global
 		{2C50FE34-A91E-49B5-A47D-E4B7AC42A4FD} = {332D431A-0DC5-4287-8C2E-60F3682EA709}
 		{10635625-3FBC-43A3-827D-428BC53F8D36} = {332D431A-0DC5-4287-8C2E-60F3682EA709}
 		{D034519E-AF4F-46F7-B09D-0D81B336D4A3} = {332D431A-0DC5-4287-8C2E-60F3682EA709}
+		{3B4EF734-3AC9-4DF6-B637-7B079D0F34B8} = {42E5E72B-4D07-4D36-BAA6-29885F103F1A}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{84FBFE31-7AC3-462A-9B67-CB6887BC21C0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -127,5 +132,9 @@ Global
 		{D034519E-AF4F-46F7-B09D-0D81B336D4A3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D034519E-AF4F-46F7-B09D-0D81B336D4A3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D034519E-AF4F-46F7-B09D-0D81B336D4A3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3B4EF734-3AC9-4DF6-B637-7B079D0F34B8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3B4EF734-3AC9-4DF6-B637-7B079D0F34B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3B4EF734-3AC9-4DF6-B637-7B079D0F34B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3B4EF734-3AC9-4DF6-B637-7B079D0F34B8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

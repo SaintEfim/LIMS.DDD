@@ -13,16 +13,14 @@
     <Compile Update="StudyTemplateAggregate\ValueObjects\Name.cs">
       <Generator>MSBuild:GenerateCodeFromAttributes</Generator>
     </Compile>
-    <Compile Update="SeedWork\ValueObjects\Description.cs">
-      <Generator>MSBuild:GenerateCodeFromAttributes</Generator>
-    </Compile>
-    <Compile Update="SeedWork\ValueObjects\Name.cs">
-      <Generator>MSBuild:GenerateCodeFromAttributes</Generator>
-    </Compile>
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="NoStringEvaluating" Version="2.6.1"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Domain.SeedWork\Domain.SeedWork.csproj" />
   </ItemGroup>
 
 </Project>

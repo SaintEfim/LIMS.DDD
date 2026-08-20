@@ -1,12 +1,13 @@
-﻿using Guides.Messages;
+﻿using Domain.SeedWork.SeedWork;
+using Domain.SeedWork.SeedWork.Result;
+using Domain.SeedWork.SeedWork.ValueObjects;
+using Guides.Messages;
 using LIMS.Service.Methodologies.Application.StudyTemplates.Core.Commands;
-using LIMS.Service.Methodologies.Domain.SeedWork;
-using LIMS.Service.Methodologies.Domain.SeedWork.Result;
-using LIMS.Service.Methodologies.Domain.SeedWork.ValueObjects;
 using LIMS.Service.Methodologies.Domain.StudyTemplateAggregate;
 using LIMS.Service.Methodologies.Domain.StudyTemplateAggregate.Services;
 using LIMS.Service.Methodologies.Domain.StudyTemplateAggregate.ValueObjects;
 using RabbitMq.Library.QuickStart.Abstractions;
+using Revision = LIMS.Service.Methodologies.Domain.StudyTemplateAggregate.ValueObjects.Revision;
 
 namespace LIMS.Service.Methodologies.Application.StudyTemplates.Core;
 

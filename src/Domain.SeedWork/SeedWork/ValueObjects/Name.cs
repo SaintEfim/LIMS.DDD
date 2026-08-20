@@ -1,6 +1,6 @@
-﻿using LIMS.Service.Methodologies.Domain.SeedWork.Result;
+﻿using Domain.SeedWork.SeedWork.Result;
 
-namespace LIMS.Service.Methodologies.Domain.SeedWork.ValueObjects;
+namespace Domain.SeedWork.SeedWork.ValueObjects;
 
 public sealed record Name
 {

@@ -1,5 +1,4 @@
-﻿using LIMS.Service.LaboratoryOperations.Domain.SeedWork;
-using LIMS.Service.LaboratoryOperations.Domain.SeedWork.SoftDeletable;
+﻿using Domain.SeedWork.SeedWork.SoftDeletable;
 using LIMS.Service.LaboratoryOperations.Domain.StudyTemplateSnapshots.InputParameters;
 
 namespace LIMS.Service.LaboratoryOperations.Domain.StudyAggregate.Entities;
