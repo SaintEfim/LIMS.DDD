@@ -1,9 +1,10 @@
+using Application.SeedWork.SeedWork;
 using LIMS.Service.LaboratoryOperations.Domain.OrderAggregate;
 using LIMS.Service.LaboratoryOperations.Domain.SampleAggregate;
 
 namespace LIMS.Service.LaboratoryOperations.Application.Samples;
 
-public sealed class SampleQueries(ISampleRepository repository)
+public sealed class SampleQueries(ISampleRepository repository) : IQueries
 {
     public async Task<SampleDto?> GetByIdAsync(
         Guid id,

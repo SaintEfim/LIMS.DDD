@@ -1,10 +1,11 @@
-﻿using LIMS.Service.LaboratoryOperations.Domain.SampleAggregate;
+﻿using Application.SeedWork.SeedWork;
+using LIMS.Service.LaboratoryOperations.Domain.SampleAggregate;
 using LIMS.Service.LaboratoryOperations.Domain.StudyAggregate;
 using LIMS.Service.LaboratoryOperations.Domain.StudyTemplateSnapshots;
 
 namespace LIMS.Service.LaboratoryOperations.Application.Studies.Core;
 
-public sealed class StudyQueries(IStudyRepository repository, IStudyTemplateSnapshotRepository snapshotRepository)
+public sealed class StudyQueries(IStudyRepository repository, IStudyTemplateSnapshotRepository snapshotRepository) : IQueries
 {
     public async Task<StudyDto?> GetByIdAsync(
         Guid id,

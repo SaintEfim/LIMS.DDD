@@ -1,3 +1,4 @@
+using Application.SeedWork.SeedWork;
 using Domain.SeedWork.SeedWork;
 using Domain.SeedWork.SeedWork.Result;
 using Domain.SeedWork.SeedWork.ValueObjects;
@@ -14,7 +15,7 @@ public sealed class OrderCommandsHandler(
     IUnitOfWork unitOfWork,
     IOrderRepository repository,
     ISampleRepository sampleRepository,
-    OrderStatusChangeDomainService statusChangeDomainService)
+    OrderStatusChangeDomainService statusChangeDomainService) : ICommandsHandler
 {
     public async Task<Result<Order, Exception>> CreateAsync(
         CreateOrderCommand command,

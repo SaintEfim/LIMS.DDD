@@ -1,4 +1,5 @@
-﻿using LIMS.Service.LaboratoryOperations.Domain.StudyAggregate;
+﻿using Application.SeedWork.SeedWork;
+using LIMS.Service.LaboratoryOperations.Domain.StudyAggregate;
 using LIMS.Service.LaboratoryOperations.Domain.StudyAggregate.Entities;
 using LIMS.Service.LaboratoryOperations.Domain.StudyTemplateSnapshots;
 
@@ -6,7 +7,7 @@ namespace LIMS.Service.LaboratoryOperations.Application.Studies.MeasuredValues;
 
 public sealed class MeasuredValueQueries(
     IStudyRepository repository,
-    IStudyTemplateSnapshotRepository snapshotRepository)
+    IStudyTemplateSnapshotRepository snapshotRepository) : IQueries
 {
     public async Task<MeasuredValueDto?> GetByIdAsync(
         Guid studyId,

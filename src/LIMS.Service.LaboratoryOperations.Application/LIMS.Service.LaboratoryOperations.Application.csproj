@@ -12,6 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Application.SeedWork\Application.SeedWork.csproj" />
     <ProjectReference Include="..\LIMS.Service.LaboratoryOperations.Domain\LIMS.Service.LaboratoryOperations.Domain.csproj"/>
   </ItemGroup>
 

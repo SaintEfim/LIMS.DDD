@@ -1,4 +1,5 @@
-﻿using Domain.SeedWork.SeedWork;
+﻿using Application.SeedWork.SeedWork;
+using Domain.SeedWork.SeedWork;
 using Domain.SeedWork.SeedWork.Result;
 using Domain.SeedWork.SeedWork.ValueObjects;
 using LIMS.Service.LaboratoryOperations.Domain.StudyTemplateSnapshots;
@@ -11,7 +12,7 @@ namespace LIMS.Service.LaboratoryOperations.Application.StudyTemplates;
 
 public sealed class StudyTemplateSnapshotCommandsHandler(
     IUnitOfWork unitOfWork,
-    IStudyTemplateSnapshotRepository snapshotRepository)
+    IStudyTemplateSnapshotRepository snapshotRepository) : ICommandsHandler
 {
     public async Task<Result<StudyTemplateSnapshot, Exception>> CreateAsync(
         CreateStudyTemplateSnapshotCommand command,

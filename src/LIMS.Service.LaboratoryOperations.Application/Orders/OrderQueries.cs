@@ -1,8 +1,9 @@
+using Application.SeedWork.SeedWork;
 using LIMS.Service.LaboratoryOperations.Domain.OrderAggregate;
 
 namespace LIMS.Service.LaboratoryOperations.Application.Orders;
 
-public sealed class OrderQueries(IOrderRepository repository)
+public sealed class OrderQueries(IOrderRepository repository) : IQueries
 {
     public async Task<OrderDto?> GetByIdAsync(
         Guid id,

@@ -1,4 +1,5 @@
-﻿using Domain.SeedWork.SeedWork;
+﻿using Application.SeedWork.SeedWork;
+using Domain.SeedWork.SeedWork;
 using Domain.SeedWork.SeedWork.Result;
 using Domain.SeedWork.SeedWork.ValueObjects;
 using LIMS.Service.LaboratoryOperations.Application.Samples.Commands;
@@ -18,7 +19,7 @@ public sealed class SampleCommandsHandler(
     IStudyRepository studyRepository,
     SampleCreationDomainService creationDomainService,
     SampleDeletionDomainService deletionDomainService,
-    SampleStatusChangeDomainService statusChangeDomainService)
+    SampleStatusChangeDomainService statusChangeDomainService) : ICommandsHandler
 {
     public async Task<Result<Sample, Exception>> CreateAsync(
         OrderId orderId,
