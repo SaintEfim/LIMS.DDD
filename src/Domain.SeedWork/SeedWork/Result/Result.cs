@@ -15,7 +15,7 @@ public class Result<TValue, TError>
         Error = error;
     }
 
-    private bool IsSuccess { get; }
+    public bool IsSuccess { get; }
     public bool IsFailure => !IsSuccess;
     private TValue? Value { get; }
     private TError? Error { get; }
@@ -32,35 +32,21 @@ public class Result<TValue, TError>
         return new Result<TValue, TError>(false, default, error);
     }
 
-    public static Result<None, TError> Success()
-    {
-        return Result<None, TError>.Success(new None());
-    }
+    public static Result<None, TError> Success() => Result<None, TError>.Success(new None());
 
     public static Result<TValue, TError> Success(
-        TValue value)
-    {
-        return new Result<TValue, TError>(true, value, null);
-    }
+        TValue value) =>
+        new(true, value, null);
 
     public static Result<TValue, TError> Failure(
-        TError error)
-    {
-        return new Result<TValue, TError>(false, default, error);
-    }
+        TError error) =>
+        new(false, default, error);
 
-    public TValue GetValue()
-    {
-        return IsFailure ? throw new InvalidOperationException("Cannot get value from failed result.") : Value!;
-    }
+    public TValue GetValue() =>
+        IsFailure ? throw new InvalidOperationException("Cannot get value from failed result.") : Value!;
 
-    public TError GetError()
-    {
-        return IsFailure ? Error! : throw new InvalidOperationException("Cannot get error from failed result.");
-    }
+    public TError GetError() =>
+        IsFailure ? Error! : throw new InvalidOperationException("Cannot get error from failed result.");
 
-    public Result<TNew, TError> CastFailure<TNew>()
-    {
-        return Result<TNew, TError>.Failure(GetError());
-    }
+    public Result<TNew, TError> CastFailure<TNew>() => Result<TNew, TError>.Failure(GetError());
 }
