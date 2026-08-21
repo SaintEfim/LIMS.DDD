@@ -1,4 +1,4 @@
-﻿using Guides.Messages;
+﻿using RannitMq.Messages;
 using LIMS.Service.LaboratoryOperations.Application.Units;
 using Microsoft.Extensions.Logging;
 using RabbitMq.Library.QuickStart.Receive;

@@ -6,5 +6,5 @@ public record CreateStudyTemplateSnapshotCommand(
     string Description,
     string Revision,
     IReadOnlyList<InputParameterDto> InputParameters,
-    IReadOnlyList<ResultDefinitionDto> ResultDefinitions,
+    IReadOnlyList<CreateResultDefinitionCommand> ResultDefinitions,
     IReadOnlyList<CalculationRuleDto> CalculationRules);

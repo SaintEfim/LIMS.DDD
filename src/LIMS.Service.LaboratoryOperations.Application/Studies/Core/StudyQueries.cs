@@ -2,10 +2,14 @@
 using LIMS.Service.LaboratoryOperations.Domain.SampleAggregate;
 using LIMS.Service.LaboratoryOperations.Domain.StudyAggregate;
 using LIMS.Service.LaboratoryOperations.Domain.StudyTemplateSnapshots;
+using LIMS.Service.LaboratoryOperations.Domain.UnitSnapshots;
 
 namespace LIMS.Service.LaboratoryOperations.Application.Studies.Core;
 
-public sealed class StudyQueries(IStudyRepository repository, IStudyTemplateSnapshotRepository snapshotRepository) : IQueries
+public sealed class StudyQueries(
+    IStudyRepository repository,
+    IStudyTemplateSnapshotRepository snapshotRepository,
+    IUnitSnapshotRepository unitSnapshotRepository) : IQueries
 {
     public async Task<StudyDto?> GetByIdAsync(
         Guid id,
@@ -23,7 +27,9 @@ public sealed class StudyQueries(IStudyRepository repository, IStudyTemplateSnap
             throw new KeyNotFoundException("template not found");
         }
 
-        return StudyDto.FromDomain(study, snapshot);
+        var unitsById = await GetUnitsByIdAsync([snapshot], cancellationToken);
+
+        return StudyDto.FromDomain(study, snapshot, unitsById);
     }
 
     public async Task<ICollection<StudyDto>> GetAllBySampleIdAsync(
@@ -36,19 +42,38 @@ public sealed class StudyQueries(IStudyRepository repository, IStudyTemplateSnap
             return [];
         }
 
-        var studyDtos = new List<StudyDto>();
-
+        var snapshotsByTemplateId = new Dictionary<StudyTemplateId, StudyTemplateSnapshot>();
         foreach (var study in studies)
         {
-            var snapshot = await snapshotRepository.GetByIdAsync(study.StudyTemplateId, cancellationToken);
-            if (snapshot is null)
-            {
-                throw new KeyNotFoundException("template not found");
-            }
+            if (snapshotsByTemplateId.ContainsKey(study.StudyTemplateId)) continue;
 
-            studyDtos.Add(StudyDto.FromDomain(study, snapshot));
+            var snapshot = await snapshotRepository.GetByIdAsync(study.StudyTemplateId, cancellationToken);
+
+            snapshotsByTemplateId[study.StudyTemplateId] = snapshot ?? throw new KeyNotFoundException("template not found");
         }
 
-        return studyDtos;
+        var unitsById = await GetUnitsByIdAsync(snapshotsByTemplateId.Values, cancellationToken);
+
+        return studies.Select(study =>
+                StudyDto.FromDomain(study, snapshotsByTemplateId[study.StudyTemplateId], unitsById))
+            .ToList();
+    }
+
+    private async Task<IReadOnlyDictionary<UnitId, UnitSnapshot>> GetUnitsByIdAsync(
+        IEnumerable<StudyTemplateSnapshot> snapshots,
+        CancellationToken cancellationToken)
+    {
+        var unitIds = snapshots.SelectMany(s => s.Results)
+            .Select(r => r.UnitId)
+            .Distinct()
+            .ToList();
+
+        if (unitIds.Count == 0)
+        {
+            return new Dictionary<UnitId, UnitSnapshot>();
+        }
+
+        var units = await unitSnapshotRepository.GetByIdsAsync(unitIds, cancellationToken);
+        return units.ToDictionary(u => u.Id);
     }
 }

@@ -17,10 +17,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Apis\"/>
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\LIMS.Service.LaboratoryOperations.Application\LIMS.Service.LaboratoryOperations.Application.csproj"/>
     <ProjectReference Include="..\LIMS.Service.LaboratoryOperations.Domain\LIMS.Service.LaboratoryOperations.Domain.csproj"/>
     <ProjectReference Include="..\LIMS.Service.LaboratoryOperations.Infrastructure\LIMS.Service.LaboratoryOperations.Infrastructure.csproj"/>

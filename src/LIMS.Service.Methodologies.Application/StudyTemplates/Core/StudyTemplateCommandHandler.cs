@@ -2,7 +2,7 @@
 using Domain.SeedWork.SeedWork;
 using Domain.SeedWork.SeedWork.Result;
 using Domain.SeedWork.SeedWork.ValueObjects;
-using Guides.Messages;
+using RannitMq.Messages;
 using LIMS.Service.Methodologies.Application.StudyTemplates.Core.Commands;
 using LIMS.Service.Methodologies.Domain.StudyTemplateAggregate;
 using LIMS.Service.Methodologies.Domain.StudyTemplateAggregate.Services;

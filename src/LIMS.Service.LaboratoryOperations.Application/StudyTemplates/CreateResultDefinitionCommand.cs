@@ -4,22 +4,18 @@ using LIMS.Service.LaboratoryOperations.Domain.UnitSnapshots;
 
 namespace LIMS.Service.LaboratoryOperations.Application.StudyTemplates;
 
-public sealed record ResultDefinitionDto(
+public record CreateResultDefinitionCommand(
     Guid Id,
     string ResultInstance,
-    UnitDto? Unit,
+    Guid? UnitId,
     double? SpecMin,
     double? SpecMax)
 {
     public static ResultDefinitionDto FromSnapshot(
-        UnitSnapshot? unitSnapshot,
+        UnitSnapshot unitSnapshot,
         ResultDefinitionSnapshot snapshot)
     {
-        return new ResultDefinitionDto(
-            snapshot.Id.Value,
-            snapshot.ResultInstance,
-            unitSnapshot is null ? null : UnitDto.FromSnapshot(unitSnapshot),
-            snapshot.Specification.MinValue,
-            snapshot.Specification.MaxValue);
+        return new ResultDefinitionDto(snapshot.Id.Value, snapshot.ResultInstance, UnitDto.FromSnapshot(unitSnapshot),
+            snapshot.Specification.MinValue, snapshot.Specification.MaxValue);
     }
 }

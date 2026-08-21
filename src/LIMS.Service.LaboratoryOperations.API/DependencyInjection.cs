@@ -3,6 +3,7 @@ using LIMS.Service.LaboratoryOperations.API.Apis.Orders;
 using LIMS.Service.LaboratoryOperations.API.Apis.Samples;
 using LIMS.Service.LaboratoryOperations.API.Apis.Studies;
 using LIMS.Service.LaboratoryOperations.API.Apis.TestResults;
+using LIMS.Service.LaboratoryOperations.API.Apis.UnitSnapshot;
 using LIMS.Service.LaboratoryOperations.Application;
 using LIMS.Service.LaboratoryOperations.Domain.Services;
 using LIMS.Service.LaboratoryOperations.Infrastructure;
@@ -19,6 +20,8 @@ public static class DependencyInjection
         services.AddInfrastructure();
         services.AddPersistence(configuration);
         services.AddApplication();
+
+        services.AddScoped<UnitSnapshotServices>();
 
         services.AddScoped<StudyStatusChangeDomainService>();
         services.AddScoped<SampleStatusChangeDomainService>();

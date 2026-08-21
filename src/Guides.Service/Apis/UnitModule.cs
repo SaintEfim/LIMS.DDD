@@ -1,5 +1,5 @@
 ﻿using Carter;
-using Guides.Messages;
+using RannitMq.Messages;
 using Guides.Service.Commands;
 using Guides.Service.Domains;
 using Guides.Service.Persistence;

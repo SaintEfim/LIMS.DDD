@@ -1,4 +1,4 @@
-﻿using Guides.Messages;
+﻿using RannitMq.Messages;
 using LIMS.Service.Methodologies.Application.Units;
 using Microsoft.Extensions.Logging;
 using RabbitMq.Library.QuickStart.Receive;
@@ -15,7 +15,13 @@ public class UnitCreatedMessageHandler(
     {
         logger.LogInformation("Processing UnitCreated event: {Name}", message.Name);
 
-        await unitSnapshotCommandsHandler.CreateAsync(new CreateUnitSnapshotCommand(message.Id, message.Name),
-            cancellationToken);
+        var unitResult =
+            await unitSnapshotCommandsHandler.CreateAsync(new CreateUnitSnapshotCommand(message.Id, message.Name),
+                cancellationToken);
+
+        if (unitResult.IsFailure)
+        {
+            logger.LogError("Failed to create UnitCreated event: {Name}, Id {Id}", message.Name, message.Id);
+        }
     }
 }

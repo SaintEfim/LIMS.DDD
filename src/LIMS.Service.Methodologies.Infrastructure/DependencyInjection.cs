@@ -1,4 +1,4 @@
-﻿using Guides.Messages;
+﻿using RannitMq.Messages;
 using Microsoft.Extensions.DependencyInjection;
 using RabbitMq.Library.QuickStart.DependencyInjection;
 

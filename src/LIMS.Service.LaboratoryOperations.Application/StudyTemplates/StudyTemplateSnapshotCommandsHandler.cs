@@ -56,15 +56,14 @@ public sealed class StudyTemplateSnapshotCommandsHandler(
             return calculationRulesResult.CastFailure<StudyTemplateSnapshot>();
         }
 
-        var snapshot = new StudyTemplateSnapshot(templateId, Name: nameResult.GetValue(),
-            Description: descriptionResult.GetValue(), Revision: revisionResult.GetValue(),
-            Parameters: inputParametersResult.GetValue(), Results: resultDefinitionsResult.GetValue(),
-            CalculationRules: calculationRulesResult.GetValue());
+        var snapshot = new StudyTemplateSnapshot(templateId, revisionResult.GetValue(), nameResult.GetValue(),
+            descriptionResult.GetValue(), inputParametersResult.GetValue(), resultDefinitionsResult.GetValue(),
+            calculationRulesResult.GetValue());
 
         return await SaveAsync(snapshot, cancellationToken);
     }
 
-    private Result<IReadOnlyList<InputParameterSnapshot>, Exception> MapInputParameters(
+    private static Result<IReadOnlyList<InputParameterSnapshot>, Exception> MapInputParameters(
         StudyTemplateId templateId,
         IReadOnlyList<InputParameterDto> dtos)
     {
@@ -105,22 +104,33 @@ public sealed class StudyTemplateSnapshotCommandsHandler(
         return snapshots;
     }
 
-    private Result<IReadOnlyList<ResultDefinitionSnapshot>, Exception> MapResultDefinitions(
+    private static Result<IReadOnlyList<ResultDefinitionSnapshot>, Exception> MapResultDefinitions(
         StudyTemplateId templateId,
-        IReadOnlyList<ResultDefinitionDto> dtos)
+        IReadOnlyList<CreateResultDefinitionCommand> dtos)
     {
         var snapshots = new List<ResultDefinitionSnapshot>(dtos.Count);
 
         foreach (var dto in dtos)
         {
+            if (dto.UnitId is null)
+            {
+                return Result<IReadOnlyList<ResultDefinitionSnapshot>, Exception>.Failure(
+                    new InvalidOperationException(
+                        $"Result definition '{dto.ResultInstance}' has no unit specified"));
+            }
+
             var specificationResult = Specification.Create(dto.SpecMin, dto.SpecMax);
             if (specificationResult.IsFailure)
             {
                 return specificationResult.CastFailure<IReadOnlyList<ResultDefinitionSnapshot>>();
             }
 
-            var snapshot = new ResultDefinitionSnapshot(new ResultDefinitionId(dto.Id), templateId, dto.ResultInstance,
-                new UnitId(dto.UnitId), specificationResult.GetValue());
+            var snapshot = new ResultDefinitionSnapshot(
+                new ResultDefinitionId(dto.Id),
+                templateId,
+                dto.ResultInstance,
+                new UnitId(dto.UnitId.Value),
+                specificationResult.GetValue());
 
             snapshots.Add(snapshot);
         }

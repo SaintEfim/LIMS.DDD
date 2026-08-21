@@ -2,6 +2,7 @@
 using LIMS.Service.Methodologies.API.Apis.InputParameters;
 using LIMS.Service.Methodologies.API.Apis.ResultDefinitions;
 using LIMS.Service.Methodologies.API.Apis.StudyTemplates;
+using LIMS.Service.Methodologies.API.Apis.UnitSnapshot;
 using LIMS.Service.Methodologies.Application;
 using LIMS.Service.Methodologies.Domain.StudyTemplateAggregate.Services;
 using LIMS.Service.Methodologies.Infrastructure;
@@ -20,6 +21,8 @@ public static class DependencyInjection
         services.AddApplication();
 
         services.AddScoped<StudyTemplateVersioningService>();
+
+        services.AddScoped<UnitSnapshotServices>();
 
         services.AddScoped<InputParameterServices>();
         services.AddScoped<ResultDefinitionServices>();

@@ -6,4 +6,4 @@ public sealed record UpdateSampleCommand(
     DateTimeOffset? GatherDateEnd,
     string? Code,
     double? VolumeValue,
-    string? VolumeUnit);
+    Guid? VolumeUnitId);

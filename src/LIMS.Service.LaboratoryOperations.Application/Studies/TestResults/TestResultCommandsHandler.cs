@@ -1,4 +1,5 @@
-﻿using Domain.SeedWork.SeedWork;
+﻿using Application.SeedWork.SeedWork;
+using Domain.SeedWork.SeedWork;
 using Domain.SeedWork.SeedWork.Result;
 using Domain.SeedWork.SeedWork.ValueObjects;
 using LIMS.Service.LaboratoryOperations.Domain.StudyAggregate;
@@ -19,7 +20,7 @@ public sealed class TestResultCommandsHandler(
     IUnitOfWork unitOfWork,
     IStudyRepository studyRepository,
     IStudyTemplateSnapshotRepository studyTemplateRepository,
-    INoStringEvaluator noStringEvaluator)
+    INoStringEvaluator noStringEvaluator) : ICommandsHandler
 {
     public async Task<Result<None, Exception>> ExecuteTest(
         Guid studyId,

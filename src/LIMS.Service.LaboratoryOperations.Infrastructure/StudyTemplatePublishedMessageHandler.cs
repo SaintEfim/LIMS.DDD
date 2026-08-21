@@ -1,4 +1,4 @@
-﻿using Guides.Messages;
+﻿using RannitMq.Messages;
 using LIMS.Service.LaboratoryOperations.Application.StudyTemplates;
 using Microsoft.Extensions.Logging;
 using RabbitMq.Library.QuickStart.Receive;
@@ -20,7 +20,8 @@ public class StudyTemplatePublishedMessageHandler(
             message.Revision, message.InputParameters
                 .Select(p => new InputParameterDto(p.Id, p.Name, p.Description, p.AliasName, p.MinValue, p.MaxValue))
                 .ToList(), message.ResultDefinitions
-                .Select(r => new ResultDefinitionDto(r.Id, r.ResultInstance, r.UnitId, r.MinValue, r.MaxValue))
+                .Select(r =>
+                    new CreateResultDefinitionCommand(r.Id, r.ResultInstance, r.UnitId, r.MinValue, r.MaxValue))
                 .ToList(), message.CalculationRules
                 .Select(c =>
                     new CalculationRuleDto(c.Id, c.Name, c.Description, c.FormulaExpression, c.ResultDefinitionId))

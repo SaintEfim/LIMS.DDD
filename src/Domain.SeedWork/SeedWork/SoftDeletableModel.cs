@@ -1,6 +1,6 @@
-﻿namespace Domain.SeedWork.SeedWork.SoftDeletable;
+﻿namespace Domain.SeedWork.SeedWork;
 
-public abstract record SoftDeletableRecord
+public abstract class SoftDeletableModel
 {
     public bool IsDeleted { get; protected set; }
 

@@ -6,4 +6,4 @@ public sealed record CreateSampleCommand(
     DateTimeOffset? GatherDateEnd,
     string Code,
     double? VolumeValue,
-    string? VolumeUnit);
+    Guid? VolumeUnitId);

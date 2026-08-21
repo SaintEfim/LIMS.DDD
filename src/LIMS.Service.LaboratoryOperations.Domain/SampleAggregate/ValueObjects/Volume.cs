@@ -1,4 +1,5 @@
 using Domain.SeedWork.SeedWork.Result;
+using LIMS.Service.LaboratoryOperations.Domain.UnitSnapshots;
 
 namespace LIMS.Service.LaboratoryOperations.Domain.SampleAggregate.ValueObjects;
 
@@ -6,30 +7,50 @@ public sealed record Volume
 {
     private Volume(
         double? value,
-        string? unit)
+        UnitId? unitId)
     {
         Value = value;
-        Unit = unit;
+        UnitId = unitId;
     }
 
-    public double? Value { get; }
+    // for EF Core
+    private Volume()
+    {
+    }
 
-    public string? Unit { get; }
+    public double? Value { get; private set; }
+    public UnitId? UnitId { get; private set; }
 
     public static Result<Volume, Exception> Create(
         double? value,
-        string? unit)
+        UnitId? unitId)
     {
         if (value is < 0)
         {
-            return new ArgumentException("Volume cannot be negative");
+            return Result<Volume, Exception>.Failure(new ArgumentException("Volume cannot be negative"));
         }
 
-        if (value.HasValue && string.IsNullOrWhiteSpace(unit))
+        if (value.HasValue && unitId is null)
         {
-            return new ArgumentException("Unit is required when volume is specified");
+            return Result<Volume, Exception>.Failure(
+                new ArgumentException("Unit is required when volume is specified"));
         }
 
-        return new Volume(value, unit);
+        return Result<Volume, Exception>.Success(new Volume(value, unitId));
+    }
+
+    internal void Update(
+        double? value,
+        UnitId? unitId)
+    {
+        if (value.HasValue)
+        {
+            Value = value;
+        }
+
+        if (unitId is not null)
+        {
+            UnitId = unitId;
+        }
     }
 }

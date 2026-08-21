@@ -8,12 +8,14 @@ using LIMS.Service.LaboratoryOperations.Domain.SampleAggregate;
 using LIMS.Service.LaboratoryOperations.Domain.SampleAggregate.ValueObjects;
 using LIMS.Service.LaboratoryOperations.Domain.Services;
 using LIMS.Service.LaboratoryOperations.Domain.StudyAggregate;
+using LIMS.Service.LaboratoryOperations.Domain.UnitSnapshots;
 using LIMS.Service.LaboratoryOperations.Domain.ValueObjects;
 
 namespace LIMS.Service.LaboratoryOperations.Application.Samples;
 
 public sealed class SampleCommandsHandler(
     IUnitOfWork unitOfWork,
+    IUnitSnapshotRepository unitSnapshotRepository,
     ISampleRepository repository,
     IOrderRepository orderRepository,
     IStudyRepository studyRepository,
@@ -50,7 +52,17 @@ public sealed class SampleCommandsHandler(
             return codeResult.CastFailure<Sample>();
         }
 
-        var volumeResult = Volume.Create(command.VolumeValue, command.VolumeUnit);
+        UnitId? unitId = null;
+
+        if (command.VolumeUnitId is not null)
+        {
+            unitId = new UnitId(command.VolumeUnitId.Value);
+
+            var unit = await unitSnapshotRepository.GetByIdAsync(unitId.Value, cancellationToken);
+            if (unit is null) return new KeyNotFoundException("Unit not found.");
+        }
+
+        var volumeResult = Volume.Create(command.VolumeValue, unitId);
         if (volumeResult.IsFailure)
         {
             return volumeResult.CastFailure<Sample>();
@@ -117,7 +129,24 @@ public sealed class SampleCommandsHandler(
             code = codeResult.GetValue();
         }
 
-        var updateResult = sample.UpdatePartial(name, gatherDate, code, command.VolumeValue, command.VolumeUnit);
+        Volume? volume = null;
+        if (command.VolumeValue is not null || command.VolumeUnitId is not null)
+        {
+            var newValue = command.VolumeValue ?? sample.Volume.Value;
+            var newUnitId = command.VolumeUnitId.HasValue
+                ? new UnitId(command.VolumeUnitId.Value)
+                : sample.Volume.UnitId;
+
+            var volumeResult = Volume.Create(newValue, newUnitId);
+            if (volumeResult.IsFailure)
+            {
+                return volumeResult.CastFailure<None>();
+            }
+
+            volume = volumeResult.GetValue();
+        }
+
+        var updateResult = sample.UpdatePartial(name, gatherDate, code, volume);
         if (updateResult.IsFailure)
         {
             return updateResult.CastFailure<None>();

@@ -8,7 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Application.SeedWork\Application.SeedWork.csproj" />
-    <ProjectReference Include="..\Guides.Messages\Guides.Messages.csproj"/>
+    <ProjectReference Include="..\RannitMq.Messages\RannitMq.Messages.csproj" />
     <ProjectReference Include="..\LIMS.Service.Methodologies.Domain\LIMS.Service.Methodologies.Domain.csproj"/>
     <ProjectReference Include="..\RabbitMq.Library.QuickStart\RabbitMq.Library.QuickStart.csproj"/>
   </ItemGroup>

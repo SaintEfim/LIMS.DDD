@@ -1,9 +1,9 @@
 ﻿using Domain.SeedWork.SeedWork;
 using Domain.SeedWork.SeedWork.Result;
-using Domain.SeedWork.SeedWork.SoftDeletable;
 using Domain.SeedWork.SeedWork.ValueObjects;
 using LIMS.Service.LaboratoryOperations.Domain.OrderAggregate;
 using LIMS.Service.LaboratoryOperations.Domain.SampleAggregate.ValueObjects;
+using LIMS.Service.LaboratoryOperations.Domain.UnitSnapshots;
 using LIMS.Service.LaboratoryOperations.Domain.ValueObjects;
 
 namespace LIMS.Service.LaboratoryOperations.Domain.SampleAggregate;
@@ -54,25 +54,25 @@ public class Sample
     {
         if (IsDeleted)
         {
-            return new InvalidOperationException("Sample is already deleted.");
+            return Result<None, Exception>.Failure(new InvalidOperationException("Sample is already deleted."));
         }
 
         IsDeleted = true;
         DeletedAt = DateTimeOffset.UtcNow;
 
-        return new None();
+        return Result<None, Exception>.Success();
     }
 
     public Result<None, Exception> UpdatePartial(
         Name? name,
         GatherDate? gatherDate,
         Code? code,
-        double? volumeValue,
-        string? volumeUnit)
+        Volume? volume)
     {
         if (!SampleStatus.CanEdit)
         {
-            return new InvalidOperationException("Cannot modify sample details when it is InWork or Completed.");
+            return Result<None, Exception>.Failure(
+                new InvalidOperationException("Cannot modify sample details when it is InWork or Completed."));
         }
 
         if (name is not null)
@@ -90,20 +90,12 @@ public class Sample
             Code = code;
         }
 
-        var value = volumeValue ?? Volume.Value;
-        var unit = volumeUnit ?? Volume.Unit;
+        var newValue = volume?.Value ?? Volume.Value;
+        var newUnitId = volume?.UnitId ?? Volume.UnitId;
 
-        var volumeResult = Volume.Create(value, unit);
-        if (volumeResult.IsFailure)
-        {
-            return volumeResult.CastFailure<None>();
-        }
+        Volume.Update(newValue, newUnitId);
 
-        var volume = volumeResult.GetValue();
-
-        Volume = volume;
-
-        return new None();
+        return Result<None, Exception>.Success();
     }
 
     internal Result<None, Exception> ChangeStatus(
@@ -118,6 +110,6 @@ public class Sample
 
         SampleStatus = newSampleStatus;
 
-        return new None();
+        return Result<None, Exception>.Success();
     }
 }

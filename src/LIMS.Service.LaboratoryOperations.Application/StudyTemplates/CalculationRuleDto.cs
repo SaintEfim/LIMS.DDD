@@ -1,8 +1,21 @@
-﻿namespace LIMS.Service.LaboratoryOperations.Application.StudyTemplates;
+﻿using LIMS.Service.LaboratoryOperations.Domain.StudyTemplateSnapshots.CalculationRules;
 
-public record CalculationRuleDto(
+namespace LIMS.Service.LaboratoryOperations.Application.StudyTemplates;
+
+public sealed record CalculationRuleDto(
     Guid Id,
     string Name,
     string? Description,
     string FormulaExpression,
-    Guid ResultDefinitionId);
+    Guid ResultDefinitionId)
+{
+    public static CalculationRuleDto FromSnapshot(CalculationRuleSnapshot snapshot)
+    {
+        return new CalculationRuleDto(
+            snapshot.Id.Value,
+            snapshot.Name.Value,
+            snapshot.Description.Value,
+            snapshot.FormulaExpression.Value,
+            snapshot.ResultDefinitionId.Value);
+    }
+}

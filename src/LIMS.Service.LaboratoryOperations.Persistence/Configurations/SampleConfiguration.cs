@@ -2,6 +2,7 @@
 using LIMS.Service.LaboratoryOperations.Domain.OrderAggregate;
 using LIMS.Service.LaboratoryOperations.Domain.SampleAggregate;
 using LIMS.Service.LaboratoryOperations.Domain.SampleAggregate.ValueObjects;
+using LIMS.Service.LaboratoryOperations.Domain.UnitSnapshots;
 using LIMS.Service.LaboratoryOperations.Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -59,9 +60,16 @@ public class SampleConfiguration : IEntityTypeConfiguration<Sample>
             v.Property(p => p.Value)
                 .HasColumnName("VolumeValue")
                 .HasColumnType("decimal(18,4)");
-            v.Property(p => p.Unit)
-                .HasColumnName("VolumeUnit")
-                .HasMaxLength(50);
+
+            v.Property(p => p.UnitId)
+                .HasColumnName("VolumeUnitId")
+                .HasConversion(id => id.HasValue ? id.Value.Value : (Guid?) null,
+                    value => value.HasValue ? new UnitId(value.Value) : null);
+
+            v.HasOne<UnitSnapshot>()
+                .WithMany()
+                .HasForeignKey(p => p.UnitId)
+                .OnDelete(DeleteBehavior.Restrict);
         });
 
         builder.Property(x => x.SampleStatus)

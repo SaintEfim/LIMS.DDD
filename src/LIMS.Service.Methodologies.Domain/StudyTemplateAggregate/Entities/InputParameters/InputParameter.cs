@@ -1,4 +1,4 @@
-﻿using Domain.SeedWork.SeedWork.SoftDeletable;
+﻿using Domain.SeedWork.SeedWork;
 using Domain.SeedWork.SeedWork.ValueObjects;
 
 namespace LIMS.Service.Methodologies.Domain.StudyTemplateAggregate.Entities.InputParameters;

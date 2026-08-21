@@ -1,11 +1,12 @@
-﻿using Domain.SeedWork.SeedWork;
+﻿using Application.SeedWork.SeedWork;
+using Domain.SeedWork.SeedWork;
 using Domain.SeedWork.SeedWork.Result;
 using LIMS.Service.LaboratoryOperations.Domain.StudyAggregate;
 using LIMS.Service.LaboratoryOperations.Domain.StudyAggregate.Entities;
 
 namespace LIMS.Service.LaboratoryOperations.Application.Studies.MeasuredValues;
 
-public sealed class MeasuredValueCommandsHandler(IUnitOfWork unitOfWork, IStudyRepository studyRepository)
+public sealed class MeasuredValueCommandsHandler(IUnitOfWork unitOfWork, IStudyRepository studyRepository) : ICommandsHandler
 {
     public async Task<Result<None, Exception>> UpdateAsync(
         Guid studyId,

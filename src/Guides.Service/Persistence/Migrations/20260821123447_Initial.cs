@@ -24,6 +24,13 @@ namespace Guides.Service.Persistence.Migrations
                 {
                     table.PrimaryKey("PK_Units", x => x.Id);
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Units_Name",
+                table: "Units",
+                column: "Name",
+                unique: true,
+                filter: "\"IsDeleted\" = false");
         }
 
         /// <inheritdoc />

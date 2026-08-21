@@ -1,6 +1,6 @@
 ﻿using RabbitMq.Library.QuickStart.Messages;
 
-namespace Guides.Messages;
+namespace RannitMq.Messages;
 
 [IntegrationEvent("study-template.published")]
 public record StudyTemplatePublishedMessage(

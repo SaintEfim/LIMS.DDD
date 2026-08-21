@@ -1,6 +1,6 @@
 ﻿using RabbitMq.Library.QuickStart.Messages;
 
-namespace Guides.Messages;
+namespace RannitMq.Messages;
 
 [IntegrationEvent("unit.created")]
 public record UnitCreatedMessage(Guid Id, string Name) : IIntegrationEvent;

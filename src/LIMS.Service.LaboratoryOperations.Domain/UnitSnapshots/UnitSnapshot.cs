@@ -1,5 +1,4 @@
 ﻿using Domain.SeedWork.SeedWork;
-using Domain.SeedWork.SeedWork.SoftDeletable;
 using Domain.SeedWork.SeedWork.ValueObjects;
 
 namespace LIMS.Service.LaboratoryOperations.Domain.UnitSnapshots;

@@ -1,5 +1,5 @@
 using Carter;
-using Guides.Messages;
+using RannitMq.Messages;
 using Guides.Service.Persistence;
 using Microsoft.EntityFrameworkCore;
 using RabbitMq.Library.QuickStart.DependencyInjection;
