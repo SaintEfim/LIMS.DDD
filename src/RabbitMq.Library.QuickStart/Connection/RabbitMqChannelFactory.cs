@@ -24,7 +24,7 @@ public sealed class RabbitMqChannelFactory
 
         if (connection is not null && connection.IsOpen)
         {
-            var options = new CreateChannelOptions(true, true, null, 1);
+            var options = new CreateChannelOptions(true, true);
 
             return await connection.CreateChannelAsync(options, cancellationToken);
         }

@@ -1,37 +1,54 @@
 ﻿using Microsoft.Extensions.Logging;
 using RabbitMq.Library.QuickStart.Connection;
+using RabbitMq.Library.QuickStart.IntegrationEvents;
 
 namespace RabbitMq.Library.QuickStart;
 
-public class RabbitMqTopologyDeclarator(
-    IReadOnlyDictionary<Type, IntegrationEventDescriptor> events,
-    RabbitMqChannelFactory channelManager,
+public sealed class RabbitMqTopologyDeclarator(
+    IntegrationEventRegistry eventRegistry,
+    RabbitMqChannelFactory channelFactory,
     ILogger<RabbitMqTopologyDeclarator> logger)
 {
-    public async Task DeclareAllAsync(
-        CancellationToken ct)
+    public async Task DeclareAllAsync(CancellationToken cancellationToken = default)
     {
-        if (events.Count == 0)
+        await using var channel = await channelFactory.CreateChannelAsync(cancellationToken);
+        if (channel is null || !channel.IsOpen) return;
+
+        var declaredExchanges = new HashSet<string>();
+
+        foreach (var descriptor in eventRegistry.All.Values)
         {
-            logger.LogWarning("No integration events found");
-            return;
+            if (declaredExchanges.Add(descriptor.ExchangeName))
+            {
+                await channel.ExchangeDeclareAsync(
+                    exchange: descriptor.ExchangeName,
+                    type: "fanout",
+                    durable: true,
+                    autoDelete: false,
+                    arguments: null,
+                    cancellationToken: cancellationToken);
+
+                logger.LogInformation("Declared fanout exchange: {ExchangeName}", descriptor.ExchangeName);
+            }
+
+            await channel.QueueDeclareAsync(
+                queue: descriptor.QueueName,
+                durable: true,
+                exclusive: false,
+                autoDelete: false,
+                arguments: null,
+                cancellationToken: cancellationToken);
+
+            await channel.QueueBindAsync(
+                queue: descriptor.QueueName,
+                exchange: descriptor.ExchangeName,
+                routingKey: "",
+                arguments: null,
+                cancellationToken: cancellationToken);
+
+            logger.LogInformation(
+                "Declared and bound queue: {QueueName} -> exchange: {ExchangeName}",
+                descriptor.QueueName, descriptor.ExchangeName);
         }
-
-        await using var channel = await channelManager.CreateChannelAsync(ct);
-
-        if (channel is null || !channel.IsOpen)
-        {
-            logger.LogWarning("RabbitMQ is not available.");
-            return;
-        }
-
-        foreach (var @event in events.Values)
-        {
-            await channel.QueueDeclareAsync(@event.QueueName, true, false, false, null, cancellationToken: ct);
-
-            logger.LogInformation("Declared queue {Queue} for type {Type}", @event.QueueName, @event.EventType.Name);
-        }
-
-        logger.LogInformation("RabbitMQ topology declared: {Count} queues", events.Count);
     }
 }

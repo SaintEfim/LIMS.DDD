@@ -1,0 +1,444 @@
+@methodologiesUrl = http://localhost:1001
+@laboratoryOperationsUrl = http://localhost:1002
+@unitServiceUrl = http://localhost:1003
+
+### ============================================
+### СОЗДАНИЕ UNITS
+### ============================================
+
+# @name createUnitGram
+POST {{unitServiceUrl}}/api/units
+Content-Type: application/json
+
+{
+  "name": "г {{$random.code.ean13}}"
+}
+
+> {%
+  client.test("Create unit 'г'", function () {
+    client.assert(response.status === 201, "Unit 'г' creation failed: " + response.status);
+  });
+  client.global.set("unitGramId", response.body.id);
+%}
+
+### ============================================
+### Проверяем
+### ============================================
+
+# @name createUnitPercent
+POST {{unitServiceUrl}}/api/units
+Content-Type: application/json
+
+{
+  "name": "% {{$random.code.ean13}}"
+}
+
+> {%
+  client.test("Create unit '%'", function () {
+    client.assert(response.status === 201, "Unit '%' creation failed: " + response.status);
+  });
+  client.global.set("unitPercentId", response.body.id);
+%}
+
+### ============================================
+### СОЗДАНИЕ МЕТОДИКИ
+### ============================================
+
+# @name createMoistureTemplate
+POST {{methodologiesUrl}}/api/study-templates
+Content-Type: application/json
+
+{
+  "name": "Определение влажности зерна {{$random.uuid}}",
+  "description": "Методика определения массовой доли влаги в зерне воздушно-тепловым способом",
+  "revision": "v1.0-{{$random.uuid}}"
+}
+
+> {%
+  client.test("Create moisture template", function () {
+    client.assert(response.status === 201, "Template creation failed: " + response.status);
+  });
+  client.global.set("moistureTemplateId", response.body.id);
+%}
+
+###
+
+# @name addMassBefore
+POST {{methodologiesUrl}}/api/study-templates/{{moistureTemplateId}}/input-parameters
+Content-Type: application/json
+
+{
+  "aliasName": "m1",
+  "name": "Масса бюксы с зерном до высушивания",
+  "description": "Масса бюксы с навеской зерна до высушивания",
+  "minValue": 10.0,
+  "maxValue": 50.0
+}
+
+> {%
+  client.test("Add mass before", function () {
+    client.assert(response.status === 201, "Input parameter creation failed");
+  });
+  client.global.set("massBeforeId", response.body.id);
+%}
+
+###
+
+# @name addMassAfter
+POST {{methodologiesUrl}}/api/study-templates/{{moistureTemplateId}}/input-parameters
+Content-Type: application/json
+
+{
+  "aliasName": "m2",
+  "name": "Масса бюксы с зерном после высушивания",
+  "description": "Масса бюксы после высушивания при 130°C",
+  "minValue": 8.0,
+  "maxValue": 48.0
+}
+
+> {%
+  client.test("Add mass after", function () {
+    client.assert(response.status === 201, "Input parameter creation failed");
+  });
+  client.global.set("massAfterId", response.body.id);
+%}
+
+###
+
+# @name addEmptyMass
+POST {{methodologiesUrl}}/api/study-templates/{{moistureTemplateId}}/input-parameters
+Content-Type: application/json
+
+{
+  "aliasName": "m0",
+  "name": "Масса пустой бюксы",
+  "description": "Масса чистой сухой бюксы",
+  "minValue": 5.0,
+  "maxValue": 20.0
+}
+
+> {%
+  client.test("Add empty mass", function () {
+    client.assert(response.status === 201, "Input parameter creation failed");
+  });
+  client.global.set("emptyMassId", response.body.id);
+%}
+
+###
+
+# @name addMoistureResult
+POST {{methodologiesUrl}}/api/study-templates/{{moistureTemplateId}}/result-definitions
+Content-Type: application/json
+
+{
+  "resultInstance": "Вода",
+  "unitId": "{{unitPercentId}}",
+  "minValue": 5.0,
+  "maxValue": 20.0
+}
+
+> {%
+  client.test("Add moisture result", function () {
+    client.assert(response.status === 201, "Result definition creation failed");
+  });
+  client.global.set("moistureResultId", response.body.id);
+%}
+
+###
+
+# @name addDryMatterResult
+POST {{methodologiesUrl}}/api/study-templates/{{moistureTemplateId}}/result-definitions
+Content-Type: application/json
+
+{
+  "resultInstance": "Сухое вещество",
+  "unitId": "{{unitPercentId}}",
+  "minValue": 80.0,
+  "maxValue": 95.0
+}
+
+> {%
+  client.test("Add dry matter result", function () {
+    client.assert(response.status === 201, "Result definition creation failed");
+  });
+  client.global.set("dryMatterResultId", response.body.id);
+%}
+
+###
+
+# @name addMoistureCalculation
+POST {{methodologiesUrl}}/api/study-templates/{{moistureTemplateId}}/calculation-rules
+Content-Type: application/json
+
+{
+  "name": "Расчет влажности",
+  "formulaExpression": "((m1 - m2) / (m1 - m0)) * 100",
+  "description": "Формула расчета массовой доли влаги",
+  "resultDefinitionId": "{{moistureResultId}}"
+}
+
+> {%
+  client.test("Add moisture calculation", function () {
+    client.assert(response.status === 201, "Calculation rule creation failed");
+  });
+  client.global.set("moistureCalcId", response.body.id);
+%}
+
+###
+
+# @name approveMoistureTemplate
+POST {{methodologiesUrl}}/api/study-templates/{{moistureTemplateId}}/change-status?newStatus=Active
+
+> {%
+  client.test("Approve moisture template", function () {
+    client.assert(response.status === 200, "Status change failed: " + response.status);
+  });
+%}
+
+###
+
+# @name createMoistureRevision
+POST {{methodologiesUrl}}/api/study-templates/{{moistureTemplateId}}/create-revision
+Content-Type: application/json
+
+{
+  "newRevision": "v1.1-{{$random.uuid}}"
+}
+
+> {%
+  client.test("Create revision", function () {
+    client.assert(response.status === 201, "Revision creation failed: " + response.status);
+  });
+  client.global.set("moistureTemplateV2Id", response.body.id);
+%}
+
+###
+
+# @name approveMoistureTemplateV2
+POST {{methodologiesUrl}}/api/study-templates/{{moistureTemplateV2Id}}/change-status?newStatus=Active
+
+> {%
+  client.test("Approve moisture template V2", function () {
+    client.assert(response.status === 200, "Status change for V2 failed: " + response.status);
+  });
+  client.log("StudyTemplatePublishedMessage sent to broker");
+%}
+
+### ============================================
+### 1. СОЗДАНИЕ ЗАДАНИЯ (ORDER)
+### ============================================
+
+# @name createOrder
+POST {{laboratoryOperationsUrl}}/api/orders
+Content-Type: application/json
+
+{
+  "name": "Партия зерна №4512 {{$random.uuid}}",
+  "description": "Входной контроль качества зерна от поставщика ООО 'Агро'",
+  "code": "A-{{$random.uuid}}",
+  "contractor": "ООО 'Агро Поставки'"
+}
+
+> {%
+  client.test("Create order", function () {
+    client.assert(response.status === 201, "Order creation failed: " + response.status);
+  });
+  client.global.set("orderId", response.body.id);
+%}
+
+### ============================================
+### 2. РЕГИСТРАЦИЯ ПРОБЫ (SAMPLE)
+### ============================================
+
+# @name createSample
+POST {{laboratoryOperationsUrl}}/api/orders/{{orderId}}/samples
+Content-Type: application/json
+
+{
+  "name": "Проба зерна из вагона №12345 {{$random.uuid}}",
+  "gatherDateBegin": "2023-10-25T08:00:00Z",
+  "gatherDateEnd": "2023-10-25T08:15:00Z",
+  "code": "SAMPLE-{{$random.uuid}}",
+  "volumeValue": 1000.0,
+  "volumeUnitId": "{{unitGramId}}"
+}
+
+> {%
+  client.test("Create sample", function () {
+    client.assert(response.status === 201, "Sample creation failed: " + response.status);
+  });
+  client.global.set("sampleId", response.body.id);
+%}
+
+### ============================================
+### 3. СОЗДАНИЕ ИССЛЕДОВАНИЯ (STUDY)
+### ============================================
+
+# @name createStudy
+POST {{laboratoryOperationsUrl}}/api/samples/{{sampleId}}/studies
+Content-Type: application/json
+
+{
+  "studyTemplateId": "{{moistureTemplateV2Id}}"
+}
+
+> {%
+  client.test("Create study", function () {
+    client.assert(response.status === 201, "Study creation failed: " + response.status);
+  });
+  client.global.set("studyId", response.body.id);
+%}
+
+### ============================================
+### 4. ИЗВЛЕЧЕНИЕ ID ДОЧЕРНИХ СУЩНОСТЕЙ
+### ИСПРАВЛЕНО: resultInstance теперь внутри tr.resultDefinition
+### ============================================
+
+# @name getStudyDetails
+GET {{laboratoryOperationsUrl}}/api/samples/{{sampleId}}/studies/{{studyId}}
+
+> {%
+  client.test("Get study details", function () {
+    client.assert(response.status === 200, "Failed to get study details");
+
+    const study = response.body;
+
+    const massBefore = study.measuredValues.find(mv => mv.inputParameter.aliasName === "m1");
+    const massAfter = study.measuredValues.find(mv => mv.inputParameter.aliasName === "m2");
+    const emptyMass = study.measuredValues.find(mv => mv.inputParameter.aliasName === "m0");
+
+    // TestResultDto.ResultDefinition — вложенный объект, resultInstance внутри него
+    const moistureResult = study.testResults.find(tr =>
+      tr.resultDefinition && tr.resultDefinition.resultInstance.includes("Вода"));
+    const dryMatterResult = study.testResults.find(tr =>
+      tr.resultDefinition && tr.resultDefinition.resultInstance.includes("Сухое вещество"));
+
+    if (massBefore) client.global.set("massBeforeMvId", massBefore.id);
+    if (massAfter) client.global.set("massAfterMvId", massAfter.id);
+    if (emptyMass) client.global.set("emptyMassMvId", emptyMass.id);
+
+    if (moistureResult) client.global.set("moistureResultTrId", moistureResult.id);
+    if (dryMatterResult) client.global.set("dryMatterResultTrId", dryMatterResult.id);
+
+    client.log("MV IDs: m1=" + (massBefore ? massBefore.id : "NOT FOUND") +
+      ", m2=" + (massAfter ? massAfter.id : "NOT FOUND") +
+      ", m0=" + (emptyMass ? emptyMass.id : "NOT FOUND"));
+    client.log("TR IDs: moisture=" + (moistureResult ? moistureResult.id : "NOT FOUND") +
+      ", dryMatter=" + (dryMatterResult ? dryMatterResult.id : "NOT FOUND"));
+
+    // Диагностика: если testResults пустые или без resultDefinition — покажем структуру
+    if (study.testResults.length > 0 && !study.testResults[0].resultDefinition) {
+      client.log("WARNING: testResults[0] has no resultDefinition. Keys: " +
+        Object.keys(study.testResults[0]).join(", "));
+    }
+  });
+%}
+
+### ============================================
+### 5. ВВОД СЫРЫХ ДАННЫХ (MEASURED VALUES)
+### ============================================
+
+# @name updateMassBefore
+PATCH {{laboratoryOperationsUrl}}/api/studies/{{studyId}}/measured-values/{{massBeforeMvId}}
+Content-Type: application/json
+
+{
+  "value": 35.5
+}
+
+> {%
+  client.test("Update mass before", function () {
+    client.assert(response.status === 200 || response.status === 204,
+      "Update mass before failed: " + response.status);
+  });
+%}
+
+###
+
+# @name updateMassAfter
+PATCH {{laboratoryOperationsUrl}}/api/studies/{{studyId}}/measured-values/{{massAfterMvId}}
+Content-Type: application/json
+
+{
+  "value": 32.1
+}
+
+> {%
+  client.test("Update mass after", function () {
+    client.assert(response.status === 200 || response.status === 204,
+      "Update mass after failed: " + response.status);
+  });
+%}
+
+###
+
+# @name updateEmptyMass
+PATCH {{laboratoryOperationsUrl}}/api/studies/{{studyId}}/measured-values/{{emptyMassMvId}}
+Content-Type: application/json
+
+{
+  "value": 15.0
+}
+
+> {%
+  client.test("Update empty mass", function () {
+    client.assert(response.status === 200 || response.status === 204,
+      "Update empty mass failed: " + response.status);
+  });
+%}
+
+### ============================================
+### 6. ВЫПОЛНЕНИЕ РАСЧЁТОВ
+### ============================================
+
+# @name executeMoistureResult
+POST {{laboratoryOperationsUrl}}/api/studies/{{studyId}}/test-results/{{moistureResultTrId}}/execute
+
+> {%
+  client.test("Execute moisture calculation", function () {
+    client.assert(response.status === 200 || response.status === 204,
+      "Execute moisture failed: " + response.status);
+  });
+  client.log("Moisture result calculated");
+%}
+
+### ============================================
+### 7. ЗАВЕРШЕНИЕ ИССЛЕДОВАНИЯ
+### ============================================
+
+# @name completeStudy
+POST {{laboratoryOperationsUrl}}/api/samples/{{sampleId}}/studies/{{studyId}}/change-status
+Content-Type: application/json
+
+{
+  "status": "Completed"
+}
+
+> {%
+  client.test("Complete study", function () {
+    client.assert(response.status === 200 || response.status === 204,
+      "Study status change failed: " + response.status);
+  });
+  client.log("Study completed successfully");
+%}
+
+### ============================================
+### 8. ФИНАЛЬНАЯ ПРОВЕРКА
+### ============================================
+
+GET {{laboratoryOperationsUrl}}/api/samples/{{sampleId}}/studies/{{studyId}}
+
+> {%
+  client.test("Verify final study state", function () {
+    client.assert(response.status === 200, "Failed to get final study");
+    client.assert(response.body.status === "Completed", "Study status is not Completed");
+
+    const moisture = response.body.testResults.find(tr =>
+      tr.resultDefinition && tr.resultDefinition.resultInstance.includes("Вода"));
+    if (moisture) {
+      client.log("Moisture value: " + moisture.value + ", outOfSpec: " + moisture.isOutOfSpec);
+    }
+
+    client.log("Full LIMS workflow completed successfully");
+  });
+%}

@@ -1,0 +1,87 @@
+﻿using Application.SeedWork.SeedWork;
+using LIMS.Service.LaboratoryOperations.Domain.StudyAggregate;
+using LIMS.Service.LaboratoryOperations.Domain.StudyAggregate.Entities;
+using LIMS.Service.LaboratoryOperations.Domain.StudyTemplateSnapshots;
+using LIMS.Service.LaboratoryOperations.Domain.UnitSnapshots;
+
+namespace LIMS.Service.LaboratoryOperations.Application.Studies.TestResults;
+
+public sealed class TestResultQueries(
+    IStudyRepository repository,
+    IStudyTemplateSnapshotRepository snapshotRepository,
+    IUnitSnapshotRepository unitSnapshotRepository) : IQueries
+{
+    public async Task<TestResultDto?> GetByIdAsync(
+        Guid studyId,
+        Guid testResultId,
+        CancellationToken cancellationToken = default)
+    {
+        var study = await repository.GetByIdAsync(new StudyId(studyId), cancellationToken);
+        if (study is null)
+        {
+            throw new KeyNotFoundException("study not found");
+        }
+
+        var testResult = study.TestResults.SingleOrDefault(tr => tr.Id == new TestResultId(testResultId));
+        if (testResult is null)
+        {
+            return null;
+        }
+
+        var resultDefinition = await snapshotRepository.GetResultDefinitionAsync(
+            study.StudyTemplateId, testResult.ResultDefinitionId, cancellationToken);
+        if (resultDefinition is null)
+        {
+            throw new KeyNotFoundException("result definition not found");
+        }
+
+        var unit = await unitSnapshotRepository.GetByIdAsync(resultDefinition.UnitId, cancellationToken);
+
+        return TestResultDto.FromDomain(testResult, resultDefinition, unit);
+    }
+
+    public async Task<ICollection<TestResultDto>> GetAllByStudyIdAsync(
+        Guid studyId,
+        CancellationToken cancellationToken = default)
+    {
+        var study = await repository.GetByIdAsync(new StudyId(studyId), cancellationToken);
+        if (study is null)
+        {
+            return [];
+        }
+
+        var snapshot = await snapshotRepository.GetByIdAsync(study.StudyTemplateId, cancellationToken);
+        if (snapshot is null)
+        {
+            throw new KeyNotFoundException("template not found");
+        }
+
+        var resultDefinitions =
+            await snapshotRepository.GetResultDefinitionsAsync(study.StudyTemplateId, cancellationToken);
+
+        var resultDefinitionsDict = resultDefinitions.ToDictionary(rd => rd.Id);
+
+        var unitIds = resultDefinitions
+            .Select(rd => rd.UnitId)
+            .Distinct()
+            .ToList();
+
+        var units = unitIds.Count == 0
+            ? []
+            : await unitSnapshotRepository.GetByIdsAsync(unitIds, cancellationToken);
+
+        var unitsById = units.ToDictionary(u => u.Id);
+
+        return study.TestResults
+            .Select(tr =>
+            {
+                var resultDefinition = resultDefinitionsDict.GetValueOrDefault(tr.ResultDefinitionId)
+                    ?? throw new KeyNotFoundException("result definition not found");
+
+                var unit = unitsById.GetValueOrDefault(resultDefinition.UnitId);
+
+                return TestResultDto.FromDomain(tr, resultDefinition, unit);
+            })
+            .ToList();
+    }
+}

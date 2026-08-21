@@ -1,0 +1,167 @@
+﻿using Application.SeedWork.SeedWork;
+using Domain.SeedWork.SeedWork;
+using Domain.SeedWork.SeedWork.Result;
+using Domain.SeedWork.SeedWork.ValueObjects;
+using LIMS.Service.Methodologies.Application.StudyTemplates.InputParameters.Commands;
+using LIMS.Service.Methodologies.Domain.StudyTemplateAggregate;
+using LIMS.Service.Methodologies.Domain.StudyTemplateAggregate.Entities.InputParameters;
+
+namespace LIMS.Service.Methodologies.Application.StudyTemplates.InputParameters;
+
+public sealed class InputParameterCommandsHandler(IStudyTemplateRepository repository, IUnitOfWork unitOfWork)
+    : ICommandsHandler
+{
+    public async Task<Result<Guid, Exception>> CreateAsync(
+        Guid studyTemplateId,
+        CreateInputParameterCommand command,
+        CancellationToken cancellationToken = default)
+    {
+        var templateResult = await GetTemplateForChangeAsync(studyTemplateId, cancellationToken);
+        if (templateResult.IsFailure)
+        {
+            return templateResult.CastFailure<Guid>();
+        }
+
+        var nameResult = Name.Create(command.Name);
+        if (nameResult.IsFailure)
+        {
+            return nameResult.CastFailure<Guid>();
+        }
+
+        var descResult = Description.Create(command.Description);
+        if (descResult.IsFailure)
+        {
+            return descResult.CastFailure<Guid>();
+        }
+
+        var aliasResult = AliasName.Create(command.AliasName);
+        if (aliasResult.IsFailure)
+        {
+            return aliasResult.CastFailure<Guid>();
+        }
+
+        var specification = Specification.Create(command.MinValue, command.MaxValue);
+        if (specification.IsFailure)
+        {
+            return specification.CastFailure<Guid>();
+        }
+
+        var addResult = templateResult.GetValue()
+            .AddInputParameter(nameResult.GetValue(), descResult.GetValue(), aliasResult.GetValue(),
+                specification.GetValue());
+        if (addResult.IsFailure)
+        {
+            return addResult.CastFailure<Guid>();
+        }
+
+        var saveResult = await SaveChangesAsync(cancellationToken);
+        return saveResult.IsFailure
+            ? saveResult.CastFailure<Guid>()
+            : addResult.GetValue()
+                .Id.Value;
+    }
+
+    public async Task<Result<None, Exception>> RemoveAsync(
+        Guid studyTemplateId,
+        Guid parameterId,
+        CancellationToken cancellationToken = default)
+    {
+        var templateResult = await GetTemplateForChangeAsync(studyTemplateId, cancellationToken);
+        if (templateResult.IsFailure)
+        {
+            return templateResult.CastFailure<None>();
+        }
+
+        var removeResult = templateResult.GetValue()
+            .RemoveInputParameter(new InputParameterId(parameterId));
+        if (removeResult.IsFailure)
+        {
+            return removeResult.CastFailure<None>();
+        }
+
+        return await SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task<Result<None, Exception>> UpdateAsync(
+        Guid studyTemplateId,
+        Guid parameterId,
+        UpdateInputParameterCommand command,
+        CancellationToken cancellationToken = default)
+    {
+        var templateResult = await GetTemplateForChangeAsync(studyTemplateId, cancellationToken);
+        if (templateResult.IsFailure)
+        {
+            return templateResult.CastFailure<None>();
+        }
+
+        Name? name = null;
+        if (command.Name is not null)
+        {
+            var nameResult = Name.Create(command.Name);
+            if (nameResult.IsFailure)
+            {
+                return nameResult.CastFailure<None>();
+            }
+
+            name = nameResult.GetValue();
+        }
+
+        Description? description = null;
+        if (command.Description is not null)
+        {
+            var descResult = Description.Create(command.Description);
+            if (descResult.IsFailure)
+            {
+                return descResult.CastFailure<None>();
+            }
+
+            description = descResult.GetValue();
+        }
+
+        AliasName? aliasName = null;
+        if (command.AliasName is not null)
+        {
+            var aliasResult = AliasName.Create(command.AliasName);
+            if (aliasResult.IsFailure)
+            {
+                return aliasResult.CastFailure<None>();
+            }
+
+            aliasName = aliasResult.GetValue();
+        }
+
+        var updateResult = templateResult.GetValue()
+            .UpdateInputParameter(new InputParameterId(parameterId), name, description, aliasName, command.MinValue,
+                command.MaxValue);
+        if (updateResult.IsFailure)
+        {
+            return updateResult.CastFailure<None>();
+        }
+
+        return await SaveChangesAsync(cancellationToken);
+    }
+
+    private async Task<Result<StudyTemplate, Exception>> GetTemplateForChangeAsync(
+        Guid studyTemplateId,
+        CancellationToken cancellationToken = default)
+    {
+        var template = await repository.GetByIdForChangeAsync(new StudyTemplateId(studyTemplateId), cancellationToken);
+        return template is null
+            ? new KeyNotFoundException($"StudyTemplate with id {studyTemplateId} not found.")
+            : template;
+    }
+
+    private async Task<Result<None, Exception>> SaveChangesAsync(
+        CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            await unitOfWork.SaveChangesAsync(cancellationToken);
+            return new None();
+        }
+        catch (Exception ex)
+        {
+            return new Exception($"Failed to save changes: {ex.Message}", ex);
+        }
+    }
+}
