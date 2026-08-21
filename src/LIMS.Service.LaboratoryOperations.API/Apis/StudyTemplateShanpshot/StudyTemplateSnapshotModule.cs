@@ -21,7 +21,7 @@ public class StudyTemplateSnapshotModule : ICarterModule
     }
 
     private static async Task<IResult> GetAll(
-        [FromServices] StudyTemplateServices services,
+        [FromServices] StudyTemplateSnapshotServices services,
         CancellationToken cancellationToken = default)
     {
         var templates = await services.Queries.GetAllAsync(cancellationToken);
@@ -30,7 +30,7 @@ public class StudyTemplateSnapshotModule : ICarterModule
 
     private static async Task<IResult> GetById(
         Guid studyTemplateId,
-        [FromServices] StudyTemplateServices services,
+        [FromServices] StudyTemplateSnapshotServices services,
         CancellationToken cancellationToken = default)
     {
         var template = await services.Queries.GetByIdAsync(studyTemplateId, cancellationToken);

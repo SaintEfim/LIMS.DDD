@@ -39,10 +39,10 @@ public sealed class StudyCommandsHandler(
         }
 
         var template =
-            await templateRepository.GetByIdAsync(new StudyTemplateId(command.TemplateId), cancellationToken);
+            await templateRepository.GetByIdAsync(new StudyTemplateId(command.StudyTemplateId), cancellationToken);
         if (template is null)
         {
-            return new KeyNotFoundException($"StudyTemplate with id {command.TemplateId} not found.");
+            return new KeyNotFoundException($"StudyTemplate with id {command.StudyTemplateId} not found.");
         }
 
         var createResult = domainService.CreateStudyByTemplate(sample, order, template);

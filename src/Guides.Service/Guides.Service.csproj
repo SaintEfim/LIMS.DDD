@@ -18,7 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\RannitMq.Messages\RannitMq.Messages.csproj" />
+    <ProjectReference Include="..\Broker.Messages\Broker.Messages.csproj" />
     <ProjectReference Include="..\RabbitMq.Library.QuickStart.Messages\RabbitMq.Library.QuickStart.Messages.csproj"/>
     <ProjectReference Include="..\RabbitMq.Library.QuickStart\RabbitMq.Library.QuickStart.csproj"/>
   </ItemGroup>

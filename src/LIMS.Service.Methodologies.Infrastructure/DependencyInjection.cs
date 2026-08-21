@@ -1,4 +1,4 @@
-﻿using RannitMq.Messages;
+﻿using Broker.Messages;
 using Microsoft.Extensions.DependencyInjection;
 using RabbitMq.Library.QuickStart.DependencyInjection;
 
@@ -15,7 +15,7 @@ public static class DependencyInjection
                 x.Port = 5672;
                 x.UserName = "guest";
                 x.Password = "guest";
-            })
+            }, "methodologies")
             .AddMessage<StudyTemplatePublishedMessage>()
             .AddMessageHandler<UnitCreatedMessageHandler>();
     }

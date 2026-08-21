@@ -14,7 +14,7 @@ public static class DependencyInjection
                 x.Port = 5672;
                 x.UserName = "guest";
                 x.Password = "guest";
-            })
+            }, "laboratory-operations")
             .AddMessageHandler<UnitCreatedMessageHandler>()
             .AddMessageHandler<StudyTemplatePublishedMessageHandler>();
     }

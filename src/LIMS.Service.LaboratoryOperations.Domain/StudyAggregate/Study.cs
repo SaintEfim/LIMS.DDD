@@ -91,7 +91,8 @@ public sealed class Study
 
     public Result<None, Exception> UpdateTestResult(
         TestResultId testResultId,
-        double? value)
+        double? value,
+        bool isWithinSpec)
     {
         if (!Status.CanEdit)
         {
@@ -107,7 +108,7 @@ public sealed class Study
 
         if (value is not null)
         {
-            testResult.SetValue(value.Value);
+            testResult.ApplyValue(value.Value, !isWithinSpec);
         }
 
         return new None();

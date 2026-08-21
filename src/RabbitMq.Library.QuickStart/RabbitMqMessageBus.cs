@@ -44,6 +44,8 @@ public sealed class RabbitMqMessageBus(
                 .ToString(),
             Timestamp = new AmqpTimestamp(DateTimeOffset.UtcNow.ToUnixTimeSeconds())
         };
-        await channel.BasicPublishAsync("", descriptor.QueueName, false, properties, body, cancellationToken);
+
+        await channel.BasicPublishAsync(exchange: descriptor.ExchangeName, routingKey: "", mandatory: false,
+            basicProperties: properties, body: body, cancellationToken: cancellationToken);
     }
 }

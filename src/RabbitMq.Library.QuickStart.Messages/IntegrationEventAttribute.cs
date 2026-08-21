@@ -1,7 +1,7 @@
 ﻿namespace RabbitMq.Library.QuickStart.Messages;
 
 [AttributeUsage(AttributeTargets.Class)]
-public sealed class IntegrationEventAttribute(string queueName) : Attribute
+public sealed class IntegrationEventAttribute(string eventName) : Attribute
 {
-    public string QueueName { get; } = queueName;
+    public string EventName { get; } = eventName;
 }

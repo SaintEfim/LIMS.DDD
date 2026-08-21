@@ -21,7 +21,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Guides.Service", "src\Guide
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Messages", "Messages", "{7570D6EF-62DD-4245-B8DC-8630259BB493}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RannitMq.Messages", "src\RannitMq.Messages\RannitMq.Messages.csproj", "{ADD698B0-821B-4B14-9A9E-52481CC0FBE2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Broker.Messages", "src\Broker.Messages\Broker.Messages.csproj", "{ADD698B0-821B-4B14-9A9E-52481CC0FBE2}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "RabbitMq", "RabbitMq", "{3CD25C1E-D65B-46F0-9DBE-DF904FFCCF79}"
 EndProject
@@ -53,7 +53,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Domain.SeedWork", "src\Doma
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Application.SeedWork", "src\Application.SeedWork\Application.SeedWork.csproj", "{860D2680-71C4-4FFF-8860-25AA3D303C07}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Https", "Https", "{2602B473-4EB1-4B50-B8AF-264A0382E2C2}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Http", "Http", "{2602B473-4EB1-4B50-B8AF-264A0382E2C2}"
 	ProjectSection(SolutionItems) = preProject
 		LIMS.http = LIMS.http
 	EndProjectSection

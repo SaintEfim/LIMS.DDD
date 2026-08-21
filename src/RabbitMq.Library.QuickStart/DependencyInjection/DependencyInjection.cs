@@ -9,7 +9,8 @@ public static class DependencyInjection
 {
     public static RabbitMqBuilder AddRabbitMq(
         this IServiceCollection services,
-        Action<RabbitMqOptions> options)
+        Action<RabbitMqOptions> options,
+        string serviceName)
     {
         var events = new RegisteredEventsDictionary(new Dictionary<Type, IntegrationEventDescriptor>());
         var consumedEvents = new ConsumedEventsDictionary(new Dictionary<Type, IntegrationEventDescriptor>());
@@ -27,6 +28,6 @@ public static class DependencyInjection
         services.AddHostedService<RabbitMqConnectionMonitor>();
         services.AddScoped<IMessageBus, RabbitMqMessageBus>();
 
-        return new RabbitMqBuilder(services, events, consumedEvents);
+        return new RabbitMqBuilder(services, events, consumedEvents, serviceName);
     }
 }

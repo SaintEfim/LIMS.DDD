@@ -24,23 +24,12 @@ public sealed class TestResult : SoftDeletableModel
 
     public bool IsOutOfSpec { get; private set; }
 
-    // TODO вынести в domain service
-    public void SetValue(
-        double value)
+    internal void ApplyValue(
+        double value,
+        bool isOutOfSpec)
     {
         Value = value;
-        RecalculateIsOutOfSpec();
-    }
-
-    private void RecalculateIsOutOfSpec()
-    {
-        if (!Value.HasValue)
-        {
-            IsOutOfSpec = false;
-        }
-
-        //var isWithinSpec = ResultSnapshot.Specification.IsWithinSpec(Value.Value);
-        //  IsOutOfSpec = !isWithinSpec;
+        IsOutOfSpec = isOutOfSpec;
     }
 
     internal void MarkAsDeleted()

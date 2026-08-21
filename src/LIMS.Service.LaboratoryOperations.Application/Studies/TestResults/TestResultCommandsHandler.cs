@@ -2,10 +2,12 @@
 using Domain.SeedWork.SeedWork;
 using Domain.SeedWork.SeedWork.Result;
 using Domain.SeedWork.SeedWork.ValueObjects;
+using LIMS.Service.LaboratoryOperations.Domain.Services;
 using LIMS.Service.LaboratoryOperations.Domain.StudyAggregate;
 using LIMS.Service.LaboratoryOperations.Domain.StudyAggregate.Entities;
 using LIMS.Service.LaboratoryOperations.Domain.StudyTemplateSnapshots;
 using LIMS.Service.LaboratoryOperations.Domain.StudyTemplateSnapshots.CalculationRules;
+using LIMS.Service.LaboratoryOperations.Domain.StudyTemplateSnapshots.ResultDefinitions;
 using NoStringEvaluating.Contract;
 using NoStringEvaluating.Models.Values;
 
@@ -13,55 +15,66 @@ namespace LIMS.Service.LaboratoryOperations.Application.Studies.TestResults;
 
 internal readonly record struct CalculationContext(
     TestResult Result,
-    CalculationRuleSnapshot Rules,
+    ResultDefinitionSnapshot ResultDefinition,
+    CalculationRuleSnapshot Rule,
     Dictionary<AliasName, double> Variables);
 
 public sealed class TestResultCommandsHandler(
     IUnitOfWork unitOfWork,
     IStudyRepository studyRepository,
     IStudyTemplateSnapshotRepository studyTemplateRepository,
-    INoStringEvaluator noStringEvaluator) : ICommandsHandler
+    INoStringEvaluator noStringEvaluator,
+    TestResultDomainService testResultDomainService) : ICommandsHandler
 {
     public async Task<Result<None, Exception>> ExecuteTest(
         Guid studyId,
         Guid testResultId,
         CancellationToken cancellationToken = default)
     {
-        var prepareResult = await PrepareCalculationContext(studyId, testResultId, cancellationToken);
+        var studyResult = await GetStudyForChangeAsync(studyId, cancellationToken);
+        if (studyResult.IsFailure)
+        {
+            return studyResult.CastFailure<None>();
+        }
+
+        var study = studyResult.GetValue();
+
+        var prepareResult = await PrepareCalculationContext(study, testResultId, cancellationToken);
         if (prepareResult.IsFailure)
         {
             return prepareResult.CastFailure<None>();
         }
 
-        var calcResult = CalculateFormula(prepareResult.GetValue());
+        var context = prepareResult.GetValue();
+
+        var calcResult = CalculateFormula(context);
         if (calcResult.IsFailure)
         {
             return calcResult.CastFailure<None>();
         }
 
-        var (result, value) = calcResult.GetValue();
-        result.SetValue(value);
+        var calculatedValue = calcResult.GetValue();
+
+        var setResult = testResultDomainService.SetValue(context.Result.Id, study, calculatedValue,
+            context.ResultDefinition.Specification);
+
+        if (setResult.IsFailure)
+        {
+            return setResult;
+        }
 
         return await SaveChangesAsync(cancellationToken);
     }
 
     private async Task<Result<CalculationContext, Exception>> PrepareCalculationContext(
-        Guid studyId,
+        Study study,
         Guid testResultId,
         CancellationToken cancellationToken)
     {
-        var studyResult = await GetStudyForChangeAsync(studyId, cancellationToken);
-        if (studyResult.IsFailure)
+        var testResult = study.TestResults.FirstOrDefault(t => t.Id == new TestResultId(testResultId));
+        if (testResult is null)
         {
-            return studyResult.GetError();
-        }
-
-        var study = studyResult.GetValue();
-
-        var result = study.TestResults.FirstOrDefault(t => t.Id == new TestResultId(testResultId));
-        if (result is null)
-        {
-            return new InvalidOperationException($"Test result '{testResultId}' not found in study '{studyId}'");
+            return new InvalidOperationException($"Test result '{testResultId}' not found in study '{study.Id.Value}'");
         }
 
         var template = await studyTemplateRepository.GetByIdAsync(study.StudyTemplateId, cancellationToken);
@@ -70,19 +83,25 @@ public sealed class TestResultCommandsHandler(
             return new InvalidOperationException($"Study template '{study.StudyTemplateId}' not found");
         }
 
-        var calculationRules =
-            template.CalculationRules.FirstOrDefault(x => x.ResultDefinitionId == result.ResultDefinitionId);
-        if (calculationRules is null)
+        var calculationRule =
+            template.CalculationRules.FirstOrDefault(x => x.ResultDefinitionId == testResult.ResultDefinitionId);
+        if (calculationRule is null)
         {
             return new InvalidOperationException(
-                $"Calculation rule not found for result definition '{result.ResultDefinitionId}'");
+                $"Calculation rule not found for result definition '{testResult.ResultDefinitionId}'");
+        }
+
+        var resultDefinition = template.Results.FirstOrDefault(r => r.Id == testResult.ResultDefinitionId);
+        if (resultDefinition is null)
+        {
+            return new InvalidOperationException(
+                $"Result definition '{testResult.ResultDefinitionId}' not found in snapshot");
         }
 
         var parametersByAlias = template.Parameters.ToDictionary(p => p.AliasName.Value, p => p);
-
         var measuredValuesByParamId = study.MeasuredValues.ToDictionary(m => m.InputParameterId, m => m);
 
-        var extractVariables = calculationRules.FormulaExpression.ExtractVariables();
+        var extractVariables = calculationRule.FormulaExpression.ExtractVariables();
         var calculationOutputs = new Dictionary<AliasName, double>(extractVariables.Count);
 
         foreach (var variable in extractVariables)
@@ -107,21 +126,19 @@ public sealed class TestResultCommandsHandler(
             calculationOutputs.Add(templateParameter.AliasName, measuredValue.Value.Value);
         }
 
-        var calculationContext = new CalculationContext(result, calculationRules, calculationOutputs);
-
-        return calculationContext;
+        return new CalculationContext(testResult, resultDefinition, calculationRule, calculationOutputs);
     }
 
-    private Result<(TestResult Result, double Value), Exception> CalculateFormula(
+    private Result<double, Exception> CalculateFormula(
         CalculationContext context)
     {
         try
         {
             var evaluatorValues = context.Variables.ToDictionary(x => x.Key.Value, x => new EvaluatorValue(x.Value));
 
-            var calculatedValue = noStringEvaluator.CalcNumber(context.Rules.FormulaExpression.Value, evaluatorValues);
+            var calculatedValue = noStringEvaluator.CalcNumber(context.Rule.FormulaExpression.Value, evaluatorValues);
 
-            return (context.Result, calculatedValue);
+            return calculatedValue;
         }
         catch (Exception ex)
         {
@@ -131,12 +148,53 @@ public sealed class TestResultCommandsHandler(
         }
     }
 
-    private async Task<Result<Study, Exception>> GetStudyForChangeAsync(
+    public async Task<Result<None, Exception>> UpdateAsync(
         Guid studyId,
-        CancellationToken ct)
+        Guid testResultId,
+        UpdateTestResultCommand command,
+        CancellationToken cancellationToken = default)
     {
-        var study = await studyRepository.GetByIdForChangeAsync(new StudyId(studyId), ct);
-        return study is null ? new KeyNotFoundException($"Study with id {studyId} not found.") : study;
+        var studyResult = await GetStudyForChangeAsync(studyId, cancellationToken);
+        if (studyResult.IsFailure)
+        {
+            return studyResult.CastFailure<None>();
+        }
+
+        var study = studyResult.GetValue();
+
+        var testResult = study.TestResults.FirstOrDefault(t => t.Id == new TestResultId(testResultId));
+        if (testResult is null)
+        {
+            return new KeyNotFoundException($"Test result '{testResultId}' not found in study.");
+        }
+
+        if (!command.Value.HasValue)
+        {
+            return new InvalidOperationException("Value is required for update.");
+        }
+
+        var template = await studyTemplateRepository.GetByIdAsync(study.StudyTemplateId, cancellationToken);
+        if (template is null)
+        {
+            return new InvalidOperationException($"Study template '{study.StudyTemplateId}' not found");
+        }
+
+        var resultDefinition = template.Results.FirstOrDefault(r => r.Id == testResult.ResultDefinitionId);
+        if (resultDefinition is null)
+        {
+            return new InvalidOperationException(
+                $"Result definition '{testResult.ResultDefinitionId}' not found in snapshot");
+        }
+
+        var setResult = testResultDomainService.SetValue(
+            testResult.Id, study, command.Value.Value, resultDefinition.Specification);
+
+        if (setResult.IsFailure)
+        {
+            return setResult;
+        }
+
+        return await SaveChangesAsync(cancellationToken);
     }
 
     private async Task<Result<None, Exception>> SaveChangesAsync(
@@ -153,26 +211,11 @@ public sealed class TestResultCommandsHandler(
         }
     }
 
-    public async Task<Result<None, Exception>> UpdateAsync(
+    private async Task<Result<Study, Exception>> GetStudyForChangeAsync(
         Guid studyId,
-        Guid testResultId,
-        UpdateTestResultCommand command,
-        CancellationToken cancellationToken = default)
+        CancellationToken ct)
     {
-        var studyResult = await GetStudyForChangeAsync(studyId, cancellationToken);
-        if (studyResult.IsFailure)
-        {
-            return studyResult.CastFailure<None>();
-        }
-
-        var updateResult = studyResult.GetValue()
-            .UpdateTestResult(new TestResultId(testResultId), command.Value);
-
-        if (updateResult.IsFailure)
-        {
-            return updateResult;
-        }
-
-        return await SaveChangesAsync(cancellationToken);
+        var study = await studyRepository.GetByIdForChangeAsync(new StudyId(studyId), ct);
+        return study is null ? new KeyNotFoundException($"Study with id {studyId} not found.") : study;
     }
 }

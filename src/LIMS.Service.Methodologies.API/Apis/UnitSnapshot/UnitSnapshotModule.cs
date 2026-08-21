@@ -13,10 +13,10 @@ public class UnitSnapshotModule : ICarterModule
             .WithTags("UnitSnapshots");
 
         group.MapGet("/", GetAll)
-            .Produces<ICollection<UnitDto>>();
+            .Produces<ICollection<UnitSnapshotDto>>();
 
         group.MapGet("/{unitId:guid}", GetById)
-            .Produces<UnitDto>()
+            .Produces<UnitSnapshotDto>()
             .Produces(StatusCodes.Status404NotFound);
     }
 

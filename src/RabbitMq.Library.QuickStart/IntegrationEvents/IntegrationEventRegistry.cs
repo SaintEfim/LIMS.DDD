@@ -27,12 +27,4 @@ public sealed class IntegrationEventRegistry
             ? descriptor
             : throw new InvalidOperationException($"Integration event '{eventType.FullName}' is not registered.");
     }
-
-    public IntegrationEventDescriptor Get(
-        Type eventType)
-    {
-        return _events.TryGetValue(eventType, out var descriptor)
-            ? descriptor
-            : throw new InvalidOperationException($"Integration event '{eventType.FullName}' is not registered.");
-    }
 }

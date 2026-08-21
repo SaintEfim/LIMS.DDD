@@ -1,5 +1,5 @@
 using Carter;
-using RannitMq.Messages;
+using Broker.Messages;
 using Guides.Service.Persistence;
 using Microsoft.EntityFrameworkCore;
 using RabbitMq.Library.QuickStart.DependencyInjection;
@@ -17,7 +17,7 @@ builder.Services
         options.Port = 5672;
         options.UserName = "guest";
         options.Password = "guest";
-    })
+    }, "guid-service")
     .AddMessage<UnitCreatedMessage>();
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>

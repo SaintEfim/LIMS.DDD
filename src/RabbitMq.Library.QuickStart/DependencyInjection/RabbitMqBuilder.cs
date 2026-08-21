@@ -13,14 +13,18 @@ public sealed class RabbitMqBuilder
     private readonly IServiceCollection _services;
     private bool _receiveInfrastructureRegistered;
 
+    private readonly string _serviceName;
+
     internal RabbitMqBuilder(
         IServiceCollection services,
         RegisteredEventsDictionary events,
-        ConsumedEventsDictionary consumedEvents)
+        ConsumedEventsDictionary consumedEvents,
+        string serviceName)
     {
         _services = services;
         _events = events;
         _consumedEvents = consumedEvents;
+        _serviceName = serviceName;
     }
 
     public RabbitMqBuilder AddMessage<TMessage>()
@@ -43,21 +47,24 @@ public sealed class RabbitMqBuilder
                 $"Integration event '{messageType.FullName}' is missing [{nameof(IntegrationEventAttribute)}].");
         }
 
-        if (string.IsNullOrWhiteSpace(attribute.QueueName))
+        if (string.IsNullOrWhiteSpace(attribute.EventName))
         {
             throw new InvalidOperationException($"Integration event '{messageType.FullName}' has an empty queue name.");
         }
 
         var duplicateQueue =
-            _events.Values.FirstOrDefault(x => x.QueueName == attribute.QueueName && x.EventType != messageType);
+            _events.Values.FirstOrDefault(x => x.QueueName == attribute.EventName && x.EventType != messageType);
 
         if (duplicateQueue is not null)
         {
             throw new InvalidOperationException(
-                $"Queue '{attribute.QueueName}' is already registered for event '{duplicateQueue.EventType.FullName}'.");
+                $"Queue '{attribute.EventName}' is already registered for event '{duplicateQueue.EventType.FullName}'.");
         }
 
-        _events.Add(messageType, new IntegrationEventDescriptor(messageType, attribute.QueueName));
+        var exchangeName = attribute.EventName;
+        var queueName = $"{attribute.EventName}.{_serviceName}";
+
+        _events.Add(messageType, new IntegrationEventDescriptor(messageType, exchangeName, queueName));
 
         return this;
     }

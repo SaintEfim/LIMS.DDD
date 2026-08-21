@@ -6,7 +6,7 @@ namespace LIMS.Service.Methodologies.Application.StudyTemplates.ResultDefinition
 
 public sealed record ResultDefinitionDto(
     Guid Id,
-    UnitDto Unit,
+    UnitSnapshotDto Unit,
     string ResultInstance,
     double? MinValue,
     double? MaxValue)
@@ -15,7 +15,7 @@ public sealed record ResultDefinitionDto(
         UnitSnapshot unit,
         ResultDefinition resultDefinition)
     {
-        return new ResultDefinitionDto(resultDefinition.Id.Value, UnitDto.FromSnapshot(unit),
+        return new ResultDefinitionDto(resultDefinition.Id.Value, UnitSnapshotDto.FromSnapshot(unit),
             resultDefinition.ResultInstance, resultDefinition.Specification.MinValue,
             resultDefinition.Specification.MaxValue);
     }

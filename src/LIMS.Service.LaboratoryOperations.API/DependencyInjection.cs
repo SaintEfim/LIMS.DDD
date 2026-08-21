@@ -2,6 +2,7 @@
 using LIMS.Service.LaboratoryOperations.API.Apis.Orders;
 using LIMS.Service.LaboratoryOperations.API.Apis.Samples;
 using LIMS.Service.LaboratoryOperations.API.Apis.Studies;
+using LIMS.Service.LaboratoryOperations.API.Apis.StudyTemplateShanpshot;
 using LIMS.Service.LaboratoryOperations.API.Apis.TestResults;
 using LIMS.Service.LaboratoryOperations.API.Apis.UnitSnapshot;
 using LIMS.Service.LaboratoryOperations.Application;
@@ -37,5 +38,7 @@ public static class DependencyInjection
         services.AddScoped<StudyServices>();
         services.AddScoped<TestResultServices>();
         services.AddScoped<MeasuredValueServices>();
+        services.AddScoped<StudyTemplateSnapshotServices>();
+        services.AddScoped<TestResultDomainService>();
     }
 }

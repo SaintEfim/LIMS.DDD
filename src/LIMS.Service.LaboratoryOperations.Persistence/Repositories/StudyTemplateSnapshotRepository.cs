@@ -98,6 +98,7 @@ public class StudyTemplateSnapshotRepository(ApplicationDbContext context) : ISt
         IQueryable<StudyTemplateSnapshot> query)
     {
         return query.Include(t => t.Parameters)
-            .Include(t => t.Results);
+            .Include(t => t.Results)
+            .Include(x => x.CalculationRules);
     }
 }

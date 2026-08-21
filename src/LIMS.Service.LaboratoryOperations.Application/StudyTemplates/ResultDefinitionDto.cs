@@ -7,7 +7,7 @@ namespace LIMS.Service.LaboratoryOperations.Application.StudyTemplates;
 public sealed record ResultDefinitionDto(
     Guid Id,
     string ResultInstance,
-    UnitDto? Unit,
+    UnitSnapshotDto? Unit,
     double? SpecMin,
     double? SpecMax)
 {
@@ -18,7 +18,7 @@ public sealed record ResultDefinitionDto(
         return new ResultDefinitionDto(
             snapshot.Id.Value,
             snapshot.ResultInstance,
-            unitSnapshot is null ? null : UnitDto.FromSnapshot(unitSnapshot),
+            unitSnapshot is null ? null : UnitSnapshotDto.FromSnapshot(unitSnapshot),
             snapshot.Specification.MinValue,
             snapshot.Specification.MaxValue);
     }
