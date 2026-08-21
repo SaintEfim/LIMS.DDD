@@ -1,3 +1,4 @@
+using Domain.SeedWork.Errors;
 using Domain.SeedWork.Result;
 
 namespace Domain.SeedWork.ValueObjects;
@@ -27,7 +28,8 @@ public sealed record Specification
     {
         if (minValue.HasValue && maxValue.HasValue && minValue.Value > maxValue.Value)
         {
-            return new ArgumentException($"Min value ({minValue}) cannot be greater than max value ({maxValue}).");
+            return new ValidationException(
+                $"Min value ({minValue}) cannot be greater than max value ({maxValue}).");
         }
 
         var specification = new Specification(minValue, maxValue);

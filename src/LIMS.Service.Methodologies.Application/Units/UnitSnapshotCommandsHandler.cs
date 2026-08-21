@@ -1,5 +1,6 @@
 using Application.SeedWork;
 using Domain.SeedWork;
+using Domain.SeedWork.Errors;
 using Domain.SeedWork.Result;
 using Domain.SeedWork.ValueObjects;
 using LIMS.Service.Methodologies.Domain.UnitSnapshots;
@@ -40,7 +41,7 @@ public sealed class UnitSnapshotCommandsHandler(
         }
         catch (Exception ex)
         {
-            return new Exception($"Failed to save UnitSnapshot: {ex.Message}", ex);
+            return new PersistenceException($"Failed to save UnitSnapshot: {ex.Message}", ex);
         }
     }
 }

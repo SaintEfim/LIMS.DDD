@@ -5,6 +5,7 @@ using RabbitMq.Library.QuickStart.Receive;
 
 namespace LIMS.Service.Methodologies.Infrastructure;
 
+
 public class UnitCreatedMessageHandler(
     UnitSnapshotCommandsHandler unitSnapshotCommandsHandler,
     ILogger<UnitCreatedMessageHandler> logger) : IReceiveHandler<UnitCreatedMessage>

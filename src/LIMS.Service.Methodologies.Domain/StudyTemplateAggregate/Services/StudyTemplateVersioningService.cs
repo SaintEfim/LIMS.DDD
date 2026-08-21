@@ -1,8 +1,8 @@
 ﻿using Domain.SeedWork.Result;
 using Domain.SeedWork.ValueObjects;
 using LIMS.Service.Methodologies.Domain.StudyTemplateAggregate.Entities.ResultDefinitions;
+using LIMS.Service.Methodologies.Domain.StudyTemplateAggregate.Errors;
 using LIMS.Service.Methodologies.Domain.StudyTemplateAggregate.ValueObjects;
-using Revision = LIMS.Service.Methodologies.Domain.StudyTemplateAggregate.ValueObjects.Revision;
 
 namespace LIMS.Service.Methodologies.Domain.StudyTemplateAggregate.Services;
 
@@ -14,7 +14,7 @@ public class StudyTemplateVersioningService
     {
         if (original.Status != Status.Active && original.Status != Status.Archived)
         {
-            return new InvalidOperationException("Can only create revisions from Active or Archived templates.");
+            return new InvalidStatusTransitionException(original.Status.Name, "Create revision from");
         }
 
         var createResult = StudyTemplate.Create(original.Name, original.Description, newRevisionValue);

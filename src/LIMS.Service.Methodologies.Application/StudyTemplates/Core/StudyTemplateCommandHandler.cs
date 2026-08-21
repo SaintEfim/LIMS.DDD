@@ -1,6 +1,7 @@
 ﻿using Application.SeedWork;
 using Broker.Messages;
 using Domain.SeedWork;
+using Domain.SeedWork.Errors;
 using Domain.SeedWork.Result;
 using Domain.SeedWork.ValueObjects;
 using LIMS.Service.Methodologies.Application.StudyTemplates.Core.Commands;
@@ -8,7 +9,6 @@ using LIMS.Service.Methodologies.Domain.StudyTemplateAggregate;
 using LIMS.Service.Methodologies.Domain.StudyTemplateAggregate.Services;
 using LIMS.Service.Methodologies.Domain.StudyTemplateAggregate.ValueObjects;
 using RabbitMq.Library.QuickStart.Abstractions;
-using Revision = LIMS.Service.Methodologies.Domain.StudyTemplateAggregate.ValueObjects.Revision;
 
 namespace LIMS.Service.Methodologies.Application.StudyTemplates.Core;
 
@@ -114,7 +114,7 @@ public sealed class StudyTemplateCommandsHandler(
 
         if (!Status.TryParse(statusCommand, out var newStatus) || newStatus is null)
         {
-            return new InvalidOperationException($"Unknown status '{statusCommand}'.");
+            return new ValidationException($"Unknown status '{statusCommand}'.");
         }
 
         var changeResult = template.ChangeStatus(newStatus);
@@ -206,7 +206,7 @@ public sealed class StudyTemplateCommandsHandler(
         CancellationToken cancellationToken = default)
     {
         var template = await repository.GetByIdForChangeAsync(new StudyTemplateId(id), cancellationToken);
-        return template is null ? new KeyNotFoundException($"StudyTemplate with id {id} not found.") : template;
+        return template is null ? new EntityNotFoundException("Study template", id) : template;
     }
 
     private async Task<Result<StudyTemplate, Exception>> SaveNewAsync(
@@ -221,7 +221,7 @@ public sealed class StudyTemplateCommandsHandler(
         }
         catch (Exception ex)
         {
-            return new Exception($"Failed to save StudyTemplate: {ex.Message}", ex);
+            return new PersistenceException($"Failed to save StudyTemplate: {ex.Message}", ex);
         }
     }
 
@@ -236,7 +236,7 @@ public sealed class StudyTemplateCommandsHandler(
         }
         catch (Exception ex)
         {
-            return new Exception($"Failed to save StudyTemplate: {ex.Message}", ex);
+            return new PersistenceException($"Failed to save StudyTemplate: {ex.Message}", ex);
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Domain.SeedWork.Result;
+﻿using Domain.SeedWork.Errors;
+using Domain.SeedWork.Result;
 
 namespace Domain.SeedWork.ValueObjects;
 
@@ -26,9 +27,9 @@ public sealed record Description
 
         if (descriptionValue.Length > MaxDescriptionLength)
         {
-            return new ArgumentException(
+            return new ValidationException(
                 $"Description length cannot exceed {MaxDescriptionLength} characters. " +
-                $"Current length: {descriptionValue.Length}.", nameof(value));
+                $"Current length: {descriptionValue.Length}.");
         }
 
         var description = new Description(descriptionValue);

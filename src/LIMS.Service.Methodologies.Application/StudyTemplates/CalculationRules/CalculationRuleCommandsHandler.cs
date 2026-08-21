@@ -1,5 +1,6 @@
 ﻿using Application.SeedWork;
 using Domain.SeedWork;
+using Domain.SeedWork.Errors;
 using Domain.SeedWork.Result;
 using Domain.SeedWork.ValueObjects;
 using LIMS.Service.Methodologies.Application.StudyTemplates.CalculationRules.Commands;
@@ -144,9 +145,7 @@ public sealed class CalculationRuleCommandsHandler(IStudyTemplateRepository repo
         CancellationToken cancellationToken = default)
     {
         var template = await repository.GetByIdForChangeAsync(new StudyTemplateId(studyTemplateId), cancellationToken);
-        return template is null
-            ? new KeyNotFoundException($"StudyTemplate with id {studyTemplateId} not found.")
-            : template;
+        return template is null ? new EntityNotFoundException("Study template", studyTemplateId) : template;
     }
 
     private async Task<Result<None, Exception>> SaveChangesAsync(
@@ -159,7 +158,7 @@ public sealed class CalculationRuleCommandsHandler(IStudyTemplateRepository repo
         }
         catch (Exception ex)
         {
-            return new Exception($"Failed to save changes: {ex.Message}", ex);
+            return new PersistenceException($"Failed to save changes: {ex.Message}", ex);
         }
     }
 }

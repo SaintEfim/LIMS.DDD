@@ -1,12 +1,13 @@
 ﻿using Domain.SeedWork;
+using Domain.SeedWork.Errors;
 using Domain.SeedWork.Result;
 using Domain.SeedWork.ValueObjects;
 using LIMS.Service.Methodologies.Domain.StudyTemplateAggregate.Entities.CalculationRules;
 using LIMS.Service.Methodologies.Domain.StudyTemplateAggregate.Entities.InputParameters;
 using LIMS.Service.Methodologies.Domain.StudyTemplateAggregate.Entities.ResultDefinitions;
+using LIMS.Service.Methodologies.Domain.StudyTemplateAggregate.Errors;
 using LIMS.Service.Methodologies.Domain.StudyTemplateAggregate.ValueObjects;
 using LIMS.Service.Methodologies.Domain.UnitSnapshots;
-using Revision = LIMS.Service.Methodologies.Domain.StudyTemplateAggregate.ValueObjects.Revision;
 
 namespace LIMS.Service.Methodologies.Domain.StudyTemplateAggregate;
 
@@ -73,8 +74,7 @@ public sealed class StudyTemplate
     {
         if (!Status.CanEdit)
         {
-            return new InvalidOperationException(
-                "Cannot modify details of an Active or Archived template. Create a new revision.");
+            return new TemplateNotEditableException(Status.Name, "modify template details");
         }
 
         if (name is not null)
@@ -98,12 +98,12 @@ public sealed class StudyTemplate
     {
         if (!Status.CanEdit)
         {
-            return new InvalidOperationException("Cannot add observation to an Active template.");
+            return new TemplateNotEditableException(Status.Name, "add input parameters to");
         }
 
         if (_inputParameters.Any(p => p.Name == name))
         {
-            return new InvalidOperationException("Parameter name must be unique within the template.");
+            return new DuplicateEntityException("Input parameter", "name", name.Value);
         }
 
         var parameter = new InputParameter(Id, name, description, aliasName, specification);
@@ -120,17 +120,17 @@ public sealed class StudyTemplate
     {
         if (!Status.CanEdit)
         {
-            return new InvalidOperationException("Cannot add calculation rules to an Active template.");
+            return new TemplateNotEditableException(Status.Name, "add calculation rules to");
         }
 
         if (_calculationRules.Any(p => p.Name == name))
         {
-            return new InvalidOperationException("Calculation rule name must be unique within the template.");
+            return new DuplicateEntityException("Calculation rule", "name", name.Value);
         }
 
         if (_resultDefinitions.All(p => p.Id != resultDefinitionId))
         {
-            throw new InvalidOperationException("Result definition not found in template.");
+            return new EntityNotFoundException("Result definition", resultDefinitionId.Value);
         }
 
         var rule = new CalculationRule(Id, name, formula, description, resultDefinitionId);
@@ -144,13 +144,13 @@ public sealed class StudyTemplate
     {
         if (!Status.CanEdit)
         {
-            return new InvalidOperationException("Cannot remove calculation rule from an Active or Archived template.");
+            return new TemplateNotEditableException(Status.Name, "remove calculation rules from");
         }
 
         var rule = _calculationRules.SingleOrDefault(r => r.Id == ruleId);
         if (rule == null)
         {
-            return new InvalidOperationException("Calculation rule not found.");
+            return new EntityNotFoundException("Calculation rule", ruleId.Value);
         }
 
         rule.MarkAsDeleted();
@@ -162,13 +162,13 @@ public sealed class StudyTemplate
     {
         if (!Status.CanEdit)
         {
-            return new InvalidOperationException("Cannot remove observation from an Active template.");
+            return new TemplateNotEditableException(Status.Name, "remove input parameters from");
         }
 
         var parameter = _inputParameters.SingleOrDefault(p => p.Id == observationId);
         if (parameter == null)
         {
-            return new InvalidOperationException("Parameter not found.");
+            return new EntityNotFoundException("Input parameter", observationId.Value);
         }
 
         parameter.MarkAsDeleted();
@@ -221,13 +221,14 @@ public sealed class StudyTemplate
     {
         if (!Status.CanEdit)
         {
-            return new InvalidOperationException("Cannot add determination to an Active template.");
+            return new TemplateNotEditableException(Status.Name, "add result definitions to");
         }
 
         var existsResult = _resultDefinitions.Any(x => x.ResultInstance == resultInstance && x.UnitId == unitId);
         if (existsResult)
         {
-            return new InvalidOperationException("Determination result instance already exists.");
+            return new DuplicateEntityException("Result definition", "result instance + unit",
+                $"{resultInstance} ({unitId.Value})");
         }
 
         var result = new ResultDefinition(Id, resultInstance, unitId, valueRange);
@@ -241,22 +242,20 @@ public sealed class StudyTemplate
     {
         if (!Status.CanEdit)
         {
-            return new InvalidOperationException(
-                "Cannot remove result definition from an Active or Archived template.");
+            return new TemplateNotEditableException(Status.Name, "remove result definitions from");
         }
 
         var resultDef = _resultDefinitions.SingleOrDefault(r => r.Id == resultDefinitionId);
         if (resultDef == null)
         {
-            return new InvalidOperationException("Determination result not found.");
+            return new EntityNotFoundException("Result definition", resultDefinitionId.Value);
         }
 
         var isUsedInCalculations = _calculationRules.Any(rule => rule.ResultDefinitionId == resultDefinitionId);
 
         if (isUsedInCalculations)
         {
-            return new InvalidOperationException(
-                "Cannot remove result definition because it is targeted by calculation rules. Remove or reassign the calculation rules first.");
+            return new EntityInUseException("Result definition", "calculation rules");
         }
 
         resultDef.MarkAsDeleted();
@@ -273,20 +272,20 @@ public sealed class StudyTemplate
     {
         if (!Status.CanEdit)
         {
-            return new InvalidOperationException("Cannot modify input parameters in an Active or Archived template.");
+            return new TemplateNotEditableException(Status.Name, "update input parameters");
         }
 
         var parameter = _inputParameters.FirstOrDefault(p => p.Id == parameterId);
         if (parameter is null)
         {
-            return new InvalidOperationException("Input parameter not found.");
+            return new EntityNotFoundException("Input parameter", parameterId.Value);
         }
 
         if (aliasName is not null && parameter.AliasName != aliasName)
         {
             if (_inputParameters.Any(p => p.AliasName == aliasName && p.Id != parameterId))
             {
-                return new InvalidOperationException("Alias name must be unique within the template.");
+                return new DuplicateEntityException("Input parameter", "alias name", aliasName.Value);
             }
         }
 
@@ -314,13 +313,13 @@ public sealed class StudyTemplate
     {
         if (!Status.CanEdit)
         {
-            return new InvalidOperationException("Cannot modify result definitions in an Active or Archived template.");
+            return new TemplateNotEditableException(Status.Name, "update result definitions");
         }
 
         var resultDef = _resultDefinitions.FirstOrDefault(r => r.Id == resultDefinitionId);
         if (resultDef is null)
         {
-            return new InvalidOperationException("Result definition not found.");
+            return new EntityNotFoundException("Result definition", resultDefinitionId.Value);
         }
 
         var min = minValue ?? resultDef.Specification.MinValue;
@@ -347,24 +346,24 @@ public sealed class StudyTemplate
     {
         if (!Status.CanEdit)
         {
-            return new InvalidOperationException("Cannot modify calculation rules in an Active or Archived template.");
+            return new TemplateNotEditableException(Status.Name, "update calculation rules");
         }
 
         var rule = _calculationRules.FirstOrDefault(r => r.Id == ruleId);
         if (rule is null)
         {
-            return new InvalidOperationException("Calculation rule not found.");
+            return new EntityNotFoundException("Calculation rule", ruleId.Value);
         }
 
         if (name is not null && rule.Name != name && _calculationRules.Any(r => r.Name == name && r.Id != ruleId))
         {
-            return new InvalidOperationException("Calculation rule name must be unique within the template.");
+            return new DuplicateEntityException("Calculation rule", "name", name.Value);
         }
 
         if (resultDefinitionId is not null && rule.ResultDefinitionId != resultDefinitionId &&
             _resultDefinitions.All(r => r.Id != resultDefinitionId))
         {
-            return new InvalidOperationException("Result definition not found in template.");
+            return new EntityNotFoundException("Result definition", resultDefinitionId.Value);
         }
 
         rule.Update(name, formulaExpression, description, resultDefinitionId);
@@ -375,13 +374,12 @@ public sealed class StudyTemplate
     {
         if (IsDeleted)
         {
-            return new InvalidOperationException("Template is already deleted.");
+            return new EntityAlreadyDeletedException("Study template", Id.Value);
         }
 
         if (Status != Status.Draft)
         {
-            return new InvalidOperationException(
-                $"Cannot delete template in '{Status.Name}' status. Only 'Draft' templates can be deleted. Use 'Archive' for Active templates.");
+            return new InvalidStatusTransitionException(Status.Name, "Deleted");
         }
 
         IsDeleted = true;

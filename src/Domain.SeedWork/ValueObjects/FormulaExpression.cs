@@ -1,4 +1,5 @@
 ﻿using System.Text.RegularExpressions;
+using Domain.SeedWork.Errors;
 using Domain.SeedWork.Result;
 
 namespace Domain.SeedWork.ValueObjects;
@@ -30,20 +31,18 @@ public sealed record FormulaExpression
     {
         if (string.IsNullOrWhiteSpace(value))
         {
-            return new ArgumentException("Formula expression cannot be empty.", nameof(value));
+            return new ValidationException("Formula expression cannot be empty.");
         }
 
         if (value.Length > MaxLength)
         {
-            return new ArgumentException(
-                $"Formula expression length cannot exceed {MaxLength} characters. Current length: {value.Length}.",
-                nameof(value));
+            return new ValidationException(
+                $"Formula expression length cannot exceed {MaxLength} characters. Current length: {value.Length}.");
         }
 
         if (value.StartsWith("=") || value.StartsWith("+") || value.StartsWith("-"))
         {
-            return new ArgumentException("Formula expression cannot start or end with '=', '+', '-' characters.",
-                nameof(value));
+            return new ValidationException("Formula expression cannot start with '=', '+', or '-' characters.");
         }
 
         var formula = new FormulaExpression(value.Trim());

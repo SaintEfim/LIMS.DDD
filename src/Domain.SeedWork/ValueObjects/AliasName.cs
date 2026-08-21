@@ -1,4 +1,5 @@
-﻿using Domain.SeedWork.Result;
+﻿using Domain.SeedWork.Errors;
+using Domain.SeedWork.Result;
 
 namespace Domain.SeedWork.ValueObjects;
 
@@ -24,17 +25,17 @@ public sealed record AliasName
     {
         if (string.IsNullOrWhiteSpace(value))
         {
-            return new ArgumentException("Invalid name.", nameof(value));
+            return new ValidationException("Alias name cannot be empty.");
         }
 
         if (value.Length > MaxAliasNameLength)
         {
-            return new ArgumentException(
-                $"AliasName length cannot exceed {MaxAliasNameLength} characters. " +
-                $"Current length: {value.Length}.", nameof(value));
+            return new ValidationException(
+                $"Alias name length cannot exceed {MaxAliasNameLength} characters. " +
+                $"Current length: {value.Length}.");
         }
 
-        var aliasName = new AliasName(value);
+        var aliasName = new AliasName(value.Trim());
         return aliasName;
     }
 }
