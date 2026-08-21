@@ -1,4 +1,4 @@
-using Domain.SeedWork.SeedWork.Result;
+using Domain.SeedWork.Result;
 using LIMS.Service.LaboratoryOperations.Domain.UnitSnapshots;
 
 namespace LIMS.Service.LaboratoryOperations.Domain.SampleAggregate.ValueObjects;

@@ -1,6 +1,6 @@
-﻿using Domain.SeedWork.SeedWork.Result;
+﻿using Domain.SeedWork.Result;
 
-namespace Domain.SeedWork.SeedWork;
+namespace Domain.SeedWork;
 
 public interface IState<T>
 {

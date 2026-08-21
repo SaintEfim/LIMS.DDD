@@ -1,4 +1,4 @@
-﻿using Application.SeedWork.SeedWork;
+﻿using Application.SeedWork;
 using LIMS.Service.Methodologies.Domain.StudyTemplateAggregate;
 using LIMS.Service.Methodologies.Domain.StudyTemplateAggregate.Entities.CalculationRules;
 

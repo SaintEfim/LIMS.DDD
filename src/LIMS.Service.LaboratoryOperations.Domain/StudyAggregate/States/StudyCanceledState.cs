@@ -1,5 +1,5 @@
-﻿using Domain.SeedWork.SeedWork;
-using Domain.SeedWork.SeedWork.Result;
+﻿using Domain.SeedWork;
+using Domain.SeedWork.Result;
 
 namespace LIMS.Service.LaboratoryOperations.Domain.StudyAggregate.States;
 

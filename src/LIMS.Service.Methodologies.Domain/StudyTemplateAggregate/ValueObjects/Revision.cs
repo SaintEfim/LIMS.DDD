@@ -1,4 +1,4 @@
-﻿using Domain.SeedWork.SeedWork.Result;
+﻿using Domain.SeedWork.Result;
 
 namespace LIMS.Service.Methodologies.Domain.StudyTemplateAggregate.ValueObjects;
 

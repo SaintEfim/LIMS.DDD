@@ -1,4 +1,4 @@
-﻿namespace Domain.SeedWork.SeedWork;
+﻿namespace Domain.SeedWork;
 
 public abstract class SoftDeletableModel
 {

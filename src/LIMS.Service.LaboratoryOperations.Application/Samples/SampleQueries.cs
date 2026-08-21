@@ -1,4 +1,4 @@
-using Application.SeedWork.SeedWork;
+using Application.SeedWork;
 using LIMS.Service.LaboratoryOperations.Domain.OrderAggregate;
 using LIMS.Service.LaboratoryOperations.Domain.SampleAggregate;
 using LIMS.Service.LaboratoryOperations.Domain.UnitSnapshots;

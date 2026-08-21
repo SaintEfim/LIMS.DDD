@@ -1,7 +1,7 @@
 ﻿using System.Text.RegularExpressions;
-using Domain.SeedWork.SeedWork.Result;
+using Domain.SeedWork.Result;
 
-namespace Domain.SeedWork.SeedWork.ValueObjects;
+namespace Domain.SeedWork.ValueObjects;
 
 public sealed record FormulaExpression
 {
