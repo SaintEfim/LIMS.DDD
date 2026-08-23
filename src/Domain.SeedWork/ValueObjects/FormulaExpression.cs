@@ -26,23 +26,23 @@ public sealed record FormulaExpression
         return new Regex(@"\b[a-zA-Z_][a-zA-Z0-9_]*\b", RegexOptions.Compiled);
     }
 
-    public static Result<FormulaExpression, Exception> Create(
+    public static Result<FormulaExpression, DomainError> Create(
         string value)
     {
         if (string.IsNullOrWhiteSpace(value))
         {
-            return new ValidationException("Formula expression cannot be empty.");
+            return new ValidationError("Formula expression cannot be empty.");
         }
 
         if (value.Length > MaxLength)
         {
-            return new ValidationException(
+            return new ValidationError(
                 $"Formula expression length cannot exceed {MaxLength} characters. Current length: {value.Length}.");
         }
 
         if (value.StartsWith("=") || value.StartsWith("+") || value.StartsWith("-"))
         {
-            return new ValidationException("Formula expression cannot start with '=', '+', or '-' characters.");
+            return new ValidationError("Formula expression cannot start with '=', '+', or '-' characters.");
         }
 
         var formula = new FormulaExpression(value.Trim());

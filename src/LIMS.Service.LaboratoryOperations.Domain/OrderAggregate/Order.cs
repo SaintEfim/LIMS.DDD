@@ -1,4 +1,5 @@
 ﻿using Domain.SeedWork;
+using Domain.SeedWork.Errors;
 using Domain.SeedWork.Result;
 using Domain.SeedWork.ValueObjects;
 using LIMS.Service.LaboratoryOperations.Domain.OrderAggregate.ValueObjects;
@@ -97,7 +98,7 @@ public class Order
         return new None();
     }
 
-    internal Result<None, Exception> ChangeStatus(
+    internal Result<None, InvalidStatusTransitionError> ChangeStatus(
         OrderStatus newOrderStatus)
     {
         var result = OrderStatus.CanTransitionTo(newOrderStatus, this);

@@ -1,6 +1,6 @@
 ﻿using Application.SeedWork;
+using Application.SeedWork.Errors;
 using Domain.SeedWork;
-using Domain.SeedWork.Errors;
 using Domain.SeedWork.Result;
 using Domain.SeedWork.ValueObjects;
 using LIMS.Service.Methodologies.Application.StudyTemplates.InputParameters.Commands;
@@ -12,7 +12,7 @@ namespace LIMS.Service.Methodologies.Application.StudyTemplates.InputParameters;
 public sealed class InputParameterCommandsHandler(IStudyTemplateRepository repository, IUnitOfWork unitOfWork)
     : ICommandsHandler
 {
-    public async Task<Result<Guid, Exception>> CreateAsync(
+    public async Task<Result<Guid, ApplicationError>> CreateAsync(
         Guid studyTemplateId,
         CreateInputParameterCommand command,
         CancellationToken cancellationToken = default)
@@ -26,25 +26,25 @@ public sealed class InputParameterCommandsHandler(IStudyTemplateRepository repos
         var nameResult = Name.Create(command.Name);
         if (nameResult.IsFailure)
         {
-            return nameResult.CastFailure<Guid>();
+            return new DomainRuleViolation(nameResult.GetError());
         }
 
         var descResult = Description.Create(command.Description);
         if (descResult.IsFailure)
         {
-            return descResult.CastFailure<Guid>();
+            return new DomainRuleViolation(descResult.GetError());
         }
 
         var aliasResult = AliasName.Create(command.AliasName);
         if (aliasResult.IsFailure)
         {
-            return aliasResult.CastFailure<Guid>();
+            return new DomainRuleViolation(aliasResult.GetError());
         }
 
         var specification = Specification.Create(command.MinValue, command.MaxValue);
         if (specification.IsFailure)
         {
-            return specification.CastFailure<Guid>();
+            return new DomainRuleViolation(specification.GetError());
         }
 
         var addResult = templateResult.GetValue()
@@ -52,7 +52,7 @@ public sealed class InputParameterCommandsHandler(IStudyTemplateRepository repos
                 specification.GetValue());
         if (addResult.IsFailure)
         {
-            return addResult.CastFailure<Guid>();
+            return new DomainRuleViolation(addResult.GetError());
         }
 
         var saveResult = await SaveChangesAsync(cancellationToken);
@@ -62,7 +62,7 @@ public sealed class InputParameterCommandsHandler(IStudyTemplateRepository repos
                 .Id.Value;
     }
 
-    public async Task<Result<None, Exception>> RemoveAsync(
+    public async Task<Result<None, ApplicationError>> RemoveAsync(
         Guid studyTemplateId,
         Guid parameterId,
         CancellationToken cancellationToken = default)
@@ -77,13 +77,13 @@ public sealed class InputParameterCommandsHandler(IStudyTemplateRepository repos
             .RemoveInputParameter(new InputParameterId(parameterId));
         if (removeResult.IsFailure)
         {
-            return removeResult.CastFailure<None>();
+            return new DomainRuleViolation(removeResult.GetError());
         }
 
         return await SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<Result<None, Exception>> UpdateAsync(
+    public async Task<Result<None, ApplicationError>> UpdateAsync(
         Guid studyTemplateId,
         Guid parameterId,
         UpdateInputParameterCommand command,
@@ -101,7 +101,7 @@ public sealed class InputParameterCommandsHandler(IStudyTemplateRepository repos
             var nameResult = Name.Create(command.Name);
             if (nameResult.IsFailure)
             {
-                return nameResult.CastFailure<None>();
+                return new DomainRuleViolation(nameResult.GetError());
             }
 
             name = nameResult.GetValue();
@@ -113,7 +113,7 @@ public sealed class InputParameterCommandsHandler(IStudyTemplateRepository repos
             var descResult = Description.Create(command.Description);
             if (descResult.IsFailure)
             {
-                return descResult.CastFailure<None>();
+                return new DomainRuleViolation(descResult.GetError());
             }
 
             description = descResult.GetValue();
@@ -125,7 +125,7 @@ public sealed class InputParameterCommandsHandler(IStudyTemplateRepository repos
             var aliasResult = AliasName.Create(command.AliasName);
             if (aliasResult.IsFailure)
             {
-                return aliasResult.CastFailure<None>();
+                return new DomainRuleViolation(aliasResult.GetError());
             }
 
             aliasName = aliasResult.GetValue();
@@ -136,21 +136,26 @@ public sealed class InputParameterCommandsHandler(IStudyTemplateRepository repos
                 command.MaxValue);
         if (updateResult.IsFailure)
         {
-            return updateResult.CastFailure<None>();
+            return new DomainRuleViolation(updateResult.GetError());
         }
 
         return await SaveChangesAsync(cancellationToken);
     }
 
-    private async Task<Result<StudyTemplate, Exception>> GetTemplateForChangeAsync(
+    private async Task<Result<StudyTemplate, ApplicationError>> GetTemplateForChangeAsync(
         Guid studyTemplateId,
         CancellationToken cancellationToken = default)
     {
         var template = await repository.GetByIdForChangeAsync(new StudyTemplateId(studyTemplateId), cancellationToken);
-        return template is null ? new EntityNotFoundException("Study template", studyTemplateId) : template;
+        if (template is null)
+        {
+            return new NotFoundError($"Study template with id '{studyTemplateId}' not found.");
+        }
+
+        return template;
     }
 
-    private async Task<Result<None, Exception>> SaveChangesAsync(
+    private async Task<Result<None, ApplicationError>> SaveChangesAsync(
         CancellationToken cancellationToken = default)
     {
         try
@@ -160,7 +165,7 @@ public sealed class InputParameterCommandsHandler(IStudyTemplateRepository repos
         }
         catch (Exception ex)
         {
-            return new PersistenceException($"Failed to save changes: {ex.Message}", ex);
+            return new PersistenceError($"Failed to save changes: {ex.Message}");
         }
     }
 }

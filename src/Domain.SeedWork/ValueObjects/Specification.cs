@@ -22,13 +22,13 @@ public sealed record Specification
 
     public double? MaxValue { get; init; }
 
-    public static Result<Specification, Exception> Create(
+    public static Result<Specification, DomainError> Create(
         double? minValue,
         double? maxValue)
     {
         if (minValue.HasValue && maxValue.HasValue && minValue.Value > maxValue.Value)
         {
-            return new ValidationException(
+            return new ValidationError(
                 $"Min value ({minValue}) cannot be greater than max value ({maxValue}).");
         }
 

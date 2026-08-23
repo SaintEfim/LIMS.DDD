@@ -20,17 +20,17 @@ public sealed record AliasName
 
     public string Value { get; } = null!;
 
-    public static Result<AliasName, Exception> Create(
+    public static Result<AliasName, DomainError> Create(
         string value)
     {
         if (string.IsNullOrWhiteSpace(value))
         {
-            return new ValidationException("Alias name cannot be empty.");
+            return new ValidationError("Alias name cannot be empty.");
         }
 
         if (value.Length > MaxAliasNameLength)
         {
-            return new ValidationException(
+            return new ValidationError(
                 $"Alias name length cannot exceed {MaxAliasNameLength} characters. " +
                 $"Current length: {value.Length}.");
         }

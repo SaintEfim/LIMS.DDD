@@ -20,17 +20,17 @@ public sealed record Revision
 
     public string Value { get; } = null!;
 
-    public static Result<Revision, Exception> Create(
+    public static Result<Revision, DomainError> Create(
         string value)
     {
         if (string.IsNullOrWhiteSpace(value))
         {
-            return new ValidationException("Revision cannot be empty.");
+            return new ValidationError("Revision cannot be empty.");
         }
 
         if (value.Length > MaxRevisionLength)
         {
-            return new ValidationException(
+            return new ValidationError(
                 $"Revision length cannot exceed {MaxRevisionLength} characters. Current length: {value.Length}.");
         }
 

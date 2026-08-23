@@ -1,9 +1,9 @@
 ﻿using Domain.SeedWork;
+using Domain.SeedWork.Errors;
 using Domain.SeedWork.Result;
 using Domain.SeedWork.ValueObjects;
 using LIMS.Service.LaboratoryOperations.Domain.OrderAggregate;
 using LIMS.Service.LaboratoryOperations.Domain.SampleAggregate.ValueObjects;
-using LIMS.Service.LaboratoryOperations.Domain.UnitSnapshots;
 using LIMS.Service.LaboratoryOperations.Domain.ValueObjects;
 
 namespace LIMS.Service.LaboratoryOperations.Domain.SampleAggregate;
@@ -60,7 +60,7 @@ public class Sample
         IsDeleted = true;
         DeletedAt = DateTimeOffset.UtcNow;
 
-        return Result<None, Exception>.Success();
+        return new None();
     }
 
     public Result<None, Exception> UpdatePartial(
@@ -95,10 +95,10 @@ public class Sample
 
         Volume.Update(newValue, newUnitId);
 
-        return Result<None, Exception>.Success();
+        return new None();
     }
 
-    internal Result<None, Exception> ChangeStatus(
+    internal Result<None, InvalidStatusTransitionError> ChangeStatus(
         SampleStatus newSampleStatus)
     {
         var result = SampleStatus.CanTransitionTo(newSampleStatus, this);
@@ -110,6 +110,6 @@ public class Sample
 
         SampleStatus = newSampleStatus;
 
-        return Result<None, Exception>.Success();
+        return new None();
     }
 }

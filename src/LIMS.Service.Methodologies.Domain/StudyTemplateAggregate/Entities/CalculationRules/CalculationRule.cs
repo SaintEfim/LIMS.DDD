@@ -1,4 +1,5 @@
 ﻿using Domain.SeedWork;
+using Domain.SeedWork.Errors;
 using Domain.SeedWork.Result;
 using Domain.SeedWork.ValueObjects;
 using LIMS.Service.Methodologies.Domain.StudyTemplateAggregate.Entities.InputParameters;
@@ -73,7 +74,7 @@ public sealed class CalculationRule : SoftDeletableModel
         DeletedAt = DateTimeOffset.UtcNow;
     }
 
-    internal Result<None, Exception> ValidateVariables(
+    internal Result<None, DomainError> ValidateVariables(
         IReadOnlyCollection<InputParameter> templateParameters)
     {
         var variables = FormulaExpression.ExtractVariables();
@@ -84,7 +85,7 @@ public sealed class CalculationRule : SoftDeletableModel
 
             if (parameter is null)
             {
-                return new InvalidOperationException(
+                return new ValidationError(
                     $"Calculation rule '{Name.Value}': variable '{variable}' references.");
             }
         }

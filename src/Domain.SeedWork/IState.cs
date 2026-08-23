@@ -1,4 +1,5 @@
-﻿using Domain.SeedWork.Result;
+﻿using Domain.SeedWork.Errors;
+using Domain.SeedWork.Result;
 
 namespace Domain.SeedWork;
 
@@ -8,7 +9,7 @@ public interface IState<T>
 
     bool CanEdit { get; }
 
-    Result<None, Exception> CanTransitionTo(
+    Result<None, InvalidStatusTransitionError> CanTransitionTo(
         IState<T> newState,
         T template);
 }

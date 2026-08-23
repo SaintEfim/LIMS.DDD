@@ -1,4 +1,5 @@
 ﻿using Domain.SeedWork;
+using Domain.SeedWork.Errors;
 using Domain.SeedWork.Result;
 using Domain.SeedWork.ValueObjects;
 using LIMS.Service.LaboratoryOperations.Domain.SampleAggregate;
@@ -135,7 +136,7 @@ public sealed class Study
         return new None();
     }
 
-    internal Result<None, Exception> ChangeStatus(
+    internal Result<None, InvalidStatusTransitionError> ChangeStatus(
         StudyStatus newStatus)
     {
         var result = Status.CanTransitionTo(newStatus, this);

@@ -1,6 +1,6 @@
 ﻿using Application.SeedWork;
+using Application.SeedWork.Errors;
 using Domain.SeedWork;
-using Domain.SeedWork.Errors;
 using Domain.SeedWork.Result;
 using Domain.SeedWork.ValueObjects;
 using LIMS.Service.Methodologies.Application.StudyTemplates.CalculationRules.Commands;
@@ -13,7 +13,7 @@ namespace LIMS.Service.Methodologies.Application.StudyTemplates.CalculationRules
 public sealed class CalculationRuleCommandsHandler(IStudyTemplateRepository repository, IUnitOfWork unitOfWork)
     : ICommandsHandler
 {
-    public async Task<Result<Guid, Exception>> CreateAsync(
+    public async Task<Result<Guid, ApplicationError>> CreateAsync(
         Guid studyTemplateId,
         CreateCalculationRuleCommand command,
         CancellationToken cancellationToken = default)
@@ -27,19 +27,19 @@ public sealed class CalculationRuleCommandsHandler(IStudyTemplateRepository repo
         var nameResult = Name.Create(command.Name);
         if (nameResult.IsFailure)
         {
-            return nameResult.CastFailure<Guid>();
+            return new DomainRuleViolation(nameResult.GetError());
         }
 
         var descResult = Description.Create(command.Description);
         if (descResult.IsFailure)
         {
-            return descResult.CastFailure<Guid>();
+            return new DomainRuleViolation(descResult.GetError());
         }
 
         var formulaResult = FormulaExpression.Create(command.FormulaExpression);
         if (formulaResult.IsFailure)
         {
-            return formulaResult.CastFailure<Guid>();
+            return new DomainRuleViolation(formulaResult.GetError());
         }
 
         var addResult = templateResult.GetValue()
@@ -47,17 +47,16 @@ public sealed class CalculationRuleCommandsHandler(IStudyTemplateRepository repo
                 new ResultDefinitionId(command.ResultDefinitionId));
         if (addResult.IsFailure)
         {
-            return addResult.CastFailure<Guid>();
+            return new DomainRuleViolation(addResult.GetError());
         }
 
         var saveResult = await SaveChangesAsync(cancellationToken);
         return saveResult.IsFailure
             ? saveResult.CastFailure<Guid>()
-            : addResult.GetValue()
-                .Id.Value;
+            : addResult.GetValue().Id.Value;
     }
 
-    public async Task<Result<None, Exception>> RemoveAsync(
+    public async Task<Result<None, ApplicationError>> RemoveAsync(
         Guid studyTemplateId,
         Guid ruleId,
         CancellationToken cancellationToken = default)
@@ -72,13 +71,13 @@ public sealed class CalculationRuleCommandsHandler(IStudyTemplateRepository repo
             .RemoveCalculationRule(new CalculationRuleId(ruleId));
         if (removeResult.IsFailure)
         {
-            return removeResult.CastFailure<None>();
+            return new DomainRuleViolation(removeResult.GetError());
         }
 
         return await SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<Result<None, Exception>> UpdateAsync(
+    public async Task<Result<None, ApplicationError>> UpdateAsync(
         Guid studyTemplateId,
         Guid ruleId,
         UpdateCalculationRuleCommand command,
@@ -96,7 +95,7 @@ public sealed class CalculationRuleCommandsHandler(IStudyTemplateRepository repo
             var nameResult = Name.Create(command.Name);
             if (nameResult.IsFailure)
             {
-                return nameResult.CastFailure<None>();
+                return new DomainRuleViolation(nameResult.GetError());
             }
 
             name = nameResult.GetValue();
@@ -108,7 +107,7 @@ public sealed class CalculationRuleCommandsHandler(IStudyTemplateRepository repo
             var formulaResult = FormulaExpression.Create(command.FormulaExpression);
             if (formulaResult.IsFailure)
             {
-                return formulaResult.CastFailure<None>();
+                return new DomainRuleViolation(formulaResult.GetError());
             }
 
             formula = formulaResult.GetValue();
@@ -120,7 +119,7 @@ public sealed class CalculationRuleCommandsHandler(IStudyTemplateRepository repo
             var descResult = Description.Create(command.Description);
             if (descResult.IsFailure)
             {
-                return descResult.CastFailure<None>();
+                return new DomainRuleViolation(descResult.GetError());
             }
 
             description = descResult.GetValue();
@@ -134,21 +133,26 @@ public sealed class CalculationRuleCommandsHandler(IStudyTemplateRepository repo
             .UpdateCalculationRule(new CalculationRuleId(ruleId), name, formula, description, resultDefinitionId);
         if (updateResult.IsFailure)
         {
-            return updateResult.CastFailure<None>();
+            return new DomainRuleViolation(updateResult.GetError());
         }
 
         return await SaveChangesAsync(cancellationToken);
     }
 
-    private async Task<Result<StudyTemplate, Exception>> GetTemplateForChangeAsync(
+    private async Task<Result<StudyTemplate, ApplicationError>> GetTemplateForChangeAsync(
         Guid studyTemplateId,
         CancellationToken cancellationToken = default)
     {
         var template = await repository.GetByIdForChangeAsync(new StudyTemplateId(studyTemplateId), cancellationToken);
-        return template is null ? new EntityNotFoundException("Study template", studyTemplateId) : template;
+        if (template is null)
+        {
+            return new NotFoundError($"Study template with id '{studyTemplateId}' not found.");
+        }
+
+        return template;
     }
 
-    private async Task<Result<None, Exception>> SaveChangesAsync(
+    private async Task<Result<None, ApplicationError>> SaveChangesAsync(
         CancellationToken cancellationToken = default)
     {
         try
@@ -158,7 +162,7 @@ public sealed class CalculationRuleCommandsHandler(IStudyTemplateRepository repo
         }
         catch (Exception ex)
         {
-            return new PersistenceException($"Failed to save changes: {ex.Message}", ex);
+            return new PersistenceError($"Failed to save changes: {ex.Message}");
         }
     }
 }

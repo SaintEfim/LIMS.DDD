@@ -20,14 +20,14 @@ public sealed record Description
 
     public string? Value { get; }
 
-    public static Result<Description, Exception> Create(
+    public static Result<Description, DomainError> Create(
         string? value)
     {
         var descriptionValue = string.IsNullOrWhiteSpace(value) ? string.Empty : value.Trim();
 
         if (descriptionValue.Length > MaxDescriptionLength)
         {
-            return new ValidationException(
+            return new ValidationError(
                 $"Description length cannot exceed {MaxDescriptionLength} characters. " +
                 $"Current length: {descriptionValue.Length}.");
         }
