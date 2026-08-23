@@ -1,7 +1,8 @@
-using Application.SeedWork.SeedWork;
-using Domain.SeedWork.SeedWork;
-using Domain.SeedWork.SeedWork.Result;
-using Domain.SeedWork.SeedWork.ValueObjects;
+using Application.SeedWork;
+using Application.SeedWork.Errors;
+using Domain.SeedWork;
+using Domain.SeedWork.Result;
+using Domain.SeedWork.ValueObjects;
 using LIMS.Service.LaboratoryOperations.Application.Orders.Commands;
 using LIMS.Service.LaboratoryOperations.Domain.OrderAggregate;
 using LIMS.Service.LaboratoryOperations.Domain.OrderAggregate.ValueObjects;
@@ -17,26 +18,26 @@ public sealed class OrderCommandsHandler(
     ISampleRepository sampleRepository,
     OrderStatusChangeDomainService statusChangeDomainService) : ICommandsHandler
 {
-    public async Task<Result<Order, Exception>> CreateAsync(
+    public async Task<Result<Order, ApplicationError>> CreateAsync(
         CreateOrderCommand command,
         CancellationToken cancellationToken = default)
     {
         var nameResult = Name.Create(command.Name);
         if (nameResult.IsFailure)
         {
-            return nameResult.CastFailure<Order>();
+            return new DomainRuleViolation(nameResult.GetError());
         }
 
         var descResult = Description.Create(command.Description);
         if (descResult.IsFailure)
         {
-            return descResult.CastFailure<Order>();
+            return new DomainRuleViolation(descResult.GetError());
         }
 
         var codeResult = Code.Create(command.Code);
         if (codeResult.IsFailure)
         {
-            return codeResult.CastFailure<Order>();
+            return new DomainRuleViolation(codeResult.GetError());
         }
 
         var createOrder = new Order(nameResult.GetValue(), descResult.GetValue(), command.Contractor,
@@ -45,7 +46,7 @@ public sealed class OrderCommandsHandler(
         return await SaveNewAsync(createOrder, cancellationToken);
     }
 
-    public async Task<Result<None, Exception>> UpdateAsync(
+    public async Task<Result<None, ApplicationError>> UpdateAsync(
         Guid id,
         UpdateOrderCommand command,
         CancellationToken cancellationToken = default)
@@ -64,7 +65,7 @@ public sealed class OrderCommandsHandler(
             var nameResult = Name.Create(command.Name);
             if (nameResult.IsFailure)
             {
-                return nameResult.CastFailure<None>();
+                return new DomainRuleViolation(nameResult.GetError());
             }
 
             name = nameResult.GetValue();
@@ -76,7 +77,7 @@ public sealed class OrderCommandsHandler(
             var descriptionResult = Description.Create(command.Description);
             if (descriptionResult.IsFailure)
             {
-                return descriptionResult.CastFailure<None>();
+                return new DomainRuleViolation(descriptionResult.GetError());
             }
 
             description = descriptionResult.GetValue();
@@ -88,7 +89,7 @@ public sealed class OrderCommandsHandler(
             var codeResult = Code.Create(command.Code);
             if (codeResult.IsFailure)
             {
-                return codeResult.CastFailure<None>();
+                return new DomainRuleViolation(codeResult.GetError());
             }
 
             code = codeResult.GetValue();
@@ -97,13 +98,13 @@ public sealed class OrderCommandsHandler(
         var updateResult = order.UpdatePartial(name, description, command.Contractor, code);
         if (updateResult.IsFailure)
         {
-            return updateResult.CastFailure<None>();
+            return new DomainRuleViolation(updateResult.GetError());
         }
 
         return await SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<Result<None, Exception>> ChangeStatusAsync(
+    public async Task<Result<None, ApplicationError>> ChangeStatusAsync(
         Guid id,
         ChangeOrderStatusCommand command,
         CancellationToken cancellationToken = default)
@@ -118,7 +119,7 @@ public sealed class OrderCommandsHandler(
 
         if (!OrderStatus.TryParse(command.Status, out var newStatus) || newStatus is null)
         {
-            return new InvalidOperationException($"Unknown status '{command.Status}'.");
+            return new ValidationError($"Unknown status '{command.Status}'.");
         }
 
         var samples = (await sampleRepository.GetByOrderIdAsync(order.Id, cancellationToken)).ToList()
@@ -127,13 +128,13 @@ public sealed class OrderCommandsHandler(
         var changeResult = statusChangeDomainService.ValidateAndChangeStatus(order, newStatus, samples);
         if (changeResult.IsFailure)
         {
-            return changeResult.CastFailure<None>();
+            return new DomainRuleViolation(changeResult.GetError());
         }
 
         return await SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<Result<None, Exception>> DeleteAsync(
+    public async Task<Result<None, ApplicationError>> DeleteAsync(
         Guid id,
         CancellationToken cancellationToken = default)
     {
@@ -148,13 +149,13 @@ public sealed class OrderCommandsHandler(
         var deleteResult = order.Delete();
         if (deleteResult.IsFailure)
         {
-            return deleteResult;
+            return new DomainRuleViolation(deleteResult.GetError());
         }
 
         return await SaveChangesAsync(cancellationToken);
     }
 
-    private async Task<Result<Order, Exception>> SaveNewAsync(
+    private async Task<Result<Order, ApplicationError>> SaveNewAsync(
         Order order,
         CancellationToken cancellationToken = default)
     {
@@ -166,11 +167,11 @@ public sealed class OrderCommandsHandler(
         }
         catch (Exception ex)
         {
-            return new Exception($"Failed to save Order: {ex.Message}", ex);
+            return new PersistenceError($"Failed to save Order: {ex.Message}");
         }
     }
 
-    private async Task<Result<None, Exception>> SaveChangesAsync(
+    private async Task<Result<None, ApplicationError>> SaveChangesAsync(
         CancellationToken cancellationToken = default)
     {
         try
@@ -180,15 +181,20 @@ public sealed class OrderCommandsHandler(
         }
         catch (Exception ex)
         {
-            return new Exception($"Failed to save Order: {ex.Message}", ex);
+            return new PersistenceError($"Failed to save Order: {ex.Message}");
         }
     }
 
-    private async Task<Result<Order, Exception>> GetOrderForChangeAsync(
+    private async Task<Result<Order, ApplicationError>> GetOrderForChangeAsync(
         Guid id,
         CancellationToken ct)
     {
         var order = await repository.GetByIdForChangeAsync(new OrderId(id), ct);
-        return order is null ? new KeyNotFoundException($"Order with id {id} not found.") : order;
+        if (order is null)
+        {
+            return new NotFoundError($"Order with id '{id}' not found.");
+        }
+
+        return order;
     }
 }

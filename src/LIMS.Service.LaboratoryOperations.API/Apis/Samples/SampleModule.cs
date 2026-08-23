@@ -6,7 +6,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace LIMS.Service.LaboratoryOperations.API.Apis.Samples;
 
-public class SampleModule : ICarterModule
+public class SampleModule
+    : ModuleBase,
+        ICarterModule
 {
     public void AddRoutes(
         IEndpointRouteBuilder app)
@@ -110,17 +112,5 @@ public class SampleModule : ICarterModule
     {
         var result = await services.Commands.DeleteAsync(sampleId, cancellationToken);
         return result.IsFailure ? HandleFailure(result.GetError()) : Results.NoContent();
-    }
-
-    private static IResult HandleFailure(
-        Exception error)
-    {
-        return error switch
-        {
-            KeyNotFoundException => Results.NotFound(new { error.Message }),
-            ArgumentException or InvalidOperationException => Results.BadRequest(new { error.Message }),
-            _ => Results.Problem(error.Message, statusCode: StatusCodes.Status500InternalServerError,
-                title: "An unexpected error occurred")
-        };
     }
 }

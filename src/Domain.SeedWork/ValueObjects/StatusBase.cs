@@ -1,6 +1,7 @@
-﻿using Domain.SeedWork.SeedWork.Result;
+﻿using Domain.SeedWork.Errors;
+using Domain.SeedWork.Result;
 
-namespace Domain.SeedWork.SeedWork.ValueObjects;
+namespace Domain.SeedWork.ValueObjects;
 
 /// <summary>
 ///     Базовый класс для статусов, реализующих State Pattern
@@ -19,7 +20,7 @@ public abstract record StatusBase<TState, TEntity>
     public string Name => _state.Name;
     public bool CanEdit => _state.CanEdit;
 
-    public Result<None, Exception> CanTransitionTo(
+    public Result<None, InvalidStatusTransitionError> CanTransitionTo(
         StatusBase<TState, TEntity> newStatus,
         TEntity entity)
     {

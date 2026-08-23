@@ -1,4 +1,5 @@
-﻿using Domain.SeedWork.SeedWork.Result;
+﻿using Domain.SeedWork.Errors;
+using Domain.SeedWork.Result;
 using LIMS.Service.LaboratoryOperations.Domain.SampleAggregate;
 using LIMS.Service.LaboratoryOperations.Domain.SampleAggregate.ValueObjects;
 using LIMS.Service.LaboratoryOperations.Domain.StudyAggregate;
@@ -8,7 +9,7 @@ namespace LIMS.Service.LaboratoryOperations.Domain.Services;
 
 public sealed class SampleStatusChangeDomainService
 {
-    public Result<None, Exception> ValidateAndChangeStatus(
+    public Result<None, DomainError> ValidateAndChangeStatus(
         Sample sample,
         SampleStatus newStatus,
         IReadOnlyCollection<Study> associatedStudies)
@@ -18,7 +19,7 @@ public sealed class SampleStatusChangeDomainService
             var hasActiveStudies = associatedStudies.Any(s => s.Status == StudyStatus.InProgress);
             if (hasActiveStudies)
             {
-                return new InvalidOperationException(
+                return new InvalidStatusTransitionError(nameof(Sample), sample.SampleStatus.Name, newStatus.Name,
                     "Cannot complete the sample because there are studies in 'InProgress' status. " +
                     "Please complete all studies first.");
             }
@@ -30,12 +31,18 @@ public sealed class SampleStatusChangeDomainService
                 s.Status == StudyStatus.Completed || s.Status == StudyStatus.Approved);
             if (hasCompletedStudies)
             {
-                return new InvalidOperationException(
+                return new InvalidStatusTransitionError(nameof(Sample), sample.SampleStatus.Name, newStatus.Name,
                     "Cannot cancel the sample because there are completed or approved studies. " +
                     "Please cancel the studies first.");
             }
         }
 
-        return sample.ChangeStatus(newStatus);
+        var changeResult = sample.ChangeStatus(newStatus);
+        if (changeResult.IsFailure)
+        {
+            return changeResult.GetError();
+        }
+
+        return new None();
     }
 }

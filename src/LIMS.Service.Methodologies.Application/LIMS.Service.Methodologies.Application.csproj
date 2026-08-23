@@ -7,8 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Application.SeedWork\Application.SeedWork.csproj" />
-    <ProjectReference Include="..\Broker.Messages\Broker.Messages.csproj" />
+    <ProjectReference Include="..\Application.SeedWork\Application.SeedWork.csproj"/>
+    <ProjectReference Include="..\Broker.Messages\Broker.Messages.csproj"/>
     <ProjectReference Include="..\LIMS.Service.Methodologies.Domain\LIMS.Service.Methodologies.Domain.csproj"/>
     <ProjectReference Include="..\RabbitMq.Library.QuickStart\RabbitMq.Library.QuickStart.csproj"/>
   </ItemGroup>

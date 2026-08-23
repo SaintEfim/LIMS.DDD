@@ -1,4 +1,5 @@
-using Domain.SeedWork.SeedWork.Result;
+using Domain.SeedWork.Errors;
+using Domain.SeedWork.Result;
 
 namespace LIMS.Service.LaboratoryOperations.Domain.ValueObjects;
 
@@ -14,12 +15,12 @@ public sealed record Code
 
     public string? Value { get; }
 
-    public static Result<Code, Exception> Create(
+    public static Result<Code, DomainError> Create(
         string? code)
     {
         if (code is not null && code.Length > MaxCodeLength)
         {
-            return new ArgumentException($"Code cannot exceed {MaxCodeLength} characters");
+            return new ValidationError($"Code cannot exceed {MaxCodeLength} characters.");
         }
 
         return new Code(code?.Trim());

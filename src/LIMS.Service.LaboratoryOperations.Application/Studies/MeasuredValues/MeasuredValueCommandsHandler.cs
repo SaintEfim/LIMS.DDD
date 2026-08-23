@@ -1,6 +1,7 @@
-﻿using Application.SeedWork.SeedWork;
-using Domain.SeedWork.SeedWork;
-using Domain.SeedWork.SeedWork.Result;
+﻿using Application.SeedWork;
+using Application.SeedWork.Errors;
+using Domain.SeedWork;
+using Domain.SeedWork.Result;
 using LIMS.Service.LaboratoryOperations.Domain.StudyAggregate;
 using LIMS.Service.LaboratoryOperations.Domain.StudyAggregate.Entities;
 
@@ -8,7 +9,7 @@ namespace LIMS.Service.LaboratoryOperations.Application.Studies.MeasuredValues;
 
 public sealed class MeasuredValueCommandsHandler(IUnitOfWork unitOfWork, IStudyRepository studyRepository) : ICommandsHandler
 {
-    public async Task<Result<None, Exception>> UpdateAsync(
+    public async Task<Result<None, ApplicationError>> UpdateAsync(
         Guid studyId,
         Guid measuredValueId,
         UpdateMeasuredValueCommand command,
@@ -25,21 +26,26 @@ public sealed class MeasuredValueCommandsHandler(IUnitOfWork unitOfWork, IStudyR
 
         if (updateResult.IsFailure)
         {
-            return updateResult;
+            return new DomainRuleViolation(updateResult.GetError());
         }
 
         return await SaveChangesAsync(cancellationToken);
     }
 
-    private async Task<Result<Study, Exception>> GetStudyForChangeAsync(
+    private async Task<Result<Study, ApplicationError>> GetStudyForChangeAsync(
         Guid studyId,
         CancellationToken ct)
     {
         var study = await studyRepository.GetByIdForChangeAsync(new StudyId(studyId), ct);
-        return study is null ? new KeyNotFoundException($"Study with id {studyId} not found.") : study;
+        if (study is null)
+        {
+            return new NotFoundError($"Study with id '{studyId}' not found.");
+        }
+
+        return study;
     }
 
-    private async Task<Result<None, Exception>> SaveChangesAsync(
+    private async Task<Result<None, ApplicationError>> SaveChangesAsync(
         CancellationToken cancellationToken = default)
     {
         try
@@ -49,7 +55,7 @@ public sealed class MeasuredValueCommandsHandler(IUnitOfWork unitOfWork, IStudyR
         }
         catch (Exception ex)
         {
-            return new Exception($"Failed to save changes: {ex.Message}", ex);
+            return new PersistenceError($"Failed to save changes: {ex.Message}");
         }
     }
 }

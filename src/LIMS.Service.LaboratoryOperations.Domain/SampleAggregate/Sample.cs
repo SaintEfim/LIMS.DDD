@@ -1,9 +1,9 @@
-﻿using Domain.SeedWork.SeedWork;
-using Domain.SeedWork.SeedWork.Result;
-using Domain.SeedWork.SeedWork.ValueObjects;
+﻿using Domain.SeedWork;
+using Domain.SeedWork.Errors;
+using Domain.SeedWork.Result;
+using Domain.SeedWork.ValueObjects;
 using LIMS.Service.LaboratoryOperations.Domain.OrderAggregate;
 using LIMS.Service.LaboratoryOperations.Domain.SampleAggregate.ValueObjects;
-using LIMS.Service.LaboratoryOperations.Domain.UnitSnapshots;
 using LIMS.Service.LaboratoryOperations.Domain.ValueObjects;
 
 namespace LIMS.Service.LaboratoryOperations.Domain.SampleAggregate;
@@ -33,7 +33,7 @@ public class Sample
     {
     }
 
-    public SampleId Id { get; private set; }
+    public SampleId Id { get; }
 
     public OrderId OrderId { get; private set; }
 
@@ -50,20 +50,20 @@ public class Sample
     public bool CanAcceptNewEntity =>
         SampleStatus == SampleStatus.Registered || SampleStatus == SampleStatus.InProgress;
 
-    internal Result<None, Exception> Delete()
+    internal Result<None, DomainError> Delete()
     {
         if (IsDeleted)
         {
-            return Result<None, Exception>.Failure(new InvalidOperationException("Sample is already deleted."));
+            return new EntityAlreadyDeletedError(nameof(Sample), Id.Value);
         }
 
         IsDeleted = true;
         DeletedAt = DateTimeOffset.UtcNow;
 
-        return Result<None, Exception>.Success();
+        return new None();
     }
 
-    public Result<None, Exception> UpdatePartial(
+    public Result<None, DomainError> UpdatePartial(
         Name? name,
         GatherDate? gatherDate,
         Code? code,
@@ -71,8 +71,7 @@ public class Sample
     {
         if (!SampleStatus.CanEdit)
         {
-            return Result<None, Exception>.Failure(
-                new InvalidOperationException("Cannot modify sample details when it is InWork or Completed."));
+            return new EntityNotEditableError(nameof(Sample), SampleStatus.Name, "modify sample details");
         }
 
         if (name is not null)
@@ -92,17 +91,15 @@ public class Sample
 
         var newValue = volume?.Value ?? Volume.Value;
         var newUnitId = volume?.UnitId ?? Volume.UnitId;
-
         Volume.Update(newValue, newUnitId);
 
-        return Result<None, Exception>.Success();
+        return new None();
     }
 
-    internal Result<None, Exception> ChangeStatus(
+    internal Result<None, InvalidStatusTransitionError> ChangeStatus(
         SampleStatus newSampleStatus)
     {
         var result = SampleStatus.CanTransitionTo(newSampleStatus, this);
-
         if (result.IsFailure)
         {
             return result.CastFailure<None>();
@@ -110,6 +107,6 @@ public class Sample
 
         SampleStatus = newSampleStatus;
 
-        return Result<None, Exception>.Success();
+        return new None();
     }
 }

@@ -1,4 +1,4 @@
-﻿using Domain.SeedWork.SeedWork;
+﻿using Domain.SeedWork;
 
 namespace LIMS.Service.LaboratoryOperations.Domain.StudyTemplateSnapshots;
 

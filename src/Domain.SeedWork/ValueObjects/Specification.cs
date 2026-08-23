@@ -1,6 +1,7 @@
-using Domain.SeedWork.SeedWork.Result;
+using Domain.SeedWork.Errors;
+using Domain.SeedWork.Result;
 
-namespace Domain.SeedWork.SeedWork.ValueObjects;
+namespace Domain.SeedWork.ValueObjects;
 
 public sealed record Specification
 {
@@ -21,13 +22,14 @@ public sealed record Specification
 
     public double? MaxValue { get; init; }
 
-    public static Result<Specification, Exception> Create(
+    public static Result<Specification, DomainError> Create(
         double? minValue,
         double? maxValue)
     {
         if (minValue.HasValue && maxValue.HasValue && minValue.Value > maxValue.Value)
         {
-            return new ArgumentException($"Min value ({minValue}) cannot be greater than max value ({maxValue}).");
+            return new ValidationError(
+                $"Min value ({minValue}) cannot be greater than max value ({maxValue}).");
         }
 
         var specification = new Specification(minValue, maxValue);

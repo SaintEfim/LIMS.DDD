@@ -1,4 +1,4 @@
-﻿using Application.SeedWork.SeedWork;
+﻿using Application.SeedWork;
 using LIMS.Service.Methodologies.Domain.UnitSnapshots;
 
 namespace LIMS.Service.Methodologies.Application.Units;
@@ -17,6 +17,7 @@ public sealed class UnitSnapshotQueries(IUnitSnapshotRepository repository) : IQ
         CancellationToken cancellationToken = default)
     {
         var snapshots = await repository.GetAllAsync(cancellationToken);
-        return snapshots.Select(UnitSnapshotDto.FromSnapshot).ToList();
+        return snapshots.Select(UnitSnapshotDto.FromSnapshot)
+            .ToList();
     }
 }

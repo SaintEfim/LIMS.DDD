@@ -1,4 +1,4 @@
-﻿namespace Domain.SeedWork.SeedWork.Result;
+﻿namespace Domain.SeedWork.Result;
 
 public readonly record struct None;
 

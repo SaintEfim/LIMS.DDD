@@ -1,7 +1,7 @@
 ﻿using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Application.SeedWork.SeedWork;
+namespace Application.SeedWork;
 
 public static class DependencyInjection
 {

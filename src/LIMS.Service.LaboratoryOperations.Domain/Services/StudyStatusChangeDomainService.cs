@@ -1,4 +1,5 @@
-﻿using Domain.SeedWork.SeedWork.Result;
+﻿using Domain.SeedWork.Errors;
+using Domain.SeedWork.Result;
 using LIMS.Service.LaboratoryOperations.Domain.SampleAggregate;
 using LIMS.Service.LaboratoryOperations.Domain.SampleAggregate.ValueObjects;
 using LIMS.Service.LaboratoryOperations.Domain.StudyAggregate;
@@ -8,7 +9,7 @@ namespace LIMS.Service.LaboratoryOperations.Domain.Services;
 
 public sealed class StudyStatusChangeDomainService
 {
-    public Result<None, Exception> ValidateAndChangeStatus(
+    public Result<None, DomainError> ValidateAndChangeStatus(
         Study study,
         StudyStatus newStatus,
         Sample parentSample)
@@ -16,9 +17,16 @@ public sealed class StudyStatusChangeDomainService
         if ((newStatus == StudyStatus.Completed || newStatus == StudyStatus.Approved) &&
             parentSample.SampleStatus == SampleStatus.Canceled)
         {
-            return new InvalidOperationException("Cannot complete or approve a study for a canceled sample.");
+            return new InvalidStatusTransitionError(nameof(Study), study.Status.Name, newStatus.Name,
+                "Cannot complete or approve a study for a canceled sample.");
         }
 
-        return study.ChangeStatus(newStatus);
+        var changeResult = study.ChangeStatus(newStatus);
+        if (changeResult.IsFailure)
+        {
+            return changeResult.GetError();
+        }
+
+        return new None();
     }
 }

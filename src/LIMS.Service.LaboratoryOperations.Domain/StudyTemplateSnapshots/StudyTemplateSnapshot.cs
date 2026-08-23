@@ -1,5 +1,5 @@
-﻿using Domain.SeedWork.SeedWork;
-using Domain.SeedWork.SeedWork.ValueObjects;
+﻿using Domain.SeedWork;
+using Domain.SeedWork.ValueObjects;
 using LIMS.Service.LaboratoryOperations.Domain.StudyTemplateSnapshots.CalculationRules;
 using LIMS.Service.LaboratoryOperations.Domain.StudyTemplateSnapshots.InputParameters;
 using LIMS.Service.LaboratoryOperations.Domain.StudyTemplateSnapshots.ResultDefinitions;

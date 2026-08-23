@@ -5,7 +5,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace LIMS.Service.Methodologies.API.Apis.CalculationRules;
 
-public class CalculationRuleModule : ICarterModule
+public class CalculationRuleModule
+    : ModuleBase,
+        ICarterModule
 {
     public void AddRoutes(
         IEndpointRouteBuilder app)
@@ -24,18 +26,20 @@ public class CalculationRuleModule : ICarterModule
             .Produces(StatusCodes.Status201Created)
             .Produces(StatusCodes.Status404NotFound)
             .Produces(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status409Conflict)
             .Produces(StatusCodes.Status500InternalServerError);
 
         group.MapDelete("/{ruleId:guid}", Delete)
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status404NotFound)
-            .Produces(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status409Conflict)
             .Produces(StatusCodes.Status500InternalServerError);
 
         group.MapPatch("/{ruleId:guid}", Update)
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status404NotFound)
-            .Produces(StatusCodes.Status400BadRequest);
+            .Produces(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status409Conflict);
     }
 
     private static async Task<IResult> GetAll(
@@ -64,14 +68,13 @@ public class CalculationRuleModule : ICarterModule
         CancellationToken cancellationToken = default)
     {
         var result = await services.Commands.CreateAsync(studyTemplateId, command, cancellationToken);
-
         if (result.IsFailure)
         {
             return HandleFailure(result.GetError());
         }
 
         var ruleId = result.GetValue();
-        return Results.Created($"/api/studyTemplates/{studyTemplateId}/calculation-rules/{ruleId}",
+        return Results.Created($"/api/study-templates/{studyTemplateId}/calculation-rules/{ruleId}",
             new { id = ruleId });
     }
 
@@ -94,17 +97,5 @@ public class CalculationRuleModule : ICarterModule
     {
         var result = await services.Commands.UpdateAsync(studyTemplateId, ruleId, command, cancellationToken);
         return result.IsFailure ? HandleFailure(result.GetError()) : Results.NoContent();
-    }
-
-    private static IResult HandleFailure(
-        Exception error)
-    {
-        return error switch
-        {
-            KeyNotFoundException => Results.NotFound(new { error.Message }),
-            InvalidOperationException => Results.BadRequest(new { error.Message }),
-            _ => Results.Problem(error.Message, statusCode: StatusCodes.Status500InternalServerError,
-                title: "An unexpected error occurred")
-        };
     }
 }

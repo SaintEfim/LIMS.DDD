@@ -1,5 +1,4 @@
-﻿using Domain.SeedWork.SeedWork.ValueObjects;
-using LIMS.Service.LaboratoryOperations.Domain.StudyTemplateSnapshots;
+﻿using LIMS.Service.LaboratoryOperations.Domain.StudyTemplateSnapshots;
 using LIMS.Service.LaboratoryOperations.Domain.UnitSnapshots;
 
 namespace LIMS.Service.LaboratoryOperations.Application.StudyTemplates;

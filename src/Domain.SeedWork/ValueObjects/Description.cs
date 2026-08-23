@@ -1,6 +1,7 @@
-﻿using Domain.SeedWork.SeedWork.Result;
+﻿using Domain.SeedWork.Errors;
+using Domain.SeedWork.Result;
 
-namespace Domain.SeedWork.SeedWork.ValueObjects;
+namespace Domain.SeedWork.ValueObjects;
 
 public sealed record Description
 {
@@ -19,16 +20,16 @@ public sealed record Description
 
     public string? Value { get; }
 
-    public static Result<Description, Exception> Create(
+    public static Result<Description, DomainError> Create(
         string? value)
     {
         var descriptionValue = string.IsNullOrWhiteSpace(value) ? string.Empty : value.Trim();
 
         if (descriptionValue.Length > MaxDescriptionLength)
         {
-            return new ArgumentException(
+            return new ValidationError(
                 $"Description length cannot exceed {MaxDescriptionLength} characters. " +
-                $"Current length: {descriptionValue.Length}.", nameof(value));
+                $"Current length: {descriptionValue.Length}.");
         }
 
         var description = new Description(descriptionValue);

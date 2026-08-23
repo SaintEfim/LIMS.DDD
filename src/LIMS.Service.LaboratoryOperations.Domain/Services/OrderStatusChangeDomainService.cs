@@ -1,4 +1,5 @@
-﻿using Domain.SeedWork.SeedWork.Result;
+﻿using Domain.SeedWork.Errors;
+using Domain.SeedWork.Result;
 using LIMS.Service.LaboratoryOperations.Domain.OrderAggregate;
 using LIMS.Service.LaboratoryOperations.Domain.OrderAggregate.ValueObjects;
 using LIMS.Service.LaboratoryOperations.Domain.SampleAggregate;
@@ -8,7 +9,7 @@ namespace LIMS.Service.LaboratoryOperations.Domain.Services;
 
 public sealed class OrderStatusChangeDomainService
 {
-    public Result<None, Exception> ValidateAndChangeStatus(
+    public Result<None, DomainError> ValidateAndChangeStatus(
         Order order,
         OrderStatus newStatus,
         IReadOnlyCollection<Sample> associatedSamples)
@@ -20,7 +21,7 @@ public sealed class OrderStatusChangeDomainService
 
             if (hasActiveSamples)
             {
-                return new InvalidOperationException(
+                return new InvalidStatusTransitionError(nameof(Order), order.OrderStatus.Name, newStatus.Name,
                     "Cannot complete the order because there are samples in 'Registered' or 'InProgress' status. " +
                     "Please complete or cancel all samples first.");
             }
@@ -33,11 +34,17 @@ public sealed class OrderStatusChangeDomainService
 
             if (hasActiveSamples)
             {
-                return new InvalidOperationException("Cannot cancel the order because there are active samples. " +
-                                                     "Please cancel all samples first.");
+                return new InvalidStatusTransitionError(nameof(Order), order.OrderStatus.Name, newStatus.Name,
+                    "Cannot cancel the order because there are active samples. " + "Please cancel all samples first.");
             }
         }
 
-        return order.ChangeStatus(newStatus);
+        var changeResult = order.ChangeStatus(newStatus);
+        if (changeResult.IsFailure)
+        {
+            return changeResult.GetError();
+        }
+
+        return new None();
     }
 }

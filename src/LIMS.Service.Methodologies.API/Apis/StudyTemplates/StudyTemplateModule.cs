@@ -5,7 +5,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace LIMS.Service.Methodologies.API.Apis.StudyTemplates;
 
-public class StudyTemplateModule : ICarterModule
+public class StudyTemplateModule
+    : ModuleBase,
+        ICarterModule
 {
     public void AddRoutes(
         IEndpointRouteBuilder app)
@@ -13,7 +15,7 @@ public class StudyTemplateModule : ICarterModule
         var group = app.MapGroup("/api/study-templates")
             .WithTags("StudyTemplates");
 
-        group.MapGet("/", GetAl)
+        group.MapGet("/", GetAll)
             .Produces<ICollection<StudyTemplateDto>>();
 
         group.MapGet("/{id:guid}", GetById)
@@ -28,29 +30,33 @@ public class StudyTemplateModule : ICarterModule
         group.MapPatch("/{id:guid}", Update)
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status404NotFound)
-            .Produces(StatusCodes.Status400BadRequest);
+            .Produces(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status409Conflict);
 
         group.MapPost("/{id:guid}/change-status", ChangeStatus)
             .WithName("ApproveStudyTemplate")
             .Produces(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status404NotFound)
-            .Produces(StatusCodes.Status400BadRequest);
+            .Produces(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status409Conflict);
 
         group.MapPost("/{id:guid}/create-revision", CreateRevision)
             .WithName("CreateStudyTemplateRevision")
             .Produces(StatusCodes.Status201Created)
             .Produces(StatusCodes.Status404NotFound)
             .Produces(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status409Conflict)
             .Produces(StatusCodes.Status500InternalServerError);
 
         group.MapDelete("/{id:guid}", Delete)
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status404NotFound)
             .Produces(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status409Conflict)
             .Produces(StatusCodes.Status500InternalServerError);
     }
 
-    private static async Task<IResult> GetAl(
+    private static async Task<IResult> GetAll(
         [FromServices] StudyTemplateServices services,
         CancellationToken cancellationToken = default)
     {
@@ -73,7 +79,6 @@ public class StudyTemplateModule : ICarterModule
         CancellationToken cancellationToken = default)
     {
         var result = await services.Commands.CreateAsync(createCommand, cancellationToken);
-
         if (result.IsFailure)
         {
             return HandleFailure(result.GetError());
@@ -81,7 +86,7 @@ public class StudyTemplateModule : ICarterModule
 
         var createdId = result.GetValue()
             .Id.Value;
-        return Results.Created($"/api/studyTemplates/{createdId}", new { id = createdId });
+        return Results.Created($"/api/study-templates/{createdId}", new { id = createdId });
     }
 
     private static async Task<IResult> Update(
@@ -111,7 +116,6 @@ public class StudyTemplateModule : ICarterModule
         CancellationToken cancellationToken = default)
     {
         var result = await services.Commands.CreateRevisionAsync(id, command, cancellationToken);
-
         if (result.IsFailure)
         {
             return HandleFailure(result.GetError());
@@ -127,19 +131,6 @@ public class StudyTemplateModule : ICarterModule
         CancellationToken cancellationToken = default)
     {
         var result = await services.Commands.DeleteAsync(id, cancellationToken);
-
         return result.IsFailure ? HandleFailure(result.GetError()) : Results.NoContent();
-    }
-
-    private static IResult HandleFailure(
-        Exception error)
-    {
-        return error switch
-        {
-            KeyNotFoundException => Results.NotFound(new { error.Message }),
-            ArgumentException or InvalidOperationException => Results.BadRequest(new { error.Message }),
-            _ => Results.Problem(error.Message, statusCode: StatusCodes.Status500InternalServerError,
-                title: "An unexpected error occurred")
-        };
     }
 }

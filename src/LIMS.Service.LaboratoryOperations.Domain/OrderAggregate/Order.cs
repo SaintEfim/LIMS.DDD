@@ -1,6 +1,7 @@
-﻿using Domain.SeedWork.SeedWork;
-using Domain.SeedWork.SeedWork.Result;
-using Domain.SeedWork.SeedWork.ValueObjects;
+﻿using Domain.SeedWork;
+using Domain.SeedWork.Errors;
+using Domain.SeedWork.Result;
+using Domain.SeedWork.ValueObjects;
 using LIMS.Service.LaboratoryOperations.Domain.OrderAggregate.ValueObjects;
 using LIMS.Service.LaboratoryOperations.Domain.ValueObjects;
 
@@ -28,7 +29,7 @@ public class Order
     {
     }
 
-    public OrderId Id { get; private set; }
+    public OrderId Id { get; }
 
     public Name Name { get; private set; } = null!;
 
@@ -44,17 +45,16 @@ public class Order
 
     public bool CanDeleteAssociatedEntities => OrderStatus == OrderStatus.Draft;
 
-    public Result<None, Exception> Delete()
+    public Result<None, DomainError> Delete()
     {
-        if (OrderStatus != OrderStatus.Draft)
-        {
-            return new InvalidOperationException($"Cannot delete order in '{OrderStatus.Name}' status. " +
-                                                 "Only orders in 'Draft' status can be deleted. Use 'Cancel' status for others.");
-        }
-
         if (IsDeleted)
         {
-            return new InvalidOperationException("Order is already deleted.");
+            return new EntityAlreadyDeletedError(nameof(Order), Id.Value);
+        }
+
+        if (OrderStatus != OrderStatus.Draft)
+        {
+            return new InvalidStatusTransitionError(nameof(Order), OrderStatus.Name, "Deleted");
         }
 
         IsDeleted = true;
@@ -63,7 +63,7 @@ public class Order
         return new None();
     }
 
-    public Result<None, Exception> UpdatePartial(
+    public Result<None, DomainError> UpdatePartial(
         Name? name,
         Description? description,
         string? contractor,
@@ -71,7 +71,7 @@ public class Order
     {
         if (!OrderStatus.CanEdit)
         {
-            return new InvalidOperationException("Cannot modify order details when the order is not editable.");
+            return new EntityNotEditableError(nameof(Order), OrderStatus.Name, "modify order details");
         }
 
         if (name is not null)
@@ -97,11 +97,10 @@ public class Order
         return new None();
     }
 
-    internal Result<None, Exception> ChangeStatus(
+    internal Result<None, InvalidStatusTransitionError> ChangeStatus(
         OrderStatus newOrderStatus)
     {
         var result = OrderStatus.CanTransitionTo(newOrderStatus, this);
-
         if (result.IsFailure)
         {
             return result.CastFailure<None>();

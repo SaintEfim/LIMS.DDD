@@ -1,4 +1,4 @@
-﻿using Domain.SeedWork.SeedWork;
+﻿using Domain.SeedWork;
 using LIMS.Service.Methodologies.Domain.StudyTemplateAggregate;
 using LIMS.Service.Methodologies.Domain.UnitSnapshots;
 using Microsoft.EntityFrameworkCore;

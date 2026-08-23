@@ -1,7 +1,8 @@
-﻿using Application.SeedWork.SeedWork;
-using Domain.SeedWork.SeedWork;
-using Domain.SeedWork.SeedWork.Result;
-using Domain.SeedWork.SeedWork.ValueObjects;
+﻿using Application.SeedWork;
+using Application.SeedWork.Errors;
+using Domain.SeedWork;
+using Domain.SeedWork.Result;
+using Domain.SeedWork.ValueObjects;
 using LIMS.Service.LaboratoryOperations.Domain.Services;
 using LIMS.Service.LaboratoryOperations.Domain.StudyAggregate;
 using LIMS.Service.LaboratoryOperations.Domain.StudyAggregate.Entities;
@@ -26,7 +27,7 @@ public sealed class TestResultCommandsHandler(
     INoStringEvaluator noStringEvaluator,
     TestResultDomainService testResultDomainService) : ICommandsHandler
 {
-    public async Task<Result<None, Exception>> ExecuteTest(
+    public async Task<Result<None, ApplicationError>> ExecuteTest(
         Guid studyId,
         Guid testResultId,
         CancellationToken cancellationToken = default)
@@ -60,95 +61,13 @@ public sealed class TestResultCommandsHandler(
 
         if (setResult.IsFailure)
         {
-            return setResult;
+            return new DomainRuleViolation(setResult.GetError());
         }
 
         return await SaveChangesAsync(cancellationToken);
     }
 
-    private async Task<Result<CalculationContext, Exception>> PrepareCalculationContext(
-        Study study,
-        Guid testResultId,
-        CancellationToken cancellationToken)
-    {
-        var testResult = study.TestResults.FirstOrDefault(t => t.Id == new TestResultId(testResultId));
-        if (testResult is null)
-        {
-            return new InvalidOperationException($"Test result '{testResultId}' not found in study '{study.Id.Value}'");
-        }
-
-        var template = await studyTemplateRepository.GetByIdAsync(study.StudyTemplateId, cancellationToken);
-        if (template is null)
-        {
-            return new InvalidOperationException($"Study template '{study.StudyTemplateId}' not found");
-        }
-
-        var calculationRule =
-            template.CalculationRules.FirstOrDefault(x => x.ResultDefinitionId == testResult.ResultDefinitionId);
-        if (calculationRule is null)
-        {
-            return new InvalidOperationException(
-                $"Calculation rule not found for result definition '{testResult.ResultDefinitionId}'");
-        }
-
-        var resultDefinition = template.Results.FirstOrDefault(r => r.Id == testResult.ResultDefinitionId);
-        if (resultDefinition is null)
-        {
-            return new InvalidOperationException(
-                $"Result definition '{testResult.ResultDefinitionId}' not found in snapshot");
-        }
-
-        var parametersByAlias = template.Parameters.ToDictionary(p => p.AliasName.Value, p => p);
-        var measuredValuesByParamId = study.MeasuredValues.ToDictionary(m => m.InputParameterId, m => m);
-
-        var extractVariables = calculationRule.FormulaExpression.ExtractVariables();
-        var calculationOutputs = new Dictionary<AliasName, double>(extractVariables.Count);
-
-        foreach (var variable in extractVariables)
-        {
-            if (!parametersByAlias.TryGetValue(variable, out var templateParameter))
-            {
-                return new InvalidOperationException($"Template parameter not found for formula variable '{variable}'");
-            }
-
-            if (!measuredValuesByParamId.TryGetValue(templateParameter.Id, out var measuredValue))
-            {
-                return new InvalidOperationException(
-                    $"Measured value not found for parameter '{templateParameter.AliasName}'");
-            }
-
-            if (measuredValue.Value is null)
-            {
-                return new InvalidOperationException(
-                    $"Missing required input parameter value for '{templateParameter.AliasName}'");
-            }
-
-            calculationOutputs.Add(templateParameter.AliasName, measuredValue.Value.Value);
-        }
-
-        return new CalculationContext(testResult, resultDefinition, calculationRule, calculationOutputs);
-    }
-
-    private Result<double, Exception> CalculateFormula(
-        CalculationContext context)
-    {
-        try
-        {
-            var evaluatorValues = context.Variables.ToDictionary(x => x.Key.Value, x => new EvaluatorValue(x.Value));
-
-            var calculatedValue = noStringEvaluator.CalcNumber(context.Rule.FormulaExpression.Value, evaluatorValues);
-
-            return calculatedValue;
-        }
-        catch (Exception ex)
-        {
-            return new InvalidOperationException(
-                $"Formula evaluation failed for result definition '{context.Result.ResultDefinitionId}': {ex.Message}",
-                ex);
-        }
-    }
-
-    public async Task<Result<None, Exception>> UpdateAsync(
+    public async Task<Result<None, ApplicationError>> UpdateAsync(
         Guid studyId,
         Guid testResultId,
         UpdateTestResultCommand command,
@@ -165,25 +84,25 @@ public sealed class TestResultCommandsHandler(
         var testResult = study.TestResults.FirstOrDefault(t => t.Id == new TestResultId(testResultId));
         if (testResult is null)
         {
-            return new KeyNotFoundException($"Test result '{testResultId}' not found in study.");
+            return new NotFoundError($"Test result '{testResultId}' not found in study.");
         }
 
         if (!command.Value.HasValue)
         {
-            return new InvalidOperationException("Value is required for update.");
+            return new ValidationError("Value is required for update.");
         }
 
         var template = await studyTemplateRepository.GetByIdAsync(study.StudyTemplateId, cancellationToken);
         if (template is null)
         {
-            return new InvalidOperationException($"Study template '{study.StudyTemplateId}' not found");
+            return new NotFoundError($"Study template '{study.StudyTemplateId.Value}' not found.");
         }
 
         var resultDefinition = template.Results.FirstOrDefault(r => r.Id == testResult.ResultDefinitionId);
         if (resultDefinition is null)
         {
-            return new InvalidOperationException(
-                $"Result definition '{testResult.ResultDefinitionId}' not found in snapshot");
+            return new NotFoundError(
+                $"Result definition '{testResult.ResultDefinitionId.Value}' not found in snapshot.");
         }
 
         var setResult = testResultDomainService.SetValue(
@@ -191,13 +110,94 @@ public sealed class TestResultCommandsHandler(
 
         if (setResult.IsFailure)
         {
-            return setResult;
+            return new DomainRuleViolation(setResult.GetError());
         }
 
         return await SaveChangesAsync(cancellationToken);
     }
 
-    private async Task<Result<None, Exception>> SaveChangesAsync(
+    private async Task<Result<CalculationContext, ApplicationError>> PrepareCalculationContext(
+        Study study,
+        Guid testResultId,
+        CancellationToken cancellationToken)
+    {
+        var testResult = study.TestResults.FirstOrDefault(t => t.Id == new TestResultId(testResultId));
+        if (testResult is null)
+        {
+            return new NotFoundError($"Test result '{testResultId}' not found in study '{study.Id.Value}'.");
+        }
+
+        var template = await studyTemplateRepository.GetByIdAsync(study.StudyTemplateId, cancellationToken);
+        if (template is null)
+        {
+            return new NotFoundError($"Study template '{study.StudyTemplateId.Value}' not found.");
+        }
+
+        var calculationRule =
+            template.CalculationRules.FirstOrDefault(x => x.ResultDefinitionId == testResult.ResultDefinitionId);
+        if (calculationRule is null)
+        {
+            return new NotFoundError(
+                $"Calculation rule not found for result definition '{testResult.ResultDefinitionId.Value}'.");
+        }
+
+        var resultDefinition = template.Results.FirstOrDefault(r => r.Id == testResult.ResultDefinitionId);
+        if (resultDefinition is null)
+        {
+            return new NotFoundError(
+                $"Result definition '{testResult.ResultDefinitionId.Value}' not found in snapshot.");
+        }
+
+        var parametersByAlias = template.Parameters.ToDictionary(p => p.AliasName.Value, p => p);
+        var measuredValuesByParamId = study.MeasuredValues.ToDictionary(m => m.InputParameterId, m => m);
+
+        var extractVariables = calculationRule.FormulaExpression.ExtractVariables();
+        var calculationOutputs = new Dictionary<AliasName, double>(extractVariables.Count);
+
+        foreach (var variable in extractVariables)
+        {
+            if (!parametersByAlias.TryGetValue(variable, out var templateParameter))
+            {
+                return new NotFoundError($"Template parameter not found for formula variable '{variable}'.");
+            }
+
+            if (!measuredValuesByParamId.TryGetValue(templateParameter.Id, out var measuredValue))
+            {
+                return new NotFoundError(
+                    $"Measured value not found for parameter '{templateParameter.AliasName.Value}'.");
+            }
+
+            if (measuredValue.Value is null)
+            {
+                return new ValidationError(
+                    $"Missing required input parameter value for '{templateParameter.AliasName.Value}'.");
+            }
+
+            calculationOutputs.Add(templateParameter.AliasName, measuredValue.Value.Value);
+        }
+
+        return new CalculationContext(testResult, resultDefinition, calculationRule, calculationOutputs);
+    }
+
+    private Result<double, ApplicationError> CalculateFormula(
+        CalculationContext context)
+    {
+        try
+        {
+            var evaluatorValues = context.Variables.ToDictionary(x => x.Key.Value, x => new EvaluatorValue(x.Value));
+
+            var calculatedValue = noStringEvaluator.CalcNumber(context.Rule.FormulaExpression.Value, evaluatorValues);
+
+            return calculatedValue;
+        }
+        catch (Exception ex)
+        {
+            return new ValidationError(
+                $"Formula evaluation failed for result definition '{context.Result.ResultDefinitionId.Value}': {ex.Message}");
+        }
+    }
+
+    private async Task<Result<None, ApplicationError>> SaveChangesAsync(
         CancellationToken cancellationToken = default)
     {
         try
@@ -207,15 +207,20 @@ public sealed class TestResultCommandsHandler(
         }
         catch (Exception ex)
         {
-            return new Exception($"Failed to save changes: {ex.Message}", ex);
+            return new PersistenceError($"Failed to save changes: {ex.Message}");
         }
     }
 
-    private async Task<Result<Study, Exception>> GetStudyForChangeAsync(
+    private async Task<Result<Study, ApplicationError>> GetStudyForChangeAsync(
         Guid studyId,
         CancellationToken ct)
     {
         var study = await studyRepository.GetByIdForChangeAsync(new StudyId(studyId), ct);
-        return study is null ? new KeyNotFoundException($"Study with id {studyId} not found.") : study;
+        if (study is null)
+        {
+            return new NotFoundError($"Study with id '{studyId}' not found.");
+        }
+
+        return study;
     }
 }

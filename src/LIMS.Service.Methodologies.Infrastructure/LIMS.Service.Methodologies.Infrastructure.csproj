@@ -11,7 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Broker.Messages\Broker.Messages.csproj" />
+    <ProjectReference Include="..\Broker.Messages\Broker.Messages.csproj"/>
     <ProjectReference Include="..\LIMS.Service.Methodologies.Application\LIMS.Service.Methodologies.Application.csproj"/>
     <ProjectReference Include="..\RabbitMq.Library.QuickStart\RabbitMq.Library.QuickStart.csproj"/>
   </ItemGroup>

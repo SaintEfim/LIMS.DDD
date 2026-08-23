@@ -4,7 +4,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace LIMS.Service.LaboratoryOperations.API.Apis.TestResults;
 
-public class TestResultModule : ICarterModule
+public class TestResultModule
+    : ModuleBase,
+        ICarterModule
 {
     public void AddRoutes(
         IEndpointRouteBuilder app)

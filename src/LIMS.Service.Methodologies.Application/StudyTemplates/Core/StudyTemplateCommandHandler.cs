@@ -1,14 +1,14 @@
-﻿using Application.SeedWork.SeedWork;
-using Domain.SeedWork.SeedWork;
-using Domain.SeedWork.SeedWork.Result;
-using Domain.SeedWork.SeedWork.ValueObjects;
+﻿using Application.SeedWork;
+using Application.SeedWork.Errors;
 using Broker.Messages;
+using Domain.SeedWork;
+using Domain.SeedWork.Result;
+using Domain.SeedWork.ValueObjects;
 using LIMS.Service.Methodologies.Application.StudyTemplates.Core.Commands;
 using LIMS.Service.Methodologies.Domain.StudyTemplateAggregate;
 using LIMS.Service.Methodologies.Domain.StudyTemplateAggregate.Services;
 using LIMS.Service.Methodologies.Domain.StudyTemplateAggregate.ValueObjects;
 using RabbitMq.Library.QuickStart.Abstractions;
-using Revision = LIMS.Service.Methodologies.Domain.StudyTemplateAggregate.ValueObjects.Revision;
 
 namespace LIMS.Service.Methodologies.Application.StudyTemplates.Core;
 
@@ -18,38 +18,34 @@ public sealed class StudyTemplateCommandsHandler(
     IUnitOfWork unitOfWork,
     StudyTemplateVersioningService domainService) : ICommandsHandler
 {
-    public async Task<Result<StudyTemplate, Exception>> CreateAsync(
+    public async Task<Result<StudyTemplate, ApplicationError>> CreateAsync(
         CreateStudyTemplateCommand command,
         CancellationToken cancellationToken = default)
     {
         var nameResult = Name.Create(command.Name);
         if (nameResult.IsFailure)
         {
-            return nameResult.CastFailure<StudyTemplate>();
+            return new DomainRuleViolation(nameResult.GetError());
         }
 
         var descResult = Description.Create(command.Description);
         if (descResult.IsFailure)
         {
-            return descResult.CastFailure<StudyTemplate>();
+            return new DomainRuleViolation(descResult.GetError());
         }
 
         var revResult = Revision.Create(command.Revision);
         if (revResult.IsFailure)
         {
-            return revResult.CastFailure<StudyTemplate>();
+            return new DomainRuleViolation(revResult.GetError());
         }
 
-        var createResult = StudyTemplate.Create(nameResult.GetValue(), descResult.GetValue(), revResult.GetValue());
-        if (createResult.IsFailure)
-        {
-            return createResult.CastFailure<StudyTemplate>();
-        }
+        var newTemplate = new StudyTemplate(nameResult.GetValue(), descResult.GetValue(), revResult.GetValue());
 
-        return await SaveNewAsync(createResult.GetValue(), cancellationToken);
+        return await SaveNewAsync(newTemplate, cancellationToken);
     }
 
-    public async Task<Result<StudyTemplate, Exception>> UpdateAsync(
+    public async Task<Result<StudyTemplate, ApplicationError>> UpdateAsync(
         Guid id,
         UpdateStudyTemplateCommand command,
         CancellationToken cancellationToken = default)
@@ -68,7 +64,7 @@ public sealed class StudyTemplateCommandsHandler(
             var nameResult = Name.Create(command.Name);
             if (nameResult.IsFailure)
             {
-                return nameResult.CastFailure<StudyTemplate>();
+                return new DomainRuleViolation(nameResult.GetError());
             }
 
             name = nameResult.GetValue();
@@ -80,7 +76,7 @@ public sealed class StudyTemplateCommandsHandler(
             var descResult = Description.Create(command.Description);
             if (descResult.IsFailure)
             {
-                return descResult.CastFailure<StudyTemplate>();
+                return new DomainRuleViolation(descResult.GetError());
             }
 
             description = descResult.GetValue();
@@ -92,36 +88,34 @@ public sealed class StudyTemplateCommandsHandler(
         var updateResult = template.UpdatePartial(effectiveName, effectiveDescription);
         if (updateResult.IsFailure)
         {
-            return updateResult.CastFailure<StudyTemplate>();
+            return new DomainRuleViolation(updateResult.GetError());
         }
 
         return await SaveChangesAsync(template, cancellationToken);
     }
 
-    public async Task<Result<StudyTemplate, Exception>> ChangeStatusAsync(
+    public async Task<Result<StudyTemplate, ApplicationError>> ChangeStatusAsync(
         Guid id,
         string statusCommand,
         CancellationToken cancellationToken = default)
     {
         var templateResult = await GetTemplateForChangeAsync(id, cancellationToken);
-
         if (templateResult.IsFailure)
         {
-            return templateResult.CastFailure<StudyTemplate>();
+            return templateResult;
         }
 
         var template = templateResult.GetValue();
 
         if (!Status.TryParse(statusCommand, out var newStatus) || newStatus is null)
         {
-            return new InvalidOperationException($"Unknown status '{statusCommand}'.");
+            return new ValidationError($"Unknown status '{statusCommand}'.");
         }
 
         var changeResult = template.ChangeStatus(newStatus);
-
         if (changeResult.IsFailure)
         {
-            return changeResult.CastFailure<StudyTemplate>();
+            return new DomainRuleViolation(changeResult.GetError());
         }
 
         if (newStatus != Status.Active)
@@ -149,7 +143,7 @@ public sealed class StudyTemplateCommandsHandler(
         return await SaveChangesAsync(template, cancellationToken);
     }
 
-    public async Task<Result<None, Exception>> DeleteAsync(
+    public async Task<Result<None, ApplicationError>> DeleteAsync(
         Guid id,
         CancellationToken cancellationToken = default)
     {
@@ -164,15 +158,22 @@ public sealed class StudyTemplateCommandsHandler(
         var deleteResult = template.Delete();
         if (deleteResult.IsFailure)
         {
-            return deleteResult;
+            return new DomainRuleViolation(deleteResult.GetError());
         }
 
-        await unitOfWork.SaveChangesAsync(cancellationToken);
+        try
+        {
+            await unitOfWork.SaveChangesAsync(cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            return new PersistenceError($"Failed to delete StudyTemplate: {ex.Message}");
+        }
 
         return new None();
     }
 
-    public async Task<Result<Guid, Exception>> CreateRevisionAsync(
+    public async Task<Result<Guid, ApplicationError>> CreateRevisionAsync(
         Guid originalId,
         CreateStudyTemplateRevisionCommand command,
         CancellationToken cancellationToken = default)
@@ -186,13 +187,13 @@ public sealed class StudyTemplateCommandsHandler(
         var revisionResult = Revision.Create(command.NewRevision);
         if (revisionResult.IsFailure)
         {
-            return revisionResult.CastFailure<Guid>();
+            return new DomainRuleViolation(revisionResult.GetError());
         }
 
         var createResult = domainService.CreateNewRevision(originalResult.GetValue(), revisionResult.GetValue());
         if (createResult.IsFailure)
         {
-            return createResult.CastFailure<Guid>();
+            return new DomainRuleViolation(createResult.GetError());
         }
 
         var creationResult = createResult.GetValue();
@@ -201,15 +202,20 @@ public sealed class StudyTemplateCommandsHandler(
         return saveResult.IsFailure ? saveResult.CastFailure<Guid>() : creationResult.Id.Value;
     }
 
-    private async Task<Result<StudyTemplate, Exception>> GetTemplateForChangeAsync(
+    private async Task<Result<StudyTemplate, ApplicationError>> GetTemplateForChangeAsync(
         Guid id,
         CancellationToken cancellationToken = default)
     {
         var template = await repository.GetByIdForChangeAsync(new StudyTemplateId(id), cancellationToken);
-        return template is null ? new KeyNotFoundException($"StudyTemplate with id {id} not found.") : template;
+        if (template is null)
+        {
+            return new NotFoundError($"Study template with id '{id}' not found.");
+        }
+
+        return template;
     }
 
-    private async Task<Result<StudyTemplate, Exception>> SaveNewAsync(
+    private async Task<Result<StudyTemplate, ApplicationError>> SaveNewAsync(
         StudyTemplate template,
         CancellationToken cancellationToken = default)
     {
@@ -221,11 +227,11 @@ public sealed class StudyTemplateCommandsHandler(
         }
         catch (Exception ex)
         {
-            return new Exception($"Failed to save StudyTemplate: {ex.Message}", ex);
+            return new PersistenceError($"Failed to save StudyTemplate: {ex.Message}");
         }
     }
 
-    private async Task<Result<StudyTemplate, Exception>> SaveChangesAsync(
+    private async Task<Result<StudyTemplate, ApplicationError>> SaveChangesAsync(
         StudyTemplate template,
         CancellationToken cancellationToken = default)
     {
@@ -236,7 +242,7 @@ public sealed class StudyTemplateCommandsHandler(
         }
         catch (Exception ex)
         {
-            return new Exception($"Failed to save StudyTemplate: {ex.Message}", ex);
+            return new PersistenceError($"Failed to save StudyTemplate: {ex.Message}");
         }
     }
 }

@@ -1,29 +1,26 @@
-﻿using Domain.SeedWork.SeedWork.Result;
-using Domain.SeedWork.SeedWork.ValueObjects;
+﻿using Domain.SeedWork.Errors;
+using Domain.SeedWork.Result;
+using Domain.SeedWork.ValueObjects;
 using LIMS.Service.Methodologies.Domain.StudyTemplateAggregate.Entities.ResultDefinitions;
+using LIMS.Service.Methodologies.Domain.StudyTemplateAggregate.Errors;
 using LIMS.Service.Methodologies.Domain.StudyTemplateAggregate.ValueObjects;
-using Revision = LIMS.Service.Methodologies.Domain.StudyTemplateAggregate.ValueObjects.Revision;
 
 namespace LIMS.Service.Methodologies.Domain.StudyTemplateAggregate.Services;
 
 public class StudyTemplateVersioningService
 {
-    public Result<StudyTemplate, Exception> CreateNewRevision(
+    public Result<StudyTemplate, DomainError> CreateNewRevision(
         StudyTemplate original,
         Revision newRevisionValue)
     {
         if (original.Status != Status.Active && original.Status != Status.Archived)
         {
-            return new InvalidOperationException("Can only create revisions from Active or Archived templates.");
+            return Result<StudyTemplate, DomainError>.Failure(
+                new InvalidStatusTransitionError(nameof(StudyTemplate), original.Status.Name, "Revision"));
         }
 
-        var createResult = StudyTemplate.Create(original.Name, original.Description, newRevisionValue);
-        if (createResult.IsFailure)
-        {
-            return createResult.CastFailure<StudyTemplate>();
-        }
+        var newTemplate = new StudyTemplate(original.Name, original.Description, newRevisionValue);
 
-        var newTemplate = createResult.GetValue();
         newTemplate.SetParentId(original.Id);
 
         var copyResult = CopyChildren(original, newTemplate);
@@ -41,7 +38,7 @@ public class StudyTemplateVersioningService
         return archiveResult.IsFailure ? archiveResult.CastFailure<StudyTemplate>() : newTemplate;
     }
 
-    private static Result<None, Exception> CopyChildren(
+    private static Result<None, DomainError> CopyChildren(
         StudyTemplate original,
         StudyTemplate newTemplate)
     {

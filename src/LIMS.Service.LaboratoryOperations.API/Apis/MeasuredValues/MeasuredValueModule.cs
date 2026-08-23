@@ -4,7 +4,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace LIMS.Service.LaboratoryOperations.API.Apis.MeasuredValues;
 
-public class MeasuredValueModule : ICarterModule
+public class MeasuredValueModule
+    : ModuleBase,
+        ICarterModule
 {
     public void AddRoutes(
         IEndpointRouteBuilder app)
@@ -53,17 +55,5 @@ public class MeasuredValueModule : ICarterModule
     {
         var result = await services.Commands.UpdateAsync(studyId, measuredValueId, command, cancellationToken);
         return result.IsFailure ? HandleFailure(result.GetError()) : Results.NoContent();
-    }
-
-    private static IResult HandleFailure(
-        Exception error)
-    {
-        return error switch
-        {
-            KeyNotFoundException => Results.NotFound(new { error.Message }),
-            ArgumentException or InvalidOperationException => Results.BadRequest(new { error.Message }),
-            _ => Results.Problem(error.Message, statusCode: StatusCodes.Status500InternalServerError,
-                title: "An unexpected error occurred")
-        };
     }
 }
