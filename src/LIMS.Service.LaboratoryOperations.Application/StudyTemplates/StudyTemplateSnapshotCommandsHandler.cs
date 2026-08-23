@@ -1,4 +1,5 @@
 ﻿using Application.SeedWork;
+using Application.SeedWork.Errors;
 using Domain.SeedWork;
 using Domain.SeedWork.Result;
 using Domain.SeedWork.ValueObjects;
@@ -14,7 +15,7 @@ public sealed class StudyTemplateSnapshotCommandsHandler(
     IUnitOfWork unitOfWork,
     IStudyTemplateSnapshotRepository snapshotRepository) : ICommandsHandler
 {
-    public async Task<Result<StudyTemplateSnapshot, Exception>> CreateAsync(
+    public async Task<Result<StudyTemplateSnapshot, ApplicationError>> CreateAsync(
         CreateStudyTemplateSnapshotCommand command,
         CancellationToken cancellationToken = default)
     {
@@ -23,19 +24,19 @@ public sealed class StudyTemplateSnapshotCommandsHandler(
         var nameResult = Name.Create(command.Name);
         if (nameResult.IsFailure)
         {
-            return nameResult.CastFailure<StudyTemplateSnapshot>();
+            return new DomainRuleViolation(nameResult.GetError());
         }
 
         var descriptionResult = Description.Create(command.Description);
         if (descriptionResult.IsFailure)
         {
-            return descriptionResult.CastFailure<StudyTemplateSnapshot>();
+            return new DomainRuleViolation(descriptionResult.GetError());
         }
 
         var revisionResult = Revision.Create(command.Revision);
         if (revisionResult.IsFailure)
         {
-            return revisionResult.CastFailure<StudyTemplateSnapshot>();
+            return new DomainRuleViolation(revisionResult.GetError());
         }
 
         var inputParametersResult = MapInputParameters(templateId, command.InputParameters);
@@ -63,7 +64,7 @@ public sealed class StudyTemplateSnapshotCommandsHandler(
         return await SaveAsync(snapshot, cancellationToken);
     }
 
-    private static Result<IReadOnlyList<InputParameterSnapshot>, Exception> MapInputParameters(
+    private static Result<IReadOnlyList<InputParameterSnapshot>, ApplicationError> MapInputParameters(
         StudyTemplateId templateId,
         IReadOnlyList<InputParameterDto> dtos)
     {
@@ -74,25 +75,25 @@ public sealed class StudyTemplateSnapshotCommandsHandler(
             var nameResult = Name.Create(dto.Name);
             if (nameResult.IsFailure)
             {
-                return nameResult.CastFailure<IReadOnlyList<InputParameterSnapshot>>();
+                return new DomainRuleViolation(nameResult.GetError());
             }
 
             var descriptionResult = Description.Create(dto.Description);
             if (descriptionResult.IsFailure)
             {
-                return descriptionResult.CastFailure<IReadOnlyList<InputParameterSnapshot>>();
+                return new DomainRuleViolation(descriptionResult.GetError());
             }
 
             var aliasResult = AliasName.Create(dto.AliasName);
             if (aliasResult.IsFailure)
             {
-                return aliasResult.CastFailure<IReadOnlyList<InputParameterSnapshot>>();
+                return new DomainRuleViolation(aliasResult.GetError());
             }
 
             var specificationResult = Specification.Create(dto.SpecMin, dto.SpecMax);
             if (specificationResult.IsFailure)
             {
-                return specificationResult.CastFailure<IReadOnlyList<InputParameterSnapshot>>();
+                return new DomainRuleViolation(specificationResult.GetError());
             }
 
             var snapshot = new InputParameterSnapshot(new InputParameterId(dto.Id), templateId, nameResult.GetValue(),
@@ -104,7 +105,7 @@ public sealed class StudyTemplateSnapshotCommandsHandler(
         return snapshots;
     }
 
-    private static Result<IReadOnlyList<ResultDefinitionSnapshot>, Exception> MapResultDefinitions(
+    private static Result<IReadOnlyList<ResultDefinitionSnapshot>, ApplicationError> MapResultDefinitions(
         StudyTemplateId templateId,
         IReadOnlyList<CreateResultDefinitionCommand> dtos)
     {
@@ -114,23 +115,17 @@ public sealed class StudyTemplateSnapshotCommandsHandler(
         {
             if (dto.UnitId is null)
             {
-                return Result<IReadOnlyList<ResultDefinitionSnapshot>, Exception>.Failure(
-                    new InvalidOperationException(
-                        $"Result definition '{dto.ResultInstance}' has no unit specified"));
+                return new ValidationError($"Result definition '{dto.ResultInstance}' has no unit specified.");
             }
 
             var specificationResult = Specification.Create(dto.SpecMin, dto.SpecMax);
             if (specificationResult.IsFailure)
             {
-                return specificationResult.CastFailure<IReadOnlyList<ResultDefinitionSnapshot>>();
+                return new DomainRuleViolation(specificationResult.GetError());
             }
 
-            var snapshot = new ResultDefinitionSnapshot(
-                new ResultDefinitionId(dto.Id),
-                templateId,
-                dto.ResultInstance,
-                new UnitId(dto.UnitId.Value),
-                specificationResult.GetValue());
+            var snapshot = new ResultDefinitionSnapshot(new ResultDefinitionId(dto.Id), templateId, dto.ResultInstance,
+                new UnitId(dto.UnitId.Value), specificationResult.GetValue());
 
             snapshots.Add(snapshot);
         }
@@ -138,7 +133,7 @@ public sealed class StudyTemplateSnapshotCommandsHandler(
         return snapshots;
     }
 
-    private static Result<IReadOnlyList<CalculationRuleSnapshot>, Exception> MapCalculationRules(
+    private static Result<IReadOnlyList<CalculationRuleSnapshot>, ApplicationError> MapCalculationRules(
         StudyTemplateId templateId,
         IReadOnlyList<CalculationRuleDto> dtos)
     {
@@ -149,19 +144,19 @@ public sealed class StudyTemplateSnapshotCommandsHandler(
             var nameResult = Name.Create(dto.Name);
             if (nameResult.IsFailure)
             {
-                return nameResult.CastFailure<IReadOnlyList<CalculationRuleSnapshot>>();
+                return new DomainRuleViolation(nameResult.GetError());
             }
 
             var descriptionResult = Description.Create(dto.Description);
             if (descriptionResult.IsFailure)
             {
-                return descriptionResult.CastFailure<IReadOnlyList<CalculationRuleSnapshot>>();
+                return new DomainRuleViolation(descriptionResult.GetError());
             }
 
             var formulaResult = FormulaExpression.Create(dto.FormulaExpression);
             if (formulaResult.IsFailure)
             {
-                return formulaResult.CastFailure<IReadOnlyList<CalculationRuleSnapshot>>();
+                return new DomainRuleViolation(formulaResult.GetError());
             }
 
             var snapshot = new CalculationRuleSnapshot(new CalculationRuleId(dto.Id), templateId, nameResult.GetValue(),
@@ -173,7 +168,7 @@ public sealed class StudyTemplateSnapshotCommandsHandler(
         return snapshots;
     }
 
-    private async Task<Result<StudyTemplateSnapshot, Exception>> SaveAsync(
+    private async Task<Result<StudyTemplateSnapshot, ApplicationError>> SaveAsync(
         StudyTemplateSnapshot snapshot,
         CancellationToken cancellationToken)
     {
@@ -182,11 +177,11 @@ public sealed class StudyTemplateSnapshotCommandsHandler(
             snapshotRepository.Add(snapshot);
             await unitOfWork.SaveChangesAsync(cancellationToken);
 
-            return Result<StudyTemplateSnapshot, Exception>.Success(snapshot);
+            return snapshot;
         }
         catch (Exception ex)
         {
-            return new Exception($"Failed to save StudyTemplateSnapshot: {ex.Message}", ex);
+            return new PersistenceError($"Failed to save StudyTemplateSnapshot: {ex.Message}");
         }
     }
 }

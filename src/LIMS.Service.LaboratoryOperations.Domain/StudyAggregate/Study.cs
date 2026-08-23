@@ -14,7 +14,6 @@ public sealed class Study
         IAggregateRoot
 {
     private readonly List<MeasuredValue> _measuredValues = [];
-
     private readonly List<TestResult> _testResults = [];
 
     internal Study(
@@ -32,7 +31,6 @@ public sealed class Study
         Description = Description.Create(null)
             .GetValue();
         Status = StudyStatus.InProgress;
-
         _measuredValues.AddRange(initialMeasuredValues);
         _testResults.AddRange(initialTestResults);
     }
@@ -42,7 +40,7 @@ public sealed class Study
     {
     }
 
-    public StudyId Id { get; private set; }
+    public StudyId Id { get; }
 
     public SampleId SampleId { get; private set; }
 
@@ -55,14 +53,15 @@ public sealed class Study
     public Description Description { get; private set; } = null!;
 
     public IReadOnlyList<MeasuredValue> MeasuredValues => _measuredValues.AsReadOnly();
+
     public IReadOnlyList<TestResult> TestResults => _testResults.AsReadOnly();
 
-    public Result<None, Exception> UpdateNotes(
+    public Result<None, DomainError> UpdateNotes(
         Description? description)
     {
         if (!Status.CanEdit)
         {
-            return new InvalidOperationException("Cannot update study notes when study is not InWork.");
+            return new EntityNotEditableError(nameof(Study), Status.Name, "update study notes");
         }
 
         if (description is not null)
@@ -73,12 +72,12 @@ public sealed class Study
         return new None();
     }
 
-    public Result<None, Exception> ReassignSample(
+    public Result<None, DomainError> ReassignSample(
         SampleId newSampleId)
     {
         if (!Status.CanEdit)
         {
-            return new InvalidOperationException("Cannot reassign sample when study is not InWork.");
+            return new EntityNotEditableError(nameof(Study), Status.Name, "reassign sample");
         }
 
         if (newSampleId == SampleId)
@@ -87,24 +86,24 @@ public sealed class Study
         }
 
         SampleId = newSampleId;
+
         return new None();
     }
 
-    public Result<None, Exception> UpdateTestResult(
+    public Result<None, DomainError> UpdateTestResult(
         TestResultId testResultId,
         double? value,
         bool isWithinSpec)
     {
         if (!Status.CanEdit)
         {
-            return new InvalidOperationException("Cannot update test results when study is not InWork.");
+            return new EntityNotEditableError(nameof(Study), Status.Name, "update test results");
         }
 
         var testResult = _testResults.FirstOrDefault(tr => tr.Id == testResultId);
-
         if (testResult is null)
         {
-            return new InvalidOperationException("Test result not found in this study.");
+            return new EntityNotFoundError("Test result", testResultId.Value);
         }
 
         if (value is not null)
@@ -115,20 +114,19 @@ public sealed class Study
         return new None();
     }
 
-    public Result<None, Exception> UpdateMeasuredValue(
+    public Result<None, DomainError> UpdateMeasuredValue(
         MeasuredValueId measuredValueId,
         double? value)
     {
         if (!Status.CanEdit)
         {
-            return new InvalidOperationException("Cannot update measured values when study is not InWork.");
+            return new EntityNotEditableError(nameof(Study), Status.Name, "update measured values");
         }
 
         var measuredValue = _measuredValues.FirstOrDefault(mv => mv.Id == measuredValueId);
-
         if (measuredValue is null)
         {
-            return new InvalidOperationException("Measured value not found in this study.");
+            return new EntityNotFoundError("Measured value", measuredValueId.Value);
         }
 
         measuredValue.Update(value);
@@ -146,20 +144,20 @@ public sealed class Study
         }
 
         Status = newStatus;
+
         return new None();
     }
 
-    public Result<None, Exception> Delete()
+    public Result<None, DomainError> Delete()
     {
         if (IsDeleted)
         {
-            return new InvalidOperationException("Study is already deleted.");
+            return new EntityAlreadyDeletedError(nameof(Study), Id.Value);
         }
 
         if (Status == StudyStatus.Completed || Status == StudyStatus.Approved)
         {
-            return new InvalidOperationException(
-                "Cannot delete a Completed or Approved study. Use 'Cancel' status instead.");
+            return new InvalidStatusTransitionError(nameof(Study), Status.Name, "Deleted");
         }
 
         IsDeleted = true;

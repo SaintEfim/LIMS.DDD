@@ -33,7 +33,7 @@ public class Sample
     {
     }
 
-    public SampleId Id { get; private set; }
+    public SampleId Id { get; }
 
     public OrderId OrderId { get; private set; }
 
@@ -50,11 +50,11 @@ public class Sample
     public bool CanAcceptNewEntity =>
         SampleStatus == SampleStatus.Registered || SampleStatus == SampleStatus.InProgress;
 
-    internal Result<None, Exception> Delete()
+    internal Result<None, DomainError> Delete()
     {
         if (IsDeleted)
         {
-            return Result<None, Exception>.Failure(new InvalidOperationException("Sample is already deleted."));
+            return new EntityAlreadyDeletedError(nameof(Sample), Id.Value);
         }
 
         IsDeleted = true;
@@ -63,7 +63,7 @@ public class Sample
         return new None();
     }
 
-    public Result<None, Exception> UpdatePartial(
+    public Result<None, DomainError> UpdatePartial(
         Name? name,
         GatherDate? gatherDate,
         Code? code,
@@ -71,8 +71,7 @@ public class Sample
     {
         if (!SampleStatus.CanEdit)
         {
-            return Result<None, Exception>.Failure(
-                new InvalidOperationException("Cannot modify sample details when it is InWork or Completed."));
+            return new EntityNotEditableError(nameof(Sample), SampleStatus.Name, "modify sample details");
         }
 
         if (name is not null)
@@ -92,7 +91,6 @@ public class Sample
 
         var newValue = volume?.Value ?? Volume.Value;
         var newUnitId = volume?.UnitId ?? Volume.UnitId;
-
         Volume.Update(newValue, newUnitId);
 
         return new None();
@@ -102,7 +100,6 @@ public class Sample
         SampleStatus newSampleStatus)
     {
         var result = SampleStatus.CanTransitionTo(newSampleStatus, this);
-
         if (result.IsFailure)
         {
             return result.CastFailure<None>();

@@ -1,4 +1,5 @@
 ﻿using Application.SeedWork;
+using Application.SeedWork.Errors;
 using Domain.SeedWork;
 using Domain.SeedWork.Result;
 using Domain.SeedWork.ValueObjects;
@@ -21,7 +22,7 @@ public sealed class StudyCommandsHandler(
     StudyCreationDomainService domainService,
     StudyStatusChangeDomainService statusChangeDomainService) : ICommandsHandler
 {
-    public async Task<Result<Study, Exception>> CreateAsync(
+    public async Task<Result<Study, ApplicationError>> CreateAsync(
         SampleId sampleId,
         CreateStudyCommand command,
         CancellationToken cancellationToken = default)
@@ -29,32 +30,32 @@ public sealed class StudyCommandsHandler(
         var sample = await sampleRepository.GetByIdAsync(sampleId, cancellationToken);
         if (sample is null)
         {
-            return new KeyNotFoundException($"Sample with id {sampleId.Value} not found.");
+            return new NotFoundError($"Sample with id '{sampleId.Value}' not found.");
         }
 
         var order = await orderRepository.GetByIdAsync(sample.OrderId, cancellationToken);
         if (order is null)
         {
-            return new KeyNotFoundException($"Order with id {sample.OrderId} not found.");
+            return new NotFoundError($"Order with id '{sample.OrderId.Value}' not found.");
         }
 
         var template =
             await templateRepository.GetByIdAsync(new StudyTemplateId(command.StudyTemplateId), cancellationToken);
         if (template is null)
         {
-            return new KeyNotFoundException($"StudyTemplate with id {command.StudyTemplateId} not found.");
+            return new NotFoundError($"StudyTemplate with id '{command.StudyTemplateId}' not found.");
         }
 
         var createResult = domainService.CreateStudyByTemplate(sample, order, template);
         if (createResult.IsFailure)
         {
-            return createResult;
+            return new DomainRuleViolation(createResult.GetError());
         }
 
         return await SaveNewAsync(createResult.GetValue(), cancellationToken);
     }
 
-    public async Task<Result<None, Exception>> UpdateNotesAsync(
+    public async Task<Result<None, ApplicationError>> UpdateNotesAsync(
         Guid id,
         UpdateStudyNotesCommand command,
         CancellationToken cancellationToken = default)
@@ -71,7 +72,7 @@ public sealed class StudyCommandsHandler(
             var descResult = Description.Create(command.Description);
             if (descResult.IsFailure)
             {
-                return descResult.CastFailure<None>();
+                return new DomainRuleViolation(descResult.GetError());
             }
 
             description = descResult.GetValue();
@@ -81,13 +82,13 @@ public sealed class StudyCommandsHandler(
             .UpdateNotes(description);
         if (updateResult.IsFailure)
         {
-            return updateResult;
+            return new DomainRuleViolation(updateResult.GetError());
         }
 
         return await SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<Result<None, Exception>> ReassignSampleAsync(
+    public async Task<Result<None, ApplicationError>> ReassignSampleAsync(
         Guid id,
         ReassignStudySampleCommand command,
         CancellationToken cancellationToken = default)
@@ -101,20 +102,20 @@ public sealed class StudyCommandsHandler(
         var newSample = await sampleRepository.GetByIdAsync(new SampleId(command.NewSampleId), cancellationToken);
         if (newSample is null)
         {
-            return new KeyNotFoundException($"New Sample with id {command.NewSampleId} not found.");
+            return new NotFoundError($"New Sample with id '{command.NewSampleId}' not found.");
         }
 
         var reassignResult = studyResult.GetValue()
             .ReassignSample(new SampleId(command.NewSampleId));
         if (reassignResult.IsFailure)
         {
-            return reassignResult;
+            return new DomainRuleViolation(reassignResult.GetError());
         }
 
         return await SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<Result<None, Exception>> ChangeStatusAsync(
+    public async Task<Result<None, ApplicationError>> ChangeStatusAsync(
         Guid id,
         ChangeStudyStatusCommand command,
         CancellationToken cancellationToken = default)
@@ -129,25 +130,25 @@ public sealed class StudyCommandsHandler(
 
         if (!StudyStatus.TryParse(command.Status, out var newStatus) || newStatus is null)
         {
-            return new InvalidOperationException($"Unknown status '{command.Status}'.");
+            return new ValidationError($"Unknown status '{command.Status}'.");
         }
 
         var sample = await sampleRepository.GetByIdAsync(study.SampleId, cancellationToken);
         if (sample is null)
         {
-            return new KeyNotFoundException($"Parent sample with id {study.SampleId.Value} not found.");
+            return new NotFoundError($"Parent sample with id '{study.SampleId.Value}' not found.");
         }
 
         var changeResult = statusChangeDomainService.ValidateAndChangeStatus(study, newStatus, sample);
         if (changeResult.IsFailure)
         {
-            return changeResult;
+            return new DomainRuleViolation(changeResult.GetError());
         }
 
         return await SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<Result<None, Exception>> DeleteAsync(
+    public async Task<Result<None, ApplicationError>> DeleteAsync(
         Guid id,
         CancellationToken cancellationToken = default)
     {
@@ -161,7 +162,7 @@ public sealed class StudyCommandsHandler(
             .Delete();
         if (deleteResult.IsFailure)
         {
-            return deleteResult;
+            return new DomainRuleViolation(deleteResult.GetError());
         }
 
         return await SaveChangesAsync(cancellationToken);
@@ -169,15 +170,20 @@ public sealed class StudyCommandsHandler(
 
     #region Private Helpers
 
-    private async Task<Result<Study, Exception>> GetStudyForChangeAsync(
+    private async Task<Result<Study, ApplicationError>> GetStudyForChangeAsync(
         Guid id,
         CancellationToken cancellationToken = default)
     {
         var study = await studyRepository.GetByIdForChangeAsync(new StudyId(id), cancellationToken);
-        return study is null ? new KeyNotFoundException($"Study with id {id} not found.") : study;
+        if (study is null)
+        {
+            return new NotFoundError($"Study with id '{id}' not found.");
+        }
+
+        return study;
     }
 
-    private async Task<Result<Study, Exception>> SaveNewAsync(
+    private async Task<Result<Study, ApplicationError>> SaveNewAsync(
         Study study,
         CancellationToken cancellationToken = default)
     {
@@ -189,11 +195,11 @@ public sealed class StudyCommandsHandler(
         }
         catch (Exception ex)
         {
-            return new Exception($"Failed to save Study: {ex.Message}", ex);
+            return new PersistenceError($"Failed to save Study: {ex.Message}");
         }
     }
 
-    private async Task<Result<None, Exception>> SaveChangesAsync(
+    private async Task<Result<None, ApplicationError>> SaveChangesAsync(
         CancellationToken cancellationToken = default)
     {
         try
@@ -203,7 +209,7 @@ public sealed class StudyCommandsHandler(
         }
         catch (Exception ex)
         {
-            return new Exception($"Failed to save changes: {ex.Message}", ex);
+            return new PersistenceError($"Failed to save changes: {ex.Message}");
         }
     }
 

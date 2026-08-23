@@ -4,7 +4,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace LIMS.Service.LaboratoryOperations.API.Apis.UnitSnapshot;
 
-public class UnitSnapshotModule : ICarterModule
+public class UnitSnapshotModule
+    : ModuleBase,
+        ICarterModule
 {
     public void AddRoutes(
         IEndpointRouteBuilder app)

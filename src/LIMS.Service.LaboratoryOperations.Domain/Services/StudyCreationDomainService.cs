@@ -1,4 +1,5 @@
-﻿using Domain.SeedWork.Result;
+﻿using Domain.SeedWork.Errors;
+using Domain.SeedWork.Result;
 using LIMS.Service.LaboratoryOperations.Domain.OrderAggregate;
 using LIMS.Service.LaboratoryOperations.Domain.SampleAggregate;
 using LIMS.Service.LaboratoryOperations.Domain.StudyAggregate;
@@ -9,21 +10,19 @@ namespace LIMS.Service.LaboratoryOperations.Domain.Services;
 
 public sealed class StudyCreationDomainService
 {
-    public Result<Study, Exception> CreateStudyByTemplate(
+    public Result<Study, DomainError> CreateStudyByTemplate(
         Sample sample,
         Order order,
         StudyTemplateSnapshot templateSnapshot)
     {
         if (!order.CanAcceptNewEntity)
         {
-            return new InvalidOperationException(
-                $"Cannot create study for an order in '{order.OrderStatus.Name}' status.");
+            return new EntityNotEditableError(nameof(Order), order.OrderStatus.Name, "create studies for");
         }
 
         if (!sample.CanAcceptNewEntity)
         {
-            return new InvalidOperationException(
-                $"Cannot create study for a sample in '{sample.SampleStatus.Name}' status.");
+            return new EntityNotEditableError(nameof(Sample), sample.SampleStatus.Name, "create studies for");
         }
 
         var studyId = new StudyId(Guid.NewGuid());

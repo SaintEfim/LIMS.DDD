@@ -1,4 +1,5 @@
-﻿using Domain.SeedWork.Result;
+﻿using Domain.SeedWork.Errors;
+using Domain.SeedWork.Result;
 using Domain.SeedWork.ValueObjects;
 using LIMS.Service.LaboratoryOperations.Domain.OrderAggregate;
 using LIMS.Service.LaboratoryOperations.Domain.SampleAggregate;
@@ -9,7 +10,7 @@ namespace LIMS.Service.LaboratoryOperations.Domain.Services;
 
 public sealed class SampleCreationDomainService
 {
-    public Result<Sample, Exception> CreateSample(
+    public Result<Sample, DomainError> CreateSample(
         Order order,
         Name name,
         GatherDate gatherDate,
@@ -18,13 +19,14 @@ public sealed class SampleCreationDomainService
     {
         if (!order.CanAcceptNewEntity)
         {
-            return new InvalidOperationException(
-                $"Cannot add samples to an order with status '{order.OrderStatus.Name}'. " +
-                "Order must be in Draft or InProgress status.");
+            return new EntityNotEditableError(
+                nameof(Order),
+                order.OrderStatus.Name,
+                "accept new samples");
         }
 
-        var sampleResult = new Sample(order.Id, name, gatherDate, code, volume);
+        var sample = new Sample(order.Id, name, gatherDate, code, volume);
 
-        return sampleResult;
+        return sample;
     }
 }

@@ -1,4 +1,5 @@
-﻿using Domain.SeedWork.Result;
+﻿using Domain.SeedWork.Errors;
+using Domain.SeedWork.Result;
 using LIMS.Service.LaboratoryOperations.Domain.OrderAggregate;
 using LIMS.Service.LaboratoryOperations.Domain.SampleAggregate;
 using LIMS.Service.LaboratoryOperations.Domain.SampleAggregate.ValueObjects;
@@ -7,28 +8,24 @@ namespace LIMS.Service.LaboratoryOperations.Domain.Services;
 
 public sealed class SampleDeletionDomainService
 {
-    public Result<None, Exception> DeleteSample(
+    public Result<None, DomainError> DeleteSample(
         Sample sample,
         Order order,
         bool hasAssociatedStudies)
     {
         if (!order.CanDeleteAssociatedEntities)
         {
-            return new InvalidOperationException(
-                $"Cannot delete sample from an order with status '{order.OrderStatus.Name}'. " +
-                "Order must be in Draft status.");
+            return new EntityNotEditableError(nameof(Order), order.OrderStatus.Name, "delete associated samples from");
         }
 
         if (hasAssociatedStudies)
         {
-            return new InvalidOperationException("Cannot delete sample because it has associated study(ies). " +
-                                                 "Please cancel or delete the studies first.");
+            return new EntityInUseError(nameof(Sample), "associated studies");
         }
 
         if (sample.SampleStatus != SampleStatus.Registered)
         {
-            return new InvalidOperationException(
-                $"Cannot delete sample in '{sample.SampleStatus.Name}' status. Only 'Registered' samples can be deleted.");
+            return new InvalidStatusTransitionError(nameof(Sample), sample.SampleStatus.Name, "Deleted");
         }
 
         return sample.Delete();

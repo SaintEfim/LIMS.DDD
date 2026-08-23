@@ -1,3 +1,4 @@
+using Domain.SeedWork.Errors;
 using Domain.SeedWork.Result;
 using LIMS.Service.LaboratoryOperations.Domain.UnitSnapshots;
 
@@ -21,22 +22,21 @@ public sealed record Volume
     public double? Value { get; private set; }
     public UnitId? UnitId { get; private set; }
 
-    public static Result<Volume, Exception> Create(
+    public static Result<Volume, DomainError> Create(
         double? value,
         UnitId? unitId)
     {
         if (value is < 0)
         {
-            return Result<Volume, Exception>.Failure(new ArgumentException("Volume cannot be negative"));
+            return new ValidationError("Volume cannot be negative.");
         }
 
         if (value.HasValue && unitId is null)
         {
-            return Result<Volume, Exception>.Failure(
-                new ArgumentException("Unit is required when volume is specified"));
+            return new ValidationError("Unit is required when volume is specified.");
         }
 
-        return Result<Volume, Exception>.Success(new Volume(value, unitId));
+        return new Volume(value, unitId);
     }
 
     internal void Update(

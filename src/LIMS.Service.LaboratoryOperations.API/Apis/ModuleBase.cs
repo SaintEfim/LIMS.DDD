@@ -1,9 +1,9 @@
-﻿using Application.SeedWork.Errors;
+using Application.SeedWork.Errors;
 using Domain.SeedWork.Errors;
 using AppValidationError = Application.SeedWork.Errors.ValidationError;
 using DomainValidationError = Domain.SeedWork.Errors.ValidationError;
 
-namespace LIMS.Service.Methodologies.API.Apis;
+namespace LIMS.Service.LaboratoryOperations.API.Apis;
 
 public class ModuleBase
 {

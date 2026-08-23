@@ -1,4 +1,5 @@
 ﻿using Application.SeedWork;
+using Application.SeedWork.Errors;
 using Domain.SeedWork;
 using Domain.SeedWork.Result;
 using Domain.SeedWork.ValueObjects;
@@ -23,7 +24,7 @@ public sealed class SampleCommandsHandler(
     SampleDeletionDomainService deletionDomainService,
     SampleStatusChangeDomainService statusChangeDomainService) : ICommandsHandler
 {
-    public async Task<Result<Sample, Exception>> CreateAsync(
+    public async Task<Result<Sample, ApplicationError>> CreateAsync(
         OrderId orderId,
         CreateSampleCommand command,
         CancellationToken cancellationToken = default)
@@ -31,25 +32,25 @@ public sealed class SampleCommandsHandler(
         var order = await orderRepository.GetByIdAsync(orderId, cancellationToken);
         if (order is null)
         {
-            return new KeyNotFoundException($"Order with id {orderId.Value} not found.");
+            return new NotFoundError($"Order with id '{orderId.Value}' not found.");
         }
 
         var nameResult = Name.Create(command.Name);
         if (nameResult.IsFailure)
         {
-            return nameResult.CastFailure<Sample>();
+            return new DomainRuleViolation(nameResult.GetError());
         }
 
         var gatherDateResult = GatherDate.Create(command.GatherDateBegin, command.GatherDateEnd);
         if (gatherDateResult.IsFailure)
         {
-            return gatherDateResult.CastFailure<Sample>();
+            return new DomainRuleViolation(gatherDateResult.GetError());
         }
 
         var codeResult = Code.Create(command.Code);
         if (codeResult.IsFailure)
         {
-            return codeResult.CastFailure<Sample>();
+            return new DomainRuleViolation(codeResult.GetError());
         }
 
         UnitId? unitId = null;
@@ -59,13 +60,16 @@ public sealed class SampleCommandsHandler(
             unitId = new UnitId(command.VolumeUnitId.Value);
 
             var unit = await unitSnapshotRepository.GetByIdAsync(unitId.Value, cancellationToken);
-            if (unit is null) return new KeyNotFoundException("Unit not found.");
+            if (unit is null)
+            {
+                return new NotFoundError($"Unit with id '{command.VolumeUnitId.Value}' not found.");
+            }
         }
 
         var volumeResult = Volume.Create(command.VolumeValue, unitId);
         if (volumeResult.IsFailure)
         {
-            return volumeResult.CastFailure<Sample>();
+            return new DomainRuleViolation(volumeResult.GetError());
         }
 
         var sampleResult = creationDomainService.CreateSample(order, nameResult.GetValue(), gatherDateResult.GetValue(),
@@ -73,13 +77,13 @@ public sealed class SampleCommandsHandler(
 
         if (sampleResult.IsFailure)
         {
-            return sampleResult.CastFailure<Sample>();
+            return new DomainRuleViolation(sampleResult.GetError());
         }
 
         return await SaveNewAsync(sampleResult.GetValue(), cancellationToken);
     }
 
-    public async Task<Result<None, Exception>> UpdateAsync(
+    public async Task<Result<None, ApplicationError>> UpdateAsync(
         Guid id,
         UpdateSampleCommand command,
         CancellationToken cancellationToken = default)
@@ -98,7 +102,7 @@ public sealed class SampleCommandsHandler(
             var nameResult = Name.Create(command.Name);
             if (nameResult.IsFailure)
             {
-                return nameResult.CastFailure<None>();
+                return new DomainRuleViolation(nameResult.GetError());
             }
 
             name = nameResult.GetValue();
@@ -111,7 +115,7 @@ public sealed class SampleCommandsHandler(
                 command.GatherDateEnd ?? sample.GatherDate.End);
             if (gatherDateResult.IsFailure)
             {
-                return gatherDateResult.CastFailure<None>();
+                return new DomainRuleViolation(gatherDateResult.GetError());
             }
 
             gatherDate = gatherDateResult.GetValue();
@@ -123,7 +127,7 @@ public sealed class SampleCommandsHandler(
             var codeResult = Code.Create(command.Code);
             if (codeResult.IsFailure)
             {
-                return codeResult.CastFailure<None>();
+                return new DomainRuleViolation(codeResult.GetError());
             }
 
             code = codeResult.GetValue();
@@ -140,7 +144,7 @@ public sealed class SampleCommandsHandler(
             var volumeResult = Volume.Create(newValue, newUnitId);
             if (volumeResult.IsFailure)
             {
-                return volumeResult.CastFailure<None>();
+                return new DomainRuleViolation(volumeResult.GetError());
             }
 
             volume = volumeResult.GetValue();
@@ -149,13 +153,13 @@ public sealed class SampleCommandsHandler(
         var updateResult = sample.UpdatePartial(name, gatherDate, code, volume);
         if (updateResult.IsFailure)
         {
-            return updateResult.CastFailure<None>();
+            return new DomainRuleViolation(updateResult.GetError());
         }
 
         return await SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<Result<None, Exception>> ChangeStatusAsync(
+    public async Task<Result<None, ApplicationError>> ChangeStatusAsync(
         Guid id,
         string statusCommand,
         CancellationToken cancellationToken = default)
@@ -170,7 +174,7 @@ public sealed class SampleCommandsHandler(
 
         if (!SampleStatus.TryParse(statusCommand, out var newStatus) || newStatus is null)
         {
-            return new InvalidOperationException($"Unknown status '{statusCommand}'.");
+            return new ValidationError($"Unknown status '{statusCommand}'.");
         }
 
         var studies = (await studyRepository.GetBySampleIdAsync(sample.Id, cancellationToken)).ToList()
@@ -179,13 +183,13 @@ public sealed class SampleCommandsHandler(
         var changeResult = statusChangeDomainService.ValidateAndChangeStatus(sample, newStatus, studies);
         if (changeResult.IsFailure)
         {
-            return changeResult;
+            return new DomainRuleViolation(changeResult.GetError());
         }
 
         return await SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<Result<None, Exception>> DeleteAsync(
+    public async Task<Result<None, ApplicationError>> DeleteAsync(
         Guid id,
         CancellationToken cancellationToken = default)
     {
@@ -200,7 +204,7 @@ public sealed class SampleCommandsHandler(
         var order = await orderRepository.GetByIdAsync(sample.OrderId, cancellationToken);
         if (order is null)
         {
-            return new KeyNotFoundException($"Parent Order with id {sample.OrderId} not found.");
+            return new NotFoundError($"Parent Order with id '{sample.OrderId.Value}' not found.");
         }
 
         var studies = (await studyRepository.GetBySampleIdAsync(sample.Id, cancellationToken)).ToList()
@@ -209,13 +213,13 @@ public sealed class SampleCommandsHandler(
         var deleteResult = deletionDomainService.DeleteSample(sample, order, studies.Count != 0);
         if (deleteResult.IsFailure)
         {
-            return deleteResult;
+            return new DomainRuleViolation(deleteResult.GetError());
         }
 
         return await SaveChangesAsync(cancellationToken);
     }
 
-    private async Task<Result<Sample, Exception>> SaveNewAsync(
+    private async Task<Result<Sample, ApplicationError>> SaveNewAsync(
         Sample sample,
         CancellationToken cancellationToken = default)
     {
@@ -227,11 +231,11 @@ public sealed class SampleCommandsHandler(
         }
         catch (Exception ex)
         {
-            return new Exception($"Failed to save Sample: {ex.Message}", ex);
+            return new PersistenceError($"Failed to save Sample: {ex.Message}");
         }
     }
 
-    private async Task<Result<None, Exception>> SaveChangesAsync(
+    private async Task<Result<None, ApplicationError>> SaveChangesAsync(
         CancellationToken cancellationToken = default)
     {
         try
@@ -241,15 +245,20 @@ public sealed class SampleCommandsHandler(
         }
         catch (Exception ex)
         {
-            return new Exception($"Failed to save Sample: {ex.Message}", ex);
+            return new PersistenceError($"Failed to save Sample: {ex.Message}");
         }
     }
 
-    private async Task<Result<Sample, Exception>> GetSampleForChangeAsync(
+    private async Task<Result<Sample, ApplicationError>> GetSampleForChangeAsync(
         Guid id,
         CancellationToken ct)
     {
         var sample = await repository.GetByIdForChangeAsync(new SampleId(id), ct);
-        return sample is null ? new KeyNotFoundException($"Sample with id {id} not found.") : sample;
+        if (sample is null)
+        {
+            return new NotFoundError($"Sample with id '{id}' not found.");
+        }
+
+        return sample;
     }
 }

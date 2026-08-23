@@ -5,7 +5,6 @@ using Domain.SeedWork.ValueObjects;
 using LIMS.Service.Methodologies.Domain.StudyTemplateAggregate.Entities.CalculationRules;
 using LIMS.Service.Methodologies.Domain.StudyTemplateAggregate.Entities.InputParameters;
 using LIMS.Service.Methodologies.Domain.StudyTemplateAggregate.Entities.ResultDefinitions;
-using LIMS.Service.Methodologies.Domain.StudyTemplateAggregate.Errors;
 using LIMS.Service.Methodologies.Domain.StudyTemplateAggregate.ValueObjects;
 using LIMS.Service.Methodologies.Domain.UnitSnapshots;
 
@@ -69,7 +68,7 @@ public sealed class StudyTemplate
     {
         if (!Status.CanEdit)
         {
-            return new TemplateNotEditableError(Status.Name, "modify template details");
+            return new EntityNotEditableError(nameof(StudyTemplate), Status.Name, "modify template details");
         }
 
         if (name is not null)
@@ -93,7 +92,7 @@ public sealed class StudyTemplate
     {
         if (!Status.CanEdit)
         {
-            return new TemplateNotEditableError(Status.Name, "add input parameters to");
+            return new EntityNotEditableError(nameof(InputParameter), Status.Name, "add input parameters to");
         }
 
         if (_inputParameters.Any(p => p.Name == name))
@@ -115,7 +114,7 @@ public sealed class StudyTemplate
     {
         if (!Status.CanEdit)
         {
-            return new TemplateNotEditableError(Status.Name, "add calculation rules to");
+            return new EntityNotEditableError(nameof(CalculationRule), Status.Name, "add calculation rules to");
         }
 
         if (_calculationRules.Any(p => p.Name == name))
@@ -139,7 +138,7 @@ public sealed class StudyTemplate
     {
         if (!Status.CanEdit)
         {
-            return new TemplateNotEditableError(Status.Name, "remove calculation rules from");
+            return new EntityNotEditableError(nameof(CalculationRule), Status.Name, "remove calculation rules from");
         }
 
         var rule = _calculationRules.SingleOrDefault(r => r.Id == ruleId);
@@ -157,7 +156,7 @@ public sealed class StudyTemplate
     {
         if (!Status.CanEdit)
         {
-            return new TemplateNotEditableError(Status.Name, "remove input parameters from");
+            return new EntityNotEditableError(nameof(InputParameter), Status.Name, "remove input parameters from");
         }
 
         var parameter = _inputParameters.SingleOrDefault(p => p.Id == observationId);
@@ -216,7 +215,7 @@ public sealed class StudyTemplate
     {
         if (!Status.CanEdit)
         {
-            return new TemplateNotEditableError(Status.Name, "add result definitions to");
+            return new EntityNotEditableError(nameof(ResultDefinition), Status.Name, "add result definitions to");
         }
 
         var existsResult = _resultDefinitions.Any(x => x.ResultInstance == resultInstance && x.UnitId == unitId);
@@ -237,7 +236,7 @@ public sealed class StudyTemplate
     {
         if (!Status.CanEdit)
         {
-            return new TemplateNotEditableError(Status.Name, "remove result definitions from");
+            return new EntityNotEditableError(nameof(ResultDefinition), Status.Name, "remove result definitions from");
         }
 
         var resultDef = _resultDefinitions.SingleOrDefault(r => r.Id == resultDefinitionId);
@@ -267,7 +266,7 @@ public sealed class StudyTemplate
     {
         if (!Status.CanEdit)
         {
-            return new TemplateNotEditableError(Status.Name, "update input parameters");
+            return new EntityNotEditableError(nameof(InputParameter), Status.Name, "update input parameters");
         }
 
         var parameter = _inputParameters.FirstOrDefault(p => p.Id == parameterId);
@@ -308,7 +307,7 @@ public sealed class StudyTemplate
     {
         if (!Status.CanEdit)
         {
-            return new TemplateNotEditableError(Status.Name, "update result definitions");
+            return new EntityNotEditableError(nameof(ResultDefinition), Status.Name, "update result definitions");
         }
 
         var resultDef = _resultDefinitions.FirstOrDefault(r => r.Id == resultDefinitionId);
@@ -341,7 +340,7 @@ public sealed class StudyTemplate
     {
         if (!Status.CanEdit)
         {
-            return new TemplateNotEditableError(Status.Name, "update calculation rules");
+            return new EntityNotEditableError(nameof(CalculationRule), Status.Name, "update calculation rules");
         }
 
         var rule = _calculationRules.FirstOrDefault(r => r.Id == ruleId);

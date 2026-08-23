@@ -1,10 +1,13 @@
 ﻿using Carter;
+using LIMS.Service.LaboratoryOperations.API.Apis.StudyTemplateShanpshot;
 using LIMS.Service.LaboratoryOperations.Application.StudyTemplates;
 using Microsoft.AspNetCore.Mvc;
 
-namespace LIMS.Service.LaboratoryOperations.API.Apis.StudyTemplateShanpshot;
+namespace LIMS.Service.LaboratoryOperations.API.Apis.StudyTemplateSnapshot;
 
-public class StudyTemplateSnapshotModule : ICarterModule
+public class StudyTemplateSnapshotModule
+    : ModuleBase,
+        ICarterModule
 {
     public void AddRoutes(
         IEndpointRouteBuilder app)
