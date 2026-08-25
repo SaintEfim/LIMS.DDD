@@ -16,7 +16,7 @@ public static class DependencyInjection
     {
         services.AddScoped<IStudyTemplateRepository, StudyTemplateRepository>();
 
-        services.AddScoped<IUnitOfWork>(provider => provider.GetRequiredService<ApplicationDbContext>());
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         services.AddScoped<IUnitSnapshotRepository, UnitSnapshotRepository>();
 

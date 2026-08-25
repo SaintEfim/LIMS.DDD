@@ -31,8 +31,8 @@ public sealed class RabbitMqMessageBus(
         await using var channel = await channelFactory.CreateChannelAsync(cancellationToken);
         if (channel is null || !channel.IsOpen)
         {
-            logger.LogWarning("RabbitMQ is not available. Message dropped: {EventType}", typeof(T).Name);
-            return;
+            throw new InvalidOperationException(
+                $"RabbitMQ is unavailable. Failed to publish message of type '{typeof(T).FullName}'.");
         }
 
         var body = Encoding.UTF8.GetBytes(json);
@@ -47,5 +47,8 @@ public sealed class RabbitMqMessageBus(
 
         await channel.BasicPublishAsync(exchange: descriptor.ExchangeName, routingKey: "", mandatory: false,
             basicProperties: properties, body: body, cancellationToken: cancellationToken);
+
+        logger.LogDebug("Message {MessageId} of type {EventType} was published to exchange {Exchange}.",
+            properties.MessageId, typeof(T).Name, descriptor.ExchangeName);
     }
 }

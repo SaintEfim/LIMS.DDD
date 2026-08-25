@@ -1,5 +1,6 @@
 using Carter;
 using Broker.Messages;
+using Guides.Service.Outbox;
 using Guides.Service.Persistence;
 using Microsoft.EntityFrameworkCore;
 using RabbitMq.Library.QuickStart.DependencyInjection;
@@ -9,6 +10,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddCarter();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddOutbox<ApplicationDbContext>();
 
 builder.Services
     .AddRabbitMq(options =>

@@ -1,12 +1,10 @@
-﻿using Domain.SeedWork;
-using LIMS.Service.Methodologies.Domain.StudyTemplateAggregate;
+﻿using LIMS.Service.Methodologies.Domain.StudyTemplateAggregate;
 using LIMS.Service.Methodologies.Domain.UnitSnapshots;
 using Microsoft.EntityFrameworkCore;
 
 namespace LIMS.Service.Methodologies.Persistence;
 
-public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : DbContext(options),
-    IUnitOfWork
+public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : DbContext(options)
 {
     public DbSet<StudyTemplate> StudyTemplates { get; set; }
 

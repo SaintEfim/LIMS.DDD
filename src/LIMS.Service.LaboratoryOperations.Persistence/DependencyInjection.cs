@@ -17,7 +17,7 @@ public static class DependencyInjection
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        services.AddScoped<IUnitOfWork>(provider => provider.GetRequiredService<ApplicationDbContext>());
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         services.AddScoped<IOrderRepository, OrderRepository>();
         services.AddScoped<ISampleRepository, SampleRepository>();

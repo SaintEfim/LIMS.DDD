@@ -2,6 +2,7 @@
 using Broker.Messages;
 using Guides.Service.Commands;
 using Guides.Service.Domains;
+using Guides.Service.Outbox;
 using Guides.Service.Persistence;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -50,9 +51,11 @@ public class UnitModule : ICarterModule
 
             db.Units.Add(unit);
 
-            await db.SaveChangesAsync(cancellationToken);
+            var message = new UnitCreatedMessage(unit.Id, unit.Name);
 
-            await busService.SendAsync(new UnitCreatedMessage(unit.Id, unit.Name), cancellationToken);
+            db.InsertOutboxMessage(message);
+
+            await db.SaveChangesAsync(cancellationToken);
 
             return Results.Created($"/api/units/{unit.Id}", unit);
         });
