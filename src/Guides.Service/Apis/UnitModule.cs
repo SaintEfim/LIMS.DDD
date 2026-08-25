@@ -2,11 +2,11 @@
 using Broker.Messages;
 using Guides.Service.Commands;
 using Guides.Service.Domains;
-using Guides.Service.Outbox;
 using Guides.Service.Persistence;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using RabbitMq.Library.QuickStart.Abstractions;
+using RabbitMq.Library.Broker;
+using RabbitMq.Library.Outbox;
 
 namespace Guides.Service.Apis;
 

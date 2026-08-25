@@ -8,7 +8,7 @@ using LIMS.Service.Methodologies.Application.StudyTemplates.Core.Commands;
 using LIMS.Service.Methodologies.Domain.StudyTemplateAggregate;
 using LIMS.Service.Methodologies.Domain.StudyTemplateAggregate.Services;
 using LIMS.Service.Methodologies.Domain.StudyTemplateAggregate.ValueObjects;
-using RabbitMq.Library.QuickStart.Abstractions;
+using RabbitMq.Library.Broker;
 
 namespace LIMS.Service.Methodologies.Application.StudyTemplates.Core;
 

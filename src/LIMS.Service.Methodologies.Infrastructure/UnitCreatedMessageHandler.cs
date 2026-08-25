@@ -1,7 +1,8 @@
 ﻿using Broker.Messages;
 using LIMS.Service.Methodologies.Application.Units;
 using Microsoft.Extensions.Logging;
-using RabbitMq.Library.QuickStart.Receive;
+using RabbitMq.Library.Broker;
+using RabbitMq.Library.Broker.Receive;
 
 namespace LIMS.Service.Methodologies.Infrastructure;
 

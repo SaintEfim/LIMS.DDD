@@ -1,6 +1,6 @@
 ﻿using Broker.Messages;
 using Microsoft.Extensions.DependencyInjection;
-using RabbitMq.Library.QuickStart.DependencyInjection;
+using RabbitMq.Library.Broker.DependencyInjection;
 
 namespace LIMS.Service.Methodologies.Infrastructure;
 
