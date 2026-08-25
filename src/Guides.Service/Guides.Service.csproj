@@ -18,9 +18,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\RabbitMq.Library.Outbox\RabbitMq.Library.Outbox.csproj" />
     <ProjectReference Include="..\Broker.Messages\Broker.Messages.csproj" />
-    <ProjectReference Include="..\RabbitMq.Library.QuickStart.Messages\RabbitMq.Library.QuickStart.Messages.csproj"/>
-    <ProjectReference Include="..\RabbitMq.Library.QuickStart\RabbitMq.Library.QuickStart.csproj"/>
+    <ProjectReference Include="..\Domain.SeedWork\Domain.SeedWork.csproj" />
+    <ProjectReference Include="..\RabbitMq.Library.Broker\RabbitMq.Library.Broker.csproj" />
   </ItemGroup>
 
 </Project>

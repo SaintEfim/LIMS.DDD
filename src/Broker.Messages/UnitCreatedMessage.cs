@@ -1,4 +1,4 @@
-﻿using RabbitMq.Library.QuickStart.Messages;
+﻿using RabbitMq.Library.Broker;
 
 namespace Broker.Messages;
 

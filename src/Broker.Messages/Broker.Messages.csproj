@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\RabbitMq.Library.QuickStart.Messages\RabbitMq.Library.QuickStart.Messages.csproj"/>
+    <ProjectReference Include="..\RabbitMq.Library.Broker.Abstractions\RabbitMq.Library.Broker.Abstractions.csproj" />
   </ItemGroup>
 
 </Project>

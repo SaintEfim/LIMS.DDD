@@ -1,5 +1,4 @@
-﻿using Domain.SeedWork;
-using LIMS.Service.LaboratoryOperations.Domain.OrderAggregate;
+﻿using LIMS.Service.LaboratoryOperations.Domain.OrderAggregate;
 using LIMS.Service.LaboratoryOperations.Domain.SampleAggregate;
 using LIMS.Service.LaboratoryOperations.Domain.StudyAggregate;
 using LIMS.Service.LaboratoryOperations.Domain.StudyTemplateSnapshots;
@@ -8,8 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LIMS.Service.LaboratoryOperations.Persistence;
 
-public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : DbContext(options),
-    IUnitOfWork
+public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : DbContext(options)
 {
     public DbSet<StudyTemplateSnapshot> StudyTemplates { get; set; }
 

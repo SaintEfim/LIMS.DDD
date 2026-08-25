@@ -5,7 +5,8 @@ using Guides.Service.Domains;
 using Guides.Service.Persistence;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using RabbitMq.Library.QuickStart.Abstractions;
+using RabbitMq.Library.Broker;
+using RabbitMq.Library.Outbox;
 
 namespace Guides.Service.Apis;
 
@@ -42,7 +43,6 @@ public class UnitModule : ICarterModule
 
         group.MapPost("/", async (
             CreateUnitCommand unitCommand,
-            [FromServices] IMessageBus busService,
             [FromServices] ApplicationDbContext db,
             CancellationToken cancellationToken = default) =>
         {
@@ -50,9 +50,11 @@ public class UnitModule : ICarterModule
 
             db.Units.Add(unit);
 
-            await db.SaveChangesAsync(cancellationToken);
+            var message = new UnitCreatedMessage(unit.Id, unit.Name);
 
-            await busService.SendAsync(new UnitCreatedMessage(unit.Id, unit.Name), cancellationToken);
+            db.InsertOutboxMessage(message);
+
+            await db.SaveChangesAsync(cancellationToken);
 
             return Results.Created($"/api/units/{unit.Id}", unit);
         });

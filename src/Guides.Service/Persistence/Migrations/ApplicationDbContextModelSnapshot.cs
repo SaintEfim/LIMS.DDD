@@ -49,6 +49,39 @@ namespace Guides.Service.Persistence.Migrations
 
                     b.ToTable("Units", (string)null);
                 });
+
+            modelBuilder.Entity("Guides.Service.Outbox.OutboxMessage", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("Error")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<DateTime>("OccurredOnUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("ProcessedOnUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OccurredOnUtc")
+                        .HasFilter("\"ProcessedOnUtc\" IS NULL");
+
+                    b.ToTable("OutboxMessages", (string)null);
+                });
 #pragma warning restore 612, 618
         }
     }
