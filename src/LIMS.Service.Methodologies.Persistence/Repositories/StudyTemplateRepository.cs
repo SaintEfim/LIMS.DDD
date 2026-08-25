@@ -14,6 +14,7 @@ public class StudyTemplateRepository(ApplicationDbContext context) : IStudyTempl
         var studyTemplateQuery = context.StudyTemplates.AsNoTracking();
 
         var studyTemplate = await StudyTemplateBaseQuery(studyTemplateQuery)
+            .AsSplitQuery()
             .SingleOrDefaultAsync(t => t.Id == id, cancellationToken);
 
         return studyTemplate;
@@ -72,6 +73,7 @@ public class StudyTemplateRepository(ApplicationDbContext context) : IStudyTempl
         var studyTemplateQuery = context.StudyTemplates;
 
         var studyTemplate = await StudyTemplateBaseQuery(studyTemplateQuery)
+            .AsSplitQuery()
             .SingleOrDefaultAsync(t => t.Id == id, cancellationToken);
 
         return studyTemplate;
@@ -83,6 +85,7 @@ public class StudyTemplateRepository(ApplicationDbContext context) : IStudyTempl
         var studyTemplateQuery = context.StudyTemplates.AsNoTracking();
 
         var studyTemplates = await StudyTemplateBaseQuery(studyTemplateQuery)
+            .AsSplitQuery()
             .ToListAsync(cancellationToken);
 
         return studyTemplates;

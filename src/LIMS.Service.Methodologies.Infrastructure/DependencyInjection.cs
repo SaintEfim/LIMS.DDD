@@ -1,4 +1,5 @@
 ﻿using Broker.Messages;
+using LIMS.Service.Methodologies.Persistence;
 using Microsoft.Extensions.DependencyInjection;
 using RabbitMq.Library.Broker.DependencyInjection;
 
@@ -17,6 +18,7 @@ public static class DependencyInjection
                 x.Password = "guest";
             }, "methodologies")
             .AddMessage<StudyTemplatePublishedMessage>()
-            .AddMessageHandler<UnitCreatedMessageHandler>();
+            .AddMessageHandler<UnitCreatedMessageHandler>()
+            .AddOutbox<ApplicationDbContext>();
     }
 }

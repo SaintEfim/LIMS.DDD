@@ -13,6 +13,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Broker.Messages\Broker.Messages.csproj"/>
     <ProjectReference Include="..\LIMS.Service.Methodologies.Application\LIMS.Service.Methodologies.Application.csproj"/>
+    <ProjectReference Include="..\LIMS.Service.Methodologies.Persistence\LIMS.Service.Methodologies.Persistence.csproj" />
     <ProjectReference Include="..\RabbitMq.Library.Broker\RabbitMq.Library.Broker.csproj" />
   </ItemGroup>
 

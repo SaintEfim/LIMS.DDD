@@ -43,7 +43,6 @@ public class UnitModule : ICarterModule
 
         group.MapPost("/", async (
             CreateUnitCommand unitCommand,
-            [FromServices] IMessageBus busService,
             [FromServices] ApplicationDbContext db,
             CancellationToken cancellationToken = default) =>
         {

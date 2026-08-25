@@ -5,6 +5,7 @@ using LIMS.Service.Methodologies.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using RabbitMq.Library.Outbox;
 
 namespace LIMS.Service.Methodologies.Persistence;
 
@@ -19,6 +20,8 @@ public static class DependencyInjection
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         services.AddScoped<IUnitSnapshotRepository, UnitSnapshotRepository>();
+
+        services.AddScoped<IOutboxRepository, OutboxRepository>();
 
         services.AddDbContext<ApplicationDbContext>(options =>
             options.UseNpgsql(configuration.GetConnectionString("ServiceDB")));

@@ -8,12 +8,12 @@ using LIMS.Service.Methodologies.Application.StudyTemplates.Core.Commands;
 using LIMS.Service.Methodologies.Domain.StudyTemplateAggregate;
 using LIMS.Service.Methodologies.Domain.StudyTemplateAggregate.Services;
 using LIMS.Service.Methodologies.Domain.StudyTemplateAggregate.ValueObjects;
-using RabbitMq.Library.Broker;
+using RabbitMq.Library.Outbox;
 
 namespace LIMS.Service.Methodologies.Application.StudyTemplates.Core;
 
 public sealed class StudyTemplateCommandsHandler(
-    IMessageBus busService,
+    IOutboxRepository outboxRepository,
     IStudyTemplateRepository repository,
     IUnitOfWork unitOfWork,
     StudyTemplateVersioningService domainService) : ICommandsHandler
@@ -138,7 +138,7 @@ public sealed class StudyTemplateCommandsHandler(
                     c.FormulaExpression.Value, c.ResultDefinitionId.Value))
                 .ToList());
 
-        await busService.SendAsync(message, cancellationToken);
+        outboxRepository.InsertOutboxMessage(message);
 
         return await SaveChangesAsync(template, cancellationToken);
     }

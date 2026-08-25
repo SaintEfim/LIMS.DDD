@@ -1,12 +1,11 @@
 @echo off
-setlocal enabledelayedexpansion
+setlocal
 
 set "LIMS_NEED_BUILD=Y"
 set "LIMS_ROOT_PATH="
 
 if /i "%~1"=="N" set "LIMS_NEED_BUILD=N"
-if /i "%~1"=="n" set "LIMS_NEED_BUILD=N"
-if "%~1"=="0" set "LIMS_NEED_BUILD=N"
+if /i "%~1"=="0" set "LIMS_NEED_BUILD=N"
 
 if "%LIMS_NEED_BUILD%"=="N" (
     if not "%~2"=="" set "LIMS_ROOT_PATH=%~2"
@@ -25,6 +24,7 @@ echo  LIMS.DDD Startup
 echo  Root:          %LIMS_ROOT_PATH%
 echo  Build:         %LIMS_NEED_BUILD%
 echo  Configuration: %LIMS_BUILD_CONFIGURATION%
+echo  Environment:   %ASPNETCORE_ENVIRONMENT%
 echo ============================================================
 echo.
 
@@ -39,10 +39,9 @@ if "%USE_WT%"=="1" (
 )
 echo.
 
-REM ---- Запуск сервисов с явными портами ----
-call :run_service Guides.Service                        Guides.Service                        "Units [Guides]"            1003
-call :run_service LIMS.Service.Methodologies.API        LIMS.Service.Methodologies.API        "Methodologies"             1001
-call :run_service LIMS.Service.LaboratoryOperations.API LIMS.Service.LaboratoryOperations.API "Laboratory Operations"     1002
+call :run_service Guides.Service                        Guides.Service                        "Units [Guides]"
+call :run_service LIMS.Service.Methodologies.API        LIMS.Service.Methodologies.API        "Methodologies"
+call :run_service LIMS.Service.LaboratoryOperations.API LIMS.Service.LaboratoryOperations.API "Laboratory Operations"
 
 echo.
 echo ============================================================
@@ -51,15 +50,14 @@ echo ============================================================
 pause
 goto :eof
 
+
 :run_service
 set "FOLDER=%~1"
 set "PROJECT=%~2"
 set "TITLE=%~3"
-set "PORT=%~4"
 set "SRC_DIR=%LIMS_ROOT_PATH%src\%FOLDER%"
-set "EXE_PATH=%SRC_DIR%\bin\%LIMS_BUILD_CONFIGURATION%\%TARGET_FRAMEWORK%\%PROJECT%.exe"
 
-echo --- [%TITLE%] on port %PORT% ---
+echo --- [%TITLE%] ---
 
 if not exist "%SRC_DIR%" (
     echo   [SKIP] Not found: %SRC_DIR%
@@ -67,37 +65,33 @@ if not exist "%SRC_DIR%" (
     goto :eof
 )
 
-if "%LIMS_NEED_BUILD%"=="Y" goto :build_%PROJECT%
-goto :check_%PROJECT%
+if "%LIMS_NEED_BUILD%"=="Y" (
+    echo   Building...
 
-:build_Guides.Service
-:build_LIMS.Service.Methodologies.API
-:build_LIMS.Service.LaboratoryOperations.API
-echo   Building...
-pushd "%SRC_DIR%"
-dotnet build --configuration %LIMS_BUILD_CONFIGURATION% --verbosity quiet
-if errorlevel 1 (
-    echo   [ERROR] Build failed!
+    pushd "%SRC_DIR%"
+    dotnet build --configuration %LIMS_BUILD_CONFIGURATION% --verbosity quiet
+
+    if errorlevel 1 (
+        echo   [ERROR] Build failed!
+        popd
+        echo.
+        goto :eof
+    )
+
     popd
-    echo.
-    goto :eof
-)
-popd
-
-:check_Guides.Service
-:check_LIMS.Service.Methodologies.API
-:check_LIMS.Service.LaboratoryOperations.API
-if not exist "%EXE_PATH%" (
-    echo   [ERROR] Exe not found: %EXE_PATH%
-    echo.
-    goto :eof
 )
 
-echo   Starting on http://localhost:%PORT%...
+echo   Starting...
+
 if "%USE_WT%"=="1" (
-    start "" wt.exe new-tab --title "%TITLE%" -d "%SRC_DIR%" cmd /K "set ASPNETCORE_ENVIRONMENT=%ASPNETCORE_ENVIRONMENT% && "%EXE_PATH%" --urls=http://localhost:%PORT%"
+    start "" wt.exe new-tab ^
+        --title "%TITLE%" ^
+        -d "%SRC_DIR%" ^
+        cmd /K "set ASPNETCORE_ENVIRONMENT=%ASPNETCORE_ENVIRONMENT% && dotnet run --no-build"
 ) else (
-    start "%TITLE%" cmd /K "cd /d "%SRC_DIR%" && set ASPNETCORE_ENVIRONMENT=%ASPNETCORE_ENVIRONMENT% && "%EXE_PATH%" --urls=http://localhost:%PORT%"
+    start "%TITLE%" ^
+        cmd /K "cd /d "%SRC_DIR%" && set ASPNETCORE_ENVIRONMENT=%ASPNETCORE_ENVIRONMENT% && dotnet run --no-build"
 )
+
 echo.
 goto :eof
