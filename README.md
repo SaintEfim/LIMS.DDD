@@ -1,6 +1,6 @@
 # LIMS.DDD
 
-![lims.png](lims.png)
+![lims.jpg](lims.jpg)
 
 Учебный проект лабораторной информационной системы (LIMS), построенный вокруг **Domain-Driven Design**, **Clean Architecture** и микросервисного подхода.
 
