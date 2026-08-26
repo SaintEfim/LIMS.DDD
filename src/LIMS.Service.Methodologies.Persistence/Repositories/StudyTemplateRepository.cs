@@ -82,13 +82,11 @@ public class StudyTemplateRepository(ApplicationDbContext context) : IStudyTempl
     public async Task<ICollection<StudyTemplate>> GetAllAsync(
         CancellationToken cancellationToken = default)
     {
-        var studyTemplateQuery = context.StudyTemplates.AsNoTracking();
-
-        var studyTemplates = await StudyTemplateBaseQuery(studyTemplateQuery)
-            .AsSplitQuery()
+        var studyTemplateQuery = await context.StudyTemplates
+            .AsNoTracking()
             .ToListAsync(cancellationToken);
 
-        return studyTemplates;
+        return studyTemplateQuery;
     }
 
     public void Add(

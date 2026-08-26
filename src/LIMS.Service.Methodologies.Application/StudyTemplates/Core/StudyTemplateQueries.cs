@@ -29,7 +29,7 @@ public sealed class StudyTemplateQueries(
         return StudyTemplateDto.FromDomain(studyTemplate, unitsById);
     }
 
-    public async Task<ICollection<StudyTemplateDto>> GetAllAsync(
+    public async Task<ICollection<StudyTemplateShortDto>> GetAllAsync(
         CancellationToken cancellationToken = default)
     {
         var studyTemplates = await repository.GetAllAsync(cancellationToken);
@@ -38,15 +38,7 @@ public sealed class StudyTemplateQueries(
             return [];
         }
 
-        var unitIds = studyTemplates.SelectMany(t => t.ResultDefinitions)
-            .Select(r => r.UnitId)
-            .Distinct()
-            .ToList();
-
-        var units = await unitSnapshotRepository.GetByIdsAsync(unitIds, cancellationToken);
-        var unitsById = units.ToDictionary(u => u.Id);
-
-        return studyTemplates.Select(t => StudyTemplateDto.FromDomain(t, unitsById))
+        return studyTemplates.Select(StudyTemplateShortDto.FromDomain)
             .ToList();
     }
 }
