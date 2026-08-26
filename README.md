@@ -1,6 +1,6 @@
 # LIMS.DDD
 
-<img width="2737" height="1445" alt="image" src="https://github.com/user-attachments/assets/8656d519-9067-48a1-8f2b-fc507e06afeb" />
+<img width="2883" height="1578" alt="image" src="https://github.com/user-attachments/assets/64d4e4af-2bbe-438f-956f-a27acbd0b689" />
 
 Учебный проект лабораторной информационной системы (LIMS), построенный вокруг **Domain-Driven Design**, **Clean Architecture** и микросервисного подхода.
 
