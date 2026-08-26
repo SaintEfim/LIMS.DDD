@@ -30,8 +30,6 @@ public class StudyRepository(ApplicationDbContext context) : IStudyRepository
     {
         return await context.Studies
             .AsNoTracking()
-            .Include(s => s.MeasuredValues)
-            .Include(s => s.TestResults)
             .Where(s => s.SampleId == sampleId)
             .ToListAsync(cancellationToken);
     }

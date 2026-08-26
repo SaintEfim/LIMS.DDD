@@ -32,7 +32,7 @@ public sealed class StudyQueries(
         return StudyDto.FromDomain(study, snapshot, unitsById);
     }
 
-    public async Task<ICollection<StudyDto>> GetAllBySampleIdAsync(
+    public async Task<ICollection<StudyShortDto>> GetAllBySampleIdAsync(
         Guid sampleId,
         CancellationToken cancellationToken = default)
     {
@@ -42,24 +42,7 @@ public sealed class StudyQueries(
             return [];
         }
 
-        var snapshotsByTemplateId = new Dictionary<StudyTemplateId, StudyTemplateSnapshot>();
-        foreach (var study in studies)
-        {
-            if (snapshotsByTemplateId.ContainsKey(study.StudyTemplateId))
-            {
-                continue;
-            }
-
-            var snapshot = await snapshotRepository.GetByIdAsync(study.StudyTemplateId, cancellationToken);
-
-            snapshotsByTemplateId[study.StudyTemplateId] =
-                snapshot ?? throw new KeyNotFoundException("template not found");
-        }
-
-        var unitsById = await GetUnitsByIdAsync(snapshotsByTemplateId.Values, cancellationToken);
-
-        return studies.Select(study =>
-                StudyDto.FromDomain(study, snapshotsByTemplateId[study.StudyTemplateId], unitsById))
+        return studies.Select(StudyShortDto.FromDomain)
             .ToList();
     }
 
