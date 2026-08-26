@@ -12,7 +12,7 @@ public sealed class OutboxProcessor<TDbContext>(
     ILogger<OutboxProcessor<TDbContext>> logger)
     where TDbContext : DbContext
 {
-    private const int BatchSize = 10;
+    private const int BatchSize = 1000;
 
     public async Task<bool> Execute(
         CancellationToken cancellationToken = default)
