@@ -14,7 +14,10 @@ public static class DependencyInjection
             var interfaceType = assembly.DefinedTypes.Where(x =>
                 x.IsClass && x.ImplementedInterfaces.Contains(typeof(ICommandsHandler)));
 
-            foreach (var type in interfaceType) services.AddScoped(type.AsType());
+            foreach (var type in interfaceType)
+            {
+                services.AddScoped(type.AsType());
+            }
         }
 
         public void AddQueries(
@@ -23,7 +26,10 @@ public static class DependencyInjection
             var interfaceType =
                 assembly.DefinedTypes.Where(x => x.IsClass && x.ImplementedInterfaces.Contains(typeof(IQueries)));
 
-            foreach (var type in interfaceType) services.AddScoped(type.AsType());
+            foreach (var type in interfaceType)
+            {
+                services.AddScoped(type.AsType());
+            }
         }
     }
 }

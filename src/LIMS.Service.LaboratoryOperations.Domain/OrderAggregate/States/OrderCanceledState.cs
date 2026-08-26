@@ -16,12 +16,8 @@ public sealed class OrderCanceledState : IState<Order>
         return newState switch
         {
             OrderCanceledState => Result<None, InvalidStatusTransitionError>.Success(), // или new None()
-            _ => Result<None, InvalidStatusTransitionError>.Failure(
-                new InvalidStatusTransitionError(
-                    nameof(Order),
-                    Name,
-                    newState.Name,
-                    "Canceled orders cannot change status."))
+            _ => Result<None, InvalidStatusTransitionError>.Failure(new InvalidStatusTransitionError(nameof(Order),
+                Name, newState.Name, "Canceled orders cannot change status."))
         };
     }
 }

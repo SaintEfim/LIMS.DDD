@@ -1,5 +1,5 @@
-using Carter;
 using Broker.Messages;
+using Carter;
 using Guides.Service.Persistence;
 using Microsoft.EntityFrameworkCore;
 using RabbitMq.Library.Broker.DependencyInjection;

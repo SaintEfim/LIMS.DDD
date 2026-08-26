@@ -56,7 +56,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Http", "Http", "{2602B473-4
 		LIMS.http = LIMS.http
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RabbitMq.Library.Outbox", "RabbitMq.Library.Outbox\RabbitMq.Library.Outbox.csproj", "{77A386BD-F7C3-4D78-8B2A-1F63BBE974BE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RabbitMq.Library.Outbox", "src\RabbitMq.Library.Outbox\RabbitMq.Library.Outbox.csproj", "{77A386BD-F7C3-4D78-8B2A-1F63BBE974BE}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RabbitMq.Library.Broker.Abstractions", "src\RabbitMq.Library.Broker.Abstractions\RabbitMq.Library.Broker.Abstractions.csproj", "{FEC02BB9-DD02-4E28-AB78-9787D794D681}"
 EndProject

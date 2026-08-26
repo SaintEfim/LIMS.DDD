@@ -15,15 +15,13 @@ public sealed record StudyTemplateDto(
         StudyTemplateSnapshot snapshot,
         IReadOnlyDictionary<UnitId, UnitSnapshot> unitsById)
     {
-        return new StudyTemplateDto(
-            snapshot.Id.Value,
-            snapshot.Revision.Value,
-            snapshot.Name.Value,
-            snapshot.Parameters.Select(InputParameterDto.FromSnapshot).ToList(),
-            snapshot.Results
-                .Select(r => ResultDefinitionDto.FromSnapshot(
-                    unitsById.TryGetValue(r.UnitId, out var unit) ? unit : null, r))
-                .ToList(),
-            snapshot.CalculationRules.Select(CalculationRuleDto.FromSnapshot).ToList());
+        return new StudyTemplateDto(snapshot.Id.Value, snapshot.Revision.Value, snapshot.Name.Value, snapshot.Parameters
+            .Select(InputParameterDto.FromSnapshot)
+            .ToList(), snapshot.Results
+            .Select(r => ResultDefinitionDto.FromSnapshot(
+                unitsById.TryGetValue(r.UnitId, out var unit) ? unit : null, r))
+            .ToList(), snapshot.CalculationRules
+            .Select(CalculationRuleDto.FromSnapshot)
+            .ToList());
     }
 }

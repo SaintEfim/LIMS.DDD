@@ -4,7 +4,7 @@ using RabbitMQ.Client.Events;
 
 namespace RabbitMq.Library.Broker.Connection;
 
-public class RabbitMqConnectionProvider : IAsyncDisposable
+public sealed class RabbitMqConnectionProvider : IAsyncDisposable
 {
     private readonly CancellationTokenSource _disposeCts = new();
     private readonly ILogger<RabbitMqConnectionProvider> _logger;

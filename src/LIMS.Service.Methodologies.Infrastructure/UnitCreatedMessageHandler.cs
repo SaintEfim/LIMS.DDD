@@ -5,7 +5,6 @@ using RabbitMq.Library.Broker;
 
 namespace LIMS.Service.Methodologies.Infrastructure;
 
-
 public class UnitCreatedMessageHandler(
     UnitSnapshotCommandsHandler unitSnapshotCommandsHandler,
     ILogger<UnitCreatedMessageHandler> logger) : IReceiveHandler<UnitCreatedMessage>

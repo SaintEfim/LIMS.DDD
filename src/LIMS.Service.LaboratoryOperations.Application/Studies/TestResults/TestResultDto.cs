@@ -17,11 +17,7 @@ public sealed record TestResultDto(
         ResultDefinitionSnapshot templateResult,
         UnitSnapshot? unit)
     {
-        return new TestResultDto(
-            tr.Id.Value,
-            tr.StudyId.Value,
-            ResultDefinitionDto.FromSnapshot(unit, templateResult),
-            tr.Value,
-            tr.IsOutOfSpec);
+        return new TestResultDto(tr.Id.Value, tr.StudyId.Value, ResultDefinitionDto.FromSnapshot(unit, templateResult),
+            tr.Value, tr.IsOutOfSpec);
     }
 }

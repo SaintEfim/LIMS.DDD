@@ -22,11 +22,6 @@ public sealed class TestResultDomainService
         var isWithinSpec = specification.IsWithinSpec(value);
 
         var updateTestResult = study.UpdateTestResult(testResultId, value, !isWithinSpec);
-        if (updateTestResult.IsFailure)
-        {
-            return updateTestResult;
-        }
-
-        return new None();
+        return updateTestResult.IsFailure ? updateTestResult : new None();
     }
 }

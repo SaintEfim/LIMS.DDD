@@ -43,7 +43,7 @@ public class Sample
 
     public Code Code { get; private set; } = null!;
 
-    public Volume Volume { get; private set; } = null!;
+    public Volume Volume { get; } = null!;
 
     public SampleStatus SampleStatus { get; private set; } = null!;
 

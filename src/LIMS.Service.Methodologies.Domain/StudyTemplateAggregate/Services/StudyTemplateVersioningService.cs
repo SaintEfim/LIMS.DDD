@@ -2,7 +2,6 @@
 using Domain.SeedWork.Result;
 using Domain.SeedWork.ValueObjects;
 using LIMS.Service.Methodologies.Domain.StudyTemplateAggregate.Entities.ResultDefinitions;
-using LIMS.Service.Methodologies.Domain.StudyTemplateAggregate.Errors;
 using LIMS.Service.Methodologies.Domain.StudyTemplateAggregate.ValueObjects;
 
 namespace LIMS.Service.Methodologies.Domain.StudyTemplateAggregate.Services;

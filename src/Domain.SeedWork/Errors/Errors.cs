@@ -39,10 +39,6 @@ public sealed class ValidationError(string message) : DomainError(message)
 
 public sealed class InvalidStatusTransitionError : DomainError
 {
-    public string EntityName { get; }
-    public string FromStatus { get; }
-    public string ToStatus { get; }
-
     public InvalidStatusTransitionError(
         string entityName,
         string fromStatus,
@@ -65,6 +61,10 @@ public sealed class InvalidStatusTransitionError : DomainError
         FromStatus = fromStatus;
         ToStatus = toStatus;
     }
+
+    public string EntityName { get; }
+    public string FromStatus { get; }
+    public string ToStatus { get; }
 
     public override string Code => "INVALID_STATUS_TRANSITION";
 }

@@ -1,5 +1,4 @@
 ﻿using Carter;
-using LIMS.Service.LaboratoryOperations.API.Apis.StudyTemplateShanpshot;
 using LIMS.Service.LaboratoryOperations.Application.StudyTemplates;
 using Microsoft.AspNetCore.Mvc;
 

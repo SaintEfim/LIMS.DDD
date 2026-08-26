@@ -23,11 +23,8 @@ public sealed class SampleDeletionDomainService
             return new EntityInUseError(nameof(Sample), "associated studies");
         }
 
-        if (sample.SampleStatus != SampleStatus.Registered)
-        {
-            return new InvalidStatusTransitionError(nameof(Sample), sample.SampleStatus.Name, "Deleted");
-        }
-
-        return sample.Delete();
+        return sample.SampleStatus != SampleStatus.Registered
+            ? new InvalidStatusTransitionError(nameof(Sample), sample.SampleStatus.Name, "Deleted")
+            : sample.Delete();
     }
 }

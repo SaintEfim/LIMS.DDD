@@ -15,11 +15,8 @@ public sealed record ResultDefinitionDto(
         UnitSnapshot? unitSnapshot,
         ResultDefinitionSnapshot snapshot)
     {
-        return new ResultDefinitionDto(
-            snapshot.Id.Value,
-            snapshot.ResultInstance,
-            unitSnapshot is null ? null : UnitSnapshotDto.FromSnapshot(unitSnapshot),
-            snapshot.Specification.MinValue,
+        return new ResultDefinitionDto(snapshot.Id.Value, snapshot.ResultInstance,
+            unitSnapshot is null ? null : UnitSnapshotDto.FromSnapshot(unitSnapshot), snapshot.Specification.MinValue,
             snapshot.Specification.MaxValue);
     }
 }

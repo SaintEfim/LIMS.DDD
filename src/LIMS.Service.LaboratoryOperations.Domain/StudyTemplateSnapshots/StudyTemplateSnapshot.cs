@@ -6,11 +6,13 @@ using LIMS.Service.LaboratoryOperations.Domain.StudyTemplateSnapshots.ResultDefi
 
 namespace LIMS.Service.LaboratoryOperations.Domain.StudyTemplateSnapshots;
 
-public sealed class StudyTemplateSnapshot : SoftDeletableModel, IAggregateRoot
+public sealed class StudyTemplateSnapshot
+    : SoftDeletableModel,
+        IAggregateRoot
 {
+    private readonly List<CalculationRuleSnapshot> _calculationRules = [];
     private readonly List<InputParameterSnapshot> _parameters = [];
     private readonly List<ResultDefinitionSnapshot> _results = [];
-    private readonly List<CalculationRuleSnapshot> _calculationRules = [];
 
     private StudyTemplateSnapshot()
     {
