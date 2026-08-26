@@ -19,10 +19,7 @@ public sealed class SampleCreationDomainService
     {
         if (!order.CanAcceptNewEntity)
         {
-            return new EntityNotEditableError(
-                nameof(Order),
-                order.OrderStatus.Name,
-                "accept new samples");
+            return new EntityNotEditableError(nameof(Order), order.OrderStatus.Name, "accept new samples");
         }
 
         var sample = new Sample(order.Id, name, gatherDate, code, volume);

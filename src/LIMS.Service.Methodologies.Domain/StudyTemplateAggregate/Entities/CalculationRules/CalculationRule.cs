@@ -85,8 +85,7 @@ public sealed class CalculationRule : SoftDeletableModel
 
             if (parameter is null)
             {
-                return new ValidationError(
-                    $"Calculation rule '{Name.Value}': variable '{variable}' references.");
+                return new ValidationError($"Calculation rule '{Name.Value}': variable '{variable}' references.");
             }
         }
 

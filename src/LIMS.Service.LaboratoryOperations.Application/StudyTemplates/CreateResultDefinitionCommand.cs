@@ -15,7 +15,8 @@ public record CreateResultDefinitionCommand(
         UnitSnapshot unitSnapshot,
         ResultDefinitionSnapshot snapshot)
     {
-        return new ResultDefinitionDto(snapshot.Id.Value, snapshot.ResultInstance, UnitSnapshotDto.FromSnapshot(unitSnapshot),
-            snapshot.Specification.MinValue, snapshot.Specification.MaxValue);
+        return new ResultDefinitionDto(snapshot.Id.Value, snapshot.ResultInstance,
+            UnitSnapshotDto.FromSnapshot(unitSnapshot), snapshot.Specification.MinValue,
+            snapshot.Specification.MaxValue);
     }
 }

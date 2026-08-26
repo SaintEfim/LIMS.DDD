@@ -5,6 +5,14 @@ namespace LIMS.Service.Methodologies.Persistence;
 internal sealed class UnitOfWork(ApplicationDbContext context) : IUnitOfWork,
     IAsyncDisposable
 {
+    public async ValueTask DisposeAsync()
+    {
+        if (context.Database.CurrentTransaction is not null)
+        {
+            await context.Database.CurrentTransaction.DisposeAsync();
+        }
+    }
+
     public async Task<int> SaveChangesAsync(
         CancellationToken cancellationToken = default)
     {
@@ -42,13 +50,5 @@ internal sealed class UnitOfWork(ApplicationDbContext context) : IUnitOfWork,
         }
 
         await context.Database.RollbackTransactionAsync(cancellationToken);
-    }
-
-    public async ValueTask DisposeAsync()
-    {
-        if (context.Database.CurrentTransaction is not null)
-        {
-            await context.Database.CurrentTransaction.DisposeAsync();
-        }
     }
 }

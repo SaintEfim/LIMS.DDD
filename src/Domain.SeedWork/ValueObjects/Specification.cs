@@ -28,8 +28,7 @@ public sealed record Specification
     {
         if (minValue.HasValue && maxValue.HasValue && minValue.Value > maxValue.Value)
         {
-            return new ValidationError(
-                $"Min value ({minValue}) cannot be greater than max value ({maxValue}).");
+            return new ValidationError($"Min value ({minValue}) cannot be greater than max value ({maxValue}).");
         }
 
         var specification = new Specification(minValue, maxValue);

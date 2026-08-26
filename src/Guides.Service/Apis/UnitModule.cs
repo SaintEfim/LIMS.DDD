@@ -1,11 +1,10 @@
-﻿using Carter;
-using Broker.Messages;
+﻿using Broker.Messages;
+using Carter;
 using Guides.Service.Commands;
 using Guides.Service.Domains;
 using Guides.Service.Persistence;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using RabbitMq.Library.Broker;
 using RabbitMq.Library.Outbox;
 
 namespace Guides.Service.Apis;

@@ -10,15 +10,10 @@ public sealed record InputParameterDto(
     double? SpecMin,
     double? SpecMax)
 {
-    public static InputParameterDto FromSnapshot(InputParameterSnapshot snapshot)
+    public static InputParameterDto FromSnapshot(
+        InputParameterSnapshot snapshot)
     {
-        return new InputParameterDto(
-            snapshot.Id.Value,
-            snapshot.Name.Value,
-            snapshot.Description.Value,
-            snapshot.AliasName.Value,
-            snapshot.Specification.MinValue,
-            snapshot.Specification.MaxValue);
+        return new InputParameterDto(snapshot.Id.Value, snapshot.Name.Value, snapshot.Description.Value,
+            snapshot.AliasName.Value, snapshot.Specification.MinValue, snapshot.Specification.MaxValue);
     }
 }
-

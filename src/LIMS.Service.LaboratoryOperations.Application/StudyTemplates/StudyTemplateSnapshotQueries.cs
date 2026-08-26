@@ -13,7 +13,10 @@ public sealed class StudyTemplateQueries(
         CancellationToken cancellationToken = default)
     {
         var snapshot = await repository.GetByIdAsync(new StudyTemplateId(id), cancellationToken);
-        if (snapshot is null) return null;
+        if (snapshot is null)
+        {
+            return null;
+        }
 
         var unitsById = await GetUnitsByIdAsync([snapshot], cancellationToken);
         return StudyTemplateDto.FromSnapshot(snapshot, unitsById);
@@ -23,7 +26,10 @@ public sealed class StudyTemplateQueries(
         CancellationToken cancellationToken = default)
     {
         var snapshots = await repository.GetAllAsync(cancellationToken);
-        if (snapshots.Count == 0) return [];
+        if (snapshots.Count == 0)
+        {
+            return [];
+        }
 
         var unitsById = await GetUnitsByIdAsync(snapshots, cancellationToken);
         return snapshots.Select(s => StudyTemplateDto.FromSnapshot(s, unitsById))
@@ -39,7 +45,10 @@ public sealed class StudyTemplateQueries(
             .Distinct()
             .ToList();
 
-        if (unitIds.Count == 0) return new Dictionary<UnitId, UnitSnapshot>();
+        if (unitIds.Count == 0)
+        {
+            return new Dictionary<UnitId, UnitSnapshot>();
+        }
 
         var units = await unitSnapshotRepository.GetByIdsAsync(unitIds, cancellationToken);
         return units.ToDictionary(u => u.Id);

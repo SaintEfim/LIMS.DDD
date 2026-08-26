@@ -9,13 +9,10 @@ public sealed record CalculationRuleDto(
     string FormulaExpression,
     Guid ResultDefinitionId)
 {
-    public static CalculationRuleDto FromSnapshot(CalculationRuleSnapshot snapshot)
+    public static CalculationRuleDto FromSnapshot(
+        CalculationRuleSnapshot snapshot)
     {
-        return new CalculationRuleDto(
-            snapshot.Id.Value,
-            snapshot.Name.Value,
-            snapshot.Description.Value,
-            snapshot.FormulaExpression.Value,
-            snapshot.ResultDefinitionId.Value);
+        return new CalculationRuleDto(snapshot.Id.Value, snapshot.Name.Value, snapshot.Description.Value,
+            snapshot.FormulaExpression.Value, snapshot.ResultDefinitionId.Value);
     }
 }

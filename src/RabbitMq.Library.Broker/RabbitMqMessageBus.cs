@@ -43,8 +43,7 @@ public sealed class RabbitMqMessageBus(
             Timestamp = new AmqpTimestamp(DateTimeOffset.UtcNow.ToUnixTimeSeconds())
         };
 
-        await channel.BasicPublishAsync(exchange: descriptor.ExchangeName, routingKey: "", mandatory: false,
-            basicProperties: properties, body: body, cancellationToken: cancellationToken);
+        await channel.BasicPublishAsync(descriptor.ExchangeName, "", false, properties, body, cancellationToken);
 
         logger.LogDebug("Message {MessageId} of type {EventType} was published to exchange {Exchange}.",
             properties.MessageId, typeof(T).Name, descriptor.ExchangeName);

@@ -29,12 +29,9 @@ public sealed class MeasuredValueQueries(
 
         var inputParameter = await snapshotRepository.GetInputParameterAsync(study.StudyTemplateId,
             measuredValue.InputParameterId, cancellationToken);
-        if (inputParameter is null)
-        {
-            throw new KeyNotFoundException("input parameter not found");
-        }
-
-        return MeasuredValueDto.FromDomain(measuredValue, inputParameter);
+        return inputParameter is null
+            ? throw new KeyNotFoundException("input parameter not found")
+            : MeasuredValueDto.FromDomain(measuredValue, inputParameter);
     }
 
     public async Task<ICollection<MeasuredValueDto>> GetAllByStudyIdAsync(

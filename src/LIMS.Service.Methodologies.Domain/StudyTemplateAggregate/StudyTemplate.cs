@@ -25,9 +25,20 @@ public sealed class StudyTemplate
     {
     }
 
+    public StudyTemplate(
+        Name name,
+        Description description,
+        Revision revision)
+    {
+        Id = new StudyTemplateId(Guid.NewGuid());
+        Name = name;
+        Description = description;
+        Revision = revision;
+    }
+
     public StudyTemplateId? ParentId { get; private set; }
 
-    public StudyTemplateId Id { get; private set; }
+    public StudyTemplateId Id { get; }
 
     public Name Name { get; private set; } = null!;
 
@@ -43,23 +54,10 @@ public sealed class StudyTemplate
 
     public IReadOnlyList<CalculationRule> CalculationRules => _calculationRules.AsReadOnly();
 
-    public bool CanCreateStudy => Status == Status.Active;
-
     internal void SetParentId(
         StudyTemplateId parentId)
     {
         ParentId = parentId;
-    }
-
-    public StudyTemplate(
-        Name name,
-        Description description,
-        Revision revision)
-    {
-        Id = new StudyTemplateId(Guid.NewGuid());
-        Name = name;
-        Description = description;
-        Revision = revision;
     }
 
     public Result<None, DomainError> UpdatePartial(

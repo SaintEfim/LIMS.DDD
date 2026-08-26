@@ -4,7 +4,7 @@ using Domain.SeedWork.Result;
 
 namespace Domain.SeedWork.ValueObjects;
 
-public sealed record FormulaExpression
+public sealed partial record FormulaExpression
 {
     private const int MaxLength = 2000;
 
@@ -23,7 +23,7 @@ public sealed record FormulaExpression
 
     private static Regex Formula()
     {
-        return new Regex(@"\b[a-zA-Z_][a-zA-Z0-9_]*\b", RegexOptions.Compiled);
+        return MyRegex();
     }
 
     public static Result<FormulaExpression, DomainError> Create(
@@ -40,7 +40,7 @@ public sealed record FormulaExpression
                 $"Formula expression length cannot exceed {MaxLength} characters. Current length: {value.Length}.");
         }
 
-        if (value.StartsWith("=") || value.StartsWith("+") || value.StartsWith("-"))
+        if (value.StartsWith('=') || value.StartsWith('+') || value.StartsWith('-'))
         {
             return new ValidationError("Formula expression cannot start with '=', '+', or '-' characters.");
         }
@@ -58,4 +58,7 @@ public sealed record FormulaExpression
             .Distinct(StringComparer.OrdinalIgnoreCase)
             .ToList();
     }
+
+    [GeneratedRegex(@"\b[a-zA-Z_][a-zA-Z0-9_]*\b", RegexOptions.Compiled)]
+    private static partial Regex MyRegex();
 }

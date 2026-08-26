@@ -24,17 +24,10 @@ public sealed record StudyDto(
         var resultsById = templateSnapshot.Results.ToDictionary(r => r.Id);
         var parametersById = templateSnapshot.Parameters.ToDictionary(p => p.Id);
 
-        return new StudyDto(
-            study.Id.Value,
-            study.SampleId.Value,
-            study.Status.Name,
-            study.Name.Value,
-            study.StudyTemplateId.Value,
-            study.Description.Value,
-            study.MeasuredValues
+        return new StudyDto(study.Id.Value, study.SampleId.Value, study.Status.Name, study.Name.Value,
+            study.StudyTemplateId.Value, study.Description.Value, study.MeasuredValues
                 .Select(mv => MeasuredValueDto.FromDomain(mv, parametersById[mv.InputParameterId]))
-                .ToList(),
-            study.TestResults
+                .ToList(), study.TestResults
                 .Select(tr =>
                 {
                     var resultDefinition = resultsById[tr.ResultDefinitionId];

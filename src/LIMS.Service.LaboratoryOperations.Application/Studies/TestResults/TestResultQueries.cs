@@ -28,8 +28,8 @@ public sealed class TestResultQueries(
             return null;
         }
 
-        var resultDefinition = await snapshotRepository.GetResultDefinitionAsync(
-            study.StudyTemplateId, testResult.ResultDefinitionId, cancellationToken);
+        var resultDefinition = await snapshotRepository.GetResultDefinitionAsync(study.StudyTemplateId,
+            testResult.ResultDefinitionId, cancellationToken);
         if (resultDefinition is null)
         {
             throw new KeyNotFoundException("result definition not found");
@@ -61,22 +61,19 @@ public sealed class TestResultQueries(
 
         var resultDefinitionsDict = resultDefinitions.ToDictionary(rd => rd.Id);
 
-        var unitIds = resultDefinitions
-            .Select(rd => rd.UnitId)
+        var unitIds = resultDefinitions.Select(rd => rd.UnitId)
             .Distinct()
             .ToList();
 
-        var units = unitIds.Count == 0
-            ? []
-            : await unitSnapshotRepository.GetByIdsAsync(unitIds, cancellationToken);
+        var units = unitIds.Count == 0 ? [] : await unitSnapshotRepository.GetByIdsAsync(unitIds, cancellationToken);
 
         var unitsById = units.ToDictionary(u => u.Id);
 
         return study.TestResults
             .Select(tr =>
             {
-                var resultDefinition = resultDefinitionsDict.GetValueOrDefault(tr.ResultDefinitionId)
-                    ?? throw new KeyNotFoundException("result definition not found");
+                var resultDefinition = resultDefinitionsDict.GetValueOrDefault(tr.ResultDefinitionId) ??
+                                       throw new KeyNotFoundException("result definition not found");
 
                 var unit = unitsById.GetValueOrDefault(resultDefinition.UnitId);
 

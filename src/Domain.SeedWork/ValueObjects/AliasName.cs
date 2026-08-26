@@ -30,9 +30,8 @@ public sealed record AliasName
 
         if (value.Length > MaxAliasNameLength)
         {
-            return new ValidationError(
-                $"Alias name length cannot exceed {MaxAliasNameLength} characters. " +
-                $"Current length: {value.Length}.");
+            return new ValidationError($"Alias name length cannot exceed {MaxAliasNameLength} characters. " +
+                                       $"Current length: {value.Length}.");
         }
 
         var aliasName = new AliasName(value.Trim());

@@ -14,7 +14,10 @@ public sealed class SampleQueries(
         CancellationToken cancellationToken = default)
     {
         var sample = await sampleRepository.GetByIdAsync(new SampleId(id), cancellationToken);
-        if (sample is null) return null;
+        if (sample is null)
+        {
+            return null;
+        }
 
         var unitSnapshot = sample.Volume.UnitId.HasValue
             ? await unitSnapshotRepository.GetByIdAsync(sample.Volume.UnitId.Value, cancellationToken)
@@ -28,7 +31,10 @@ public sealed class SampleQueries(
         CancellationToken cancellationToken = default)
     {
         var samples = await sampleRepository.GetByOrderIdAsync(new OrderId(orderId), cancellationToken);
-        if (samples.Count == 0) return [];
+        if (samples.Count == 0)
+        {
+            return [];
+        }
 
         var unitIds = samples.Where(s => s.Volume.UnitId.HasValue)
             .Select(s => s.Volume.UnitId!.Value)

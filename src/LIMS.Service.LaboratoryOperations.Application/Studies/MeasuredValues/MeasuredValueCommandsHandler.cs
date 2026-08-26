@@ -7,7 +7,8 @@ using LIMS.Service.LaboratoryOperations.Domain.StudyAggregate.Entities;
 
 namespace LIMS.Service.LaboratoryOperations.Application.Studies.MeasuredValues;
 
-public sealed class MeasuredValueCommandsHandler(IUnitOfWork unitOfWork, IStudyRepository studyRepository) : ICommandsHandler
+public sealed class MeasuredValueCommandsHandler(IUnitOfWork unitOfWork, IStudyRepository studyRepository)
+    : ICommandsHandler
 {
     public async Task<Result<None, ApplicationError>> UpdateAsync(
         Guid studyId,

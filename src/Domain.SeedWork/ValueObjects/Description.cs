@@ -27,9 +27,8 @@ public sealed record Description
 
         if (descriptionValue.Length > MaxDescriptionLength)
         {
-            return new ValidationError(
-                $"Description length cannot exceed {MaxDescriptionLength} characters. " +
-                $"Current length: {descriptionValue.Length}.");
+            return new ValidationError($"Description length cannot exceed {MaxDescriptionLength} characters. " +
+                                       $"Current length: {descriptionValue.Length}.");
         }
 
         var description = new Description(descriptionValue);

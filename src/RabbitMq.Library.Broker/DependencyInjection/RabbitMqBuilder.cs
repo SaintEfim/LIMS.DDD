@@ -11,10 +11,10 @@ public sealed class RabbitMqBuilder
 {
     private readonly ConsumedEventsDictionary _consumedEvents;
     private readonly RegisteredEventsDictionary _events;
-    private readonly IServiceCollection _services;
-    private bool _receiveInfrastructureRegistered;
 
     private readonly string _serviceName;
+    private readonly IServiceCollection _services;
+    private bool _receiveInfrastructureRegistered;
 
     internal RabbitMqBuilder(
         IServiceCollection services,

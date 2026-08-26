@@ -7,12 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\RabbitMq.Library.Outbox\RabbitMq.Library.Outbox.csproj" />
-    <ProjectReference Include="..\RabbitMq.Library.Broker.Abstractions\RabbitMq.Library.Broker.Abstractions.csproj" />
+    <ProjectReference Include="..\RabbitMq.Library.Broker.Abstractions\RabbitMq.Library.Broker.Abstractions.csproj"/>
+    <ProjectReference Include="..\RabbitMq.Library.Outbox\RabbitMq.Library.Outbox.csproj"/>
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.11" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.11"/>
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.11"/>
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.11"/>
     <PackageReference Include="RabbitMQ.Client" Version="7.2.2"/>
