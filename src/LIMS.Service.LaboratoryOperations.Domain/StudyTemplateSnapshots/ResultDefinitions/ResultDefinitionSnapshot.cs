@@ -4,7 +4,7 @@ using LIMS.Service.LaboratoryOperations.Domain.UnitSnapshots;
 
 namespace LIMS.Service.LaboratoryOperations.Domain.StudyTemplateSnapshots.ResultDefinitions;
 
-public sealed class ResultDefinitionSnapshot : SoftDeletableModel
+public sealed class ResultDefinitionSnapshot : ISoftDeletable
 {
     private ResultDefinitionSnapshot()
     {
@@ -29,4 +29,6 @@ public sealed class ResultDefinitionSnapshot : SoftDeletableModel
     public string ResultInstance { get; private set; } = string.Empty;
     public UnitId UnitId { get; private set; }
     public Specification Specification { get; private set; } = null!;
+    public bool IsDeleted { get; private set; }
+    public DateTimeOffset? DeletedAt { get; private set; }
 }

@@ -3,9 +3,7 @@ using Library.Domain.SeedWork.ValueObjects;
 
 namespace LIMS.Service.Methodologies.Domain.UnitSnapshots;
 
-public sealed class UnitSnapshot
-    : SoftDeletableModel,
-        IAggregateRoot
+public sealed class UnitSnapshot : IAggregateRoot
 {
     private UnitSnapshot()
     {

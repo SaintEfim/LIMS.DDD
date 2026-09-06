@@ -7,7 +7,7 @@ using LIMS.Service.LaboratoryOperations.Domain.StudyTemplateSnapshots.ResultDefi
 namespace LIMS.Service.LaboratoryOperations.Domain.StudyTemplateSnapshots;
 
 public sealed class StudyTemplateSnapshot
-    : SoftDeletableModel,
+    : ISoftDeletable,
         IAggregateRoot
 {
     private readonly List<CalculationRuleSnapshot> _calculationRules = [];
@@ -44,4 +44,7 @@ public sealed class StudyTemplateSnapshot
     public IReadOnlyList<InputParameterSnapshot> Parameters => _parameters.AsReadOnly();
     public IReadOnlyList<ResultDefinitionSnapshot> Results => _results.AsReadOnly();
     public IReadOnlyList<CalculationRuleSnapshot> CalculationRules => _calculationRules.AsReadOnly();
+
+    public bool IsDeleted { get; private set; }
+    public DateTimeOffset? DeletedAt { get; private set; }
 }

@@ -14,12 +14,6 @@ public class UnitSnapshotConfiguration : IEntityTypeConfiguration<UnitSnapshot>
 
         builder.HasKey(x => x.Id);
 
-        builder.Property(x => x.IsDeleted)
-            .HasDefaultValue(false);
-        builder.Property(x => x.DeletedAt)
-            .IsRequired(false);
-        builder.HasQueryFilter(x => !x.IsDeleted);
-
         builder.Property(x => x.Id)
             .HasConversion(id => id.Value, value => new UnitId(value));
 

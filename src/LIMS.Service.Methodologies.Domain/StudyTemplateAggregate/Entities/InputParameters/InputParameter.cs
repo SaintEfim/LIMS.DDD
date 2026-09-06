@@ -3,7 +3,7 @@ using Library.Domain.SeedWork.ValueObjects;
 
 namespace LIMS.Service.Methodologies.Domain.StudyTemplateAggregate.Entities.InputParameters;
 
-public sealed class InputParameter : SoftDeletableModel
+public sealed class InputParameter : ISoftDeletable
 {
     internal InputParameter(
         StudyTemplateId studyTemplateId,
@@ -36,6 +36,10 @@ public sealed class InputParameter : SoftDeletableModel
     public AliasName AliasName { get; private set; } = null!;
 
     public Specification Specification { get; private set; } = null!;
+
+    public bool IsDeleted { get; private set; }
+
+    public DateTimeOffset? DeletedAt { get; private set; }
 
     internal void Update(
         Name? name,
