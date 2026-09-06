@@ -1,7 +1,7 @@
-﻿using Application.SeedWork;
-using Application.SeedWork.Errors;
-using Domain.SeedWork;
-using Domain.SeedWork.Result;
+﻿using Library.Application.SeedWork;
+using Library.Application.SeedWork.Errors;
+using Library.Domain.SeedWork;
+using Library.Domain.SeedWork.Result;
 using LIMS.Service.LaboratoryOperations.Domain.StudyAggregate;
 using LIMS.Service.LaboratoryOperations.Domain.StudyAggregate.Entities;
 

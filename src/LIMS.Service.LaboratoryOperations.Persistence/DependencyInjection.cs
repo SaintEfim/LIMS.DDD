@@ -1,4 +1,4 @@
-﻿using Domain.SeedWork;
+﻿using Library.Domain.SeedWork;
 using LIMS.Service.LaboratoryOperations.Domain.OrderAggregate;
 using LIMS.Service.LaboratoryOperations.Domain.SampleAggregate;
 using LIMS.Service.LaboratoryOperations.Domain.StudyAggregate;
@@ -29,5 +29,7 @@ public static class DependencyInjection
 
         services.AddDbContext<ApplicationDbContext>(options =>
             options.UseNpgsql(configuration.GetConnectionString("ServiceDB")));
+
+        services.AddScoped<DbContext>(provider => provider.GetRequiredService<ApplicationDbContext>());
     }
 }

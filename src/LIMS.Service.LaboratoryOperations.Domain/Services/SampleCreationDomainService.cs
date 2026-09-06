@@ -1,6 +1,6 @@
-﻿using Domain.SeedWork.Errors;
-using Domain.SeedWork.Result;
-using Domain.SeedWork.ValueObjects;
+﻿using Library.Domain.SeedWork.Errors;
+using Library.Domain.SeedWork.Result;
+using Library.Domain.SeedWork.ValueObjects;
 using LIMS.Service.LaboratoryOperations.Domain.OrderAggregate;
 using LIMS.Service.LaboratoryOperations.Domain.SampleAggregate;
 using LIMS.Service.LaboratoryOperations.Domain.SampleAggregate.ValueObjects;

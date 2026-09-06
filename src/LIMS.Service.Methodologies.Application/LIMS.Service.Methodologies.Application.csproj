@@ -7,11 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Application.SeedWork\Application.SeedWork.csproj"/>
-    <ProjectReference Include="..\Broker.Messages\Broker.Messages.csproj"/>
+    <ProjectReference Include="..\Library.Application.SeedWork\Library.Application.SeedWork.csproj" />
+    <ProjectReference Include="..\Library.Broker.Messages\Library.Broker.Messages.csproj" />
     <ProjectReference Include="..\LIMS.Service.Methodologies.Domain\LIMS.Service.Methodologies.Domain.csproj"/>
-    <ProjectReference Include="..\RabbitMq.Library.Broker\RabbitMq.Library.Broker.csproj"/>
-    <ProjectReference Include="..\RabbitMq.Library.Outbox.Abstractions\RabbitMq.Library.Outbox.Abstractions.csproj"/>
+    <ProjectReference Include="..\Library.Broker.RabbitMq\Library.Broker.RabbitMq.csproj" />
+    <ProjectReference Include="..\Library.Outbox.Abstractions\Library.Outbox.Abstractions.csproj" />
   </ItemGroup>
 
   <ItemGroup>

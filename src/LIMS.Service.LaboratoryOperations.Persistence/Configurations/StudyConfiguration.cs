@@ -1,4 +1,4 @@
-﻿using Domain.SeedWork.ValueObjects;
+﻿using Library.Domain.SeedWork.ValueObjects;
 using LIMS.Service.LaboratoryOperations.Domain.SampleAggregate;
 using LIMS.Service.LaboratoryOperations.Domain.StudyAggregate;
 using LIMS.Service.LaboratoryOperations.Domain.StudyAggregate.ValueObjects;

@@ -1,14 +1,14 @@
-﻿using Application.SeedWork;
-using Application.SeedWork.Errors;
-using Broker.Messages;
-using Domain.SeedWork;
-using Domain.SeedWork.Result;
-using Domain.SeedWork.ValueObjects;
+﻿using Library.Application.SeedWork;
+using Library.Application.SeedWork.Errors;
+using Library.Broker.Messages;
+using Library.Domain.SeedWork;
+using Library.Domain.SeedWork.Result;
+using Library.Domain.SeedWork.ValueObjects;
+using Library.Outbox;
 using LIMS.Service.Methodologies.Application.StudyTemplates.Core.Commands;
 using LIMS.Service.Methodologies.Domain.StudyTemplateAggregate;
 using LIMS.Service.Methodologies.Domain.StudyTemplateAggregate.Services;
 using LIMS.Service.Methodologies.Domain.StudyTemplateAggregate.ValueObjects;
-using RabbitMq.Library.Outbox;
 
 namespace LIMS.Service.Methodologies.Application.StudyTemplates.Core;
 

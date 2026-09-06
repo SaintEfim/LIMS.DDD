@@ -1,4 +1,4 @@
-﻿using Broker.Messages;
+﻿using Library.Broker.Messages;
 using LIMS.Service.Methodologies.Application.Units;
 using Microsoft.Extensions.Logging;
 using RabbitMq.Library.Broker;

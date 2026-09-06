@@ -1,14 +1,19 @@
-using Broker.Messages;
+using Library.Broker.Messages;
 using Carter;
 using Guides.Service.Persistence;
 using Microsoft.EntityFrameworkCore;
-using RabbitMq.Library.Broker.DependencyInjection;
+using Library.Broker.RabbitMq.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddCarter();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("ServiceDB")));
+
+builder.Services.AddScoped<DbContext>(provider => provider.GetRequiredService<ApplicationDbContext>());
 
 builder.Services
     .AddRabbitMq(options =>
@@ -19,10 +24,7 @@ builder.Services
         options.Password = "guest";
     }, "guid-service")
     .AddMessage<UnitCreatedMessage>()
-    .AddOutbox<ApplicationDbContext>();
-
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("ServiceDB")));
+    .AddOutbox();
 
 var app = builder.Build();
 

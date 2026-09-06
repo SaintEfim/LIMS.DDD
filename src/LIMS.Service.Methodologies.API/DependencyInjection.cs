@@ -16,8 +16,8 @@ public static class DependencyInjection
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        services.AddInfrastructure();
         services.AddPersistence(configuration);
+        services.AddInfrastructure();
         services.AddApplication();
 
         services.AddScoped<StudyTemplateVersioningService>();

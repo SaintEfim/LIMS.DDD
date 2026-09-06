@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Domain.SeedWork\Domain.SeedWork.csproj"/>
+    <ProjectReference Include="..\Library.Domain.SeedWork\Library.Domain.SeedWork.csproj" />
   </ItemGroup>
 
 </Project>

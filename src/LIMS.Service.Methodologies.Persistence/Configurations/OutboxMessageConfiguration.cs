@@ -1,6 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Library.Outbox;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using RabbitMq.Library.Outbox;
 
 namespace LIMS.Service.Methodologies.Persistence.Configurations;
 

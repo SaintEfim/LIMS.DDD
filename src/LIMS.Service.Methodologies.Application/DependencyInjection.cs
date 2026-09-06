@@ -1,4 +1,4 @@
-﻿using Application.SeedWork;
+﻿using Library.Application.SeedWork;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace LIMS.Service.Methodologies.Application;

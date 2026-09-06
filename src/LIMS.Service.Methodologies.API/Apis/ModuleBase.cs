@@ -1,7 +1,7 @@
-﻿using Application.SeedWork.Errors;
-using Domain.SeedWork.Errors;
-using AppValidationError = Application.SeedWork.Errors.ValidationError;
-using DomainValidationError = Domain.SeedWork.Errors.ValidationError;
+﻿using Library.Application.SeedWork.Errors;
+using Library.Domain.SeedWork.Errors;
+using AppValidationError = Library.Application.SeedWork.Errors.ValidationError;
+using DomainValidationError = Library.Domain.SeedWork.Errors.ValidationError;
 
 namespace LIMS.Service.Methodologies.API.Apis;
 

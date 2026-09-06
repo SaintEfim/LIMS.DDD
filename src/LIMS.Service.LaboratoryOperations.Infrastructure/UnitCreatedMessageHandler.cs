@@ -1,6 +1,7 @@
-﻿using Broker.Messages;
+﻿using Library.Broker.Messages;
 using LIMS.Service.LaboratoryOperations.Application.Units;
 using Microsoft.Extensions.Logging;
+using Library.Broker.RabbitMq;
 using RabbitMq.Library.Broker;
 
 namespace LIMS.Service.LaboratoryOperations.Infrastructure;

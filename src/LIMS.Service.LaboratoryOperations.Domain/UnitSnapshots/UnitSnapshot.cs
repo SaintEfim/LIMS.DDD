@@ -1,5 +1,5 @@
-﻿using Domain.SeedWork;
-using Domain.SeedWork.ValueObjects;
+﻿using Library.Domain.SeedWork;
+using Library.Domain.SeedWork.ValueObjects;
 
 namespace LIMS.Service.LaboratoryOperations.Domain.UnitSnapshots;
 
