@@ -1,10 +1,8 @@
 ﻿using Library.Application.SeedWork;
 using Library.Application.SeedWork.Errors;
-using Library.Broker.Messages;
 using Library.Domain.SeedWork;
 using Library.Domain.SeedWork.Result;
 using Library.Domain.SeedWork.ValueObjects;
-using Library.Outbox;
 using LIMS.Service.Methodologies.Application.StudyTemplates.Core.Commands;
 using LIMS.Service.Methodologies.Domain.StudyTemplateAggregate;
 using LIMS.Service.Methodologies.Domain.StudyTemplateAggregate.Services;
@@ -13,7 +11,6 @@ using LIMS.Service.Methodologies.Domain.StudyTemplateAggregate.ValueObjects;
 namespace LIMS.Service.Methodologies.Application.StudyTemplates.Core;
 
 public sealed class StudyTemplateCommandsHandler(
-    IOutboxRepository outboxRepository,
     IStudyTemplateRepository repository,
     IUnitOfWork unitOfWork,
     StudyTemplateVersioningService domainService) : ICommandsHandler
@@ -117,28 +114,6 @@ public sealed class StudyTemplateCommandsHandler(
         {
             return new DomainRuleViolation(changeResult.GetError());
         }
-
-        if (newStatus != Status.Active)
-        {
-            return await SaveChangesAsync(template, cancellationToken);
-        }
-
-        var message = new StudyTemplatePublishedMessage(template.Id.Value, template.Name.Value,
-            template.Description.Value ?? string.Empty, template.Revision.Value, template.InputParameters
-                .Where(p => !p.IsDeleted)
-                .Select(p => new InputParameterMessage(p.Id.Value, p.Name.Value, p.Description.Value, p.AliasName.Value,
-                    p.Specification.MinValue, p.Specification.MaxValue))
-                .ToList(), template.ResultDefinitions
-                .Where(r => !r.IsDeleted)
-                .Select(r => new ResultDefinitionMessage(r.Id.Value, r.ResultInstance, r.UnitId.Value,
-                    r.Specification.MinValue, r.Specification.MaxValue))
-                .ToList(), template.CalculationRules
-                .Where(c => !c.IsDeleted)
-                .Select(c => new CalculationRuleMessage(c.Id.Value, c.Name.Value, c.Description.Value ?? string.Empty,
-                    c.FormulaExpression.Value, c.ResultDefinitionId.Value))
-                .ToList());
-
-        outboxRepository.InsertOutboxMessage(message);
 
         return await SaveChangesAsync(template, cancellationToken);
     }

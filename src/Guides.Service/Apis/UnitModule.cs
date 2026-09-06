@@ -93,8 +93,7 @@ public class UnitModule : ICarterModule
                 return Results.NotFound();
             }
 
-            unit.IsDeleted = true;
-            unit.DeletedAt = DateTime.UtcNow;
+            unit.MarkAsDeleted();
             await db.SaveChangesAsync(cancellationToken);
 
             return Results.NoContent();
