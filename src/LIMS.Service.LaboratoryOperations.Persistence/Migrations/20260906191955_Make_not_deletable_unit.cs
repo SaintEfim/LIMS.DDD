@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace LIMS.Service.LaboratoryOperations.Persistence.Migrations
 {
     /// <inheritdoc />
-    public partial class Make_not_deleteble_unit : Migration
+    public partial class Make_not_deletable_unit : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

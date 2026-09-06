@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace LIMS.Service.LaboratoryOperations.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260906191955_Make_not_deleteble_unit")]
-    partial class Make_not_deleteble_unit
+    [Migration("20260906191955_Make_not_deletable_unit")]
+    partial class Make_not_deletable_unit
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
