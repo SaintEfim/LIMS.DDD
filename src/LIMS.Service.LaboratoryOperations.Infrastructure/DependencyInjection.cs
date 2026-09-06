@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using RabbitMq.Library.Broker.DependencyInjection;
+using Library.Broker.RabbitMq.DependencyInjection;
 
 namespace LIMS.Service.LaboratoryOperations.Infrastructure;
 

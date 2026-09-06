@@ -1,7 +1,6 @@
-﻿using Broker.Messages;
-using LIMS.Service.Methodologies.Persistence;
+﻿using Library.Broker.Messages;
 using Microsoft.Extensions.DependencyInjection;
-using RabbitMq.Library.Broker.DependencyInjection;
+using Library.Broker.RabbitMq.DependencyInjection;
 
 namespace LIMS.Service.Methodologies.Infrastructure;
 
@@ -19,6 +18,6 @@ public static class DependencyInjection
             }, "methodologies")
             .AddMessage<StudyTemplatePublishedMessage>()
             .AddMessageHandler<UnitCreatedMessageHandler>()
-            .AddOutbox<ApplicationDbContext>();
+            .AddOutbox();
     }
 }

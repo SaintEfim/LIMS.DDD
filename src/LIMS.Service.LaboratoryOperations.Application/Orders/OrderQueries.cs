@@ -1,4 +1,4 @@
-using Application.SeedWork;
+using Library.Application.SeedWork;
 using LIMS.Service.LaboratoryOperations.Domain.OrderAggregate;
 
 namespace LIMS.Service.LaboratoryOperations.Application.Orders;

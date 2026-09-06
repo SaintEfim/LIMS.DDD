@@ -1,4 +1,4 @@
-﻿using Domain.SeedWork;
+﻿using Library.Domain.SeedWork;
 using LIMS.Service.LaboratoryOperations.Domain.StudyTemplateSnapshots.InputParameters;
 using LIMS.Service.LaboratoryOperations.Domain.StudyTemplateSnapshots.ResultDefinitions;
 

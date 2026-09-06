@@ -13,8 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\LIMS.Service.Methodologies.Domain\LIMS.Service.Methodologies.Domain.csproj"/>
-    <ProjectReference Include="..\RabbitMq.Library.Outbox.Abstractions\RabbitMq.Library.Outbox.Abstractions.csproj"/>
-    <ProjectReference Include="..\RabbitMq.Library.Outbox\RabbitMq.Library.Outbox.csproj"/>
+    <ProjectReference Include="..\Library.Outbox.Abstractions\Library.Outbox.Abstractions.csproj" />
   </ItemGroup>
 
 </Project>

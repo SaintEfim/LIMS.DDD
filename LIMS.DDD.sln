@@ -21,11 +21,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Guides.Service", "src\Guide
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Messages", "Messages", "{7570D6EF-62DD-4245-B8DC-8630259BB493}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Broker.Messages", "src\Broker.Messages\Broker.Messages.csproj", "{ADD698B0-821B-4B14-9A9E-52481CC0FBE2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Library.Broker.Messages", "src\Library.Broker.Messages\Library.Broker.Messages.csproj", "{ADD698B0-821B-4B14-9A9E-52481CC0FBE2}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "RabbitMq", "RabbitMq", "{3CD25C1E-D65B-46F0-9DBE-DF904FFCCF79}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RabbitMq.Library.Broker", "src\RabbitMq.Library.Broker\RabbitMq.Library.Broker.csproj", "{BC2E4D27-0685-4194-A258-9C6C2A6A6AB7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Library.Broker.RabbitMq", "src\Library.Broker.RabbitMq\Library.Broker.RabbitMq.csproj", "{BC2E4D27-0685-4194-A258-9C6C2A6A6AB7}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LIMS.Service.Methodologies.Infrastructure", "src\LIMS.Service.Methodologies.Infrastructure\LIMS.Service.Methodologies.Infrastructure.csproj", "{713D93EB-C00F-45FC-AA25-2123C6D95667}"
 EndProject
@@ -47,20 +47,20 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LIMS.Service.LaboratoryOper
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Libraries", "Libraries", "{42E5E72B-4D07-4D36-BAA6-29885F103F1A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Domain.SeedWork", "src\Domain.SeedWork\Domain.SeedWork.csproj", "{3B4EF734-3AC9-4DF6-B637-7B079D0F34B8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Library.Domain.SeedWork", "src\Library.Domain.SeedWork\Library.Domain.SeedWork.csproj", "{3B4EF734-3AC9-4DF6-B637-7B079D0F34B8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Application.SeedWork", "src\Application.SeedWork\Application.SeedWork.csproj", "{860D2680-71C4-4FFF-8860-25AA3D303C07}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Library.Application.SeedWork", "src\Library.Application.SeedWork\Library.Application.SeedWork.csproj", "{860D2680-71C4-4FFF-8860-25AA3D303C07}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Http", "Http", "{2602B473-4EB1-4B50-B8AF-264A0382E2C2}"
 	ProjectSection(SolutionItems) = preProject
 		LIMS.http = LIMS.http
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RabbitMq.Library.Outbox", "src\RabbitMq.Library.Outbox\RabbitMq.Library.Outbox.csproj", "{77A386BD-F7C3-4D78-8B2A-1F63BBE974BE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Library.Outbox", "src\Library.Outbox\Library.Outbox.csproj", "{77A386BD-F7C3-4D78-8B2A-1F63BBE974BE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RabbitMq.Library.Broker.Abstractions", "src\RabbitMq.Library.Broker.Abstractions\RabbitMq.Library.Broker.Abstractions.csproj", "{FEC02BB9-DD02-4E28-AB78-9787D794D681}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Library.Broker.Abstractions", "src\Library.Broker.Abstractions\Library.Broker.Abstractions.csproj", "{FEC02BB9-DD02-4E28-AB78-9787D794D681}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RabbitMq.Library.Outbox.Abstractions", "src\RabbitMq.Library.Outbox.Abstractions\RabbitMq.Library.Outbox.Abstractions.csproj", "{9B45A877-7CC8-4A7C-8CAF-D5DCF9002EAF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Library.Outbox.Abstractions", "src\Library.Outbox.Abstractions\Library.Outbox.Abstractions.csproj", "{9B45A877-7CC8-4A7C-8CAF-D5DCF9002EAF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -88,6 +88,7 @@ Global
 		{77A386BD-F7C3-4D78-8B2A-1F63BBE974BE} = {3CD25C1E-D65B-46F0-9DBE-DF904FFCCF79}
 		{FEC02BB9-DD02-4E28-AB78-9787D794D681} = {3CD25C1E-D65B-46F0-9DBE-DF904FFCCF79}
 		{9B45A877-7CC8-4A7C-8CAF-D5DCF9002EAF} = {3CD25C1E-D65B-46F0-9DBE-DF904FFCCF79}
+		{3CD25C1E-D65B-46F0-9DBE-DF904FFCCF79} = {42E5E72B-4D07-4D36-BAA6-29885F103F1A}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{84FBFE31-7AC3-462A-9B67-CB6887BC21C0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU

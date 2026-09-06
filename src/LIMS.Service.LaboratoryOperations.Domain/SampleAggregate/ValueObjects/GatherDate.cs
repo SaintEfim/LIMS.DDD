@@ -1,5 +1,5 @@
-﻿using Domain.SeedWork.Errors;
-using Domain.SeedWork.Result;
+﻿using Library.Domain.SeedWork.Errors;
+using Library.Domain.SeedWork.Result;
 
 namespace LIMS.Service.LaboratoryOperations.Domain.SampleAggregate.ValueObjects;
 

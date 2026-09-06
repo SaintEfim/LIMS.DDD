@@ -21,9 +21,7 @@ Content-Type: application/json
   client.global.set("unitGramId", response.body.id);
 %}
 
-### ============================================
-### Проверяем
-### ============================================
+###
 
 # @name createUnitPercent
 POST {{unitServiceUrl}}/api/units
@@ -38,6 +36,15 @@ Content-Type: application/json
     client.assert(response.status === 201, "Unit '%' creation failed: " + response.status);
   });
   client.global.set("unitPercentId", response.body.id);
+%}
+
+###
+
+# @name waitForSnapshotCreation
+GET https://httpbin.org/delay/5
+
+> {%
+  client.log("Waiting 5 seconds for RabbitMQ delivery and snapshot creation...");
 %}
 
 ### ============================================
@@ -222,6 +229,15 @@ POST {{methodologiesUrl}}/api/study-templates/{{moistureTemplateV2Id}}/change-st
     client.assert(response.status === 200, "Status change for V2 failed: " + response.status);
   });
   client.log("StudyTemplatePublishedMessage sent to broker");
+%}
+
+###
+
+# @name waitForSnapshotCreation
+GET https://httpbin.org/delay/5
+
+> {%
+  client.log("Waiting 5 seconds for RabbitMQ delivery and snapshot creation...");
 %}
 
 ### ============================================

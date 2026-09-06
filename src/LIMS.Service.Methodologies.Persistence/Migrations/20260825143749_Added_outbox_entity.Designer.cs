@@ -262,7 +262,7 @@ namespace LIMS.Service.Methodologies.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.OwnsOne("Domain.SeedWork.ValueObjects.Specification", "Specification", b1 =>
+                    b.OwnsOne("Library.Domain.SeedWork.ValueObjects.Specification", "Specification", b1 =>
                         {
                             b1.Property<Guid>("InputParameterId")
                                 .HasColumnType("uuid");
@@ -301,7 +301,7 @@ namespace LIMS.Service.Methodologies.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.OwnsOne("Domain.SeedWork.ValueObjects.Specification", "Specification", b1 =>
+                    b.OwnsOne("Library.Domain.SeedWork.ValueObjects.Specification", "Specification", b1 =>
                         {
                             b1.Property<Guid>("ResultDefinitionId")
                                 .HasColumnType("uuid");

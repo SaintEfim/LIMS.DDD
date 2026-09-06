@@ -1,4 +1,4 @@
-﻿using Domain.SeedWork;
+﻿using Library.Domain.SeedWork;
 
 namespace LIMS.Service.LaboratoryOperations.Domain.SampleAggregate;
 

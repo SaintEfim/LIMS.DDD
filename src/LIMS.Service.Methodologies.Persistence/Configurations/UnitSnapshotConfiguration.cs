@@ -1,4 +1,4 @@
-﻿using Domain.SeedWork.ValueObjects;
+﻿using Library.Domain.SeedWork.ValueObjects;
 using LIMS.Service.Methodologies.Domain.UnitSnapshots;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;

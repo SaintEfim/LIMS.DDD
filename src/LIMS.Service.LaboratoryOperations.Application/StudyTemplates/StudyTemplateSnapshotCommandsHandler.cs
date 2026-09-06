@@ -1,8 +1,8 @@
-﻿using Application.SeedWork;
-using Application.SeedWork.Errors;
-using Domain.SeedWork;
-using Domain.SeedWork.Result;
-using Domain.SeedWork.ValueObjects;
+﻿using Library.Application.SeedWork;
+using Library.Application.SeedWork.Errors;
+using Library.Domain.SeedWork;
+using Library.Domain.SeedWork.Result;
+using Library.Domain.SeedWork.ValueObjects;
 using LIMS.Service.LaboratoryOperations.Domain.StudyTemplateSnapshots;
 using LIMS.Service.LaboratoryOperations.Domain.StudyTemplateSnapshots.CalculationRules;
 using LIMS.Service.LaboratoryOperations.Domain.StudyTemplateSnapshots.InputParameters;

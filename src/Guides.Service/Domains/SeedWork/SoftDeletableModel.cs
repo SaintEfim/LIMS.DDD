@@ -2,7 +2,7 @@
 
 public abstract class SoftDeletableModel
 {
-    public bool IsDeleted { get; protected internal set; }
+    public bool IsDeleted { get; set; }
 
-    public DateTimeOffset? DeletedAt { get; protected set; }
+    public DateTimeOffset? DeletedAt { get; set; }
 }

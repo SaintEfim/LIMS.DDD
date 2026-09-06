@@ -1,5 +1,5 @@
-﻿using Domain.SeedWork;
-using Domain.SeedWork.ValueObjects;
+﻿using Library.Domain.SeedWork;
+using Library.Domain.SeedWork.ValueObjects;
 using LIMS.Service.Methodologies.Domain.StudyTemplateAggregate.States;
 
 namespace LIMS.Service.Methodologies.Domain.StudyTemplateAggregate.ValueObjects;

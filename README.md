@@ -227,6 +227,10 @@ dotnet ef database update \
 dotnet ef database update \
   --project src/LIMS.Service.LaboratoryOperations.Persistence \
   --startup-project src/LIMS.Service.LaboratoryOperations.API
+
+dotnet ef database update \
+  --project src/LIMS.Service.Guides \
+  --startup-project src/LIMS.Service.Guides
 ```
 
 Если `dotnet ef` отсутствует:
@@ -1152,7 +1156,7 @@ Management: localhost:15672
 
 Предметная область и основные бизнес-процессы проекта моделировались с опорой на:
 
-**ГОСТ Р 53798-2010  
+**ГОСТ Р 53798-2010
 «Стандартное руководство по лабораторным информационным менеджмент-системам (ЛИМС)».**
 
 ГОСТ используется как источник требований при моделировании жизненных циклов, процессов работы с заданиями, пробами, исследованиями, методиками и результатами.

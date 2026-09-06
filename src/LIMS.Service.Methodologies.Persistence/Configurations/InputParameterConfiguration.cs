@@ -1,4 +1,4 @@
-using Domain.SeedWork.ValueObjects;
+using Library.Domain.SeedWork.ValueObjects;
 using LIMS.Service.Methodologies.Domain.StudyTemplateAggregate;
 using LIMS.Service.Methodologies.Domain.StudyTemplateAggregate.Entities.InputParameters;
 using Microsoft.EntityFrameworkCore;

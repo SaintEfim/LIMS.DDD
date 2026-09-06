@@ -1,4 +1,4 @@
-﻿using Application.SeedWork;
+﻿using Library.Application.SeedWork;
 using LIMS.Service.Methodologies.Domain.StudyTemplateAggregate;
 using LIMS.Service.Methodologies.Domain.UnitSnapshots;
 

@@ -1,11 +1,11 @@
-﻿using Broker.Messages;
+﻿using Library.Broker.Messages;
 using Carter;
 using Guides.Service.Commands;
 using Guides.Service.Domains;
 using Guides.Service.Persistence;
+using Library.Outbox;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using RabbitMq.Library.Outbox;
 
 namespace Guides.Service.Apis;
 
@@ -94,6 +94,7 @@ public class UnitModule : ICarterModule
             }
 
             unit.IsDeleted = true;
+            unit.DeletedAt = DateTime.UtcNow;
             await db.SaveChangesAsync(cancellationToken);
 
             return Results.NoContent();

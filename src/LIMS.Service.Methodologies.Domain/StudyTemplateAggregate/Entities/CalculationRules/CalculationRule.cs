@@ -1,7 +1,7 @@
-﻿using Domain.SeedWork;
-using Domain.SeedWork.Errors;
-using Domain.SeedWork.Result;
-using Domain.SeedWork.ValueObjects;
+﻿using Library.Domain.SeedWork;
+using Library.Domain.SeedWork.Errors;
+using Library.Domain.SeedWork.Result;
+using Library.Domain.SeedWork.ValueObjects;
 using LIMS.Service.Methodologies.Domain.StudyTemplateAggregate.Entities.InputParameters;
 using LIMS.Service.Methodologies.Domain.StudyTemplateAggregate.Entities.ResultDefinitions;
 

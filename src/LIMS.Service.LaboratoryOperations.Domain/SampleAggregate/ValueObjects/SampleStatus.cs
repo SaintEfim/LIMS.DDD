@@ -1,5 +1,5 @@
-﻿using Domain.SeedWork;
-using Domain.SeedWork.ValueObjects;
+﻿using Library.Domain.SeedWork;
+using Library.Domain.SeedWork.ValueObjects;
 using LIMS.Service.LaboratoryOperations.Domain.SampleAggregate.States;
 
 namespace LIMS.Service.LaboratoryOperations.Domain.SampleAggregate.ValueObjects;
