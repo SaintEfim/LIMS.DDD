@@ -1,4 +1,6 @@
-﻿namespace Library.Domain.SeedWork.Events;
+﻿using Library.Domain.SeedWork.Events;
+
+namespace Library.Application.SeedWork.Events;
 
 internal sealed class DomainEventsDispatcher(IServiceProvider serviceProvider) : IDomainEventsDispatcher
 {
