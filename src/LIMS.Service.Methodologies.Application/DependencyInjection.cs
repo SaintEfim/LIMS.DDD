@@ -1,14 +1,18 @@
-﻿using Library.Application.SeedWork;
+﻿using System.Reflection;
+using Library.Application.SeedWork;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace LIMS.Service.Methodologies.Application;
 
 public static class DependencyInjection
 {
+    private static readonly Assembly ThisAssembly = typeof(DependencyInjection).Assembly;
+
     public static void AddApplication(
         this IServiceCollection services)
     {
-        services.AddQueries(typeof(DependencyInjection).Assembly);
-        services.AddCommandsHandlers(typeof(DependencyInjection).Assembly);
+        services.AddQueries(ThisAssembly);
+        services.AddCommandsHandlers(ThisAssembly);
+        services.AddEvents(ThisAssembly);
     }
 }
