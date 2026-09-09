@@ -5,7 +5,7 @@ using LIMS.Service.Methodologies.Domain.StudyTemplateAggregate.Events;
 
 namespace LIMS.Service.Methodologies.Application.StudyTemplates.Events;
 
-public class StudyTemplatePublishedEventHandler(IOutboxRepository outboxRepository)
+public class StudyTemplatePublishedDomainEventHandler(IOutboxRepository outboxRepository)
     : IDomainEventHandler<StudyTemplatePublishedDomainEvent>
 {
     public Task Handle(

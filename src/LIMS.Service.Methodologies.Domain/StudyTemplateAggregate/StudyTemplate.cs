@@ -5,6 +5,7 @@ using Library.Domain.SeedWork.ValueObjects;
 using LIMS.Service.Methodologies.Domain.StudyTemplateAggregate.Entities.CalculationRules;
 using LIMS.Service.Methodologies.Domain.StudyTemplateAggregate.Entities.InputParameters;
 using LIMS.Service.Methodologies.Domain.StudyTemplateAggregate.Entities.ResultDefinitions;
+using LIMS.Service.Methodologies.Domain.StudyTemplateAggregate.Events;
 using LIMS.Service.Methodologies.Domain.StudyTemplateAggregate.ValueObjects;
 using LIMS.Service.Methodologies.Domain.UnitSnapshots;
 
@@ -177,6 +178,8 @@ public sealed class StudyTemplate
             {
                 return validationResult;
             }
+
+            AddDomainEvent(new StudyTemplatePublishedDomainEvent(this));
         }
 
         Status = newStatus;
