@@ -3,7 +3,7 @@ using LIMS.Service.LaboratoryOperations.Domain.StudyTemplateSnapshots.ResultDefi
 
 namespace LIMS.Service.LaboratoryOperations.Domain.StudyAggregate.Entities;
 
-public sealed class TestResult : SoftDeletableModel
+public sealed class TestResult : ISoftDeletable
 {
     internal TestResult(
         StudyId studyId,
@@ -23,6 +23,10 @@ public sealed class TestResult : SoftDeletableModel
     public double? Value { get; private set; }
 
     public bool IsOutOfSpec { get; private set; }
+
+    public bool IsDeleted { get; private set; }
+
+    public DateTimeOffset? DeletedAt { get; private set; }
 
     internal void ApplyValue(
         double value,

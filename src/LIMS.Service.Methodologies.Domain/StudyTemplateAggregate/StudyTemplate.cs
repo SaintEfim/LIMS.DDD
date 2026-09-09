@@ -11,13 +11,12 @@ using LIMS.Service.Methodologies.Domain.UnitSnapshots;
 namespace LIMS.Service.Methodologies.Domain.StudyTemplateAggregate;
 
 public sealed class StudyTemplate
-    : SoftDeletableModel,
+    : EntityBase,
+        ISoftDeletable,
         IAggregateRoot
 {
     private readonly List<CalculationRule> _calculationRules = [];
-
     private readonly List<InputParameter> _inputParameters = [];
-
     private readonly List<ResultDefinition> _resultDefinitions = [];
 
     // for EF Core
@@ -37,22 +36,16 @@ public sealed class StudyTemplate
     }
 
     public StudyTemplateId? ParentId { get; private set; }
-
     public StudyTemplateId Id { get; }
-
     public Name Name { get; private set; } = null!;
-
     public Description Description { get; private set; } = null!;
-
     public Revision Revision { get; private set; } = null!;
-
     public Status Status { get; private set; } = Status.Draft;
-
     public IReadOnlyList<InputParameter> InputParameters => _inputParameters.AsReadOnly();
-
     public IReadOnlyList<ResultDefinition> ResultDefinitions => _resultDefinitions.AsReadOnly();
-
     public IReadOnlyList<CalculationRule> CalculationRules => _calculationRules.AsReadOnly();
+    public bool IsDeleted { get; private set; }
+    public DateTimeOffset? DeletedAt { get; private set; }
 
     internal void SetParentId(
         StudyTemplateId parentId)

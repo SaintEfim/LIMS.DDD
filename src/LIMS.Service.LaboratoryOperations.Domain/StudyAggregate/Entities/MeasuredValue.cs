@@ -3,7 +3,7 @@ using LIMS.Service.LaboratoryOperations.Domain.StudyTemplateSnapshots.InputParam
 
 namespace LIMS.Service.LaboratoryOperations.Domain.StudyAggregate.Entities;
 
-public sealed class MeasuredValue : SoftDeletableModel
+public sealed class MeasuredValue : ISoftDeletable
 {
     internal MeasuredValue(
         StudyId studyId,
@@ -21,6 +21,10 @@ public sealed class MeasuredValue : SoftDeletableModel
     public InputParameterId InputParameterId { get; private set; }
 
     public double? Value { get; private set; }
+
+    public bool IsDeleted { get; private set; }
+
+    public DateTimeOffset? DeletedAt { get; private set; }
 
     internal void Update(
         double? value)

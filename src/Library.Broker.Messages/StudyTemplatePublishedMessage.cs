@@ -6,7 +6,7 @@ namespace Library.Broker.Messages;
 public record StudyTemplatePublishedMessage(
     Guid Id,
     string Name,
-    string Description,
+    string? Description,
     string Revision,
     IReadOnlyList<InputParameterMessage> InputParameters,
     IReadOnlyList<ResultDefinitionMessage> ResultDefinitions,

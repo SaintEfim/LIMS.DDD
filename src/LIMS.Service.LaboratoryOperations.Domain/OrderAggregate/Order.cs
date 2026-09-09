@@ -8,7 +8,7 @@ using LIMS.Service.LaboratoryOperations.Domain.ValueObjects;
 namespace LIMS.Service.LaboratoryOperations.Domain.OrderAggregate;
 
 public class Order
-    : SoftDeletableModel,
+    : ISoftDeletable,
         IAggregateRoot
 {
     public Order(
@@ -44,6 +44,10 @@ public class Order
     public bool CanAcceptNewEntity => OrderStatus == OrderStatus.Draft || OrderStatus == OrderStatus.InProgress;
 
     public bool CanDeleteAssociatedEntities => OrderStatus == OrderStatus.Draft;
+
+    public bool IsDeleted { get; private set; }
+
+    public DateTimeOffset? DeletedAt { get; private set; }
 
     public Result<None, DomainError> Delete()
     {

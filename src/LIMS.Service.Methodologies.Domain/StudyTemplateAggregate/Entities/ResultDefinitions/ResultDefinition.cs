@@ -4,7 +4,7 @@ using LIMS.Service.Methodologies.Domain.UnitSnapshots;
 
 namespace LIMS.Service.Methodologies.Domain.StudyTemplateAggregate.Entities.ResultDefinitions;
 
-public sealed class ResultDefinition : SoftDeletableModel
+public sealed class ResultDefinition : ISoftDeletable
 {
     internal ResultDefinition(
         StudyTemplateId studyTemplateId,
@@ -33,6 +33,10 @@ public sealed class ResultDefinition : SoftDeletableModel
     public UnitId UnitId { get; private set; }
 
     public Specification Specification { get; private set; } = null!;
+
+    public bool IsDeleted { get; private set; }
+
+    public DateTimeOffset? DeletedAt { get; private set; }
 
     internal void Update(
         string? resultInstance,

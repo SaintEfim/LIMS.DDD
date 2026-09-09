@@ -7,7 +7,7 @@ using LIMS.Service.Methodologies.Domain.StudyTemplateAggregate.Entities.ResultDe
 
 namespace LIMS.Service.Methodologies.Domain.StudyTemplateAggregate.Entities.CalculationRules;
 
-public sealed class CalculationRule : SoftDeletableModel
+public sealed class CalculationRule : ISoftDeletable
 {
     internal CalculationRule(
         StudyTemplateId studyTemplateId,
@@ -40,6 +40,10 @@ public sealed class CalculationRule : SoftDeletableModel
     public FormulaExpression FormulaExpression { get; private set; } = null!;
 
     public Description Description { get; private set; } = null!;
+
+    public bool IsDeleted { get; private set; }
+
+    public DateTimeOffset? DeletedAt { get; private set; }
 
     internal void Update(
         Name? name,

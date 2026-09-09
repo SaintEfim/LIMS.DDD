@@ -9,7 +9,7 @@ using LIMS.Service.LaboratoryOperations.Domain.ValueObjects;
 namespace LIMS.Service.LaboratoryOperations.Domain.SampleAggregate;
 
 public class Sample
-    : SoftDeletableModel,
+    : ISoftDeletable,
         IAggregateRoot
 {
     internal Sample(
@@ -49,6 +49,10 @@ public class Sample
 
     public bool CanAcceptNewEntity =>
         SampleStatus == SampleStatus.Registered || SampleStatus == SampleStatus.InProgress;
+
+    public bool IsDeleted { get; private set; }
+
+    public DateTimeOffset? DeletedAt { get; private set; }
 
     internal Result<None, DomainError> Delete()
     {

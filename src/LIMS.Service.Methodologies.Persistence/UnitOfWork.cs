@@ -1,9 +1,11 @@
 ﻿using Library.Domain.SeedWork;
+using Library.Domain.SeedWork.Events;
 
 namespace LIMS.Service.Methodologies.Persistence;
 
-internal sealed class UnitOfWork(ApplicationDbContext context) : IUnitOfWork,
-    IAsyncDisposable
+internal sealed class UnitOfWork(ApplicationDbContext context, IDomainEventsDispatcher domainEventsDispatcher)
+    : IUnitOfWork,
+        IAsyncDisposable
 {
     public async ValueTask DisposeAsync()
     {
@@ -16,7 +18,34 @@ internal sealed class UnitOfWork(ApplicationDbContext context) : IUnitOfWork,
     public async Task<int> SaveChangesAsync(
         CancellationToken cancellationToken = default)
     {
+        var domainEvents = CollectDomainEvents();
+
+        await domainEventsDispatcher.DispatchAsync(domainEvents, cancellationToken);
+
+        ClearDomainEvents();
+
         return await context.SaveChangesAsync(cancellationToken);
+    }
+
+    private IReadOnlyList<IDomainEvent> CollectDomainEvents()
+    {
+        return context.ChangeTracker
+            .Entries<EntityBase>()
+            .Where(entry => entry.Entity.DomainEvents.Count > 0)
+            .SelectMany(entry => entry.Entity.DomainEvents)
+            .ToList();
+    }
+
+    private void ClearDomainEvents()
+    {
+        var entityChangeTracker = context.ChangeTracker
+            .Entries<EntityBase>()
+            .Where(entry => entry.Entity.DomainEvents.Count > 0);
+
+        foreach (var entry in entityChangeTracker)
+        {
+            entry.Entity.ClearDomainEvents();
+        }
     }
 
     public async Task BeginTransactionAsync(

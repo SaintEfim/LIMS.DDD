@@ -3,7 +3,7 @@ using Library.Domain.SeedWork.ValueObjects;
 
 namespace LIMS.Service.LaboratoryOperations.Domain.StudyTemplateSnapshots.InputParameters;
 
-public sealed class InputParameterSnapshot : SoftDeletableModel
+public sealed class InputParameterSnapshot : ISoftDeletable
 {
     private InputParameterSnapshot()
     {
@@ -31,4 +31,6 @@ public sealed class InputParameterSnapshot : SoftDeletableModel
     public Description Description { get; private set; } = null!;
     public AliasName AliasName { get; private set; } = null!;
     public Specification Specification { get; private set; } = null!;
+    public bool IsDeleted { get; private set; }
+    public DateTimeOffset? DeletedAt { get; private set; }
 }

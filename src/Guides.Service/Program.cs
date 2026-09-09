@@ -1,5 +1,6 @@
 using Library.Broker.Messages;
 using Carter;
+using Guides.Service.Commands;
 using Guides.Service.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Library.Broker.RabbitMq.DependencyInjection;
@@ -25,6 +26,8 @@ builder.Services
     }, "guid-service")
     .AddMessage<UnitCreatedMessage>()
     .AddOutbox();
+
+builder.Services.AddScoped<UnitCreatedDomainEventHandler>();
 
 var app = builder.Build();
 

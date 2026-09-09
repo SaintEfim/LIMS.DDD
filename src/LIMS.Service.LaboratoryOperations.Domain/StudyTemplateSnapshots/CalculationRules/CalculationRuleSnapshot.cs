@@ -4,7 +4,7 @@ using LIMS.Service.LaboratoryOperations.Domain.StudyTemplateSnapshots.ResultDefi
 
 namespace LIMS.Service.LaboratoryOperations.Domain.StudyTemplateSnapshots.CalculationRules;
 
-public sealed class CalculationRuleSnapshot : SoftDeletableModel
+public sealed class CalculationRuleSnapshot : ISoftDeletable
 {
     private CalculationRuleSnapshot()
     {
@@ -32,4 +32,6 @@ public sealed class CalculationRuleSnapshot : SoftDeletableModel
     public Description Description { get; private set; } = null!;
     public FormulaExpression FormulaExpression { get; private set; } = null!;
     public ResultDefinitionId ResultDefinitionId { get; private set; }
+    public bool IsDeleted { get; private set; }
+    public DateTimeOffset? DeletedAt { get; private set; }
 }

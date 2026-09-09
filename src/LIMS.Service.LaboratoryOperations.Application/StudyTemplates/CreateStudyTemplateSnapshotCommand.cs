@@ -3,7 +3,7 @@
 public record CreateStudyTemplateSnapshotCommand(
     Guid Id,
     string Name,
-    string Description,
+    string? Description,
     string Revision,
     IReadOnlyList<InputParameterDto> InputParameters,
     IReadOnlyList<CreateResultDefinitionCommand> ResultDefinitions,
