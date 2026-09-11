@@ -1,3 +1,3 @@
-﻿namespace Guides.Service.Commands;
+﻿namespace Guides.Service.Application.Commands;
 
 public sealed record CreateUnitCommand(string Name);

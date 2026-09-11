@@ -18,6 +18,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Guides.Service.Application\Guides.Service.Application.csproj" />
+    <ProjectReference Include="..\Guides.Service.Infrastructure\Guides.Service.Infrastructure.csproj" />
+    <ProjectReference Include="..\Guides.Service.Persistence\Guides.Service.Persistence.csproj" />
     <ProjectReference Include="..\Library.Broker.Messages\Library.Broker.Messages.csproj" />
     <ProjectReference Include="..\Library.Domain.SeedWork\Library.Domain.SeedWork.csproj" />
     <ProjectReference Include="..\Library.Broker.RabbitMq\Library.Broker.RabbitMq.csproj" />

@@ -43,11 +43,4 @@ public sealed class UnitSnapshotRepository(ApplicationDbContext context) : IUnit
             .AsNoTracking()
             .SingleOrDefaultAsync(x => x.Id == id, cancellationToken);
     }
-
-    public async Task<UnitSnapshot?> GetByIdForChangeAsync(
-        UnitId id,
-        CancellationToken cancellationToken = default)
-    {
-        return await context.UnitSnapshots.SingleOrDefaultAsync(x => x.Id == id, cancellationToken);
-    }
 }
