@@ -14,7 +14,7 @@ internal sealed class DomainEventsDispatcher(IServiceProvider serviceProvider) :
             var handlerType = typeof(IDomainEventHandler<>).MakeGenericType(eventType);
 
             var handler = serviceProvider.GetService(handlerType);
-            if (handler == null) return;
+            if (handler == null) continue;
 
             var handleMethod = handlerType.GetMethod(nameof(IDomainEventHandler<>.Handle));
             var task = (Task) handleMethod!.Invoke(handler, [@event, cancellationToken])!;
