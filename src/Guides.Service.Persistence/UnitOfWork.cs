@@ -4,17 +4,8 @@ using Library.Domain.SeedWork.Events;
 namespace Guides.Service.Persistence;
 
 internal sealed class UnitOfWork(ApplicationDbContext context, IDomainEventsDispatcher domainEventsDispatcher)
-    : IUnitOfWork,
-        IAsyncDisposable
+    : IUnitOfWork
 {
-    public async ValueTask DisposeAsync()
-    {
-        if (context.Database.CurrentTransaction is not null)
-        {
-            await context.Database.CurrentTransaction.DisposeAsync();
-        }
-    }
-
     public async Task<int> SaveChangesAsync(
         CancellationToken cancellationToken = default)
     {

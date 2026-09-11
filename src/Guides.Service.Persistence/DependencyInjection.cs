@@ -15,6 +15,7 @@ public static class DependencyInjection
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         services.AddScoped<IUnitRepository, UnitRepository>();
+        services.AddScoped<UnitSeeder>();
 
         services.AddDbContext<ApplicationDbContext>(options =>
             options.UseNpgsql(configuration.GetConnectionString("ServiceDB")));

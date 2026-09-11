@@ -17,7 +17,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LIMS.Service.Methodologies.
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Guides", "Guides", "{ECDC5063-8703-4563-90ED-9CA188064DC8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Guides.Service", "src\Guides.Service\Guides.Service.csproj", "{9EDAEF6A-F590-495C-B262-EABC3657860D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Guides.Service.API", "src\Guides.Service.API\Guides.Service.API.csproj", "{9EDAEF6A-F590-495C-B262-EABC3657860D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Messages", "Messages", "{7570D6EF-62DD-4245-B8DC-8630259BB493}"
 EndProject

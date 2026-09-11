@@ -1,9 +1,9 @@
-﻿using Guides.Service.Apis;
+﻿using Guides.Service.API.Apis;
 using Guides.Service.Application;
 using Guides.Service.Infrastructure;
 using Guides.Service.Persistence;
 
-namespace Guides.Service;
+namespace Guides.Service.API;
 
 public static class DependencyInjection
 {

@@ -25,7 +25,7 @@ namespace Guides.Service.Persistence.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Guides.Service.Domains.Unit", b =>
+            modelBuilder.Entity("Guides.Service.API.Domains.Unit", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -53,7 +53,7 @@ namespace Guides.Service.Persistence.Migrations
                     b.ToTable("Units", (string)null);
                 });
 
-            modelBuilder.Entity("Guides.Service.Outbox.OutboxMessage", b =>
+            modelBuilder.Entity("Guides.Service.API.Outbox.OutboxMessage", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
