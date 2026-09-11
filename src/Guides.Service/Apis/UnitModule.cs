@@ -1,15 +1,12 @@
-﻿using Library.Broker.Messages;
-using Carter;
-using Guides.Service.Commands;
-using Guides.Service.Domains;
-using Guides.Service.Persistence;
-using Library.Outbox;
+﻿using Carter;
+using Guides.Service.Application.Commands;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace Guides.Service.Apis;
 
-public class UnitModule : ICarterModule
+public class UnitModule
+    : ModuleBase,
+        ICarterModule
 {
     public void AddRoutes(
         IEndpointRouteBuilder app)
@@ -17,86 +14,28 @@ public class UnitModule : ICarterModule
         var group = app.MapGroup("/api/units")
             .WithTags("Units");
 
-        group.MapGet("/", async (
-            [FromServices] ApplicationDbContext db,
-            CancellationToken cancellationToken = default) =>
-        {
-            var units = await db.Units
-                .AsNoTracking()
-                .ToListAsync(cancellationToken);
+        group.MapGet("/", GetAll)
+            .Produces<ICollection<UnitDto>>();
 
-            return Results.Ok(units);
-        });
+        group.MapGet("/{id:guid}", GetById)
+            .Produces<UnitDto>()
+            .Produces(StatusCodes.Status404NotFound);
+    }
 
-        group.MapGet("/{id:guid}", async (
-            Guid id,
-            [FromServices] ApplicationDbContext db,
-            CancellationToken cancellationToken = default) =>
-        {
-            var unit = await db.Units
-                .AsNoTracking()
-                .FirstOrDefaultAsync(u => u.Id == id, cancellationToken);
+    private static async Task<IResult> GetAll(
+        [FromServices] UnitServices services,
+        CancellationToken cancellationToken = default)
+    {
+        var units = await services.Queries.GetAllAsync(cancellationToken);
+        return Results.Ok(units);
+    }
 
-            return unit is null ? Results.NotFound() : Results.Ok(unit);
-        });
-
-        group.MapPost("/", async (
-            CreateUnitCommand unitCommand,
-            [FromServices] ApplicationDbContext db,
-            CancellationToken cancellationToken = default) =>
-        {
-            var unit = new Unit { Name = unitCommand.Name };
-
-            db.Units.Add(unit);
-
-            var message = new UnitCreatedMessage(unit.Id, unit.Name);
-
-            db.InsertOutboxMessage(message);
-
-            await db.SaveChangesAsync(cancellationToken);
-
-            return Results.Created($"/api/units/{unit.Id}", unit);
-        });
-
-        group.MapPut("/{id:guid}", async (
-            Guid id,
-            Unit updatedUnit,
-            [FromServices] ApplicationDbContext db,
-            CancellationToken cancellationToken = default) =>
-        {
-            if (id != updatedUnit.Id)
-            {
-                return Results.BadRequest();
-            }
-
-            var existingUnit = await db.Units.FindAsync([id], cancellationToken);
-            if (existingUnit is null)
-            {
-                return Results.NotFound();
-            }
-
-            existingUnit.Name = updatedUnit.Name;
-            await db.SaveChangesAsync(cancellationToken);
-
-            return Results.NoContent();
-        });
-
-        group.MapDelete("/{id:guid}", async (
-            Guid id,
-            [FromServices] ApplicationDbContext db,
-            CancellationToken cancellationToken = default) =>
-        {
-            var unit = await db.Units.FindAsync([id], cancellationToken);
-
-            if (unit is null)
-            {
-                return Results.NotFound();
-            }
-
-            unit.MarkAsDeleted();
-            await db.SaveChangesAsync(cancellationToken);
-
-            return Results.NoContent();
-        });
+    private static async Task<IResult> GetById(
+        Guid id,
+        [FromServices] UnitServices services,
+        CancellationToken cancellationToken = default)
+    {
+        var dto = await services.Queries.GetByIdAsync(id, cancellationToken);
+        return dto is null ? Results.NotFound() : Results.Ok(dto);
     }
 }

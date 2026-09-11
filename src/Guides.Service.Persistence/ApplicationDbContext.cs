@@ -1,4 +1,4 @@
-﻿using Guides.Service.Domains;
+﻿using Guides.Service.Domain;
 using Microsoft.EntityFrameworkCore;
 
 namespace Guides.Service.Persistence;

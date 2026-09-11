@@ -11,10 +11,6 @@ public interface IUnitSnapshotRepository : IRepository<UnitSnapshot>
         UnitId id,
         CancellationToken cancellationToken = default);
 
-    Task<UnitSnapshot?> GetByIdForChangeAsync(
-        UnitId id,
-        CancellationToken cancellationToken = default);
-
     Task<IReadOnlyList<UnitSnapshot>> GetByIdsAsync(
         IEnumerable<UnitId> ids,
         CancellationToken cancellationToken = default);
