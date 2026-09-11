@@ -18,7 +18,7 @@
 
   * [Требования](#требования)
   * [Запуск RabbitMQ](#запуск-rabbitmq)
-  * [Настройка базы данных](#настройка-базы-данных)
+  * [Настройка базы данных](#настройка-postgresql)
   * [Применение миграций](#применение-миграций)
   * [Запуск сервисов](#запуск-сервисов)
   * [Сервисы проекта](#сервисы-проекта)
@@ -39,6 +39,7 @@
 * [Использованные архитектурные паттерны](#использованные-архитектурные-паттерны)
 * [Архитектурные принципы](#архитектурные-принципы)
 * [Технологии](#технологии)
+* [Быстрый запуск](#быстрый-запуск)
 * [Нормативная основа](#нормативная-основа)
 * [Цель проекта](#цель-проекта)
 
@@ -50,26 +51,32 @@
 
 На текущий момент в репозитории присутствуют:
 
-* **Guides.Service** — сервис для хранения статических данных, например Ед. изм.
-* **LIMS.Service.Methodologies** — управление методиками, параметрами, результатами и правилами расчёта.
-* **LIMS.Service.LaboratoryOperations** — управление заданиями, пробами и исследованиями.
-* **RabbitMq.Library.Broker** — библиотека для работы с RabbitMQ.
-* **RabbitMq.Library.Outbox** — переиспользуемая реализация Outbox Pattern.
-* **Broker.Messages** — контракты интеграционных сообщений.
-* `Application.SeedWork` и `Domain.SeedWork` — общие примитивы Application и Domain слоёв.
+**Сервисы**
 
-Структура `src` отражает разделение сервисов на отдельные Application, Domain, Infrastructure, Persistence и API проекты.
+* **Guides.Service** — справочник единиц измерения (`Unit`). Публикует `UnitCreatedMessage`.
+* **LIMS.Service.Methodologies** — управление методиками, параметрами, результатами и правилами расчёта. Публикует `StudyTemplatePublishedMessage`, потребляет `UnitCreatedMessage`.
+* **LIMS.Service.LaboratoryOperations** — управление заданиями, пробами и исследованиями. Потребляет оба интеграционных события и хранит собственные snapshot-агрегаты.
 
-Каждый бизнес-контекст имеет собственный `DbContext` и собственный набор persistence-компонентов. Например, `LIMS.Service.Methodologies.Persistence` содержит `ApplicationDbContext`, репозитории, Unit of Work и EF Core migrations.
+**Общие библиотеки**
+
+* `Library.Broker.RabbitMq` — инфраструктура RabbitMQ.
+* `Library.Broker.Abstractions` — абстракции шины сообщений.
+* `Library.Outbox` / `Library.Outbox.Abstractions` — переиспользуемая реализация Outbox Pattern.
+* `Library.Broker.Messages` — контракты интеграционных сообщений.
+* `Library.Application.SeedWork` и `Library.Domain.SeedWork` — общие примитивы Application и Domain слоёв.
+
+Структура `src` отражает разделение каждого сервиса на отдельные Application, Domain, Infrastructure, Persistence и API проекты.
+
+Каждый бизнес-контекст имеет собственный `ApplicationDbContext`, собственную базу PostgreSQL и собственный набор persistence-компонентов.
 
 ---
 
 # Структура проекта
 
-Каждый основной микросервис разделён по слоям:
+Каждый микросервис разделён по слоям:
 
 ```text
-LIMS.Service.Methodologies
+Guides.Service / LIMS.Service.Methodologies / LIMS.Service.LaboratoryOperations
 │
 ├── API
 ├── Application
@@ -82,7 +89,7 @@ LIMS.Service.Methodologies
 
 Отвечает за транспортный слой:
 
-* HTTP endpoints;
+* HTTP endpoints (Carter);
 * HTTP request/response;
 * DI composition;
 * Swagger/OpenAPI.
@@ -118,14 +125,12 @@ Application Layer не содержит инфраструктурной реа�
 Отвечает за:
 
 * EF Core;
-* `DbContext`;
+* `ApplicationDbContext`;
 * PostgreSQL;
 * Repository implementations;
 * Unit of Work;
 * database configurations;
 * migrations.
-
-Например, `LIMS.Service.Methodologies.Persistence` содержит отдельные `Repositories`, `Configurations`, `Migrations` и `ApplicationDbContext`.
 
 ### Infrastructure
 
@@ -134,8 +139,10 @@ Application Layer не содержит инфраструктурной реа�
 * RabbitMQ;
 * integration events;
 * message handlers;
-* Outbox;
+* Outbox (Guides и Methodologies);
 * другие инфраструктурные зависимости.
+
+`LaboratoryOperations` в текущей версии только потребляет сообщения и не публикует собственные интеграционные события через Outbox.
 
 ---
 
@@ -146,9 +153,12 @@ Application Layer не содержит инфраструктурной реа�
 Для запуска проекта необходимо установить:
 
 * [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0)
-* [Docker](https://www.docker.com/)
+* [Docker](https://www.docker.com/) (для RabbitMQ и при желании PostgreSQL)
 * PostgreSQL
 * Git
+* [dotnet-ef](https://learn.microsoft.com/ef/core/cli/dotnet) для применения миграций
+
+SDK зафиксирован в `global.json` (`10.0.0`, `rollForward: major`).
 
 ---
 
@@ -168,11 +178,7 @@ cd LIMS.DDD
 Используется официальный Docker image с management UI:
 
 ```bash
-docker run -it --rm \
-  --name rabbitmq \
-  -p 5672:5672 \
-  -p 15672:15672 \
-  rabbitmq:3-management
+docker run -it --rm --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:3-management
 ```
 
 После запуска:
@@ -187,29 +193,43 @@ Username: guest
 Password: guest
 ```
 
-RabbitMQ используется сервисами для асинхронного обмена интеграционными событиями.
+Сервисы подключаются к брокеру с этими значениями по умолчанию (`localhost:5672`, `guest` / `guest`).
 
 ---
 
 ## 3. Настройка PostgreSQL
 
-Каждый бизнес-сервис имеет собственный `DbContext` и собственную persistence-конфигурацию.
+Каждый бизнес-сервис использует собственную базу:
 
 ```text
-LIMS.Service.Methodologies
+Guides.Service.API
         ↓
-ApplicationDbContext
-        ↓
-PostgreSQL
+ApplicationDbContext → GuidsDb
 
-LIMS.Service.LaboratoryOperations
+LIMS.Service.Methodologies.API
         ↓
-ApplicationDbContext
+ApplicationDbContext → MethodologiesDb
+
+LIMS.Service.LaboratoryOperations.API
         ↓
-PostgreSQL
+ApplicationDbContext → LaboratoryOperationsDb
 ```
 
-Connection string должен соответствовать настройкам локального PostgreSQL.
+Строки подключения задаются в `appsettings.json` каждого API (`ConnectionStrings:ServiceDB`). Значения по умолчанию:
+
+```text
+Host=localhost; Username=postgres; Password=1234
+```
+
+Их нужно привести в соответствие с локальным PostgreSQL.
+
+Пример запуска PostgreSQL в Docker:
+
+```bash
+docker run --name lims-postgres -e POSTGRES_PASSWORD=1234 -p 5432:5432 -d postgres:16
+```
+
+Базы создаются при применении миграций.
 
 ---
 
@@ -217,47 +237,43 @@ Connection string должен соответствовать настройка
 
 Перед первым запуском необходимо применить EF Core migrations.
 
-Для каждого сервиса необходимо применить соответствующие миграции:
-
-```bash
-dotnet ef database update \
-  --project src/LIMS.Service.Methodologies.Persistence \
-  --startup-project src/LIMS.Service.Methodologies.API
-
-dotnet ef database update \
-  --project src/LIMS.Service.LaboratoryOperations.Persistence \
-  --startup-project src/LIMS.Service.LaboratoryOperations.API
-
-dotnet ef database update \
-  --project src/LIMS.Service.Guides \
-  --startup-project src/LIMS.Service.Guides
-```
-
-Если `dotnet ef` отсутствует:
-
 ```bash
 dotnet tool install --global dotnet-ef
+
+dotnet ef database update --project src/LIMS.Service.Methodologies.Persistence --startup-project src/LIMS.Service.Methodologies.API
+
+dotnet ef database update --project src/LIMS.Service.LaboratoryOperations.Persistence --startup-project src/LIMS.Service.LaboratoryOperations.API
+
+dotnet ef database update --project src/Guides.Service.Persistence --startup-project src/Guides.Service.API
 ```
 
-После этого база данных будет приведена к актуальной схеме.
+После этого каждая база будет приведена к актуальной схеме.
 
 ---
 
-## 5. Заполнение базы данных
+## 5. Запуск сервисов
 
-После применения миграций необходимо выполнить скрипт инициализации, находящийся в корне репозитория:
+После применения миграций запустите сервисы скриптом из корня репозитория:
 
 ```cmd
 run-lims.cmd
 ```
 
-Скрипт предназначен для запуска сервисов проекта и автоматически подготавливает/запускает несколько приложений. В текущей версии он запускает:
+Скрипт собирает и запускает:
 
-* `Guides.Service`;
-* `LIMS.Service.Methodologies.API`;
-* `LIMS.Service.LaboratoryOperations.API`.
+* `Guides.Service.API` — [http://localhost:1003/swagger](http://localhost:1003/swagger)
+* `LIMS.Service.Methodologies.API` — [http://localhost:1001/swagger](http://localhost:1001/swagger)
+* `LIMS.Service.LaboratoryOperations.API` — [http://localhost:1002/swagger](http://localhost:1002/swagger)
 
-> **Важно:** перед запуском скрипта должны быть доступны PostgreSQL и RabbitMQ.
+Либо вручную:
+
+```bash
+dotnet run --project src/Guides.Service.API
+dotnet run --project src/LIMS.Service.Methodologies.API
+dotnet run --project src/LIMS.Service.LaboratoryOperations.API
+```
+
+> **Важно:** перед запуском должны быть доступны PostgreSQL и RabbitMQ.
 
 ---
 
@@ -265,7 +281,9 @@ run-lims.cmd
 
 ## Guides.Service
 
-Сервис для статических данных, которые не несут в себе сложной бизнес-логики. Например: Ед. изм., Оборудование, Заказчики.
+Справочный сервис единиц измерения. Сейчас в домене есть агрегат `Unit`.
+
+При создании единицы публикуется `UnitCreatedMessage`. Methodologies и LaboratoryOperations сохраняют у себя `UnitSnapshot`, чтобы не обращаться к базе Guides напрямую.
 
 ---
 
@@ -286,7 +304,7 @@ StudyTemplate
 
 * входные параметры;
 * определяемые показатели;
-* единицы измерения;
+* единицы измерения (через `UnitSnapshot`);
 * спецификации;
 * математические формулы;
 * правила расчёта.
@@ -307,7 +325,10 @@ Order
         └── TestResult
 ```
 
-Он работает независимо от контекста методик и использует собственный `ApplicationDbContext`.
+Он работает независимо от контекста методик и справочника единиц, используя собственные snapshot-агрегаты:
+
+* `StudyTemplateSnapshot` — снимок методики после публикации;
+* `UnitSnapshot` — снимок единицы измерения после создания в Guides.
 
 ---
 
@@ -320,7 +341,8 @@ stateDiagram-v2
     [*] --> Draft
 
     Draft --> Active : Утверждение (публикация snapshot)
-    Draft --> [*] : Удаление
+    Draft --> Archived : Архивирование
+    Draft --> [*] : Удаление (soft delete)
 
     Active --> Archived : Архивирование
 ```
@@ -376,11 +398,13 @@ stateDiagram-v2
     InProgress --> [*] : Удаление
 
     Completed --> Approved : Утверждение
-    Completed --> Canceled : Аннулирование
+    Completed --> InProgress : Возврат в работу
 
+    Canceled --> [*] : Удаление
     Approved --> [*]
-    Canceled --> [*]
 ```
+
+Удаление исследования запрещено в статусах `Completed` и `Approved`.
 
 ---
 
@@ -390,16 +414,20 @@ stateDiagram-v2
 
 ```mermaid
 flowchart LR
+    G[Unit<br/>Guides] -->|UnitCreatedMessage| U1[UnitSnapshot<br/>Methodologies]
+    G -->|UnitCreatedMessage| U2[UnitSnapshot<br/>LabOps]
+
+    M[StudyTemplate<br/>Methodologies] -->|StudyTemplatePublishedMessage| S[StudyTemplateSnapshot<br/>LabOps]
+
     A[Order<br/>Задание] -->|1:N| B[Sample<br/>Проба]
     B -->|1:N| C[Study<br/>Исследование]
 
     C -->|1:N| D[MeasuredValue<br/>Сырые измерения]
     C -->|1:N| E[TestResult<br/>Результаты]
-
-    C -->|1:1| S[StudyTemplateSnapshot<br/>Снимок методики]
+    C -->|1:1| S
 ```
 
-Важно понимать, что **snapshot методики создаётся не в момент создания `Study`, а значительно раньше — при публикации методики в сервисе `Methodologies`** (переход `Draft → Active`). В этот момент публикуется интеграционное событие `StudyTemplatePublishedMessage`, которое доставляется в `LaboratoryOperations`, где на его основе формируется отдельный агрегат `StudyTemplateSnapshot`.
+**Snapshot методики создаётся не в момент создания `Study`, а при публикации методики** (переход `Draft → Active`). В этот момент публикуется `StudyTemplatePublishedMessage`, которое доставляется в `LaboratoryOperations`, где формируется отдельный агрегат `StudyTemplateSnapshot`.
 
 Когда создаётся `Study`, он использует **уже существующий** snapshot из собственного контекста `LaboratoryOperations`. Это позволяет исследованию оставаться неизменным с точки зрения применённой методики даже после появления новой ревизии `StudyTemplate`.
 
@@ -411,11 +439,11 @@ flowchart LR
 
 1. **Регистрация Задания** — создание бизнес-обязательства перед заказчиком.
 2. **Регистрация Проб** — привязка физических образцов к заданию с указанием даты отбора, объёма и кода.
-3. **Создание Исследований** — автоматическая генерация структуры исследования на основе **уже существующего** `StudyTemplateSnapshot`, ранее полученного через интеграционное событие:
+3. **Создание Исследований** — автоматическая генерация структуры исследования на основе **уже существующего** `StudyTemplateSnapshot`:
 
-  1. Создаются `MeasuredValue` для входных параметров.
-  2. Создаются `TestResult` для определяемых показателей.
-  3. Исторические данные методики копируются в исследование.
+   1. Создаются `MeasuredValue` для входных параметров.
+   2. Создаются `TestResult` для определяемых показателей.
+   3. Исторические данные методики копируются в исследование.
 
 Таким образом, последующие изменения методики не изменяют уже созданные исследования.
 
@@ -431,8 +459,8 @@ flowchart LR
 4. Определение правил расчёта.
 5. Привязка переменных формул к входным параметрам.
 6. **Утверждение методики — переход `Draft → Active`**. В этот момент:
-  * публикуется интеграционное событие `StudyTemplatePublishedMessage`;
-  * `LaboratoryOperations` получает событие и создаёт собственный `StudyTemplateSnapshot`.
+   * публикуется интеграционное событие `StudyTemplatePublishedMessage`;
+   * `LaboratoryOperations` получает событие и создаёт собственный `StudyTemplateSnapshot`.
 
 ---
 
@@ -471,7 +499,7 @@ flowchart LR
 
 # Движок расчётов
 
-LIMS поддерживает автоматический расчёт результатов по формулам, определённым в `StudyTemplateSnapshot`.
+LIMS поддерживает автоматический расчёт результатов по формулам из `StudyTemplateSnapshot`. Вычисление выполняется библиотекой **NoStringEvaluating**.
 
 ```mermaid
 sequenceDiagram
@@ -482,10 +510,10 @@ sequenceDiagram
     participant TR as TestResult
     participant E as Formula Engine
 
-    A->>API: PATCH /measured-values/{id}
+    A->>API: PATCH /api/studies/{studyId}/measured-values/{id}
     API->>MV: Update(35.5)
 
-    A->>API: POST /test-results/{id}/execute
+    A->>API: POST /api/studies/{studyId}/test-results/{id}/execute
 
     API->>S: Загрузка Study + StudyTemplateSnapshot
     API->>TR: Поиск CalculationRule
@@ -529,9 +557,14 @@ DDD используется не только как структура пап�
 
 ## Bounded Context
 
-Проект разделён как минимум на два основных бизнес-контекста:
+Проект разделён на три бизнес-контекста:
 
 ```text
+GuidesContext
+        │
+        │ UnitCreatedMessage
+        │ (через RabbitMQ + Outbox)
+        ▼
 StudyTemplateContext (Methodologies)
         │
         │ StudyTemplatePublishedMessage
@@ -541,8 +574,14 @@ LaboratoryOperationsContext
         │
         │ сохраняет
         ▼
-StudyTemplateSnapshot (отдельный агрегат)
+StudyTemplateSnapshot / UnitSnapshot
 ```
+
+### GuidesContext
+
+Отвечает за справочные данные:
+
+* единицы измерения.
 
 ### StudyTemplateContext
 
@@ -552,7 +591,8 @@ StudyTemplateSnapshot (отдельный агрегат)
 * параметры;
 * результаты;
 * формулы;
-* спецификации.
+* спецификации;
+* snapshots единиц измерения.
 
 ### LaboratoryOperationsContext
 
@@ -563,7 +603,7 @@ StudyTemplateSnapshot (отдельный агрегат)
 * исследования;
 * измерения;
 * результаты;
-* snapshots методик (полученные через интеграционные события).
+* snapshots методик и единиц измерения.
 
 ---
 
@@ -595,6 +635,7 @@ IStudyRepository
 IStudyTemplateRepository
 IOrderRepository
 ISampleRepository
+IUnitRepository
 ```
 
 Конкретная реализация находится в Persistence Layer.
@@ -635,7 +676,7 @@ Domain Services используются для бизнес-операций, �
 
 Один из ключевых паттернов проекта.
 
-Snapshot создаётся **при публикации методики** (`Draft → Active`), а не при создании исследования:
+Snapshot методики создаётся **при публикации** (`Draft → Active`), а не при создании исследования:
 
 ```text
 StudyTemplate v1 (Methodologies)
@@ -654,13 +695,15 @@ StudyTemplateSnapshot (отдельный агрегат в LabOps)
 Study
 ```
 
+Аналогично `Unit` из Guides проецируется в `UnitSnapshot` в Methodologies и LaboratoryOperations.
+
 Это позволяет:
 
 * сохранять историческое состояние методики;
 * не зависеть от последующих изменений мастер-данных;
 * воспроизводить результаты исследований;
 * обеспечивать аудит применённой методики;
-* полностью развязать два bounded context (они не обращаются к БД друг друга).
+* полностью развязать bounded contexts (они не обращаются к БД друг друга).
 
 ---
 
@@ -698,15 +741,13 @@ RabbitMQ
 
 После успешного commit фоновый worker публикует сообщение в RabbitMQ. Если брокер недоступен — сообщение остаётся в таблице и будет отправлено при следующей итерации.
 
-Outbox вынесен в переиспользуемую библиотеку и может работать с разными `DbContext`, поэтому каждый микросервис может использовать собственную persistence-модель.
+Outbox вынесен в переиспользуемую библиотеку и может работать с разными `DbContext`. Сейчас Outbox подключён в **Guides** и **Methodologies**. LaboratoryOperations в текущей версии только потребляет события.
 
 ---
 
 ## Integration Events
 
-Для коммуникации между микросервисами используются интеграционные события.
-
-Например:
+Для коммуникации между микросервисами используются интеграционные события из `Library.Broker.Messages`:
 
 ```text
 StudyTemplatePublishedMessage
@@ -732,7 +773,7 @@ Message Handler
        ↓
 Application
        ↓
-Сохранение StudyTemplateSnapshot
+Сохранение snapshot
 ```
 
 Таким образом, бизнес-контексты не должны напрямую обращаться к базам данных друг друга.
@@ -757,13 +798,14 @@ Consumer
 
 и уменьшить связанность между микросервисами.
 
-RabbitMQ инфраструктура также вынесена в отдельные библиотеки:
+RabbitMQ инфраструктура вынесена в отдельные библиотеки:
 
 ```text
-RabbitMq.Library.Broker
-RabbitMq.Library.Broker.Abstractions
-RabbitMq.Library.Outbox
-RabbitMq.Library.Outbox.Abstractions
+Library.Broker.RabbitMq
+Library.Broker.Abstractions
+Library.Outbox
+Library.Outbox.Abstractions
+Library.Broker.Messages
 ```
 
 ---
@@ -774,10 +816,18 @@ RabbitMq.Library.Outbox.Abstractions
 
 ```mermaid
 sequenceDiagram
+    participant G as Guides
     participant M as Methodologies
     participant O as Outbox
     participant R as RabbitMQ
     participant L as Laboratory Operations
+
+    G->>O: UnitCreated
+    O->>R: Publish message
+    R->>M: Deliver UnitCreated
+    R->>L: Deliver UnitCreated
+    M->>M: Сохранить UnitSnapshot
+    L->>L: Сохранить UnitSnapshot
 
     M->>O: StudyTemplatePublished
     O->>R: Publish message
@@ -794,11 +844,9 @@ sequenceDiagram
 Управление жизненным циклом агрегатов реализовано через State Machine Pattern. Каждый статус (`Draft`, `Active`, `Archived`, `InProgress`, `Completed` и т.д.) определяет:
 
 * допустимые переходы (`CanTransitionTo`);
-* возможность редактирования (`CanEdit`);
-* возможность создания дочерних сущностей (`CanAcceptNewEntity`);
-* возможность удаления связанных сущностей (`CanDeleteAssociatedEntities`).
+* возможность редактирования (`CanEdit`).
 
-Правила переходов инкапсулированы в самих сущностях статусов, а не размазаны по коду бизнес-логики.
+Правила переходов инкапсулированы в классах состояний. Возможность создавать дочерние сущности (`CanAcceptNewEntity`) и удалять связанные сущности (`CanDeleteAssociatedEntities`) проверяется на агрегатах `Order` и `Sample` на основании текущего статуса.
 
 ---
 
@@ -814,8 +862,9 @@ public static Result<Name, DomainError> Create(string value)
     if (string.IsNullOrWhiteSpace(value))
         return new ValidationError("Name cannot be empty.");
 
-    if (value.Length > MaxLength)
-        return new ValidationError($"Name cannot exceed {MaxLength} characters.");
+    if (value.Length > MaxNameLength)
+        return new ValidationError(
+            $"Name length cannot exceed {MaxNameLength} characters. Current length: {value.Length}.");
 
     return new Name(value.Trim());
 }
@@ -832,49 +881,41 @@ public static Result<Name, DomainError> Create(string value)
 
 ## Двухуровневая модель ошибок
 
-В проекте используются два уровня ошибок для чёткого разделения ответственности:
+В проекте используются два уровня ошибок для чёткого разделения ответственности.
 
 ### Domain Errors
 
-Ошибки бизнес-логики, возникающие в доменном слое:
+Ошибки бизнес-логики в доменном слое (`Library.Domain.SeedWork.Errors`). `DomainError` наследуется от `Exception` и содержит `Code` / `Message`.
 
-```csharp
-public abstract record DomainError
-{
-    public abstract string Code { get; }
-    public abstract string Message { get; }
-}
-```
-
-Примеры: `EntityNotFoundError`, `EntityAlreadyDeletedError`, `InvalidStatusTransitionError`, `EntityNotEditableError`, `EntityInUseError`, `ValidationError`.
+Примеры: `EntityNotFoundError`, `EntityAlreadyDeletedError`, `InvalidStatusTransitionError`, `EntityNotEditableError`, `EntityInUseError`, `DuplicateEntityError`, `ValidationError`.
 
 ### Application Errors
 
-Ошибки application-слоя, оборачивающие доменные ошибки или представляющие инфраструктурные проблемы:
+Ошибки application-слоя (`Library.Application.SeedWork.Errors`) оборачивают доменные ошибки или представляют инфраструктурные проблемы. `ApplicationError` также наследуется от `Exception`:
 
 ```csharp
-public abstract record ApplicationError;
+public abstract class ApplicationError : Exception;
 
-public sealed record DomainRuleViolation(DomainError Error) : ApplicationError;
-public sealed record NotFoundError(string Message) : ApplicationError;
-public sealed record ValidationError(string Message) : ApplicationError;
-public sealed record PersistenceError(string Message) : ApplicationError;
+public sealed class DomainRuleViolation(DomainError error) : ApplicationError;
+public sealed class NotFoundError(string Message) : ApplicationError;
+public sealed class ValidationError(string Message) : ApplicationError;
+public sealed class PersistenceError(string Message) : ApplicationError;
 ```
 
-API-слой маппит `ApplicationError` на HTTP-статусы:
+API-слой (например, `ModuleBase` в Methodologies) маппит ошибки на HTTP-статусы:
 
 | Тип ошибки | HTTP статус |
 |------------|-------------|
-| `NotFoundError` / `EntityNotFoundError` | 404 Not Found |
+| `NotFoundError` / `EntityNotFoundError` / `EntityAlreadyDeletedError` | 404 Not Found |
 | `ValidationError` | 400 Bad Request |
-| `InvalidStatusTransitionError` / `EntityNotEditableError` / `EntityInUseError` | 409 Conflict |
+| `InvalidStatusTransitionError` / `EntityNotEditableError` / `EntityInUseError` / `DuplicateEntityError` | 409 Conflict |
 | `PersistenceError` | 500 Internal Server Error |
 
 ---
 
 ## Soft Delete
 
-Для мастер-данных используется Soft Delete:
+Для мастер-данных и операционных агрегатов используется Soft Delete:
 
 ```text
 IsDeleted = true
@@ -902,10 +943,11 @@ DeletedAt = DateTimeOffset.UtcNow
 ## 1. Разделение контекстов
 
 ```text
+GuidesContext
+        │ UnitCreatedMessage
+        ▼
 StudyTemplateContext (Methodologies)
-        │
         │ StudyTemplatePublishedMessage
-        │ (через Outbox + RabbitMQ)
         ▼
 LaboratoryOperationsContext
 ```
@@ -1008,6 +1050,7 @@ COMMIT
 | **RabbitMQ**                 | Message Broker                    |
 | **Docker**                   | Инфраструктура                    |
 | **Carter**                   | Организация Minimal API endpoints |
+| **NoStringEvaluating**       | Движок формул                     |
 | **Swagger / OpenAPI**        | API documentation                 |
 | **Mermaid**                  | Архитектурные и бизнес-диаграммы  |
 | **Git**                      | Version Control                   |
@@ -1026,26 +1069,14 @@ cd LIMS.DDD
 
 ```bash
 # 2. Запустить RabbitMQ
-docker run -it --rm \
-  --name rabbitmq \
-  -p 5672:5672 \
-  -p 15672:15672 \
-  rabbitmq:3-management
+docker run -it --rm --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:3-management
 ```
 
 ```bash
 # 3. Применить миграции
-dotnet ef database update \
-  --project src/LIMS.Service.Methodologies.Persistence \
-  --startup-project src/LIMS.Service.Methodologies.API
-
-dotnet ef database update \
-  --project src/LIMS.Service.LaboratoryOperations.Persistence \
-  --startup-project src/LIMS.Service.LaboratoryOperations.API
-
-dotnet ef database update \
-  --project src/LIMS.Service.Guides \
-  --startup-project src/LIMS.Service.Guides
+dotnet ef database update --project src/LIMS.Service.Methodologies.Persistence --startup-project src/LIMS.Service.Methodologies.API
+dotnet ef database update --project src/LIMS.Service.LaboratoryOperations.Persistence --startup-project src/LIMS.Service.LaboratoryOperations.API
+dotnet ef database update --project src/Guides.Service.Persistence --startup-project src/Guides.Service.API
 ```
 
 Затем:
@@ -1057,9 +1088,9 @@ run-lims.cmd
 После этого должны быть запущены:
 
 ```text
-Guides.Service
-LIMS.Service.Methodologies.API
-LIMS.Service.LaboratoryOperations.API
+Guides.Service.API                     http://localhost:1003
+LIMS.Service.Methodologies.API         http://localhost:1001
+LIMS.Service.LaboratoryOperations.API  http://localhost:1002
 ```
 
 И RabbitMQ:
@@ -1080,6 +1111,8 @@ Management: localhost:15672
    Регистрируются единицы измерения, необходимые для работы с методикой:
    - `г` — грамм;
    - `%` — процент.
+
+   После создания нужно дождаться доставки `UnitCreatedMessage` и появления `UnitSnapshot` в остальных сервисах.
 
 2. **Создание методики**
 
@@ -1104,9 +1137,9 @@ Management: localhost:15672
 
    ```text
    ((m1 - m2) / (m1 - m0)) * 100
-    ````
+   ```
 
-Переменные формулы связываются с соответствующими входными параметрами методики.
+   Переменные формулы связываются с соответствующими входными параметрами методики.
 
 5. **Утверждение методики**
 
@@ -1136,9 +1169,9 @@ Management: localhost:15672
 
     В исследование вносятся фактические значения:
 
-  * `m1` — масса бюксы с зерном до высушивания;
-  * `m2` — масса бюксы с зерном после высушивания;
-  * `m0` — масса пустой бюксы.
+    * `m1` — масса бюксы с зерном до высушивания;
+    * `m2` — масса бюксы с зерном после высушивания;
+    * `m0` — масса пустой бюксы.
 
 11. **Расчёт результатов**
 
