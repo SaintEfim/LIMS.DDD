@@ -2,7 +2,7 @@
 using Guides.Service.Application.Commands;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Guides.Service.Apis;
+namespace Guides.Service.API.Apis;
 
 public class UnitModule
     : ModuleBase,

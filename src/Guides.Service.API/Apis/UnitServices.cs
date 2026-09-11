@@ -1,6 +1,6 @@
 ﻿using Guides.Service.Application.Commands;
 
-namespace Guides.Service.Apis;
+namespace Guides.Service.API.Apis;
 
 public class UnitServices(UnitCommandsHandler commands, UnitQueries queries)
 {

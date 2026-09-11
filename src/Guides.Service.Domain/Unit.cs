@@ -4,18 +4,40 @@ using Library.Domain.SeedWork.ValueObjects;
 namespace Guides.Service.Domain;
 
 public class Unit
-    : ISoftDeletable,
+    : EntityBase,
+        ISoftDeletable,
         IAggregateRoot
 {
-    public Unit(
-        Name name)
+    private Unit()
     {
-        Id = new UnitId(Guid.NewGuid());
-        Name = name;
+        // Required by EF Core.
     }
 
-    public UnitId Id { get; set; }
-    public Name Name { get; set; }
+    public Unit(
+        Name name)
+        : this(new UnitId(Guid.NewGuid()), name)
+    {
+    }
+
+    public static Unit CreateSystem(
+        UnitId id,
+        Name name)
+    {
+        return new Unit(id, name);
+    }
+
+    private Unit(
+        UnitId id,
+        Name name)
+    {
+        Id = id;
+        Name = name;
+
+        AddDomainEvent(new UnitCreatedDomainEvent(this));
+    }
+
+    public UnitId Id { get; private set; }
+    public Name Name { get; private set; } = null!;
     public bool IsDeleted { get; private set; }
     public DateTimeOffset? DeletedAt { get; private set; }
 

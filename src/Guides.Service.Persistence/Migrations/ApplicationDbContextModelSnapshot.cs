@@ -22,10 +22,9 @@ namespace Guides.Service.Persistence.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Guides.Service.Domains.Unit", b =>
+            modelBuilder.Entity("Guides.Service.Domain.Unit", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
                     b.Property<DateTimeOffset?>("DeletedAt")
@@ -38,8 +37,8 @@ namespace Guides.Service.Persistence.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
 
                     b.HasKey("Id");
 
@@ -50,14 +49,14 @@ namespace Guides.Service.Persistence.Migrations
                     b.ToTable("Units", (string)null);
                 });
 
-            modelBuilder.Entity("Guides.Service.Outbox.OutboxMessage", b =>
+            modelBuilder.Entity("Library.Outbox.OutboxMessage", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
 
                     b.Property<string>("Content")
                         .IsRequired()
-                        .HasMaxLength(2000)
+                        .HasMaxLength(10000)
                         .HasColumnType("jsonb");
 
                     b.Property<string>("Error")

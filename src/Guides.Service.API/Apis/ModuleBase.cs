@@ -3,7 +3,7 @@ using Library.Domain.SeedWork.Errors;
 using AppValidationError = Library.Application.SeedWork.Errors.ValidationError;
 using DomainValidationError = Library.Domain.SeedWork.Errors.ValidationError;
 
-namespace Guides.Service.Apis;
+namespace Guides.Service.API.Apis;
 
 public class ModuleBase
 {
