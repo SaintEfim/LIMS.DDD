@@ -1,11 +1,13 @@
 using Guides.Service.Domain;
+using Library.Broker.Messages;
 using Library.Domain.SeedWork;
 using Library.Domain.SeedWork.ValueObjects;
+using Library.Outbox;
 using Microsoft.EntityFrameworkCore;
 
 namespace Guides.Service.Persistence;
 
-public sealed class UnitSeeder(ApplicationDbContext context, IUnitOfWork unitOfWork)
+public sealed class UnitSeeder(ApplicationDbContext context, IUnitOfWork unitOfWork, IOutboxRepository outboxRepository)
 {
     private static readonly UnitSeed[] DefaultUnits =
     [
@@ -44,6 +46,9 @@ public sealed class UnitSeeder(ApplicationDbContext context, IUnitOfWork unitOfW
             }
 
             context.Units.Add(Unit.CreateSystem(seed.Id, nameResult.GetValue()));
+
+            outboxRepository.InsertOutboxMessage(new UnitCreatedMessage(seed.Id.Value, nameResult.GetValue()
+                .Value));
         }
 
         await unitOfWork.SaveChangesAsync(cancellationToken);

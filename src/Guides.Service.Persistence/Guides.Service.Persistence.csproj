@@ -13,6 +13,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Guides.Service.Domain\Guides.Service.Domain.csproj" />
+      <ProjectReference Include="..\Library.Broker.Messages\Library.Broker.Messages.csproj" />
       <ProjectReference Include="..\Library.Outbox.Abstractions\Library.Outbox.Abstractions.csproj" />
     </ItemGroup>
 
