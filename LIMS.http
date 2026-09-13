@@ -2,41 +2,11 @@
 @laboratoryOperationsUrl = http://localhost:1002
 @unitServiceUrl = http://localhost:1003
 
+@unitPercentId = "00000000-0000-0000-0000-000000000001"
+
 ### ============================================
 ### СОЗДАНИЕ UNITS
 ### ============================================
-
-# @name createUnitGram
-POST {{unitServiceUrl}}/api/units
-Content-Type: application/json
-
-{
-  "name": "г {{$random.code.ean13}}"
-}
-
-> {%
-  client.test("Create unit 'г'", function () {
-    client.assert(response.status === 201, "Unit 'г' creation failed: " + response.status);
-  });
-  client.global.set("unitGramId", response.body.id);
-%}
-
-###
-
-# @name createUnitPercent
-POST {{unitServiceUrl}}/api/units
-Content-Type: application/json
-
-{
-  "name": "% {{$random.code.ean13}}"
-}
-
-> {%
-  client.test("Create unit '%'", function () {
-    client.assert(response.status === 201, "Unit '%' creation failed: " + response.status);
-  });
-  client.global.set("unitPercentId", response.body.id);
-%}
 
 ###
 
@@ -139,7 +109,7 @@ Content-Type: application/json
 
 {
   "resultInstance": "Вода",
-  "unitId": "{{unitPercentId}}",
+  "unitId": {{unitPercentId}},
   "minValue": 5.0,
   "maxValue": 20.0
 }
@@ -159,7 +129,7 @@ Content-Type: application/json
 
 {
   "resultInstance": "Сухое вещество",
-  "unitId": "{{unitPercentId}}",
+  "unitId": {{unitPercentId}},
   "minValue": 80.0,
   "maxValue": 95.0
 }
@@ -276,7 +246,7 @@ Content-Type: application/json
   "gatherDateEnd": "2023-10-25T08:15:00Z",
   "code": "SAMPLE-{{$random.uuid}}",
   "volumeValue": 1000.0,
-  "volumeUnitId": "{{unitGramId}}"
+  "volumeUnitId": {{unitPercentId}}
 }
 
 > {%
