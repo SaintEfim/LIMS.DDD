@@ -17,7 +17,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LIMS.Service.Methodologies.
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Guides", "Guides", "{ECDC5063-8703-4563-90ED-9CA188064DC8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Guides.Service.API", "src\Guides.Service.API\Guides.Service.API.csproj", "{9EDAEF6A-F590-495C-B262-EABC3657860D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Service.Guides.API", "src\Service.Guides.API\Service.Guides.API.csproj", "{9EDAEF6A-F590-495C-B262-EABC3657860D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Messages", "Messages", "{7570D6EF-62DD-4245-B8DC-8630259BB493}"
 EndProject
@@ -62,13 +62,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Library.Broker.Abstractions
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Library.Outbox.Abstractions", "src\Library.Outbox.Abstractions\Library.Outbox.Abstractions.csproj", "{9B45A877-7CC8-4A7C-8CAF-D5DCF9002EAF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Guides.Service.Application", "src\Guides.Service.Application\Guides.Service.Application.csproj", "{23434F6D-04C7-4033-AB53-995B242193BC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Service.Guides.Application", "src\Service.Guides.Application\Service.Guides.Application.csproj", "{23434F6D-04C7-4033-AB53-995B242193BC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Guides.Service.Domain", "src\Guides.Service.Domain\Guides.Service.Domain.csproj", "{BEB240C8-2D9E-46CC-BE35-D3839B6E6DD3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Service.Guides.Domain", "src\Service.Guides.Domain\Service.Guides.Domain.csproj", "{BEB240C8-2D9E-46CC-BE35-D3839B6E6DD3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Guides.Service.Persistence", "src\Guides.Service.Persistence\Guides.Service.Persistence.csproj", "{0B536109-51B0-42EF-B6FE-6A32E1FB0F2F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Service.Guides.Persistence", "src\Service.Guides.Persistence\Service.Guides.Persistence.csproj", "{0B536109-51B0-42EF-B6FE-6A32E1FB0F2F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Guides.Service.Infrastructure", "src\Guides.Service.Infrastructure\Guides.Service.Infrastructure.csproj", "{51718CA3-9457-4649-8548-5157A40537F8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Service.Guides.Infrastructure", "src\Service.Guides.Infrastructure\Service.Guides.Infrastructure.csproj", "{51718CA3-9457-4649-8548-5157A40537F8}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Broker", "Broker", "{8AA046A3-6393-4F72-B553-D92CC295D9E0}"
 EndProject
