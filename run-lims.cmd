@@ -41,6 +41,7 @@ echo.
 
 call :run_service Guides.Service.API                     Guides.Service.API                     "Units [Guides]"
 call :run_service LIMS.Service.Methodologies.API        LIMS.Service.Methodologies.API        "Methodologies"
+call :run_service Service.Reports                        Service.Reports                        "Reports"
 call :run_service LIMS.Service.LaboratoryOperations.API LIMS.Service.LaboratoryOperations.API "Laboratory Operations"
 
 echo.

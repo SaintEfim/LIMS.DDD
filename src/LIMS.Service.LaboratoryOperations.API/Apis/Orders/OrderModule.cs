@@ -1,7 +1,10 @@
 ﻿using Carter;
 using LIMS.Service.LaboratoryOperations.Application.Orders;
 using LIMS.Service.LaboratoryOperations.Application.Orders.Commands;
+using LIMS.Service.LaboratoryOperations.Application.Samples;
 using Microsoft.AspNetCore.Mvc;
+using Service.Reports.Client;
+using Service.Reports.Client.Models;
 
 namespace LIMS.Service.LaboratoryOperations.API.Apis.Orders;
 
@@ -21,6 +24,11 @@ public class OrderModule
         group.MapGet("/{id:guid}", GetById)
             .Produces<OrderDto>()
             .Produces(StatusCodes.Status404NotFound);
+
+        group.MapPost("/{id:guid}/report", GenerateReport)
+            .Produces(StatusCodes.Status200OK, contentType: "application/pdf")
+            .Produces(StatusCodes.Status404NotFound)
+            .Produces(StatusCodes.Status502BadGateway);
 
         group.MapPost("/", Create)
             .Produces(StatusCodes.Status201Created)
@@ -58,6 +66,40 @@ public class OrderModule
     {
         var dto = await services.Queries.GetByIdAsync(id, cancellationToken);
         return dto is not null ? Results.Ok(dto) : Results.NotFound();
+    }
+
+    private static async Task<IResult> GenerateReport(
+        Guid id,
+        [FromServices] OrderServices services,
+        [FromServices] SampleQueries sampleQueries,
+        [FromServices] IReportClient reportClient,
+        CancellationToken cancellationToken = default)
+    {
+        var order = await services.Queries.GetByIdAsync(id, cancellationToken);
+        if (order is null) return Results.NotFound();
+
+        var samples = await sampleQueries.GetAllByOrderIdAsync(id, cancellationToken);
+        try
+        {
+            var orderClient = new OrderInfo(order.Id, order.Name, order.Description, order.Code, order.Contractor,
+                order.Status);
+
+            var sampleList = samples.Select(x => new SampleInfo(x.Id, x.OrderId, x.Name, x.GatherDateBegin,
+                    x.GatherDateEnd, x.Code, x.VolumeValue, x.VolumeUnit, x.Status))
+                .ToList();
+
+            var pdf = await reportClient.GenerateReportAsync(orderClient, sampleList, cancellationToken);
+
+            return Results.File(pdf, "application/pdf", $"order-{id}.pdf");
+        }
+        catch (HttpRequestException)
+        {
+            return Results.Problem("Report service is unavailable.", statusCode: StatusCodes.Status502BadGateway);
+        }
+        catch (TaskCanceledException) when (!cancellationToken.IsCancellationRequested)
+        {
+            return Results.Problem("Report service timed out.", statusCode: StatusCodes.Status504GatewayTimeout);
+        }
     }
 
     private static async Task<IResult> Create(
