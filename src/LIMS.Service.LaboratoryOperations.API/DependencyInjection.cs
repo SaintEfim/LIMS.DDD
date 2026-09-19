@@ -9,6 +9,7 @@ using LIMS.Service.LaboratoryOperations.Application;
 using LIMS.Service.LaboratoryOperations.Domain.Services;
 using LIMS.Service.LaboratoryOperations.Infrastructure;
 using LIMS.Service.LaboratoryOperations.Persistence;
+using Service.Reports.Client;
 
 namespace LIMS.Service.LaboratoryOperations.API;
 
@@ -21,6 +22,8 @@ public static class DependencyInjection
         services.AddInfrastructure();
         services.AddPersistence(configuration);
         services.AddApplication();
+
+        services.AddReportsClient(configuration);
 
         services.AddScoped<UnitSnapshotServices>();
 

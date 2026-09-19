@@ -21,6 +21,7 @@
     <ProjectReference Include="..\LIMS.Service.LaboratoryOperations.Domain\LIMS.Service.LaboratoryOperations.Domain.csproj"/>
     <ProjectReference Include="..\LIMS.Service.LaboratoryOperations.Infrastructure\LIMS.Service.LaboratoryOperations.Infrastructure.csproj"/>
     <ProjectReference Include="..\LIMS.Service.LaboratoryOperations.Persistence\LIMS.Service.LaboratoryOperations.Persistence.csproj"/>
+    <ProjectReference Include="..\Service.Reports.Client\Service.Reports.Client.csproj" />
   </ItemGroup>
 
 </Project>

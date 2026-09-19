@@ -53,9 +53,10 @@
 
 **Сервисы**
 
-* **Guides.Service** — справочник единиц измерения (`Unit`). Публикует `UnitCreatedMessage`.
+* **Service.Guides** — справочник единиц измерения (`Unit`). Публикует `UnitCreatedMessage`.
 * **LIMS.Service.Methodologies** — управление методиками, параметрами, результатами и правилами расчёта. Публикует `StudyTemplatePublishedMessage`, потребляет `UnitCreatedMessage`.
 * **LIMS.Service.LaboratoryOperations** — управление заданиями, пробами и исследованиями. Потребляет оба интеграционных события и хранит собственные snapshot-агрегаты.
+* **Service.Reports** — формирует PDF-отчёт по заданию и его пробам с помощью FastReport. Вызывается синхронно из `LIMS.Service.LaboratoryOperations` по HTTP.
 
 **Общие библиотеки**
 
@@ -64,6 +65,7 @@
 * `Library.Outbox` / `Library.Outbox.Abstractions` — переиспользуемая реализация Outbox Pattern.
 * `Library.Broker.Messages` — контракты интеграционных сообщений.
 * `Library.Application.SeedWork` и `Library.Domain.SeedWork` — общие примитивы Application и Domain слоёв.
+* `Service.Reports.Client` / `Service.Reports.Client.Abstractions` — HTTP-клиент и контракт синхронного вызова сервиса отчётов.
 
 Структура `src` отражает разделение каждого сервиса на отдельные Application, Domain, Infrastructure, Persistence и API проекты.
 
@@ -76,7 +78,7 @@
 Каждый микросервис разделён по слоям:
 
 ```text
-Guides.Service / LIMS.Service.Methodologies / LIMS.Service.LaboratoryOperations
+Service.Guides / LIMS.Service.Methodologies / LIMS.Service.LaboratoryOperations
 │
 ├── API
 ├── Application
@@ -202,7 +204,7 @@ Password: guest
 Каждый бизнес-сервис использует собственную базу:
 
 ```text
-Guides.Service.API
+Service.Guides.API
         ↓
 ApplicationDbContext → GuidsDb
 
@@ -244,7 +246,7 @@ dotnet ef database update --project src/LIMS.Service.Methodologies.Persistence -
 
 dotnet ef database update --project src/LIMS.Service.LaboratoryOperations.Persistence --startup-project src/LIMS.Service.LaboratoryOperations.API
 
-dotnet ef database update --project src/Guides.Service.Persistence --startup-project src/Guides.Service.API
+dotnet ef database update --project src/Service.Guides.Persistence --startup-project src/Service.Guides.API
 ```
 
 После этого каждая база будет приведена к актуальной схеме.
@@ -261,16 +263,18 @@ run-lims.cmd
 
 Скрипт собирает и запускает:
 
-* `Guides.Service.API` — [http://localhost:1003/swagger](http://localhost:1003/swagger)
+* `Service.Guides.API` — [http://localhost:1003/swagger](http://localhost:1003/swagger)
 * `LIMS.Service.Methodologies.API` — [http://localhost:1001/swagger](http://localhost:1001/swagger)
 * `LIMS.Service.LaboratoryOperations.API` — [http://localhost:1002/swagger](http://localhost:1002/swagger)
+* `Service.Reports` — [http://localhost:1004/openapi/v1.json](http://localhost:1004/openapi/v1.json)
 
 Либо вручную:
 
 ```bash
-dotnet run --project src/Guides.Service.API
+dotnet run --project src/Service.Guides.API
 dotnet run --project src/LIMS.Service.Methodologies.API
 dotnet run --project src/LIMS.Service.LaboratoryOperations.API
+dotnet run --project src/Service.Reports
 ```
 
 > **Важно:** перед запуском должны быть доступны PostgreSQL и RabbitMQ.
@@ -279,7 +283,7 @@ dotnet run --project src/LIMS.Service.LaboratoryOperations.API
 
 # Сервисы проекта
 
-## Guides.Service
+## Service.Guides
 
 Справочный сервис единиц измерения. Сейчас в домене есть агрегат `Unit`.
 
@@ -329,6 +333,16 @@ Order
 
 * `StudyTemplateSnapshot` — снимок методики после публикации;
 * `UnitSnapshot` — снимок единицы измерения после создания в Guides.
+
+Для формирования отчёта endpoint `POST /api/orders/{id}/report` получает задание и его пробы, синхронно вызывает `Service.Reports` и возвращает готовый PDF. Адрес сервиса задаётся параметром `Reports:BaseUrl`.
+
+---
+
+## Service.Reports
+
+Сервис формирует PDF-отчёт по данным задания и проб. Он не обращается к базе данных LaboratoryOperations: необходимые данные передаются в теле запроса `POST /reports`.
+
+`Service.Reports.Client` инкапсулирует HTTP-вызов, а `Service.Reports.Client.Abstractions` содержит общий контракт запроса. Таймаут клиента — 60 секунд; при недоступности сервиса LaboratoryOperations возвращает ошибку шлюза.
 
 ---
 
@@ -798,6 +812,25 @@ Consumer
 
 и уменьшить связанность между микросервисами.
 
+## Synchronous Report Generation
+
+Генерация отчёта выполняется синхронно, поскольку вызывающий пользователь ожидает PDF в ответ на запрос:
+
+```text
+Client
+  │ POST /api/orders/{id}/report
+  ▼
+LaboratoryOperations
+  │ POST /reports
+  ▼
+Service.Reports (FastReport)
+  │ PDF
+  ▼
+LaboratoryOperations → Client
+```
+
+Эта связь не использует RabbitMQ и не создаёт интеграционных событий.
+
 RabbitMQ инфраструктура вынесена в отдельные библиотеки:
 
 ```text
@@ -1051,6 +1084,7 @@ COMMIT
 | **Docker**                   | Инфраструктура                    |
 | **Carter**                   | Организация Minimal API endpoints |
 | **NoStringEvaluating**       | Движок формул                     |
+| **FastReport.Core**          | Формирование PDF-отчётов          |
 | **Swagger / OpenAPI**        | API documentation                 |
 | **Mermaid**                  | Архитектурные и бизнес-диаграммы  |
 | **Git**                      | Version Control                   |
@@ -1076,7 +1110,7 @@ docker run -it --rm --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:3-manag
 # 3. Применить миграции
 dotnet ef database update --project src/LIMS.Service.Methodologies.Persistence --startup-project src/LIMS.Service.Methodologies.API
 dotnet ef database update --project src/LIMS.Service.LaboratoryOperations.Persistence --startup-project src/LIMS.Service.LaboratoryOperations.API
-dotnet ef database update --project src/Guides.Service.Persistence --startup-project src/Guides.Service.API
+dotnet ef database update --project src/Service.Guides.Persistence --startup-project src/Service.Guides.API
 ```
 
 Затем:
@@ -1088,9 +1122,10 @@ run-lims.cmd
 После этого должны быть запущены:
 
 ```text
-Guides.Service.API                     http://localhost:1003
+Service.Guides.API                     http://localhost:1003
 LIMS.Service.Methodologies.API         http://localhost:1001
 LIMS.Service.LaboratoryOperations.API  http://localhost:1002
+Service.Reports                         http://localhost:1004
 ```
 
 И RabbitMQ:
