@@ -13,7 +13,8 @@ public class InputParameterModule
         IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("/api/study-templates/{studyTemplateId:guid}/input-parameters")
-            .WithTags("InputParameters");
+            .WithTags("InputParameters")
+            .RequireAuthorization();
 
         group.MapGet("/", GetAll)
             .Produces<ICollection<InputParameterDto>>();

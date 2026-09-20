@@ -16,7 +16,8 @@ public class OrderModule
         IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("/api/orders")
-            .WithTags("Orders");
+            .WithTags("Orders")
+            .RequireAuthorization();
 
         group.MapGet("/", GetAll)
             .Produces<ICollection<OrderDto>>();

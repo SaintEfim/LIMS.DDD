@@ -199,6 +199,43 @@ Password: guest
 
 ---
 
+## Авторизация через Keycloak
+
+HTTP API сервисов `LIMS.Service.LaboratoryOperations`, `LIMS.Service.Methodologies`, `Service.Guides` и `Service.Reports` принимают только access token, выпущенный Keycloak realm `lims` для аудитории `lims-api`.
+
+Для локальной разработки поднимите Keycloak с импортом подготовленного realm:
+
+```bash
+docker compose -f docker-compose.keycloak.yml up -d
+```
+
+После изменения порта пересоздайте контейнер Keycloak и перезапустите API. Проверьте, что адрес ниже возвращает JSON с `issuer` равным `http://localhost:8081/realms/lims`:
+
+```powershell
+Invoke-RestMethod 'http://localhost:8081/realms/lims/.well-known/openid-configuration'
+```
+
+Затем заново выполните **Authorize** в Swagger: токены, выданные для прежнего адреса `localhost:8080`, больше не подходят.
+
+Административная консоль доступна по адресу [http://localhost:8081](http://localhost:8081). Учётные данные администратора для development-контура по умолчанию: `admin` / `admin`. Их можно переопределить переменными окружения `KEYCLOAK_ADMIN_USERNAME` и `KEYCLOAK_ADMIN_PASSWORD`.
+
+Импорт создаёт realm `lims`, public OIDC clients `lims-frontend` и `lims-swagger`, аудиторию API `lims-api` и пользователя `laboratory.user` с ролью `laboratory-user`. Его начальный пароль — `lims-dev-password`; Keycloak попросит сменить его при первом входе.
+
+В Swagger UI каждого API нажмите **Authorize**, выберите Keycloak и войдите под `laboratory.user`. Swagger использует Authorization Code Flow с PKCE и передаёт полученный JWT в запросах к API. Клиент `lims-swagger` разрешает callback-адреса Swagger на портах `1001`, `1002` и `1003`.
+
+`LIMS.Service.LaboratoryOperations` передаёт исходный access token в синхронный запрос к `Service.Reports`, поэтому генерация отчёта также выполняется от имени вошедшего пользователя.
+
+Если Keycloak уже был запущен до появления клиента `lims-swagger`, пересоздайте development-контейнер, чтобы realm импортировался заново:
+
+```bash
+docker compose -f docker-compose.keycloak.yml down
+docker compose -f docker-compose.keycloak.yml up -d
+```
+
+Адрес realm и аудитория API задаются в `Keycloak:Authority` и `Keycloak:Audience` в `appsettings.json`. В production необходимо включить HTTPS metadata и заменить development-конфигурацию Keycloak.
+
+---
+
 ## 3. Настройка PostgreSQL
 
 Каждый бизнес-сервис использует собственную базу:
@@ -1085,6 +1122,7 @@ COMMIT
 | **Carter**                   | Организация Minimal API endpoints |
 | **NoStringEvaluating**       | Движок формул                     |
 | **FastReport.Core**          | Формирование PDF-отчётов          |
+| **Keycloak**                 | OpenID Connect и выдача JWT        |
 | **Swagger / OpenAPI**        | API documentation                 |
 | **Mermaid**                  | Архитектурные и бизнес-диаграммы  |
 | **Git**                      | Version Control                   |

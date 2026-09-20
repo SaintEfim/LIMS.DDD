@@ -10,7 +10,8 @@ public class UnitSnapshotModule : ICarterModule
         IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("/api/unit-snapshots")
-            .WithTags("UnitSnapshots");
+            .WithTags("UnitSnapshots")
+            .RequireAuthorization();
 
         group.MapGet("/", GetAll)
             .Produces<ICollection<UnitSnapshotDto>>();

@@ -12,7 +12,8 @@ public class MeasuredValueModule
         IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("/api/studies/{studyId:guid}/measured-values")
-            .WithTags("MeasuredValues");
+            .WithTags("MeasuredValues")
+            .RequireAuthorization();
 
         group.MapGet("/", GetAll)
             .Produces<ICollection<MeasuredValueDto>>();

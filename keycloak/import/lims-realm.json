@@ -1,0 +1,90 @@
+{
+  "realm": "lims",
+  "enabled": true,
+  "roles": {
+    "realm": [
+      { "name": "laboratory-user" },
+      { "name": "laboratory-manager" },
+      { "name": "administrator" }
+    ]
+  },
+  "clientScopes": [
+    {
+      "name": "lims-api-audience",
+      "protocol": "openid-connect",
+      "attributes": {
+        "include.in.token.scope": "false",
+        "display.on.consent.screen": "false"
+      },
+      "protocolMappers": [
+        {
+          "name": "lims-api audience",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "config": {
+            "included.client.audience": "lims-api",
+            "access.token.claim": "true",
+            "id.token.claim": "false",
+            "introspection.token.claim": "true"
+          }
+        }
+      ]
+    }
+  ],
+  "clients": [
+    {
+      "clientId": "lims-frontend",
+      "name": "LIMS Frontend",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": false,
+      "redirectUris": ["http://localhost:*"],
+      "webOrigins": ["http://localhost:*"],
+      "defaultClientScopes": ["profile", "email", "roles", "web-origins", "lims-api-audience"]
+    },
+    {
+      "clientId": "lims-api",
+      "name": "LIMS LaboratoryOperations API",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "bearerOnly": true
+    },
+    {
+      "clientId": "lims-swagger",
+      "name": "LIMS Swagger UI",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": false,
+      "redirectUris": [
+        "http://localhost:1001/swagger/oauth2-redirect.html",
+        "http://localhost:1002/swagger/oauth2-redirect.html",
+        "http://localhost:1003/swagger/oauth2-redirect.html"
+      ],
+      "webOrigins": [
+        "http://localhost:1001",
+        "http://localhost:1002",
+        "http://localhost:1003"
+      ],
+      "defaultClientScopes": ["profile", "email", "roles", "web-origins", "lims-api-audience"]
+    }
+  ],
+  "users": [
+    {
+      "username": "laboratory.user",
+      "enabled": true,
+      "emailVerified": true,
+      "realmRoles": ["laboratory-user"],
+      "credentials": [
+        {
+          "type": "password",
+          "value": "lims-dev-password",
+          "temporary": true
+        }
+      ]
+    }
+  ]
+}

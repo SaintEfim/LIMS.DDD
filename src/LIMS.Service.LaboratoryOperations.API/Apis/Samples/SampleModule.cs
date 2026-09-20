@@ -14,7 +14,8 @@ public class SampleModule
         IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("/api/orders/{orderId:guid}/samples")
-            .WithTags("Samples");
+            .WithTags("Samples")
+            .RequireAuthorization();
 
         group.MapGet("/", GetAll)
             .Produces<ICollection<SampleDto>>();

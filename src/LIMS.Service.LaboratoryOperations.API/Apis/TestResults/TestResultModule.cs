@@ -12,7 +12,8 @@ public class TestResultModule
         IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("/api/studies/{studyId:guid}/test-results")
-            .WithTags("TestResults");
+            .WithTags("TestResults")
+            .RequireAuthorization();
 
         group.MapGet("/", GetAll)
             .Produces<ICollection<TestResultDto>>();
