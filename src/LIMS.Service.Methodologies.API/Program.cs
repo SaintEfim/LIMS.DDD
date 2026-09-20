@@ -32,7 +32,7 @@ builder.Services.AddSwaggerGen(options =>
     });
     options.AddSecurityRequirement(document => new OpenApiSecurityRequirement
     {
-        [new OpenApiSecuritySchemeReference("Keycloak", document, null)] = ["openid"]
+        [new OpenApiSecuritySchemeReference("Keycloak", document)] = ["openid"]
     });
 });
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

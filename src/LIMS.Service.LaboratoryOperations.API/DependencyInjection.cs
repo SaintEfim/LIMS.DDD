@@ -5,7 +5,9 @@ using LIMS.Service.LaboratoryOperations.API.Apis.Studies;
 using LIMS.Service.LaboratoryOperations.API.Apis.StudyTemplateSnapshot;
 using LIMS.Service.LaboratoryOperations.API.Apis.TestResults;
 using LIMS.Service.LaboratoryOperations.API.Apis.UnitSnapshot;
+using LIMS.Service.LaboratoryOperations.API.BackgroundServices;
 using LIMS.Service.LaboratoryOperations.Application;
+using LIMS.Service.LaboratoryOperations.Domain.BackgroundOperations;
 using LIMS.Service.LaboratoryOperations.Domain.Services;
 using LIMS.Service.LaboratoryOperations.Infrastructure;
 using LIMS.Service.LaboratoryOperations.Persistence;
@@ -42,6 +44,10 @@ public static class DependencyInjection
         services.AddScoped<TestResultServices>();
         services.AddScoped<MeasuredValueServices>();
         services.AddScoped<StudyTemplateSnapshotServices>();
+        services.AddScoped<BackgroundOperationServices>();
         services.AddScoped<TestResultDomainService>();
+
+        services.AddKeyedScoped<IProcessor, ReportProcessor>(
+            OperationType.GenerateReport);
     }
 }

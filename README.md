@@ -223,7 +223,7 @@ Invoke-RestMethod 'http://localhost:8081/realms/lims/.well-known/openid-configur
 
 В Swagger UI каждого API нажмите **Authorize**, выберите Keycloak и войдите под `laboratory.user`. Swagger использует Authorization Code Flow с PKCE и передаёт полученный JWT в запросах к API. Клиент `lims-swagger` разрешает callback-адреса Swagger на портах `1001`, `1002` и `1003`.
 
-`LIMS.Service.LaboratoryOperations` передаёт исходный access token в синхронный запрос к `Service.Reports`, поэтому генерация отчёта также выполняется от имени вошедшего пользователя.
+`LIMS.Service.LaboratoryOperations` передаёт исходный access token в синхронный запрос к `Service.Reports`. Для фоновой генерации отчётов используется service account клиента `lims-laboratory-operations` через Client Credentials.
 
 Если Keycloak уже был запущен до появления клиента `lims-swagger`, пересоздайте development-контейнер, чтобы realm импортировался заново:
 

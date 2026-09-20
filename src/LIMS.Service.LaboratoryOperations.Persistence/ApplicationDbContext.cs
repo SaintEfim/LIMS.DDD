@@ -1,4 +1,5 @@
 ﻿using LIMS.Service.LaboratoryOperations.Domain.OrderAggregate;
+using LIMS.Service.LaboratoryOperations.Domain.BackgroundOperations;
 using LIMS.Service.LaboratoryOperations.Domain.SampleAggregate;
 using LIMS.Service.LaboratoryOperations.Domain.StudyAggregate;
 using LIMS.Service.LaboratoryOperations.Domain.StudyTemplateSnapshots;
@@ -12,6 +13,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<StudyTemplateSnapshot> StudyTemplates { get; set; }
 
     public DbSet<Order> Orders { get; set; }
+    public DbSet<BackgroundOperation> BackgroundOperations { get; set; }
     public DbSet<Sample> Samples { get; set; }
     public DbSet<Study> Studies { get; set; }
 

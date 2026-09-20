@@ -52,6 +52,18 @@
       "bearerOnly": true
     },
     {
+      "clientId": "lims-laboratory-operations",
+      "name": "LIMS LaboratoryOperations service account",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "secret": "lims-laboratory-operations-dev-secret",
+      "standardFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": true,
+      "defaultClientScopes": ["roles", "lims-api-audience"]
+    },
+    {
       "clientId": "lims-swagger",
       "name": "LIMS Swagger UI",
       "enabled": true,

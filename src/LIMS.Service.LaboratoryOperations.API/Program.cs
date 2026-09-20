@@ -1,5 +1,6 @@
 using Carter;
 using LIMS.Service.LaboratoryOperations.API;
+using LIMS.Service.LaboratoryOperations.API.BackgroundServices;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
@@ -11,6 +12,8 @@ builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddNoStringEvaluator();
+
+builder.Services.AddSignalR();
 
 var keycloak = builder.Configuration.GetRequiredSection("Keycloak");
 var keycloakAuthority = keycloak.GetValue<string>("Authority")!;
@@ -57,6 +60,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.AddAuthorization();
 
 builder.Services.AddApi(builder.Configuration);
+builder.Services.AddHostedService<NotificationBackgroundService>();
 
 var app = builder.Build();
 
