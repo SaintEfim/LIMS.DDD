@@ -3,12 +3,12 @@ using LIMS.Service.LaboratoryOperations.API.Hubs;
 
 namespace LIMS.Service.LaboratoryOperations.API.Apis.Hubs;
 
-public class ReportHubs : ICarterModule
+public class HubModule : ICarterModule
 {
     public void AddRoutes(
         IEndpointRouteBuilder app)
     {
-        app.MapHub<NotificationHub>("/reports")
+        app.MapHub<NotificationHub>("/hubs/notifications")
             .RequireAuthorization();
     }
 }

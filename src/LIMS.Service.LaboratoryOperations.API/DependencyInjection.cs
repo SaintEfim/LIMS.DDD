@@ -1,4 +1,5 @@
-﻿using LIMS.Service.LaboratoryOperations.API.Apis.MeasuredValues;
+﻿using LIMS.Service.LaboratoryOperations.API.Apis.Hubs;
+using LIMS.Service.LaboratoryOperations.API.Apis.MeasuredValues;
 using LIMS.Service.LaboratoryOperations.API.Apis.Orders;
 using LIMS.Service.LaboratoryOperations.API.Apis.Samples;
 using LIMS.Service.LaboratoryOperations.API.Apis.Studies;
@@ -11,6 +12,7 @@ using LIMS.Service.LaboratoryOperations.Domain.BackgroundOperations;
 using LIMS.Service.LaboratoryOperations.Domain.Services;
 using LIMS.Service.LaboratoryOperations.Infrastructure;
 using LIMS.Service.LaboratoryOperations.Persistence;
+using Microsoft.AspNetCore.SignalR;
 using Service.Reports.Client;
 
 namespace LIMS.Service.LaboratoryOperations.API;
@@ -47,7 +49,8 @@ public static class DependencyInjection
         services.AddScoped<BackgroundOperationServices>();
         services.AddScoped<TestResultDomainService>();
 
-        services.AddKeyedScoped<IProcessor, ReportProcessor>(
-            OperationType.GenerateReport);
+        services.AddSingleton<IUserIdProvider, KeycloakUserIdProvider>();
+
+        services.AddKeyedScoped<IProcessor, ReportProcessor>(OperationType.GenerateReport);
     }
 }

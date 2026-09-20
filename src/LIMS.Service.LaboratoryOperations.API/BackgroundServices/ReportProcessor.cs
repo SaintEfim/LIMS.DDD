@@ -65,6 +65,23 @@ public sealed class ReportProcessor(
                     operation.Id, completionResult.GetError()
                         .Message);
             }
+
+            try
+            {
+                await hubContext.Clients
+                    .User(operation.RequestedByUserId.ToString())
+                    .SendAsync("Receive", new
+                    {
+                        operationId = operation.Id,
+                        nameOperation = operation.Type.ToString(),
+                        status = "Succeeded"
+                    }, cancellationToken);
+            }
+            catch (Exception exception)
+            {
+                logger.LogWarning(exception, "Could not send completion notification for operation {OperationId}.",
+                    operation.Id);
+            }
         }
         catch (Exception exception) when (exception is not OperationCanceledException ||
                                           !cancellationToken.IsCancellationRequested)
