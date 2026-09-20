@@ -12,7 +12,8 @@ public class UnitModule
         IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("/api/units")
-            .WithTags("Units");
+            .WithTags("Units")
+            .RequireAuthorization();
 
         group.MapGet("/", GetAll)
             .Produces<ICollection<UnitDto>>();

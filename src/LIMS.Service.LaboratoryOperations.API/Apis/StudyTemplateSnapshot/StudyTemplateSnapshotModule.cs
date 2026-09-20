@@ -12,7 +12,8 @@ public class StudyTemplateSnapshotModule
         IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("/api/study-template-snapshots")
-            .WithTags("StudyTemplateSnapshots");
+            .WithTags("StudyTemplateSnapshots")
+            .RequireAuthorization();
 
         group.MapGet("/", GetAll)
             .Produces<ICollection<StudyTemplateDto>>();

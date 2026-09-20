@@ -13,7 +13,8 @@ public class CalculationRuleModule
         IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("/api/study-templates/{studyTemplateId:guid}/calculation-rules")
-            .WithTags("CalculationRules");
+            .WithTags("CalculationRules")
+            .RequireAuthorization();
 
         group.MapGet("/", GetAll)
             .Produces<ICollection<CalculationRuleDto>>();

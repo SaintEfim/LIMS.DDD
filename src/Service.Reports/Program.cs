@@ -1,12 +1,35 @@
 using Service.Reports;
 using Service.Reports.Client.Models;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddOpenApi();
 builder.Services.AddSingleton<OrderReportGenerator>();
 
+var keycloak = builder.Configuration.GetRequiredSection("Keycloak");
+var keycloakAuthority = keycloak.GetValue<string>("Authority")!;
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.Authority = keycloakAuthority;
+        options.Audience = keycloak["Audience"];
+        options.RequireHttpsMetadata = keycloak.GetValue("RequireHttpsMetadata", true);
+        options.MapInboundClaims = false;
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            NameClaimType = "sub",
+            ValidIssuer = keycloakAuthority
+        };
+    });
+builder.Services.AddAuthorization();
+
 var app = builder.Build();
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 if (app.Environment.IsDevelopment())
 {
@@ -23,6 +46,7 @@ app.MapPost("/reports", (
         return Results.File(pdf, "application/pdf", $"order-{request.Order.Id}.pdf");
     })
     .WithName("GenerateReport")
+    .RequireAuthorization()
     .Produces(StatusCodes.Status200OK, contentType: "application/pdf")
     .Produces(StatusCodes.Status400BadRequest);
 

@@ -14,7 +14,8 @@ public class StudyModule
         IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("/api/samples/{sampleId:guid}/studies")
-            .WithTags("Studies");
+            .WithTags("Studies")
+            .RequireAuthorization();
 
         group.MapGet("/", GetAll)
             .Produces<ICollection<StudyDto>>();

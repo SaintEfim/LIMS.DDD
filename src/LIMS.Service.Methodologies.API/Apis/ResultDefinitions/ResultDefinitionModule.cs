@@ -13,7 +13,8 @@ public class ResultDefinitionModule
         IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("/api/study-templates/{studyTemplateId:guid}/result-definitions")
-            .WithTags("ResultDefinitions");
+            .WithTags("ResultDefinitions")
+            .RequireAuthorization();
 
         group.MapGet("/", GetAll)
             .Produces<ICollection<ResultDefinitionDto>>();
