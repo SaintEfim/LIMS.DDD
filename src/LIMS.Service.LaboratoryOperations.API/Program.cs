@@ -13,7 +13,6 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddNoStringEvaluator();
 
-builder.Services.AddSignalR();
 
 var keycloak = builder.Configuration.GetRequiredSection("Keycloak");
 var keycloakAuthority = keycloak.GetValue<string>("Authority")!;
@@ -52,7 +51,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         options.MapInboundClaims = false;
         options.TokenValidationParameters = new TokenValidationParameters
         {
-            NameClaimType = "sub",
+            NameClaimType = "user_id",
             ValidIssuer = keycloakAuthority
         };
     });
@@ -60,7 +59,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.AddAuthorization();
 
 builder.Services.AddApi(builder.Configuration);
-builder.Services.AddHostedService<NotificationBackgroundService>();
+builder.Services.AddHostedService<BackgroundOperationWorker>();
 
 var app = builder.Build();
 
@@ -69,6 +68,7 @@ app.UseAuthorization();
 
 if (app.Environment.IsDevelopment())
 {
+    app.UseStaticFiles();
     app.UseSwagger();
     app.UseSwaggerUI(options =>
     {

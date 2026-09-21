@@ -27,7 +27,7 @@ public sealed class BackgroundOperationCommandsHandler(
         {
             return new ValidationError(exception.Message);
         }
-        catch (Exception exception)
+        catch (Exception exception) when (exception is not OperationCanceledException || !cancellationToken.IsCancellationRequested)
         {
             return new PersistenceError($"Failed to create background operation: {exception.Message}");
         }
@@ -81,7 +81,7 @@ public sealed class BackgroundOperationCommandsHandler(
         {
             return new ValidationError(exception.Message);
         }
-        catch (Exception exception)
+        catch (Exception exception) when (exception is not OperationCanceledException || !cancellationToken.IsCancellationRequested)
         {
             return new PersistenceError($"Failed to update background operation: {exception.Message}");
         }

@@ -36,9 +36,9 @@ public class OrderModule
             .Produces(StatusCodes.Status502BadGateway);
 
         group.MapPost("/{id:guid}/report-async", GenerateReportAsync)
-            .Produces(StatusCodes.Status200OK)
-            .Produces(StatusCodes.Status404NotFound)
-            .Produces(StatusCodes.Status502BadGateway);
+            .Produces(StatusCodes.Status202Accepted)
+            .Produces(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status403Forbidden);
 
         group.MapPost("/", Create)
             .Produces(StatusCodes.Status201Created)
@@ -84,7 +84,7 @@ public class OrderModule
         [FromServices] BackgroundOperationCommandsHandler commands,
         CancellationToken cancellationToken = default)
     {
-        var subject = user.FindFirstValue("sub");
+        var subject = user.FindFirstValue("user_id");
 
         if (!Guid.TryParse(subject, out var userId))
         {
@@ -92,7 +92,7 @@ public class OrderModule
         }
 
         var command = new CreateBackgroundOperationCommand(RequestedByUserId: userId,
-            Type: OperationType.GenerateReport, Payload: new JObject { ["orderId"] = id });
+            Type: OperationType.GenerateReport, Payload: JObject.FromObject(new ReportPayload(id)));
 
         var result = await commands.CreateAsync(command, cancellationToken);
 
@@ -107,7 +107,7 @@ public class OrderModule
         return Results.Accepted($"/api/background-operations/{operation.Id}", new
         {
             operationId = operation.Id,
-            status = operation.Status
+            status = OperationStatus.Pending
         });
     }
 

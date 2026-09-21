@@ -2,16 +2,16 @@ using LIMS.Service.LaboratoryOperations.Application.BackgroundOperations;
 
 namespace LIMS.Service.LaboratoryOperations.API.BackgroundServices;
 
-public class NotificationBackgroundService(
+public sealed class BackgroundOperationWorker(
     IServiceScopeFactory scopeFactory,
-    ILogger<NotificationBackgroundService> logger) : BackgroundService
+    ILogger<BackgroundOperationWorker> logger) : BackgroundService
 {
     private const int ChunkSize = 5;
     private static readonly TimeSpan FallbackInterval = TimeSpan.FromSeconds(5);
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        logger.LogInformation("Notification background service started.");
+        logger.LogInformation("Background operation worker started.");
 
         try
         {
@@ -19,10 +19,10 @@ public class NotificationBackgroundService(
             {
                 IReadOnlyList<BackgroundOperationDto> operations;
 
-                using (var scope = scopeFactory.CreateScope())
+                await using (var scope = scopeFactory.CreateAsyncScope())
                 {
-                    var services = scope.ServiceProvider.GetRequiredService<BackgroundOperationServices>();
-                    operations = await services.Queries.GetPendingAsync(ChunkSize, stoppingToken);
+                    var queries = scope.ServiceProvider.GetRequiredService<BackgroundOperationQueries>();
+                    operations = await queries.GetPendingAsync(ChunkSize, stoppingToken);
                 }
 
                 if (operations.Count == 0)
@@ -40,11 +40,11 @@ public class NotificationBackgroundService(
         }
         catch (Exception exception)
         {
-            logger.LogCritical(exception, "Notification background service terminated unexpectedly.");
+            logger.LogCritical(exception, "Background operation worker terminated unexpectedly.");
         }
         finally
         {
-            logger.LogInformation("Notification background service stopped.");
+            logger.LogInformation("Background operation worker stopped.");
         }
     }
 
@@ -52,8 +52,8 @@ public class NotificationBackgroundService(
     {
         try
         {
-            using var scope = scopeFactory.CreateScope();
-            var processor = scope.ServiceProvider.GetRequiredKeyedService<IProcessor>(operation.Type);
+            await using var scope = scopeFactory.CreateAsyncScope();
+            var processor = scope.ServiceProvider.GetRequiredKeyedService<IBackgroundOperationProcessor>(operation.Type);
             await processor.ExecuteAsync(operation, cancellationToken);
         }
         catch (Exception exception) when (exception is not OperationCanceledException || !cancellationToken.IsCancellationRequested)

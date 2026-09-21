@@ -199,6 +199,11 @@ Password: guest
 
 ---
 
+## Асинхронные отчёты
+
+Устройство фоновых обработчиков и HTTP Long Polling для ожидания результата описаны в [документации](docs/background-operations.md).
+Тестовая страница в Development: [проверка отчётов](http://localhost:1002/report-test/index.html).
+
 ## Авторизация через Keycloak
 
 HTTP API сервисов `LIMS.Service.LaboratoryOperations`, `LIMS.Service.Methodologies`, `Service.Guides` и `Service.Reports` принимают только access token, выпущенный Keycloak realm `lims` для аудитории `lims-api`.

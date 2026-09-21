@@ -29,6 +29,29 @@
           }
         }
       ]
+    },
+    {
+      "name": "lims-user-id",
+      "protocol": "openid-connect",
+      "attributes": {
+        "include.in.token.scope": "false",
+        "display.on.consent.screen": "false"
+      },
+      "protocolMappers": [
+        {
+          "name": "Keycloak user id",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-property-mapper",
+          "config": {
+            "user.attribute": "id",
+            "claim.name": "user_id",
+            "jsonType.label": "String",
+            "access.token.claim": "true",
+            "id.token.claim": "true",
+            "userinfo.token.claim": "true"
+          }
+        }
+      ]
     }
   ],
   "clients": [
@@ -41,8 +64,8 @@
       "standardFlowEnabled": true,
       "directAccessGrantsEnabled": false,
       "redirectUris": ["http://localhost:*"],
-      "webOrigins": ["http://localhost:*"],
-      "defaultClientScopes": ["profile", "email", "roles", "web-origins", "lims-api-audience"]
+      "webOrigins": ["http://localhost:*", "http://localhost:1002"],
+      "defaultClientScopes": ["profile", "email", "roles", "web-origins", "lims-api-audience", "lims-user-id"]
     },
     {
       "clientId": "lims-api",
@@ -81,7 +104,7 @@
         "http://localhost:1002",
         "http://localhost:1003"
       ],
-      "defaultClientScopes": ["profile", "email", "roles", "web-origins", "lims-api-audience"]
+      "defaultClientScopes": ["profile", "email", "roles", "web-origins", "lims-api-audience", "lims-user-id"]
     }
   ],
   "users": [

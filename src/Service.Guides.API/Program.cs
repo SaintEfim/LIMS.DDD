@@ -42,7 +42,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         options.MapInboundClaims = false;
         options.TokenValidationParameters = new TokenValidationParameters
         {
-            NameClaimType = "sub",
+            NameClaimType = "user_id",
             ValidIssuer = keycloakAuthority
         };
     });
