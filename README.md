@@ -155,12 +155,10 @@ Application Layer не содержит инфраструктурной реа�
 Для запуска проекта необходимо установить:
 
 * [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0)
-* [Docker](https://www.docker.com/) (для RabbitMQ и при желании PostgreSQL)
-* PostgreSQL
+* [Docker Desktop](https://www.docker.com/) с Docker Compose
 * Git
-* [dotnet-ef](https://learn.microsoft.com/ef/core/cli/dotnet) для применения миграций
 
-SDK зафиксирован в `global.json` (`10.0.0`, `rollForward: major`).
+`dotnet-ef` зафиксирован в локальном tool manifest и восстанавливается скриптом запуска.
 
 ---
 
@@ -173,20 +171,20 @@ cd LIMS.DDD
 
 ---
 
-## 2. Запуск RabbitMQ
+## 2. Запуск инфраструктуры в Docker
 
-Для работы интеграционных событий необходимо запустить RabbitMQ.
+PostgreSQL, RabbitMQ и Keycloak описаны в `docker-compose.yml`. Скрипт `run-lims.cmd` поднимает их автоматически. Для ручного запуска выполните:
 
-Используется официальный Docker image с management UI:
-
-```bash
-docker run -it --rm --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:3-management
+```powershell
+docker compose up -d
 ```
 
 После запуска:
 
+* PostgreSQL: `localhost:5432`, `postgres` / `1234`;
 * AMQP: `localhost:5672`
 * RabbitMQ Management UI: [http://localhost:15672](http://localhost:15672)
+* Keycloak: [http://localhost:8081](http://localhost:8081)
 
 Для стандартной конфигурации контейнера:
 
@@ -208,7 +206,7 @@ Password: guest
 
 HTTP API сервисов `LIMS.Service.LaboratoryOperations`, `LIMS.Service.Methodologies`, `Service.Guides` и `Service.Reports` принимают только access token, выпущенный Keycloak realm `lims` для аудитории `lims-api`.
 
-Для локальной разработки поднимите Keycloak с импортом подготовленного realm:
+Keycloak запускается общим `docker-compose.yml` с импортом подготовленного realm. Отдельно можно поднять только Keycloak:
 
 ```bash
 docker compose -f docker-compose.keycloak.yml up -d
@@ -267,10 +265,10 @@ Host=localhost; Username=postgres; Password=1234
 
 Их нужно привести в соответствие с локальным PostgreSQL.
 
-Пример запуска PostgreSQL в Docker:
+PostgreSQL запускается общим `docker-compose.yml`. Его данные сохраняются в named volume `lims-postgres-data`.
 
 ```bash
-docker run --name lims-postgres -e POSTGRES_PASSWORD=1234 -p 5432:5432 -d postgres:16
+docker compose up -d postgres
 ```
 
 Базы создаются при применении миграций.
@@ -279,16 +277,18 @@ docker run --name lims-postgres -e POSTGRES_PASSWORD=1234 -p 5432:5432 -d postgr
 
 ## 4. Применение миграций
 
-Перед первым запуском необходимо применить EF Core migrations.
+`run-lims.cmd` применяет EF Core migrations автоматически после готовности PostgreSQL и до запуска API. Команды идемпотентны: при повторном запуске EF применит только новые миграции.
+
+Для ручного применения используйте локальную версию `dotnet-ef`:
 
 ```bash
-dotnet tool install --global dotnet-ef
+dotnet tool restore
 
-dotnet ef database update --project src/LIMS.Service.Methodologies.Persistence --startup-project src/LIMS.Service.Methodologies.API
+dotnet tool run dotnet-ef database update --project src/LIMS.Service.Methodologies.Persistence --startup-project src/LIMS.Service.Methodologies.API
 
-dotnet ef database update --project src/LIMS.Service.LaboratoryOperations.Persistence --startup-project src/LIMS.Service.LaboratoryOperations.API
+dotnet tool run dotnet-ef database update --project src/LIMS.Service.LaboratoryOperations.Persistence --startup-project src/LIMS.Service.LaboratoryOperations.API
 
-dotnet ef database update --project src/Service.Guides.Persistence --startup-project src/Service.Guides.API
+dotnet tool run dotnet-ef database update --project src/Service.Guides.Persistence --startup-project src/Service.Guides.API
 ```
 
 После этого каждая база будет приведена к актуальной схеме.
@@ -297,13 +297,30 @@ dotnet ef database update --project src/Service.Guides.Persistence --startup-pro
 
 ## 5. Запуск сервисов
 
-После применения миграций запустите сервисы скриптом из корня репозитория:
+Запустите скрипт из корня репозитория:
 
 ```cmd
 run-lims.cmd
 ```
 
-Скрипт собирает и запускает:
+Скрипт последовательно:
+
+1. поднимает PostgreSQL, RabbitMQ и Keycloak через Docker Compose;
+2. ожидает готовности инфраструктуры;
+3. собирает solution;
+4. применяет миграции `GuidesDb`, `MethodologiesDb` и `LaboratoryOperationsDb`;
+5. запускает четыре приложения.
+
+Доступные параметры:
+
+```cmd
+run-lims.cmd --no-docker
+run-lims.cmd --no-migrations
+run-lims.cmd --no-build
+run-lims.cmd --root C:\projects\GitHubProject\LIMS.DDD
+```
+
+Запускаемые приложения:
 
 * `Service.Guides.API` — [http://localhost:1003/swagger](http://localhost:1003/swagger)
 * `LIMS.Service.Methodologies.API` — [http://localhost:1001/swagger](http://localhost:1001/swagger)
@@ -319,7 +336,7 @@ dotnet run --project src/LIMS.Service.LaboratoryOperations.API
 dotnet run --project src/Service.Reports
 ```
 
-> **Важно:** перед запуском должны быть доступны PostgreSQL и RabbitMQ.
+При ошибке Docker, сборки или миграции скрипт остановится и не запустит API с неподготовленной инфраструктурой.
 
 ---
 
@@ -1144,19 +1161,7 @@ git clone https://github.com/SaintEfim/LIMS.DDD.git
 cd LIMS.DDD
 ```
 
-```bash
-# 2. Запустить RabbitMQ
-docker run -it --rm --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:3-management
-```
-
-```bash
-# 3. Применить миграции
-dotnet ef database update --project src/LIMS.Service.Methodologies.Persistence --startup-project src/LIMS.Service.Methodologies.API
-dotnet ef database update --project src/LIMS.Service.LaboratoryOperations.Persistence --startup-project src/LIMS.Service.LaboratoryOperations.API
-dotnet ef database update --project src/Service.Guides.Persistence --startup-project src/Service.Guides.API
-```
-
-Затем:
+Затем одной командой поднимите Docker-инфраструктуру, примените миграции и запустите приложения:
 
 ```cmd
 run-lims.cmd
@@ -1171,11 +1176,13 @@ LIMS.Service.LaboratoryOperations.API  http://localhost:1002
 Service.Reports                         http://localhost:1004
 ```
 
-И RabbitMQ:
+И инфраструктура:
 
 ```text
-AMQP:       localhost:5672
-Management: localhost:15672
+PostgreSQL:          localhost:5432
+RabbitMQ AMQP:       localhost:5672
+RabbitMQ Management: localhost:15672
+Keycloak:            localhost:8081
 ```
 
 ## Демонстрационный сценарий
