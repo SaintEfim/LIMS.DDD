@@ -1,8 +1,12 @@
-﻿using Carter;
+﻿using System.Security.Claims;
+using Carter;
+using LIMS.Service.LaboratoryOperations.Application.BackgroundOperations;
 using LIMS.Service.LaboratoryOperations.Application.Orders;
 using LIMS.Service.LaboratoryOperations.Application.Orders.Commands;
 using LIMS.Service.LaboratoryOperations.Application.Samples;
+using LIMS.Service.LaboratoryOperations.Domain.BackgroundOperations;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json.Linq;
 using Service.Reports.Client;
 using Service.Reports.Client.Models;
 
@@ -30,6 +34,11 @@ public class OrderModule
             .Produces(StatusCodes.Status200OK, contentType: "application/pdf")
             .Produces(StatusCodes.Status404NotFound)
             .Produces(StatusCodes.Status502BadGateway);
+
+        group.MapPost("/{id:guid}/report-async", GenerateReportAsync)
+            .Produces(StatusCodes.Status202Accepted)
+            .Produces(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status403Forbidden);
 
         group.MapPost("/", Create)
             .Produces(StatusCodes.Status201Created)
@@ -67,6 +76,39 @@ public class OrderModule
     {
         var dto = await services.Queries.GetByIdAsync(id, cancellationToken);
         return dto is not null ? Results.Ok(dto) : Results.NotFound();
+    }
+
+    private static async Task<IResult> GenerateReportAsync(
+        Guid id,
+        ClaimsPrincipal user,
+        [FromServices] BackgroundOperationCommandsHandler commands,
+        CancellationToken cancellationToken = default)
+    {
+        var subject = user.FindFirstValue("user_id");
+
+        if (!Guid.TryParse(subject, out var userId))
+        {
+            return Results.Forbid();
+        }
+
+        var command = new CreateBackgroundOperationCommand(RequestedByUserId: userId,
+            Type: OperationType.GenerateReport, Payload: JObject.FromObject(new ReportPayload(id)));
+
+        var result = await commands.CreateAsync(command, cancellationToken);
+
+        if (result.IsFailure)
+        {
+            return Results.BadRequest(result.GetError()
+                .Message);
+        }
+
+        var operation = result.GetValue();
+
+        return Results.Accepted($"/api/background-operations/{operation.Id}", new
+        {
+            operationId = operation.Id,
+            status = OperationStatus.Pending
+        });
     }
 
     private static async Task<IResult> GenerateReport(

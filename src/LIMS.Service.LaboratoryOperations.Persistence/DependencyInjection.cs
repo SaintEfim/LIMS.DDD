@@ -1,5 +1,6 @@
 ﻿using Library.Domain.SeedWork;
 using LIMS.Service.LaboratoryOperations.Domain.OrderAggregate;
+using LIMS.Service.LaboratoryOperations.Domain.BackgroundOperations;
 using LIMS.Service.LaboratoryOperations.Domain.SampleAggregate;
 using LIMS.Service.LaboratoryOperations.Domain.StudyAggregate;
 using LIMS.Service.LaboratoryOperations.Domain.StudyTemplateSnapshots;
@@ -20,6 +21,7 @@ public static class DependencyInjection
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         services.AddScoped<IOrderRepository, OrderRepository>();
+        services.AddScoped<IBackgroundOperationRepository, BackgroundOperationRepository>();
         services.AddScoped<ISampleRepository, SampleRepository>();
         services.AddScoped<IStudyRepository, StudyRepository>();
 

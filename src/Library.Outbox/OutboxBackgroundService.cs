@@ -21,7 +21,7 @@ public sealed class OutboxBackgroundService(
 
                 while (!stoppingToken.IsCancellationRequested)
                 {
-                    using var scope = scopeFactory.CreateScope();
+                    await using var scope = scopeFactory.CreateAsyncScope();
                     var processor = scope.ServiceProvider.GetRequiredService<OutboxProcessor>();
                     var hasMoreWork = await processor.Execute(stoppingToken);
 

@@ -9,6 +9,14 @@ public static class DependencyInjection
         this IServiceCollection services,
         IConfiguration configuration)
     {
+        var keycloakAuthority = configuration["Reports:ServiceClient:Authority"] ??
+                                throw new InvalidOperationException("Reports:ServiceClient:Authority is not configured.");
+
+        services.AddHttpClient("ReportsKeycloak", client =>
+        {
+            client.BaseAddress = new Uri($"{keycloakAuthority.TrimEnd('/')}/");
+        });
+        services.AddSingleton<ServiceAccessTokenProvider>();
         services.AddTransient<UserAccessTokenHandler>();
 
         services.AddHttpClient("Reports", client =>

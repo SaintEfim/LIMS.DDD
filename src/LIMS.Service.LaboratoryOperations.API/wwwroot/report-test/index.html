@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LIMS · Проверка асинхронного отчёта</title>
+  <link rel="stylesheet" href="./style.css">
+  <script defer src="./app.js"></script>
+</head>
+<body>
+  <main class="shell">
+    <header class="hero">
+      <div class="eyebrow">LIMS / LABORATORY OPERATIONS</div>
+      <h1>Асинхронный отчёт</h1>
+      <p>Авторизация → создание операции → ожидание результата через HTTP Long Polling.</p>
+    </header>
+
+    <section class="card" aria-labelledby="session-title">
+      <div class="section-head">
+        <div>
+          <span class="step">01 / СЕССИЯ</span>
+          <h2 id="session-title">Пользователь и ожидание</h2>
+        </div>
+        <span id="connection-status" class="badge">Нет активного ожидания</span>
+      </div>
+      <p id="user-info" class="muted">Войдите через Keycloak, чтобы получить токен пользователя.</p>
+      <div class="actions">
+        <button id="login-button" class="primary">Войти через Keycloak</button>
+        <button id="connect-button" disabled>Возобновить ожидание</button>
+        <button id="logout-button" disabled>Очистить локальную сессию</button>
+      </div>
+      <p class="hint">После создания операции сервер держит HTTP-запрос до 25 секунд. Если результат ещё не готов, страница повторяет запрос. Ожидание восстанавливается после обновления страницы.</p>
+    </section>
+
+    <section class="card" aria-labelledby="report-title">
+      <div class="section-head">
+        <div>
+          <span class="step">02 / ЗАПРОС</span>
+          <h2 id="report-title">Создать отчёт</h2>
+        </div>
+        <span class="endpoint">POST /api/orders/{id}/report-async</span>
+      </div>
+      <div class="form-row">
+        <label for="order-id">ID заказа</label>
+        <input id="order-id" type="text" inputmode="text" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" autocomplete="off" spellcheck="false">
+        <button id="load-orders-button" disabled>Загрузить заказы</button>
+      </div>
+      <select id="orders-select" class="orders-select" aria-label="Выбрать заказ" hidden></select>
+      <div class="actions">
+        <button id="create-button" class="primary" disabled>Создать операцию</button>
+      </div>
+      <p id="request-result" class="result muted" role="status">Ожидание запроса.</p>
+    </section>
+
+    <section class="card" aria-labelledby="events-title">
+      <div class="section-head">
+        <div>
+          <span class="step">03 / РЕЗУЛЬТАТ</span>
+          <h2 id="events-title">События</h2>
+        </div>
+        <button id="clear-button" class="text-button">Очистить журнал</button>
+      </div>
+      <p class="hint">Итоговый статус приходит через <code>/api/background-operations/{id}/wait</code>. Здесь отображаются успешное завершение, ошибка или отмена операции.</p>
+      <ol id="events-list" class="events" aria-live="polite"></ol>
+      <p id="empty-events" class="muted empty">Пока событий нет.</p>
+    </section>
+  </main>
+</body>
+</html>
