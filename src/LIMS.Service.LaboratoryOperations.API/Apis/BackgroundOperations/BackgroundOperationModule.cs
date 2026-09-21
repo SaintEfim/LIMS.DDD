@@ -27,9 +27,9 @@ public sealed class BackgroundOperationModule : ICarterModule
 
     private static async Task<IResult> WaitAsync(
         Guid id,
-        [FromServices] ClaimsPrincipal user,
-        [FromServices] BackgroundOperationQueries queries,
-        [FromServices] HttpContext context,
+        ClaimsPrincipal user,
+        BackgroundOperationQueries queries,
+        HttpContext context,
         CancellationToken cancellationToken = default)
     {
         context.Response.Headers.CacheControl = "no-store";

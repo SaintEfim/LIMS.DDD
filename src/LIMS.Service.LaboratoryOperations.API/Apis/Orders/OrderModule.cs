@@ -81,7 +81,7 @@ public class OrderModule
     private static async Task<IResult> GenerateReportAsync(
         Guid id,
         ClaimsPrincipal user,
-        [FromServices] BackgroundOperationCommandsHandler commands,
+        BackgroundOperationCommandsHandler commands,
         CancellationToken cancellationToken = default)
     {
         var subject = user.FindFirstValue("user_id");
