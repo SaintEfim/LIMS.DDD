@@ -1,4 +1,4 @@
-﻿using Carter;
+using Carter;
 using LIMS.Service.Methodologies.Application.StudyTemplates.ResultDefinitions;
 using LIMS.Service.Methodologies.Application.StudyTemplates.ResultDefinitions.Commands;
 using Microsoft.AspNetCore.Mvc;
@@ -13,8 +13,7 @@ public class ResultDefinitionModule
         IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("/api/study-templates/{studyTemplateId:guid}/result-definitions")
-            .WithTags("ResultDefinitions")
-            .RequireAuthorization();
+            .WithTags("ResultDefinitions");
 
         group.MapGet("/", GetAll)
             .Produces<ICollection<ResultDefinitionDto>>();

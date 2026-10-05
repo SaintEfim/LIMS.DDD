@@ -1,4 +1,4 @@
-﻿using Carter;
+using Carter;
 using LIMS.Service.Methodologies.Application.StudyTemplates.CalculationRules;
 using LIMS.Service.Methodologies.Application.StudyTemplates.CalculationRules.Commands;
 using Microsoft.AspNetCore.Mvc;
@@ -13,8 +13,7 @@ public class CalculationRuleModule
         IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("/api/study-templates/{studyTemplateId:guid}/calculation-rules")
-            .WithTags("CalculationRules")
-            .RequireAuthorization();
+            .WithTags("CalculationRules");
 
         group.MapGet("/", GetAll)
             .Produces<ICollection<CalculationRuleDto>>();

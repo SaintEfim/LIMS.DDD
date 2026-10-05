@@ -1,29 +1,8 @@
 @methodologiesUrl = http://localhost:1001
 @laboratoryOperationsUrl = http://localhost:1002
 @unitServiceUrl = http://localhost:1003
-@keycloakUrl = http://localhost:8081
-@serviceClientId = lims-laboratory-operations
-@serviceClientSecret = lims-laboratory-operations-dev-secret
 
 @unitPercentId = "00000000-0000-0000-0000-000000000001"
-
-### ============================================
-### АВТОРИЗАЦИЯ
-### ============================================
-
-# @name getAccessToken
-POST {{keycloakUrl}}/realms/lims/protocol/openid-connect/token
-Content-Type: application/x-www-form-urlencoded
-
-grant_type=client_credentials&client_id={{serviceClientId}}&client_secret={{serviceClientSecret}}
-
-> {%
-  client.test("Get Keycloak access token", function () {
-    client.assert(response.status === 200, "Token request failed: " + response.status);
-    client.assert(response.body.access_token, "Keycloak did not return access_token");
-  });
-  client.global.set("accessToken", response.body.access_token);
-%}
 
 ### ============================================
 ### СОЗДАНИЕ UNITS
@@ -44,7 +23,6 @@ GET https://httpbin.org/delay/5
 
 # @name createMoistureTemplate
 POST {{methodologiesUrl}}/api/study-templates
-Authorization: Bearer {{accessToken}}
 Content-Type: application/json
 
 {
@@ -64,7 +42,6 @@ Content-Type: application/json
 
 # @name addMassBefore
 POST {{methodologiesUrl}}/api/study-templates/{{moistureTemplateId}}/input-parameters
-Authorization: Bearer {{accessToken}}
 Content-Type: application/json
 
 {
@@ -86,7 +63,6 @@ Content-Type: application/json
 
 # @name addMassAfter
 POST {{methodologiesUrl}}/api/study-templates/{{moistureTemplateId}}/input-parameters
-Authorization: Bearer {{accessToken}}
 Content-Type: application/json
 
 {
@@ -108,7 +84,6 @@ Content-Type: application/json
 
 # @name addEmptyMass
 POST {{methodologiesUrl}}/api/study-templates/{{moistureTemplateId}}/input-parameters
-Authorization: Bearer {{accessToken}}
 Content-Type: application/json
 
 {
@@ -130,7 +105,6 @@ Content-Type: application/json
 
 # @name addMoistureResult
 POST {{methodologiesUrl}}/api/study-templates/{{moistureTemplateId}}/result-definitions
-Authorization: Bearer {{accessToken}}
 Content-Type: application/json
 
 {
@@ -151,7 +125,6 @@ Content-Type: application/json
 
 # @name addDryMatterResult
 POST {{methodologiesUrl}}/api/study-templates/{{moistureTemplateId}}/result-definitions
-Authorization: Bearer {{accessToken}}
 Content-Type: application/json
 
 {
@@ -172,7 +145,6 @@ Content-Type: application/json
 
 # @name addMoistureCalculation
 POST {{methodologiesUrl}}/api/study-templates/{{moistureTemplateId}}/calculation-rules
-Authorization: Bearer {{accessToken}}
 Content-Type: application/json
 
 {
@@ -193,7 +165,6 @@ Content-Type: application/json
 
 # @name approveMoistureTemplate
 POST {{methodologiesUrl}}/api/study-templates/{{moistureTemplateId}}/change-status?newStatus=Active
-Authorization: Bearer {{accessToken}}
 
 > {%
   client.test("Approve moisture template", function () {
@@ -205,7 +176,6 @@ Authorization: Bearer {{accessToken}}
 
 # @name createMoistureRevision
 POST {{methodologiesUrl}}/api/study-templates/{{moistureTemplateId}}/create-revision
-Authorization: Bearer {{accessToken}}
 Content-Type: application/json
 
 {
@@ -223,7 +193,6 @@ Content-Type: application/json
 
 # @name approveMoistureTemplateV2
 POST {{methodologiesUrl}}/api/study-templates/{{moistureTemplateV2Id}}/change-status?newStatus=Active
-Authorization: Bearer {{accessToken}}
 
 > {%
   client.test("Approve moisture template V2", function () {
@@ -247,7 +216,6 @@ GET https://httpbin.org/delay/5
 
 # @name createOrder
 POST {{laboratoryOperationsUrl}}/api/orders
-Authorization: Bearer {{accessToken}}
 Content-Type: application/json
 
 {
@@ -270,7 +238,6 @@ Content-Type: application/json
 
 # @name createSample
 POST {{laboratoryOperationsUrl}}/api/orders/{{orderId}}/samples
-Authorization: Bearer {{accessToken}}
 Content-Type: application/json
 
 {
@@ -295,7 +262,6 @@ Content-Type: application/json
 
 # @name createStudy
 POST {{laboratoryOperationsUrl}}/api/samples/{{sampleId}}/studies
-Authorization: Bearer {{accessToken}}
 Content-Type: application/json
 
 {
@@ -316,7 +282,6 @@ Content-Type: application/json
 
 # @name getStudyDetails
 GET {{laboratoryOperationsUrl}}/api/samples/{{sampleId}}/studies/{{studyId}}
-Authorization: Bearer {{accessToken}}
 
 > {%
   client.test("Get study details", function () {
@@ -361,7 +326,6 @@ Authorization: Bearer {{accessToken}}
 
 # @name updateMassBefore
 PATCH {{laboratoryOperationsUrl}}/api/studies/{{studyId}}/measured-values/{{massBeforeMvId}}
-Authorization: Bearer {{accessToken}}
 Content-Type: application/json
 
 {
@@ -379,7 +343,6 @@ Content-Type: application/json
 
 # @name updateMassAfter
 PATCH {{laboratoryOperationsUrl}}/api/studies/{{studyId}}/measured-values/{{massAfterMvId}}
-Authorization: Bearer {{accessToken}}
 Content-Type: application/json
 
 {
@@ -397,7 +360,6 @@ Content-Type: application/json
 
 # @name updateEmptyMass
 PATCH {{laboratoryOperationsUrl}}/api/studies/{{studyId}}/measured-values/{{emptyMassMvId}}
-Authorization: Bearer {{accessToken}}
 Content-Type: application/json
 
 {
@@ -417,7 +379,6 @@ Content-Type: application/json
 
 # @name executeMoistureResult
 POST {{laboratoryOperationsUrl}}/api/studies/{{studyId}}/test-results/{{moistureResultTrId}}/execute
-Authorization: Bearer {{accessToken}}
 
 > {%
   client.test("Execute moisture calculation", function () {
@@ -433,7 +394,6 @@ Authorization: Bearer {{accessToken}}
 
 # @name completeStudy
 POST {{laboratoryOperationsUrl}}/api/samples/{{sampleId}}/studies/{{studyId}}/change-status
-Authorization: Bearer {{accessToken}}
 Content-Type: application/json
 
 {
@@ -453,7 +413,6 @@ Content-Type: application/json
 ### ============================================
 
 GET {{laboratoryOperationsUrl}}/api/samples/{{sampleId}}/studies/{{studyId}}
-Authorization: Bearer {{accessToken}}
 
 > {%
   client.test("Verify final study state", function () {

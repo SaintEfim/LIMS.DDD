@@ -1,4 +1,4 @@
-﻿using Carter;
+using Carter;
 using LIMS.Service.Methodologies.Application.StudyTemplates.InputParameters;
 using LIMS.Service.Methodologies.Application.StudyTemplates.InputParameters.Commands;
 using Microsoft.AspNetCore.Mvc;
@@ -13,8 +13,7 @@ public class InputParameterModule
         IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("/api/study-templates/{studyTemplateId:guid}/input-parameters")
-            .WithTags("InputParameters")
-            .RequireAuthorization();
+            .WithTags("InputParameters");
 
         group.MapGet("/", GetAll)
             .Produces<ICollection<InputParameterDto>>();

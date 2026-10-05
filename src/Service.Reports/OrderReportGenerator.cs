@@ -1,6 +1,6 @@
 using System.Data;
 using FastReport;
-using FastReport.Export.Pdf;
+using FastReport.Export.PdfSimple;
 using Service.Reports.Client.Models;
 
 namespace Service.Reports;
@@ -32,6 +32,7 @@ public sealed class OrderReportGenerator
         AddText(title, $"Description: {order.Description}", 0, 85, 700, 40);
 
         report.RegisterData(samples, "Samples");
+        report.GetDataSource("Samples").Enabled = true;
         var band = new DataBand
         {
             Height = 90,
@@ -54,7 +55,7 @@ public sealed class OrderReportGenerator
 
         report.Prepare();
         using var output = new MemoryStream();
-        using var export = new PDFExport();
+        using var export = new PDFSimpleExport();
         report.Export(export, output);
         return output.ToArray();
     }

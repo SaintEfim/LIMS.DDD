@@ -173,7 +173,7 @@ cd LIMS.DDD
 
 ## 2. Запуск инфраструктуры в Docker
 
-PostgreSQL, RabbitMQ и Keycloak описаны в `docker-compose.yml`. Скрипт `run-lims.cmd` поднимает их автоматически. Для ручного запуска выполните:
+PostgreSQL и RabbitMQ описаны в `docker-compose.yml`. Скрипт `run-lims.cmd` поднимает их автоматически. Для ручного запуска выполните:
 
 ```powershell
 docker compose up -d
@@ -184,7 +184,6 @@ docker compose up -d
 * PostgreSQL: `localhost:5432`, `postgres` / `1234`;
 * AMQP: `localhost:5672`
 * RabbitMQ Management UI: [http://localhost:15672](http://localhost:15672)
-* Keycloak: [http://localhost:8081](http://localhost:8081)
 
 Для стандартной конфигурации контейнера:
 
@@ -202,42 +201,6 @@ Password: guest
 Устройство фоновых обработчиков и HTTP Long Polling для ожидания результата описаны в [документации](docs/background-operations.md).
 Тестовая страница в Development: [проверка отчётов](http://localhost:1002/report-test/index.html).
 
-## Авторизация через Keycloak
-
-HTTP API сервисов `LIMS.Service.LaboratoryOperations`, `LIMS.Service.Methodologies`, `Service.Guides` и `Service.Reports` принимают только access token, выпущенный Keycloak realm `lims` для аудитории `lims-api`.
-
-Keycloak запускается общим `docker-compose.yml` с импортом подготовленного realm. Отдельно можно поднять только Keycloak:
-
-```bash
-docker compose -f docker-compose.keycloak.yml up -d
-```
-
-После изменения порта пересоздайте контейнер Keycloak и перезапустите API. Проверьте, что адрес ниже возвращает JSON с `issuer` равным `http://localhost:8081/realms/lims`:
-
-```powershell
-Invoke-RestMethod 'http://localhost:8081/realms/lims/.well-known/openid-configuration'
-```
-
-Затем заново выполните **Authorize** в Swagger: токены, выданные для прежнего адреса `localhost:8080`, больше не подходят.
-
-Административная консоль доступна по адресу [http://localhost:8081](http://localhost:8081). Учётные данные администратора для development-контура по умолчанию: `admin` / `admin`. Их можно переопределить переменными окружения `KEYCLOAK_ADMIN_USERNAME` и `KEYCLOAK_ADMIN_PASSWORD`.
-
-Импорт создаёт realm `lims`, public OIDC clients `lims-frontend` и `lims-swagger`, аудиторию API `lims-api` и пользователя `laboratory.user` с ролью `laboratory-user`. Его начальный пароль — `lims-dev-password`; Keycloak попросит сменить его при первом входе.
-
-В Swagger UI каждого API нажмите **Authorize**, выберите Keycloak и войдите под `laboratory.user`. Swagger использует Authorization Code Flow с PKCE и передаёт полученный JWT в запросах к API. Клиент `lims-swagger` разрешает callback-адреса Swagger на портах `1001`, `1002` и `1003`.
-
-`LIMS.Service.LaboratoryOperations` передаёт исходный access token в синхронный запрос к `Service.Reports`. Для фоновой генерации отчётов используется service account клиента `lims-laboratory-operations` через Client Credentials.
-
-Если Keycloak уже был запущен до появления клиента `lims-swagger`, пересоздайте development-контейнер, чтобы realm импортировался заново:
-
-```bash
-docker compose -f docker-compose.keycloak.yml down
-docker compose -f docker-compose.keycloak.yml up -d
-```
-
-Адрес realm и аудитория API задаются в `Keycloak:Authority` и `Keycloak:Audience` в `appsettings.json`. В production необходимо включить HTTPS metadata и заменить development-конфигурацию Keycloak.
-
----
 
 ## 3. Настройка PostgreSQL
 
@@ -305,7 +268,7 @@ run-lims.cmd
 
 Скрипт последовательно:
 
-1. поднимает PostgreSQL, RabbitMQ и Keycloak через Docker Compose;
+1. поднимает PostgreSQL и RabbitMQ через Docker Compose;
 2. ожидает готовности инфраструктуры;
 3. собирает solution;
 4. применяет миграции `GuidesDb`, `MethodologiesDb` и `LaboratoryOperationsDb`;
@@ -1144,7 +1107,6 @@ COMMIT
 | **Carter**                   | Организация Minimal API endpoints |
 | **NoStringEvaluating**       | Движок формул                     |
 | **FastReport.Core**          | Формирование PDF-отчётов          |
-| **Keycloak**                 | OpenID Connect и выдача JWT        |
 | **Swagger / OpenAPI**        | API documentation                 |
 | **Mermaid**                  | Архитектурные и бизнес-диаграммы  |
 | **Git**                      | Version Control                   |
@@ -1182,7 +1144,6 @@ Service.Reports                         http://localhost:1004
 PostgreSQL:          localhost:5432
 RabbitMQ AMQP:       localhost:5672
 RabbitMQ Management: localhost:15672
-Keycloak:            localhost:8081
 ```
 
 ## Демонстрационный сценарий

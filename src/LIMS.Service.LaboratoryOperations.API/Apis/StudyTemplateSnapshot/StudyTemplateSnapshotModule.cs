@@ -1,4 +1,4 @@
-﻿using Carter;
+using Carter;
 using LIMS.Service.LaboratoryOperations.Application.StudyTemplates;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,8 +12,7 @@ public class StudyTemplateSnapshotModule
         IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("/api/study-template-snapshots")
-            .WithTags("StudyTemplateSnapshots")
-            .RequireAuthorization();
+            .WithTags("StudyTemplateSnapshots");
 
         group.MapGet("/", GetAll)
             .Produces<ICollection<StudyTemplateDto>>();

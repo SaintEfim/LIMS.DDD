@@ -1,4 +1,3 @@
-﻿using System.Security.Claims;
 using Carter;
 using LIMS.Service.LaboratoryOperations.Application.BackgroundOperations;
 using LIMS.Service.LaboratoryOperations.Application.Orders;
@@ -20,8 +19,7 @@ public class OrderModule
         IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("/api/orders")
-            .WithTags("Orders")
-            .RequireAuthorization();
+            .WithTags("Orders");
 
         group.MapGet("/", GetAll)
             .Produces<ICollection<OrderDto>>();
@@ -37,8 +35,7 @@ public class OrderModule
 
         group.MapPost("/{id:guid}/report-async", GenerateReportAsync)
             .Produces(StatusCodes.Status202Accepted)
-            .Produces(StatusCodes.Status400BadRequest)
-            .Produces(StatusCodes.Status403Forbidden);
+            .Produces(StatusCodes.Status400BadRequest);
 
         group.MapPost("/", Create)
             .Produces(StatusCodes.Status201Created)
@@ -80,18 +77,10 @@ public class OrderModule
 
     private static async Task<IResult> GenerateReportAsync(
         Guid id,
-        ClaimsPrincipal user,
         [FromServices] BackgroundOperationCommandsHandler commands,
         CancellationToken cancellationToken = default)
     {
-        var subject = user.FindFirstValue("user_id");
-
-        if (!Guid.TryParse(subject, out var userId))
-        {
-            return Results.Forbid();
-        }
-
-        var command = new CreateBackgroundOperationCommand(RequestedByUserId: userId,
+        var command = new CreateBackgroundOperationCommand(RequestedByUserId: Guid.Empty,
             Type: OperationType.GenerateReport, Payload: JObject.FromObject(new ReportPayload(id)));
 
         var result = await commands.CreateAsync(command, cancellationToken);

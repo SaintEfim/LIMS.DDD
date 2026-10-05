@@ -1,4 +1,4 @@
-﻿using Carter;
+using Carter;
 using LIMS.Service.LaboratoryOperations.Application.Samples;
 using LIMS.Service.LaboratoryOperations.Application.Samples.Commands;
 using LIMS.Service.LaboratoryOperations.Domain.OrderAggregate;
@@ -14,8 +14,7 @@ public class SampleModule
         IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("/api/orders/{orderId:guid}/samples")
-            .WithTags("Samples")
-            .RequireAuthorization();
+            .WithTags("Samples");
 
         group.MapGet("/", GetAll)
             .Produces<ICollection<SampleDto>>();

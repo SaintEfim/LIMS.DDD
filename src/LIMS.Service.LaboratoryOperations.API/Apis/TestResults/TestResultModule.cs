@@ -1,4 +1,4 @@
-﻿using Carter;
+using Carter;
 using LIMS.Service.LaboratoryOperations.Application.Studies.TestResults;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,8 +12,7 @@ public class TestResultModule
         IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("/api/studies/{studyId:guid}/test-results")
-            .WithTags("TestResults")
-            .RequireAuthorization();
+            .WithTags("TestResults");
 
         group.MapGet("/", GetAll)
             .Produces<ICollection<TestResultDto>>();
