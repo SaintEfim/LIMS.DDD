@@ -184,8 +184,6 @@ call :wait_for_port localhost 5432 PostgreSQL 90
 if errorlevel 1 exit /b 1
 call :wait_for_port localhost 5672 RabbitMQ 90
 if errorlevel 1 exit /b 1
-call :wait_for_url "http://localhost:8081/realms/lims/.well-known/openid-configuration" Keycloak 120
-if errorlevel 1 exit /b 1
 echo.
 exit /b 0
 

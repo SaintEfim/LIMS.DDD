@@ -1,82 +1,28 @@
 using Carter;
 using LIMS.Service.LaboratoryOperations.API;
 using LIMS.Service.LaboratoryOperations.API.BackgroundServices;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi;
 using NoStringEvaluating.Extensions.Microsoft.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddCarter();
-builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddNoStringEvaluator();
 
 
-var keycloak = builder.Configuration.GetRequiredSection("Keycloak");
-var keycloakAuthority = keycloak.GetValue<string>("Authority")!;
-var keycloakSwaggerClientId = keycloak.GetValue<string>("SwaggerClientId")!;
-
-builder.Services.AddSwaggerGen(options =>
-{
-    options.AddSecurityDefinition("Keycloak", new OpenApiSecurityScheme
-    {
-        Type = SecuritySchemeType.OAuth2,
-        Flows = new OpenApiOAuthFlows
-        {
-            AuthorizationCode = new OpenApiOAuthFlow
-            {
-                AuthorizationUrl = new Uri($"{keycloakAuthority}/protocol/openid-connect/auth"),
-                TokenUrl = new Uri($"{keycloakAuthority}/protocol/openid-connect/token"),
-                Scopes = new Dictionary<string, string>
-                {
-                    ["openid"] = "OpenID Connect"
-                }
-            }
-        }
-    });
-    options.AddSecurityRequirement(document => new OpenApiSecurityRequirement
-    {
-        [new OpenApiSecuritySchemeReference("Keycloak", document)] = ["openid"]
-    });
-});
-
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        options.Authority = keycloakAuthority;
-        options.Audience = keycloak["Audience"];
-        options.RequireHttpsMetadata = keycloak.GetValue("RequireHttpsMetadata", true);
-        options.MapInboundClaims = false;
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            NameClaimType = "user_id",
-            ValidIssuer = keycloakAuthority
-        };
-    });
-
-builder.Services.AddAuthorization();
+builder.Services.AddSwaggerGen();
 
 builder.Services.AddApi(builder.Configuration);
 builder.Services.AddHostedService<BackgroundOperationWorker>();
 
 var app = builder.Build();
 
-app.UseAuthentication();
-app.UseAuthorization();
 
 if (app.Environment.IsDevelopment())
 {
     app.UseStaticFiles();
     app.UseSwagger();
-    app.UseSwaggerUI(options =>
-    {
-        options.OAuthClientId(keycloakSwaggerClientId);
-        options.OAuthUsePkce();
-        options.OAuthScopeSeparator(" ");
-        options.OAuthScopes("openid");
-    });
+    app.UseSwaggerUI();
 }
 
 app.MapCarter();

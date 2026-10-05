@@ -1,17 +1,8 @@
-const authority = "http://localhost:8081/realms/lims";
-const clientId = "lims-frontend";
-const redirectUri = `${location.origin}${location.pathname}`;
-const tokenKey = "lims-report-test.tokens";
-const stateKey = "lims-report-test.oauth-state";
-const verifierKey = "lims-report-test.pkce-verifier";
 const guidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 const elements = {
-  login: document.getElementById("login-button"),
   connect: document.getElementById("connect-button"),
-  logout: document.getElementById("logout-button"),
   connection: document.getElementById("connection-status"),
-  user: document.getElementById("user-info"),
   orderId: document.getElementById("order-id"),
   loadOrders: document.getElementById("load-orders-button"),
   orders: document.getElementById("orders-select"),
@@ -23,51 +14,13 @@ const elements = {
 };
 
 let polling;
-let refreshInProgress;
 let requestInProgress = false;
 const operationKey = "lims-report-test.operation";
 
-function storedTokens() {
-  try {
-    return JSON.parse(sessionStorage.getItem(tokenKey) || "null");
-  } catch {
-    return null;
-  }
-}
-
-function storeTokens(response) {
-  const previous = storedTokens();
-  sessionStorage.setItem(tokenKey, JSON.stringify({
-    accessToken: response.access_token,
-    refreshToken: response.refresh_token || previous?.refreshToken,
-    expiresAt: Date.now() + response.expires_in * 1000
-  }));
-  updateControls();
-}
-
-function tokenClaims(accessToken) {
-  try {
-    const payload = accessToken.split(".")[1].replace(/-/g, "+").replace(/_/g, "/");
-    const bytes = Uint8Array.from(atob(payload), character => character.charCodeAt(0));
-    return JSON.parse(new TextDecoder().decode(bytes));
-  } catch {
-    return {};
-  }
-}
-
 function updateControls() {
-  const tokens = storedTokens();
-  const claims = tokens ? tokenClaims(tokens.accessToken) : {};
-  elements.login.disabled = Boolean(tokens);
-  elements.connect.disabled = !tokens || Boolean(polling) || !sessionStorage.getItem(operationKey);
-  elements.logout.disabled = !tokens;
-  elements.loadOrders.disabled = !tokens;
-  elements.create.disabled = !tokens || Boolean(polling) || requestInProgress;
-  elements.user.textContent = tokens
-    ? `Пользователь: ${claims.preferred_username || "—"} · user_id: ${claims.user_id || "отсутствует в access token"}`
-    : "Войдите через Keycloak, чтобы получить токен пользователя.";
+  elements.connect.disabled = Boolean(polling) || !sessionStorage.getItem(operationKey);
+  elements.create.disabled = Boolean(polling) || requestInProgress;
 }
-
 function setConnectionStatus(text, className = "") {
   elements.connection.textContent = text;
   elements.connection.className = `badge ${className}`.trim();
@@ -95,96 +48,8 @@ function addEvent(title, data) {
   elements.events.prepend(item);
 }
 
-function randomBase64Url(length) {
-  const bytes = crypto.getRandomValues(new Uint8Array(length));
-  return btoa(String.fromCharCode(...bytes)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
-}
-
-async function sha256Base64Url(value) {
-  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(value));
-  return btoa(String.fromCharCode(...new Uint8Array(digest)))
-    .replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
-}
-
-async function beginLogin() {
-  const state = randomBase64Url(24);
-  const verifier = randomBase64Url(32);
-  sessionStorage.setItem(stateKey, state);
-  sessionStorage.setItem(verifierKey, verifier);
-
-  const url = new URL(`${authority}/protocol/openid-connect/auth`);
-  url.search = new URLSearchParams({
-    client_id: clientId,
-    redirect_uri: redirectUri,
-    response_type: "code",
-    scope: "openid",
-    state,
-    code_challenge: await sha256Base64Url(verifier),
-    code_challenge_method: "S256"
-  }).toString();
-  location.assign(url.href);
-}
-
-async function requestTokens(parameters) {
-  const response = await fetch(`${authority}/protocol/openid-connect/token`, {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: new URLSearchParams(parameters)
-  });
-  if (!response.ok) {
-    throw new Error(`Keycloak вернул HTTP ${response.status} при получении токена.`);
-  }
-  return response.json();
-}
-
-async function finishLogin() {
-  const query = new URLSearchParams(location.search);
-  if (!query.has("code") && !query.has("error")) return;
-
-  history.replaceState({}, "", redirectUri);
-  const expectedState = sessionStorage.getItem(stateKey);
-  const verifier = sessionStorage.getItem(verifierKey);
-  sessionStorage.removeItem(stateKey);
-  sessionStorage.removeItem(verifierKey);
-
-  if (query.has("error")) throw new Error(`Keycloak: ${query.get("error_description") || query.get("error")}`);
-  if (!expectedState || !verifier || query.get("state") !== expectedState) {
-    throw new Error("Не совпало состояние входа. Запустите авторизацию заново.");
-  }
-
-  const tokens = await requestTokens({
-    grant_type: "authorization_code",
-    client_id: clientId,
-    code: query.get("code"),
-    redirect_uri: redirectUri,
-    code_verifier: verifier
-  });
-  storeTokens(tokens);
-  addEvent("Вход выполнен");
-}
-
-async function accessToken() {
-  const tokens = storedTokens();
-  if (!tokens) throw new Error("Сначала войдите через Keycloak.");
-  if (Date.now() < tokens.expiresAt - 30_000) return tokens.accessToken;
-  if (!tokens.refreshToken) throw new Error("Срок действия токена истёк. Войдите снова.");
-
-  if (!refreshInProgress) {
-    refreshInProgress = requestTokens({
-      grant_type: "refresh_token",
-      client_id: clientId,
-      refresh_token: tokens.refreshToken
-    }).then(storeTokens).finally(() => { refreshInProgress = undefined; });
-  }
-  await refreshInProgress;
-  return storedTokens().accessToken;
-}
-
-async function authorizedFetch(path, options = {}) {
-  const response = await fetch(path, {
-    ...options,
-    headers: { ...options.headers, Authorization: `Bearer ${await accessToken()}` }
-  });
+async function apiFetch(path, options = {}) {
+  const response = await fetch(path, options);
   if (!response.ok) {
     const body = await response.text();
     throw new Error(`HTTP ${response.status}${body ? `: ${body.slice(0, 300)}` : ""}`);
@@ -193,7 +58,7 @@ async function authorizedFetch(path, options = {}) {
 }
 
 async function loadOrders() {
-  const response = await authorizedFetch("/api/orders");
+  const response = await apiFetch("/api/orders");
   const orders = await response.json();
   elements.orders.replaceChildren();
   for (const order of orders) {
@@ -215,7 +80,7 @@ async function createOperation() {
   updateControls();
   setResult("Отправляем запрос…");
   try {
-    const response = await authorizedFetch(`/api/orders/${orderId}/report-async`, { method: "POST" });
+    const response = await apiFetch(`/api/orders/${orderId}/report-async`, { method: "POST" });
     const operation = await response.json();
     sessionStorage.setItem(operationKey, operation.operationId);
     setResult(`Операция ${operation.operationId} создана. Ожидаем завершения…`);
@@ -238,7 +103,6 @@ function run(action) {
   };
 }
 
-elements.login.addEventListener("click", run(beginLogin));
 elements.connect.addEventListener("click", run(waitForOperation));
 elements.loadOrders.addEventListener("click", run(loadOrders));
 elements.create.addEventListener("click", run(createOperation));
@@ -247,19 +111,10 @@ elements.clear.addEventListener("click", () => {
   elements.events.replaceChildren();
   elements.empty.hidden = false;
 });
-elements.logout.addEventListener("click", run(async () => {
-  polling?.abort();
-  polling = undefined;
-  sessionStorage.removeItem(tokenKey);
-  sessionStorage.removeItem(operationKey);
-  setConnectionStatus("Нет активного ожидания");
-  setResult("Локальная сессия очищена.");
-}));
 
 run(async () => {
-  await finishLogin();
   updateControls();
-  if (storedTokens() && sessionStorage.getItem(operationKey)) await waitForOperation();
+  if (sessionStorage.getItem(operationKey)) await waitForOperation();
 })();
 
 async function waitForOperation() {
@@ -275,7 +130,6 @@ async function waitForOperation() {
       let response;
       try {
         response = await fetch(`/api/background-operations/${encodeURIComponent(id)}/wait`, {
-          headers: { Authorization: `Bearer ${await accessToken()}` },
           cache: "no-store",
           signal: controller.signal
         });

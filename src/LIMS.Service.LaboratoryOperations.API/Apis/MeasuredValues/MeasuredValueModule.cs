@@ -1,4 +1,4 @@
-﻿using Carter;
+using Carter;
 using LIMS.Service.LaboratoryOperations.Application.Studies.MeasuredValues;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,8 +12,7 @@ public class MeasuredValueModule
         IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("/api/studies/{studyId:guid}/measured-values")
-            .WithTags("MeasuredValues")
-            .RequireAuthorization();
+            .WithTags("MeasuredValues");
 
         group.MapGet("/", GetAll)
             .Produces<ICollection<MeasuredValueDto>>();

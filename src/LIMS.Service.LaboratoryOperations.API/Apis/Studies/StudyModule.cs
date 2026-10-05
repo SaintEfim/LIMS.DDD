@@ -1,4 +1,4 @@
-﻿using Carter;
+using Carter;
 using LIMS.Service.LaboratoryOperations.Application.Studies.Core;
 using LIMS.Service.LaboratoryOperations.Application.Studies.Core.Commands;
 using LIMS.Service.LaboratoryOperations.Domain.SampleAggregate;
@@ -14,8 +14,7 @@ public class StudyModule
         IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("/api/samples/{sampleId:guid}/studies")
-            .WithTags("Studies")
-            .RequireAuthorization();
+            .WithTags("Studies");
 
         group.MapGet("/", GetAll)
             .Produces<ICollection<StudyDto>>();

@@ -1,4 +1,4 @@
-﻿using Carter;
+using Carter;
 using Service.Guides.Application.Commands;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,8 +12,7 @@ public class UnitModule
         IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("/api/units")
-            .WithTags("Units")
-            .RequireAuthorization();
+            .WithTags("Units");
 
         group.MapGet("/", GetAll)
             .Produces<ICollection<UnitDto>>();

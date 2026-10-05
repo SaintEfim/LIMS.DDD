@@ -16,11 +16,6 @@ public sealed class BackgroundOperation : IAggregateRoot
         OperationType type,
         JObject payload)
     {
-        if (requestedByUserId == Guid.Empty)
-        {
-            throw new ArgumentException("Requested-by user id must be specified.", nameof(requestedByUserId));
-        }
-
         if (payload is null)
         {
             throw new ArgumentException("Operation payload must be specified.", nameof(payload));

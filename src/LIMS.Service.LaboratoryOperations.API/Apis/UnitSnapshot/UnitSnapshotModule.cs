@@ -1,4 +1,4 @@
-﻿using Carter;
+using Carter;
 using LIMS.Service.LaboratoryOperations.Application.Units;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,8 +12,7 @@ public class UnitSnapshotModule
         IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("/api/unit-snapshots")
-            .WithTags("UnitSnapshots")
-            .RequireAuthorization();
+            .WithTags("UnitSnapshots");
 
         group.MapGet("/", GetAll)
             .Produces<ICollection<UnitSnapshotDto>>();

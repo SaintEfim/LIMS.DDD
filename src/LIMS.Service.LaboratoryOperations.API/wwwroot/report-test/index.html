@@ -12,22 +12,19 @@
     <header class="hero">
       <div class="eyebrow">LIMS / LABORATORY OPERATIONS</div>
       <h1>Асинхронный отчёт</h1>
-      <p>Авторизация → создание операции → ожидание результата через HTTP Long Polling.</p>
+      <p> создание операции → ожидание результата через HTTP Long Polling.</p>
     </header>
 
     <section class="card" aria-labelledby="session-title">
       <div class="section-head">
         <div>
-          <span class="step">01 / СЕССИЯ</span>
-          <h2 id="session-title">Пользователь и ожидание</h2>
+          <span class="step">01 / ОЖИДАНИЕ</span>
+          <h2 id="session-title">Ожидание результата</h2>
         </div>
         <span id="connection-status" class="badge">Нет активного ожидания</span>
       </div>
-      <p id="user-info" class="muted">Войдите через Keycloak, чтобы получить токен пользователя.</p>
       <div class="actions">
-        <button id="login-button" class="primary">Войти через Keycloak</button>
         <button id="connect-button" disabled>Возобновить ожидание</button>
-        <button id="logout-button" disabled>Очистить локальную сессию</button>
       </div>
       <p class="hint">После создания операции сервер держит HTTP-запрос до 25 секунд. Если результат ещё не готов, страница повторяет запрос. Ожидание восстанавливается после обновления страницы.</p>
     </section>
@@ -43,11 +40,11 @@
       <div class="form-row">
         <label for="order-id">ID заказа</label>
         <input id="order-id" type="text" inputmode="text" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" autocomplete="off" spellcheck="false">
-        <button id="load-orders-button" disabled>Загрузить заказы</button>
+        <button id="load-orders-button">Загрузить заказы</button>
       </div>
       <select id="orders-select" class="orders-select" aria-label="Выбрать заказ" hidden></select>
       <div class="actions">
-        <button id="create-button" class="primary" disabled>Создать операцию</button>
+        <button id="create-button" class="primary">Создать операцию</button>
       </div>
       <p id="request-result" class="result muted" role="status">Ожидание запроса.</p>
     </section>
