@@ -270,9 +270,9 @@ if not exist "%PROJECT_FILE%" (
 
 echo --- Starting [%TITLE%] ---
 if "%USE_WT%"=="1" (
-    start "" wt.exe new-tab --title "%TITLE%" -d "%PROJECT_DIR%" cmd /K "set ASPNETCORE_ENVIRONMENT=%ASPNETCORE_ENVIRONMENT% && dotnet run --project ""%PROJECT_FILE%"" --no-build --configuration %LIMS_BUILD_CONFIGURATION%"
+    start "" wt.exe new-tab --title "%TITLE%" -d "%PROJECT_DIR%" cmd /K dotnet run --no-build --configuration %LIMS_BUILD_CONFIGURATION%
 ) else (
-    start "%TITLE%" cmd /K "cd /d ""%PROJECT_DIR%"" && set ASPNETCORE_ENVIRONMENT=%ASPNETCORE_ENVIRONMENT% && dotnet run --project ""%PROJECT_FILE%"" --no-build --configuration %LIMS_BUILD_CONFIGURATION%"
+    start "%TITLE%" /D "%PROJECT_DIR%" cmd /K dotnet run --no-build --configuration %LIMS_BUILD_CONFIGURATION%
 )
 exit /b 0
 
