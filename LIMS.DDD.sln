@@ -80,12 +80,17 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Service.Reports.Client", "s
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Service.Reports.Client.Abstractions", "src\Service.Reports.Client.Abstractions\Service.Reports.Client.Abstractions.csproj", "{121359D3-1D62-4793-BFD2-2C5F4BD7A5E6}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{0AB3BF05-4346-4AA6-1389-037BE0695223}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Service.Guides.Tests", "tests\Service.Guides.Tests\Service.Guides.Tests.csproj", "{26E65B82-AB6B-4481-AEF4-B069CDADB97E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
+		{26E65B82-AB6B-4481-AEF4-B069CDADB97E} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
 		{9EDAEF6A-F590-495C-B262-EABC3657860D} = {ECDC5063-8703-4563-90ED-9CA188064DC8}
 		{ADD698B0-821B-4B14-9A9E-52481CC0FBE2} = {7570D6EF-62DD-4245-B8DC-8630259BB493}
 		{BC2E4D27-0685-4194-A258-9C6C2A6A6AB7} = {3CD25C1E-D65B-46F0-9DBE-DF904FFCCF79}
@@ -117,6 +122,10 @@ Global
 		{121359D3-1D62-4793-BFD2-2C5F4BD7A5E6} = {04C41116-71CB-42B1-B40C-C5C4F98830EB}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{26E65B82-AB6B-4481-AEF4-B069CDADB97E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{26E65B82-AB6B-4481-AEF4-B069CDADB97E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{26E65B82-AB6B-4481-AEF4-B069CDADB97E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{26E65B82-AB6B-4481-AEF4-B069CDADB97E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{84FBFE31-7AC3-462A-9B67-CB6887BC21C0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{84FBFE31-7AC3-462A-9B67-CB6887BC21C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{84FBFE31-7AC3-462A-9B67-CB6887BC21C0}.Release|Any CPU.ActiveCfg = Release|Any CPU

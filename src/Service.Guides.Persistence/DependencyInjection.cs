@@ -1,4 +1,4 @@
-﻿using Service.Guides.Domain;
+using Service.Guides.Domain;
 using Library.Domain.SeedWork;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -15,6 +15,7 @@ public static class DependencyInjection
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         services.AddScoped<IUnitRepository, UnitRepository>();
+        services.AddScoped<Service.Guides.Domain.Sites.ISiteRepository, SiteRepository>();
         services.AddScoped<UnitSeeder>();
 
         services.AddDbContext<ApplicationDbContext>(options =>
